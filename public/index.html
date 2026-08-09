@@ -4,14 +4,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DomiKnow — Premium Rental & Boarding House Finder in Siniloan, Laguna</title>
+    <title>DOMIKNOW — Verified Rentals and Property Operations in Siniloan</title>
     <link href="css/input.css" rel="stylesheet">
+    <link href="css/design-system.css" rel="stylesheet">
+    <link href="css/public-refinement.css" rel="stylesheet">
     <!-- Leaflet.js for interactive property map -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap"
-        rel="stylesheet">
     <style>
         :root {
             /* DOMIKNOW LIGHT MODE COLOR PALETTE (From Specs) */
@@ -73,7 +72,7 @@
         }
 
         body {
-            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            font-family: Inter, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             background-color: var(--bg-color);
             color: var(--text-normal);
             min-height: 100vh;
@@ -87,7 +86,7 @@
         h3,
         h4,
         .brand-font {
-            font-family: 'Outfit', sans-serif;
+            font-family: inherit;
         }
 
         /* ── NOISE OVERLAY ── */
@@ -1478,6 +1477,8 @@
             line-height: 1.6;
         }
     </style>
+    <link href="css/design-system.css" rel="stylesheet">
+    <script src="js/ui.js" defer></script>
 </head>
 
 <body>
@@ -1489,73 +1490,72 @@
         <rect width="100%" height="100%" filter="url(#noiseFilter)" />
     </svg>
 
-    <!-- ════════ PREMIUM HERO ════════ -->
+    <!-- Public product hero -->
     <div class="aurora-hero-wrapper">
 
         <!-- Navbar -->
         <header class="landing-header" id="mainHeader">
             <!-- Logo -->
-            <a href="index.html" class="logo">
-                <span>DomiKnow<sup>™</sup></span>
+            <a href="index.html" class="logo brand-lockup" aria-label="DOMIKNOW home">
+                <span class="brand-mark" aria-hidden="true">
+                    <span class="brand-mark-dot brand-mark-dot-primary"></span>
+                    <span class="brand-mark-dot brand-mark-dot-left"></span>
+                    <span class="brand-mark-dot brand-mark-dot-right"></span>
+                </span>
+                <span class="brand-wordmark"><span class="brand-wordmark-domi">DOMI</span><span class="brand-wordmark-know">KNOW</span></span>
             </a>
 
             <!-- Centered Nav -->
-            <nav class="nav-links">
-                <a href="#searchSection" class="nav-link">Search Map</a>
-                <a href="#featuresSection" class="nav-link">Features</a>
+            <nav class="nav-links" aria-label="Primary navigation">
+                <a href="#searchSection" class="nav-link">Properties</a>
+                <a href="#searchMap" class="nav-link">Map</a>
                 <a href="#howItWorks" class="nav-link">How It Works</a>
             </nav>
 
             <!-- Auth / CTA Button -->
             <div class="auth-buttons">
-                <a href="/pages/auth/login.html" class="btn btn-primary btn-hero-cta">
-                    <span>Explore Listings</span>
-                    <span class="btn-arrow-circle">
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
-                    </span>
-                </a>
+                <a href="/pages/auth/login.html" class="btn btn-secondary">Log in</a>
+                <a href="/pages/auth/register.html" class="btn btn-primary btn-hero-cta">Create account</a>
+                <button type="button" class="theme-toggle" data-theme-toggle aria-label="Switch color theme"></button>
             </div>
         </header>
 
-        <!-- Giant backdrop headline -->
-        <h1 class="hero-backdrop-title">DOMIKNOW</h1>
-
-        <!-- Dark info card -->
-        <div class="hero-dark-card">
-
-            <!-- Floating 3D Skyscraper Building Illustration (User Uploaded & Background Cleaned) -->
-            <div class="hero-building-container" id="heroBuilding">
-                <img src="images/new_building_clean.png" alt="3D Modern Luxury Skyscraper Building"
-                    class="hero-building-image" loading="eager">
-            </div>
-
-            <!-- LEFT: tagline + stair-step pills -->
-            <div class="hero-left-col">
-                <p class="hero-tagline">We match renters to spaces, finding the perfect verified rental home in
-                    Siniloan.</p>
-
-                <div class="hero-badge-stack">
-                    <div class="hero-badge-pill">Verified student spaces</div>
-                    <div class="hero-badge-pill">Zero hidden broker fees</div>
-                    <div class="hero-badge-pill">Smart utility tracking</div>
-                    <div class="hero-badge-pill">Seamless digital leases</div>
-                    <div class="hero-badge-pill">Handpicked Siniloan rentals</div>
+        <div class="public-hero">
+            <div class="public-hero-copy">
+                <p class="hero-eyebrow">Verified rentals in Siniloan, Laguna</p>
+                <h1 class="hero-backdrop-title">Find a place. Understand the terms. Rent with clarity.</h1>
+                <p class="hero-tagline">DOMIKNOW brings property discovery, applications, leases, billing, and maintenance into one accountable rental workspace.</p>
+                <div class="hero-cta-group">
+                    <a href="#searchSection" class="btn btn-primary">Browse verified rentals</a>
+                    <a href="/pages/auth/register.html" class="btn btn-secondary">List or rent a property</a>
+                </div>
+                <div class="hero-audience-switch" aria-label="DOMIKNOW is for tenants and landlords">
+                    <span class="hero-audience-label">Built for</span>
+                    <span>Tenants</span>
+                    <span>Landlords</span>
+                    <span>Rental teams</span>
                 </div>
             </div>
 
-            <!-- RIGHT: discover more CTA -->
-            <div class="hero-right-col">
-                <span class="hero-discover-label">Discover More</span>
-                <a href="#searchSection" class="hero-arrow-btn" aria-label="Discover more">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="44" height="44" viewBox="0 0 24 24" fill="none"
-                        stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                        <line x1="7" y1="17" x2="17" y2="7"></line>
-                        <polyline points="7 7 17 7 17 17"></polyline>
-                    </svg>
-                </a>
+            <div class="hero-dashboard-preview">
+                <div class="hero-preview-topline">
+                    <span class="hero-preview-kicker">Rental workspace</span>
+                    <span class="hero-preview-status"><i aria-hidden="true"></i> Records stay connected</span>
+                </div>
+                <div class="hero-building-container" id="heroBuilding">
+                    <img src="images/new_building_clean.png" alt="Modern residential building" class="hero-building-image" loading="eager">
+                </div>
+                <div class="hero-preview-panel">
+                    <span class="hero-preview-panel-label">One place to manage the next step</span>
+                    <strong>Discovery → Application → Lease</strong>
+                    <div class="hero-preview-list">
+                        <span><b>01</b> Verified property details</span>
+                        <span><b>02</b> Clear rental records</span>
+                        <span><b>03</b> Traceable support requests</span>
+                    </div>
+                </div>
             </div>
-
-        </div><!-- /hero-dark-card -->
+        </div>
     </div><!-- /aurora-hero-wrapper -->
 
     <!-- Scrolling Marquee Feature Strip -->
@@ -1583,6 +1583,11 @@
 
     <!-- Search Section (Estates UI Style) -->
     <div class="search-container reveal-scale" id="searchSection" style="max-width: 1400px; margin: 2rem auto; padding: 0 1rem;">
+        <div class="section-header search-section-header">
+            <p class="section-eyebrow">Property discovery</p>
+            <h2>Explore verified rentals near you</h2>
+            <p>Search by location, price, and property type, then review the details that matter before you apply.</p>
+        </div>
         <div class="estates-wrapper">
             <!-- Left: Interactive Map Container -->
             <div class="estates-map-box">
@@ -1592,7 +1597,7 @@
                     <div class="estates-search-pill-box">
                         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
                         <input type="text" id="mapSearchInput" placeholder="Siniloan, Laguna" />
-                        <button id="btnClearSearch" style="background:none; border:none; color:#94a3b8; cursor:pointer; font-size: 0.75rem; padding: 0 2px;">✕</button>
+                        <button id="btnClearSearch" type="button" aria-label="Clear map search" style="background:none; border:none; color:#94a3b8; cursor:pointer; font-size: 0.75rem; padding: 0 2px;">✕</button>
                     </div>
 
                     <!-- Dark Pill Filter Buttons -->
@@ -1606,7 +1611,7 @@
                     </button>
 
                     <!-- Light Pill Selectors -->
-                    <select class="estates-filter-pill-light" id="selectBarangayFilter">
+                    <select class="estates-filter-pill-light" id="selectBarangayFilter" aria-label="Filter properties by barangay">
                         <option value="">Barangay ˅</option>
                         <option value="G. Redor">G. Redor</option>
                         <option value="Halayhayin">Halayhayin</option>
@@ -1634,7 +1639,7 @@
                 </div>
 
                 <!-- Leaflet Map Canvas -->
-                <div id="searchMap"></div>
+                <div id="searchMap" role="application" aria-label="Interactive map of verified rental properties"></div>
 
                 <!-- Floating Bottom Left Map Controls -->
                 <div class="estates-map-bottom-controls">
@@ -1677,6 +1682,7 @@
     <!-- Features Grid Section with staggered reveal -->
     <section class="features-section" id="featuresSection">
         <div class="section-header reveal-up">
+            <p class="section-eyebrow">Built for rental decisions</p>
             <h2>Why Choose DomiKnow?</h2>
             <p>Empowering tenants and landlords with modern, legally transparent rental management.</p>
         </div>
@@ -1691,9 +1697,8 @@
                         <polyline points="9 11 12 14 15 9"></polyline>
                     </svg>
                 </div>
-                <h3>Verified Trust Score</h3>
-                <p>Landlords and tenants undergo screening and trust score evaluation to maintain a safe, fraud-free
-                    rental ecosystem.</p>
+                <h3>Verified rental records</h3>
+                <p>Review property details, account status, and available rental information in one consistent place.</p>
             </div>
 
             <div class="feature-card reveal-up stagger-2">
@@ -1707,9 +1712,8 @@
                         <line x1="16" y1="17" x2="8" y2="17"></line>
                     </svg>
                 </div>
-                <h3>Digital Lease Execution</h3>
-                <p>Legally binding lease agreements with electronic signatures and enforceable utility configuration
-                    terms.</p>
+                <h3>Structured lease workflow</h3>
+                <p>Keep application decisions, lease documents, and agreed rental terms organized from one dashboard.</p>
             </div>
 
             <div class="feature-card reveal-up stagger-3">
@@ -1720,9 +1724,8 @@
                         <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
                     </svg>
                 </div>
-                <h3>Submeter Utilities Tracking</h3>
-                <p>Automated monthly utility billing based on submeter readings or fixed rent inclusions configured in
-                    your lease.</p>
+                <h3>Transparent utility records</h3>
+                <p>Track recorded readings, itemized charges, due dates, and payment status without implying live provider data.</p>
             </div>
         </div>
     </section>
@@ -1730,6 +1733,7 @@
     <!-- How It Works Section -->
     <section class="how-it-works" id="howItWorks">
         <div class="section-header reveal-up">
+            <p class="section-eyebrow">A clearer rental journey</p>
             <h2>How DomiKnow Works</h2>
             <p>From browsing to signing a lease — everything is streamlined and transparent.</p>
         </div>
@@ -1761,16 +1765,14 @@
     <footer class="landing-footer">
         <div class="footer-grid">
             <div class="footer-brand">
-                <div class="logo">
-                    <div class="logo-icon">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none"
-                            stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
-                            <polyline points="9 22 9 12 15 12 15 22"></polyline>
-                        </svg>
-                    </div>
-                    <span>DomiKnow</span>
-                </div>
+                <a href="index.html" class="logo brand-lockup" aria-label="DOMIKNOW home">
+                    <span class="brand-mark" aria-hidden="true">
+                        <span class="brand-mark-dot brand-mark-dot-primary"></span>
+                        <span class="brand-mark-dot brand-mark-dot-left"></span>
+                        <span class="brand-mark-dot brand-mark-dot-right"></span>
+                    </span>
+                    <span class="brand-wordmark"><span class="brand-wordmark-domi">DOMI</span><span class="brand-wordmark-know">KNOW</span></span>
+                </a>
                 <p>Smart rental management & boarding house directory dedicated to Siniloan, Laguna.</p>
             </div>
 
@@ -2221,7 +2223,7 @@
                         </div>
                         <div class="estates-compact-price-row">
                             <div class="estates-compact-price">₱${rentFormatted} <span style="font-size:0.68rem; font-weight:500; color:#64748b;">/mo</span></div>
-                            <button class="estates-fav-btn" onclick="event.stopPropagation(); this.style.color='#ef4444';">
+                            <button class="estates-fav-btn" aria-label="Add property to favorites" onclick="event.stopPropagation(); this.style.color='#ef4444';">
                                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
                             </button>
                         </div>

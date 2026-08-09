@@ -319,6 +319,8 @@
             30% { transform: translateY(-4px); opacity: 1; }
         }
     </style>
+    <link href="../../css/design-system.css" rel="stylesheet">
+    <script src="../../js/ui.js" defer></script>
 </head>
 <body class="app-loading" data-role="tenant" data-page-title="Tenant Reports Center">
 
@@ -540,7 +542,7 @@
         <div class="modal-container" style="max-width:550px;">
             <div class="modal-header">
                 <h3 style="margin:0;">Select Lease for Report</h3>
-                <button type="button" class="modal-close-btn" id="leaseModalCloseBtn" onclick="closeLeaseModal()">✕</button>
+                <button type="button" class="modal-close-btn" id="leaseModalCloseBtn" aria-label="Close lease selection" onclick="closeLeaseModal()">✕</button>
             </div>
             <div class="modal-body">
                 <p style="color:var(--text-secondary);font-size:.875rem;margin-bottom:1.25rem;">
@@ -571,7 +573,7 @@
             <div style="display:flex; align-items:center; gap:0.4rem; flex:1;">
                 <span style="font-weight:750; font-size:0.88rem; white-space:nowrap;">💬 Admin Case Inquiry Thread</span>
             </div>
-            <button type="button" id="closeChatHeadModalBtn" class="chat-head-close-btn">&times;</button>
+            <button type="button" id="closeChatHeadModalBtn" class="chat-head-close-btn" aria-label="Close inquiry thread">&times;</button>
         </div>
         <div class="chat-head-modal-body">
             <!-- Messages Feed -->
@@ -585,7 +587,7 @@
                 <!-- Image preview -->
                 <div id="chatHeadAttachPreview" style="display:none; margin-bottom:0.4rem; position:relative;">
                     <img id="chatHeadAttachImg" src="" alt="preview" style="max-width:100%; max-height:100px; border-radius:6px; border:1px solid var(--border-color); object-fit:cover;">
-                    <button type="button" id="chatHeadRemoveAttach" style="position:absolute;top:3px;right:3px;background:rgba(0,0,0,0.55);color:#fff;border:none;border-radius:50%;width:20px;height:20px;font-size:13px;cursor:pointer;line-height:1;display:flex;align-items:center;justify-content:center;">&times;</button>
+                    <button type="button" id="chatHeadRemoveAttach" aria-label="Remove attachment" style="position:absolute;top:3px;right:3px;background:rgba(0,0,0,0.55);color:#fff;border:none;border-radius:50%;width:20px;height:20px;font-size:13px;cursor:pointer;line-height:1;display:flex;align-items:center;justify-content:center;">&times;</button>
                 </div>
                 <div style="display:flex; gap:0.4rem; align-items:center;">
                     <!-- Attach image button -->

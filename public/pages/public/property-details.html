@@ -5,16 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Property Details - DomiKnow</title>
     <link href="../../css/input.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="../../css/design-system.css" rel="stylesheet">
+    <link href="../../css/public-refinement.css" rel="stylesheet">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <style>
         :root {
-            --primary: #0F4953;
-            --accent: #F98E6E;
-            --bg-color: #F9FCFB;
-            --soft-pink: #FFCFD2;
-            --text-dark: #0F4953;
+            --primary: #0355F3;
+            --accent: #0355F3;
+            --bg-color: #F8FAFC;
+            --soft-pink: #EAF0FF;
+            --text-dark: #042458;
             --text-normal: #1e293b;
             --text-muted: #64748b;
             --border-color: #e2e8f0;
@@ -23,14 +24,14 @@
         }
 
         body {
-            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            font-family: Inter, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             background-color: var(--bg-color);
             color: var(--text-normal);
             min-height: 100vh;
         }
 
         h1, h2, h3, .brand-font {
-            font-family: 'Outfit', sans-serif;
+            font-family: inherit;
         }
 
         @keyframes spin {
@@ -295,16 +296,29 @@
             line-height: 1.4;
         }
     </style>
+    <link href="../../css/design-system.css" rel="stylesheet">
+    <script src="../../js/ui.js" defer></script>
 </head>
 <body>
     <header class="public-header">
-        <a href="../../index.html" class="back-btn">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
-            <span>Back to Search</span>
+        <a href="../../index.html" class="logo brand-lockup" aria-label="DOMIKNOW home">
+            <span class="brand-mark" aria-hidden="true">
+                <span class="brand-mark-dot brand-mark-dot-primary"></span>
+                <span class="brand-mark-dot brand-mark-dot-left"></span>
+                <span class="brand-mark-dot brand-mark-dot-right"></span>
+            </span>
+            <span class="brand-wordmark"><span class="brand-wordmark-domi">DOMI</span><span class="brand-wordmark-know">KNOW</span></span>
         </a>
+        <nav class="public-detail-nav" aria-label="Property navigation">
+            <a href="../../index.html#searchSection" class="back-btn">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                <span>Back to properties</span>
+            </a>
+        </nav>
         <div class="login-prompt">
-            <a href="../auth/login.html" class="btn-action btn-login">Login</a>
-            <a href="../auth/register.html" class="btn-action btn-reserve">Sign Up</a>
+            <a href="../auth/login.html" class="btn-action btn-login">Log in</a>
+            <a href="../auth/register.html" class="btn-action btn-reserve">Create account</a>
+            <button type="button" class="theme-toggle" data-theme-toggle aria-label="Switch color theme"></button>
         </div>
     </header>
 
@@ -405,7 +419,7 @@
 
                     <div style="border-top: 1px solid var(--border-color); padding-top: 1.25rem;">
                         <a href="../auth/login.html" class="btn-action btn-reserve" style="width: 100%; padding: 0.875rem; text-align: center; font-size: 0.95rem;">
-                            Apply to Rent / Avail
+                            Log in to apply
                         </a>
                         <p style="font-size: 0.75rem; color: var(--text-muted); text-align: center; margin-top: 0.75rem; line-height: 1.4;">
                             Submit a digital application. You will be redirected to log in first.
@@ -458,12 +472,19 @@
             // Setup redirection parameters for unauthenticated workflows, or bypass if already logged in as a tenant
             const token = localStorage.getItem('domiknow_token');
             const role = localStorage.getItem('domiknow_role');
+            const workspacePagesByRole = {
+                tenant: '/pages/tenant/properties.html',
+                landlord: '/pages/landlord/properties.html',
+                admin: '/pages/admin/reports.html',
+                maintenance: '/pages/maintenance/dashboard.html'
+            };
             if (token && role === 'tenant') {
                 // Update header auth buttons to show dashboard link instead
                 const authDiv = document.querySelector('.login-prompt');
                 if (authDiv) {
                     authDiv.innerHTML = `
-                        <a href="/pages/tenant/dashboard.html" class="btn-action btn-login">Go to Dashboard</a>
+                        <a href="${workspacePagesByRole.tenant}" class="btn-action btn-login">Open tenant workspace</a>
+                        <button type="button" class="theme-toggle" data-theme-toggle aria-label="Switch color theme"></button>
                     `;
                 }
                 
@@ -490,8 +511,10 @@
                 // Logged in but not a tenant (e.g. landlord)
                 const authDiv = document.querySelector('.login-prompt');
                 if (authDiv) {
+                    const workspacePage = workspacePagesByRole[role] || '/pages/auth/login.html';
                     authDiv.innerHTML = `
-                        <a href="/pages/${role}/dashboard.html" class="btn-action btn-login">Go to Dashboard</a>
+                        <a href="${workspacePage}" class="btn-action btn-login">Open workspace</a>
+                        <button type="button" class="theme-toggle" data-theme-toggle aria-label="Switch color theme"></button>
                     `;
                 }
                 // Disable apply button for non-tenants

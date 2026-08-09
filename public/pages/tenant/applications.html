@@ -48,6 +48,8 @@
             word-wrap: break-word;
         }
     </style>
+    <link href="../../css/design-system.css" rel="stylesheet">
+    <script src="../../js/ui.js" defer></script>
 </head>
 <body>
     <!-- Navbar -->
@@ -60,7 +62,7 @@
             <div class="navbar-menu">
                 <a href="dashboard.html" class="navbar-menu-link">Dashboard</a>
                 <a href="properties.html" class="navbar-menu-link">Discovery</a>
-                <a href="recommendations.html" class="navbar-menu-link">Recommendations</a>
+                <a href="properties.html" class="navbar-menu-link">Discovery</a>
                 <a href="compare.html" class="navbar-menu-link">Compare</a>
                 <a href="applications.html" class="navbar-menu-link active">My Applications</a>
             </div>
@@ -88,9 +90,9 @@
                         <th>Action</th>
                     </tr>
                 </thead>
-                <tbody id="applicationsTableBody">
+                <tbody id="applicationsTableBody" aria-live="polite" aria-busy="true">
                     <tr>
-                        <td colspan="7" style="text-align: center; color: var(--text-muted);">Loading your applications...</td>
+                        <td colspan="7" role="status" style="text-align: center; color: var(--text-muted);">Loading your applications...</td>
                     </tr>
                 </tbody>
             </table>
@@ -115,7 +117,8 @@
                 });
 
                 if (!response.ok) {
-                    tableBody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: var(--error);">Failed to load your applications.</td></tr>`;
+                    tableBody.innerHTML = `<tr><td colspan="7" role="alert" style="text-align: center; color: var(--error);">Your applications could not be loaded. Please try again.</td></tr>`;
+                    tableBody.setAttribute('aria-busy', 'false');
                     return;
                 }
 
@@ -125,12 +128,13 @@
                 if (applications.length === 0) {
                     tableBody.innerHTML = `
                         <tr>
-                            <td colspan="7" style="text-align: center; padding: 3rem 1rem; color: var(--text-muted);">
-                                You have not submitted any rental applications yet. 
+                            <td colspan="7" role="status" style="text-align: center; padding: 3rem 1rem; color: var(--text-muted);">
+                                You have not submitted any rental applications yet.
                                 Find approved properties to apply in <a href="properties.html" class="auth-link">Discovery</a>!
                             </td>
                         </tr>
                     `;
+                    tableBody.setAttribute('aria-busy', 'false');
                     return;
                 }
 
@@ -187,10 +191,12 @@
                     `;
                     tableBody.appendChild(row);
                 });
+                tableBody.setAttribute('aria-busy', 'false');
 
             } catch (err) {
                 console.error(err);
-                tableBody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: var(--error);">Error reaching application API.</td></tr>`;
+                tableBody.innerHTML = `<tr><td colspan="7" role="alert" style="text-align: center; color: var(--error);">The application service could not be reached. Check your connection and try again.</td></tr>`;
+                tableBody.setAttribute('aria-busy', 'false');
             }
         }
     </script>

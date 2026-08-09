@@ -56,11 +56,13 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         // 3. Verify role
         if (expectedRole && user.role !== expectedRole) {
-            if (user.role === 'tenant' || user.role === 'landlord') {
-                window.location.href = `/pages/${user.role}/properties.html`;
-            } else {
-                window.location.href = `/pages/${user.role}/dashboard.html`;
-            }
+            const landingPagesByRole = {
+                tenant: '/pages/tenant/properties.html',
+                landlord: '/pages/landlord/properties.html',
+                admin: '/pages/admin/reports.html',
+                maintenance: '/pages/maintenance/dashboard.html'
+            };
+            window.location.href = landingPagesByRole[user.role] || '/pages/auth/login.html';
             return;
         }
 
@@ -69,8 +71,34 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     } catch (error) {
         console.error('Error loading dashboard:', error);
+        showDashboardLoadError();
     }
 });
+
+function showDashboardLoadError() {
+    const account = document.querySelector('.topbar-account');
+    if (!account || account.querySelector('[data-dashboard-error]')) return;
+
+    const error = document.createElement('span');
+    error.setAttribute('data-dashboard-error', '');
+    error.setAttribute('role', 'alert');
+    error.className = 'topbar-account-error';
+    error.textContent = 'Account details unavailable.';
+
+    const retry = document.createElement('button');
+    retry.type = 'button';
+    retry.className = 'topbar-account-retry';
+    retry.textContent = 'Retry';
+    retry.addEventListener('click', () => window.location.reload());
+
+    const login = document.createElement('a');
+    login.href = '/pages/auth/login.html';
+    login.className = 'topbar-account-login';
+    login.textContent = 'Sign in again';
+
+    error.append(' ', retry, ' ', login);
+    account.appendChild(error);
+}
 
 function populateDashboardUI(user) {
     // Populate User Name
@@ -233,7 +261,7 @@ function renderNewDashboardLayout(user) {
 
     // Create main container layout
     const dashboardLayout = document.createElement('div');
-    dashboardLayout.className = `dashboard-layout`;
+    dashboardLayout.className = `dashboard-layout dashboard-layout-${role}`;
 
     // 1. Sidebar HTML
     let roleBadgeClass = 'navbar-badge-tenant';
@@ -243,22 +271,49 @@ function renderNewDashboardLayout(user) {
 
     let sidebarHtml = '';
     const currentPath = window.location.pathname;
+    const currentPageFilename = currentPath.split('/').pop() || 'dashboard.html';
+    const parentNavigationPages = {
+        admin: {
+            'property-review-details.html': 'property-review.html',
+            'report-detail.html': 'reports.html'
+        },
+        maintenance: {
+            'task-details.html': 'tasks.html'
+        },
+        tenant: {
+            'property-details.html': 'properties.html',
+            'apply.html': 'properties.html',
+            'application-details.html': 'applications.html',
+            'landlord-report-form.html': 'reports.html',
+            'tenant-reports.html': 'reports.html'
+        },
+        landlord: {
+            'property-details.html': 'properties.html',
+            'units.html': 'properties.html',
+            'application-details.html': 'applications.html',
+            'lease-create.html': 'leases.html',
+            'maintenance-details.html': 'maintenance.html',
+            'tenant-report-form.html': 'reports.html',
+            'landlord-reports.html': 'reports.html'
+        }
+    };
+    const activeNavigationFilename = parentNavigationPages[role]?.[currentPageFilename] || currentPageFilename;
+    const roleLabel = role.charAt(0).toUpperCase() + role.slice(1);
+    const shellUserName = (user && user.full_name) ? user.full_name : 'Checking account...';
 
     if (role === 'tenant') {
-        // Render advanced collapsible sidebar for tenant
-        const isCollapsed = localStorage.getItem('domiknow_sidebar_collapsed') === 'true';
-        const collapsedClass = isCollapsed ? 'collapsed' : '';
-        
-        if (isCollapsed) {
-            dashboardLayout.classList.add('sidebar-collapsed');
-        }
-        
+        // Render the full tenant sidebar; mobile navigation uses the drawer.
         sidebarHtml = `
-            <aside class="sidebar sidebar-tenant" id="domiknowSidebar">
-                <div style="height: 1.5rem;"></div>
-                
-                <!-- Menu items list -->
-                <div class="sidebar-menu">
+            <aside class="sidebar sidebar-tenant" id="domiknowSidebar" aria-label="${roleLabel} navigation">
+                <div class="sidebar-logo-container">
+                    <div class="app-brand" aria-label="DOMIKNOW">
+                        <span class="app-brand-mark" aria-hidden="true">D</span>
+                        <span class="app-brand-name">DOMI<span class="app-brand-accent">KNOW</span></span>
+                    </div>
+                    <span class="role-badge navbar-badge ${roleBadgeClass}">${roleLabel}</span>
+                </div>
+
+                <nav class="sidebar-menu" aria-label="Primary navigation">
                     <div class="sidebar-section-title">Overview</div>
         `;
         
@@ -268,7 +323,7 @@ function renderNewDashboardLayout(user) {
                 let isGroupActive = false;
                 if (item.subItems) {
                     item.subItems.forEach(sub => {
-                        if (currentPath.endsWith(sub.href)) {
+                        if (activeNavigationFilename === sub.href) {
                             isGroupActive = true;
                         }
                     });
@@ -282,11 +337,13 @@ function renderNewDashboardLayout(user) {
                 
                 const expandedClass = isExpanded === 'true' ? 'expanded' : '';
                 const groupActiveClass = isGroupActive ? 'group-active' : '';
+                const groupPanelId = `sidebar-group-${item.label.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`;
                 
                 if (item.subItems && item.subItems.length === 1) {
+                    const isSubActive = activeNavigationFilename === item.subItems[0].href;
                     sidebarHtml += `
                         <div class="sidebar-group ${groupActiveClass}" data-group="${item.label.toLowerCase()}">
-                            <a href="${item.subItems[0].href}" class="sidebar-group-header" style="text-decoration: none;">
+                            <a href="${item.subItems[0].href}" class="sidebar-group-header ${isSubActive ? 'active' : ''}" ${isSubActive ? 'aria-current="page"' : ''}>
                                 <span class="sidebar-group-header-left">
                                     ${getTenantIcon(item.label)}
                                     <span class="sidebar-group-label">${item.label}</span>
@@ -297,7 +354,7 @@ function renderNewDashboardLayout(user) {
                 } else {
                     sidebarHtml += `
                         <div class="sidebar-group ${expandedClass} ${groupActiveClass}" data-group="${item.label.toLowerCase()}">
-                            <button class="sidebar-group-header">
+                            <button type="button" class="sidebar-group-header" aria-expanded="${isExpanded === 'true'}" aria-controls="${groupPanelId}">
                                 <span class="sidebar-group-header-left">
                                     ${getTenantIcon(item.label)}
                                     <span class="sidebar-group-label">${item.label}</span>
@@ -308,15 +365,15 @@ function renderNewDashboardLayout(user) {
                                     </svg>
                                 </span>
                             </button>
-                            <div class="sidebar-sub-menu">
+                            <div class="sidebar-sub-menu" id="${groupPanelId}">
                     `;
                     
                     if (item.subItems) {
                         item.subItems.forEach(sub => {
-                            const isSubActive = currentPath.endsWith(sub.href);
+                            const isSubActive = activeNavigationFilename === sub.href;
                             const subActiveClass = isSubActive ? 'active' : '';
                             sidebarHtml += `
-                                <a href="${sub.href}" class="sidebar-sub-link ${subActiveClass}">
+                                <a href="${sub.href}" class="sidebar-sub-link ${subActiveClass}" ${isSubActive ? 'aria-current="page"' : ''}>
                                     <span class="sub-link-dot"></span>
                                     <span class="sidebar-sub-label">${sub.label}</span>
                                 </a>
@@ -332,35 +389,37 @@ function renderNewDashboardLayout(user) {
             });
         }
         
-        const userName = (user && user.full_name) ? user.full_name : 'Loading...';
-        const userEmail = (user && user.email) ? user.email : 'loading@domiknow.com';
-        const userAvatarUrl = `https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(userName)}`;
-        
         sidebarHtml += `
+                </nav>
+                <div class="sidebar-footer">
+                    <button type="button" id="newLogoutBtn" class="sidebar-link sidebar-logout" aria-label="Log out of DOMIKNOW">
+                        <svg class="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                        <span>Log out</span>
+                    </button>
                 </div>
-                
             </aside>
         `;
     } else {
-        // Fallback to old design for other roles
         sidebarHtml = `
-            <aside class="sidebar sidebar-${role}">
+            <aside class="sidebar sidebar-${role}" id="domiknowSidebar" aria-label="${roleLabel} navigation">
                 <div class="sidebar-logo-container">
-                    <span class="sidebar-logo">DomiKnow</span>
-                    <span class="navbar-badge ${roleBadgeClass}" style="margin-top:0.4rem; padding: 0.2rem 0.6rem; font-size:0.65rem;">${role.toUpperCase()}</span>
+                    <div class="app-brand" aria-label="DOMIKNOW">
+                        <span class="app-brand-mark" aria-hidden="true">D</span>
+                        <span class="app-brand-name">DOMI<span class="app-brand-accent">KNOW</span></span>
+                    </div>
+                    <span class="role-badge navbar-badge ${roleBadgeClass}">${roleLabel}</span>
                 </div>
-                <div class="sidebar-menu">
+                <nav class="sidebar-menu" aria-label="Primary navigation">
         `;
         
-        const pageFilename = window.location.pathname.split('/').pop() || 'dashboard.html';
         menuGroups.forEach(group => {
             if (!(role === 'tenant' && group.section === 'Main')) {
                 sidebarHtml += `<div class="sidebar-section-title">${group.section}</div>`;
             }
             group.items.forEach(item => {
-                const isItemActive = (pageFilename === item.href);
+                const isItemActive = activeNavigationFilename === item.href;
                 const activeClass = isItemActive ? 'active' : '';
-                sidebarHtml += `<a href="${item.href}" class="sidebar-link ${activeClass}">
+                sidebarHtml += `<a href="${item.href}" class="sidebar-link ${activeClass}" ${isItemActive ? 'aria-current="page"' : ''}>
                     ${getLinkIcon(item.label)}
                     <span>${item.label}</span>
                 </a>`;
@@ -368,12 +427,11 @@ function renderNewDashboardLayout(user) {
         });
         
         sidebarHtml += `
-                </div>
-                <!-- Bottom Sidebar Footer with Logout Button -->
-                <div style="padding: 1rem; border-top: 1px solid var(--border-color); margin-top: auto;">
-                    <button id="newLogoutBtn" class="sidebar-link" style="width: 100%; border: none; background: rgba(239, 68, 68, 0.08); color: var(--error); border-radius: var(--radius-md); font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 0.65rem; padding: 0.75rem 1rem; transition: background 0.2s;">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-                        <span>Logout</span>
+                </nav>
+                <div class="sidebar-footer">
+                    <button type="button" id="newLogoutBtn" class="sidebar-link sidebar-logout" aria-label="Log out of DOMIKNOW">
+                        <svg class="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                        <span>Log out</span>
                     </button>
                 </div>
             </aside>
@@ -381,256 +439,104 @@ function renderNewDashboardLayout(user) {
     }
 
     // Get page title dynamically from document.title
-    let pageTitle = 'Dashboard';
+    let pageTitle = (document.body.getAttribute('data-page-title') || '').trim() || 'Dashboard';
     const docTitle = document.title;
-    if (docTitle) {
+    if (docTitle && pageTitle === 'Dashboard') {
         pageTitle = docTitle.split(' - ')[0];
     }
 
-    // 2. Main Area and Header HTML
-    let topbarHtml = '';
-    
-    if (role === 'tenant') {
-        const activeTab = currentPath.includes('properties.html') ? 'discovery' :
-                          currentPath.includes('applications.html') ? 'applications' :
-                          currentPath.includes('leases.html') ? 'leases' :
-                          currentPath.includes('billings.html') ? 'payments' :
-                          currentPath.includes('reports.html') ? 'reports' :
-                          (currentPath.includes('maintenance.html') || currentPath.includes('disputes.html') || currentPath.includes('feedback.html')) ? 'support' : '';
-
-        // Inject Bottom Nav CSS Styles
-        const styleEl = document.createElement('style');
-        styleEl.textContent = `
-            .bottom-nav-bar {
-                position: fixed;
-                bottom: 0;
-                left: 0;
-                right: 0;
-                height: 64px;
-                background-color: #FFFFFF;
-                border-top: 1px solid #E2E8F0;
-                display: none;
-                flex-direction: row;
-                justify-content: space-around;
-                align-items: center;
-                box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.05);
-                z-index: 9999;
-                padding-bottom: env(safe-area-inset-bottom);
-            }
-
-            .bottom-nav-item {
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                justify-content: center;
-                width: 48px;
-                height: 48px;
-                border-radius: 12px;
-                color: #042458;
-                text-decoration: none;
-                transition: all 0.2s ease;
-                position: relative;
-                background: none;
-                border: none;
-                cursor: pointer;
-            }
-
-            .bottom-nav-item.active {
-                color: #0355F3;
-            }
-
-            .nav-sheet-overlay {
-                position: fixed;
-                top: 0;
-                left: 0;
-                right: 0;
-                bottom: 0;
-                background: rgba(4, 36, 88, 0.4);
-                z-index: 10000;
-                display: flex;
-                align-items: flex-end;
-                opacity: 0;
-                pointer-events: none;
-                transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-            }
-
-            .nav-sheet-overlay.open {
-                opacity: 1;
-                pointer-events: auto;
-            }
-
-            .nav-sheet {
-                background: #FFFFFF;
-                width: 100%;
-                max-width: 600px;
-                margin: 0 auto;
-                border-top-left-radius: 20px;
-                border-top-right-radius: 20px;
-                padding: 24px;
-                box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.15);
-                transform: translateY(100%);
-                transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-                box-sizing: border-box;
-            }
-
-            .nav-sheet-overlay.open .nav-sheet {
-                transform: translateY(0);
-            }
-
-            .nav-sheet-header {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                margin-bottom: 20px;
-            }
-
-            .nav-sheet-title {
-                font-size: 18px;
-                font-weight: 600;
-                color: #042458;
-                margin: 0;
-            }
-
-            .nav-sheet-close {
-                background: none;
-                border: none;
-                font-size: 24px;
-                color: #042458;
-                cursor: pointer;
-                line-height: 1;
-            }
-
-            .nav-sheet-menu {
-                display: flex;
-                flex-direction: column;
-                gap: 12px;
-            }
-
-            .nav-sheet-item {
-                display: flex;
-                align-items: center;
-                gap: 12px;
-                padding: 12px 16px;
-                border-radius: 12px;
-                color: #042458;
-                text-decoration: none;
-                font-size: 15px;
-                font-weight: 600;
-                background-color: #F8FAFC;
-                transition: background-color 0.2s ease;
-            }
-
-            .nav-sheet-item:active {
-                background-color: #F1F5F9;
-            }
-            
-            .nav-sheet-item.logout {
-                color: #EF4444;
-                background-color: #FEF2F2;
-            }
-
-            /* Responsive rules for mobile viewport */
-            @media (max-width: 768px) {
-                .sidebar-tenant {
-                    display: none !important;
-                }
-                .main-wrapper {
-                    margin-left: 0 !important;
-                    padding-bottom: 72px !important;
-                }
-                .main-content-inner {
-                    padding: 16px !important;
-                    min-height: calc(100vh - 72px) !important;
-                    background-color: #F8FAFC !important;
-                }
-                .bottom-nav-bar {
-                    display: flex !important;
-                }
-            }
-        `;
-        document.head.appendChild(styleEl);
-
-        topbarHtml = `
-            <div class="main-wrapper">
-                <div class="main-content-inner">
-                    <!-- Content will be moved here -->
-                </div>
-            </div>
-            
-            <!-- Sticky Bottom Navigation Bar -->
-            <div class="bottom-nav-bar">
-                <a href="/pages/tenant/properties.html" class="bottom-nav-item ${activeTab === 'discovery' ? 'active' : ''}" title="Explore">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                        <circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-                    </svg>
-                </a>
-                <a href="/pages/tenant/applications.html" class="bottom-nav-item ${activeTab === 'applications' ? 'active' : ''}" title="Applications">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line>
-                    </svg>
-                </a>
-                <a href="/pages/tenant/leases.html" class="bottom-nav-item ${activeTab === 'leases' ? 'active' : ''}" title="Lease">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-                    </svg>
-                </a>
-                <a href="/pages/tenant/billings.html" class="bottom-nav-item ${activeTab === 'payments' ? 'active' : ''}" title="Payments">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                        <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line>
-                    </svg>
-                </a>
-                <a href="/pages/tenant/reports.html" class="bottom-nav-item ${activeTab === 'reports' ? 'active' : ''}" title="Reports">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                        <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line>
-                    </svg>
-                </a>
-                <button id="btnOpenNavSheet" class="bottom-nav-item ${activeTab === 'support' ? 'active' : ''}" title="Help & Settings">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                        <circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line>
-                    </svg>
-                </button>
-            </div>
-
-            <!-- Bottom Sheet Support & Settings Modal -->
-            <div id="navSheetOverlay" class="nav-sheet-overlay">
-                <div class="nav-sheet">
-                    <div class="nav-sheet-header">
-                        <h3 class="nav-sheet-title">Help & Settings</h3>
-                        <button id="btnCloseNavSheet" class="nav-sheet-close">&times;</button>
+    // 2. Main area and contextual header
+    let topbarHtml = `
+        <div class="main-wrapper">
+            <header class="topbar" aria-label="Page header">
+                <div class="topbar-left">
+                    <button type="button" id="menuToggleBtn" class="mobile-menu-toggle topbar-action" aria-label="Open navigation" aria-controls="domiknowSidebar" aria-expanded="false">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/></svg>
+                    </button>
+                    <div class="topbar-heading">
+                        <span class="topbar-context">${roleLabel} workspace</span>
+                        <h1 class="topbar-title" id="appPageTitle">${pageTitle}</h1>
                     </div>
-                    <div class="nav-sheet-menu">
-                        <a href="/pages/tenant/maintenance.html" class="nav-sheet-item">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle;"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path></svg>
-                            <span>Maintenance Requests</span>
+                </div>
+                <div class="topbar-right">
+                    <button type="button" class="topbar-action theme-toggle" data-theme-toggle aria-label="Toggle color theme" aria-pressed="false" title="Toggle color theme">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.66 6.34l1.41-1.41"/></svg>
+                    </button>
+                    <div class="topbar-account" aria-label="Signed in user">
+                        <span class="topbar-account-role">${roleLabel}</span>
+                        <span class="user-name">Checking account...</span>
+                    </div>
+                </div>
+            </header>
+            <div class="main-content-inner">
+                <!-- Content will be moved here -->
+            </div>
+        </div>
+        <div class="sidebar-overlay" id="sidebarOverlay" aria-hidden="true"></div>
+    `;
+
+    if (role === 'tenant') {
+        const activeTab = activeNavigationFilename === 'properties.html' ? 'discovery' :
+                          activeNavigationFilename === 'applications.html' ? 'applications' :
+                          activeNavigationFilename === 'leases.html' ? 'leases' :
+                          activeNavigationFilename === 'billings.html' ? 'payments' :
+                          activeNavigationFilename === 'reports.html' ? 'reports' :
+                          ['maintenance.html', 'disputes.html', 'feedback.html'].includes(activeNavigationFilename) ? 'support' : '';
+
+        topbarHtml += `
+            <nav class="bottom-nav-bar" aria-label="Tenant quick navigation">
+                <a href="/pages/tenant/properties.html" class="bottom-nav-item ${activeTab === 'discovery' ? 'active' : ''}" aria-label="Explore properties" ${activeTab === 'discovery' ? 'aria-current="page"' : ''}>
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                </a>
+                <a href="/pages/tenant/applications.html" class="bottom-nav-item ${activeTab === 'applications' ? 'active' : ''}" aria-label="Applications" ${activeTab === 'applications' ? 'aria-current="page"' : ''}>
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                </a>
+                <a href="/pages/tenant/leases.html" class="bottom-nav-item ${activeTab === 'leases' ? 'active' : ''}" aria-label="Lease" ${activeTab === 'leases' ? 'aria-current="page"' : ''}>
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                </a>
+                <a href="/pages/tenant/billings.html" class="bottom-nav-item ${activeTab === 'payments' ? 'active' : ''}" aria-label="Payments" ${activeTab === 'payments' ? 'aria-current="page"' : ''}>
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+                </a>
+                <a href="/pages/tenant/reports.html" class="bottom-nav-item ${activeTab === 'reports' ? 'active' : ''}" aria-label="Reports" ${activeTab === 'reports' ? 'aria-current="page"' : ''}>
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                </a>
+                <button type="button" id="btnOpenNavSheet" class="bottom-nav-item ${activeTab === 'support' ? 'active' : ''}" aria-label="Open help and settings" aria-controls="navSheetOverlay" aria-expanded="false">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                </button>
+            </nav>
+
+            <div id="navSheetOverlay" class="nav-sheet-overlay" aria-hidden="true">
+                <section class="nav-sheet" role="dialog" aria-modal="true" aria-labelledby="navSheetTitle">
+                    <div class="nav-sheet-header">
+                        <h2 class="nav-sheet-title" id="navSheetTitle">Help &amp; settings</h2>
+                        <button type="button" id="btnCloseNavSheet" class="nav-sheet-close" aria-label="Close help and settings">&times;</button>
+                    </div>
+                    <nav class="nav-sheet-menu" aria-label="Tenant support navigation">
+                        <a href="/pages/tenant/maintenance.html" class="nav-sheet-item" ${activeNavigationFilename === 'maintenance.html' ? 'aria-current="page"' : ''}>
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+                            <span>Maintenance requests</span>
                         </a>
-                        <a href="/pages/tenant/disputes.html" class="nav-sheet-item">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle;"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                        <a href="/pages/tenant/disputes.html" class="nav-sheet-item" ${activeNavigationFilename === 'disputes.html' ? 'aria-current="page"' : ''}>
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
                             <span>Disputes</span>
                         </a>
-                        <a href="/pages/tenant/feedback.html" class="nav-sheet-item">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle;"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
-                            <span>Ratings & Feedback</span>
+                        <a href="/pages/tenant/feedback.html" class="nav-sheet-item" ${activeNavigationFilename === 'feedback.html' ? 'aria-current="page"' : ''}>
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                            <span>Ratings &amp; feedback</span>
                         </a>
-                        <button id="sheetLogoutBtn" class="nav-sheet-item logout" style="border: none; text-align: left; width: 100%; cursor: pointer;">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle;"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+                        <button type="button" id="sheetLogoutBtn" class="nav-sheet-item logout" aria-label="Log out of DOMIKNOW">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
                             <span>Log out</span>
                         </button>
-                    </div>
-                </div>
+                    </nav>
+                </section>
             </div>
-        `;
-    } else {
-        topbarHtml = `
-            <div class="main-wrapper">
-                <div class="main-content-inner">
-                    <!-- Content will be moved here -->
-                </div>
-            </div>
-            <div class="sidebar-overlay" id="sidebarOverlay"></div>
         `;
     }
 
     dashboardLayout.innerHTML = sidebarHtml + topbarHtml;
+    const shellUserNameEl = dashboardLayout.querySelector('.user-name');
+    if (shellUserNameEl) shellUserNameEl.textContent = shellUserName;
 
     // Get original page content direct children of body (excluding script, style, modals, overlays)
     const bodyChildren = Array.from(document.body.children);
@@ -664,11 +570,20 @@ function renderNewDashboardLayout(user) {
         menuToggleBtn.addEventListener('click', () => {
             sidebar.classList.add('open');
             overlay.classList.add('open');
+            menuToggleBtn.setAttribute('aria-expanded', 'true');
+            overlay.setAttribute('aria-hidden', 'false');
+            window.requestAnimationFrame(() => {
+                const firstNavigationControl = sidebar.querySelector('a[href], button:not([disabled])');
+                if (firstNavigationControl) firstNavigationControl.focus();
+            });
         });
 
         overlay.addEventListener('click', () => {
             sidebar.classList.remove('open');
             overlay.classList.remove('open');
+            menuToggleBtn.setAttribute('aria-expanded', 'false');
+            overlay.setAttribute('aria-hidden', 'true');
+            menuToggleBtn.focus();
         });
     }
 
@@ -699,15 +614,24 @@ function renderNewDashboardLayout(user) {
         if (btnOpenNavSheet && btnCloseNavSheet && navSheetOverlay) {
             btnOpenNavSheet.addEventListener('click', () => {
                 navSheetOverlay.classList.add('open');
+                btnOpenNavSheet.setAttribute('aria-expanded', 'true');
+                navSheetOverlay.setAttribute('aria-hidden', 'false');
+                window.requestAnimationFrame(() => btnCloseNavSheet.focus());
             });
 
             btnCloseNavSheet.addEventListener('click', () => {
                 navSheetOverlay.classList.remove('open');
+                btnOpenNavSheet.setAttribute('aria-expanded', 'false');
+                navSheetOverlay.setAttribute('aria-hidden', 'true');
+                btnOpenNavSheet.focus();
             });
 
             navSheetOverlay.addEventListener('click', (e) => {
                 if (e.target === navSheetOverlay) {
                     navSheetOverlay.classList.remove('open');
+                    btnOpenNavSheet.setAttribute('aria-expanded', 'false');
+                    navSheetOverlay.setAttribute('aria-hidden', 'true');
+                    btnOpenNavSheet.focus();
                 }
             });
         }
@@ -729,6 +653,7 @@ function renderNewDashboardLayout(user) {
                     const group = header.closest('.sidebar-group');
                     const groupName = group.getAttribute('data-group');
                     const isExpanded = group.classList.toggle('expanded');
+                    header.setAttribute('aria-expanded', isExpanded ? 'true' : 'false');
                     sessionStorage.setItem(`domiknow_group_${groupName}`, isExpanded ? 'true' : 'false');
                 });
             });
@@ -743,6 +668,32 @@ function renderNewDashboardLayout(user) {
             });
         }
     }
+
+    document.addEventListener('keydown', (event) => {
+        if (event.key !== 'Escape') return;
+
+        const openNavSheet = document.getElementById('navSheetOverlay');
+        const navSheetTrigger = document.getElementById('btnOpenNavSheet');
+        if (openNavSheet && openNavSheet.classList.contains('open')) {
+            openNavSheet.classList.remove('open');
+            openNavSheet.setAttribute('aria-hidden', 'true');
+            if (navSheetTrigger) {
+                navSheetTrigger.setAttribute('aria-expanded', 'false');
+                navSheetTrigger.focus();
+            }
+            return;
+        }
+
+        if (sidebar && overlay && sidebar.classList.contains('open')) {
+            sidebar.classList.remove('open');
+            overlay.classList.remove('open');
+            overlay.setAttribute('aria-hidden', 'true');
+            if (menuToggleBtn) {
+                menuToggleBtn.setAttribute('aria-expanded', 'false');
+                menuToggleBtn.focus();
+            }
+        }
+    });
 
     // ⚡ INSTANT FADE-IN: Reveal layout smooth & flicker-free once sidebar is constructed
     document.body.classList.remove('app-loading');
@@ -783,7 +734,7 @@ function initSidebarScrollPersistence(sidebar) {
 
 // Minimal inline SVG icons for sidebar links (Serious & System-like)
 function getLinkIcon(label) {
-    const baseSvg = (pathData) => `<svg class="nav-icon" viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 0.75rem; flex-shrink: 0; transition: transform var(--transition-fast);">${pathData}</svg>`;
+    const baseSvg = (pathData) => `<svg class="nav-icon" viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">${pathData}</svg>`;
     
     const icons = {
         'Dashboard': baseSvg('<rect x="3" y="3" width="7" height="9"></rect><rect x="14" y="3" width="7" height="5"></rect><rect x="14" y="12" width="7" height="9"></rect><rect x="3" y="16" width="7" height="5"></rect>'),
@@ -854,5 +805,5 @@ function getTenantIcon(label) {
         'Help': `<svg class="nav-icon" viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>`,
         'Setting': `<svg class="nav-icon" viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>`
     };
-    return icons[label] || '';
+    return (icons[label] || '').replace('<svg ', '<svg aria-hidden="true" focusable="false" ');
 }

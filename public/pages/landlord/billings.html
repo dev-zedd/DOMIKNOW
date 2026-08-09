@@ -279,6 +279,8 @@
             text-align: right;
         }
     </style>
+    <link href="../../css/design-system.css" rel="stylesheet">
+    <script src="../../js/ui.js" defer></script>
 </head>
 <body class="app-loading" data-role="landlord" data-page-title="Rent & Billings Management">
     <!-- Navbar -->
@@ -352,8 +354,8 @@
                             <th>Action</th>
                         </tr>
                     </thead>
-                    <tbody id="activeLeasesTableBody">
-                        <tr><td colspan="6" style="text-align:center;color:var(--text-muted);padding:2rem;">Loading active leases...</td></tr>
+                    <tbody id="activeLeasesTableBody" aria-live="polite" aria-busy="true">
+                        <tr><td colspan="6" role="status" style="text-align:center;color:var(--text-muted);padding:2rem;">Loading active leases...</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -401,8 +403,8 @@
                             <th>Action</th>
                         </tr>
                     </thead>
-                    <tbody id="historyTableBody">
-                        <tr><td colspan="6" style="text-align:center;color:var(--text-muted);">Loading historical logs...</td></tr>
+                    <tbody id="historyTableBody" aria-live="polite" aria-busy="true">
+                        <tr><td colspan="6" role="status" style="text-align:center;color:var(--text-muted);">Loading historical logs...</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -414,7 +416,7 @@
         <div class="modal-container">
             <div class="modal-header">
                 <h3 style="margin:0;color:var(--text-primary);">Generate Monthly Billing</h3>
-                <button id="closeGenerateModalBtn" class="modal-close-x">&times;</button>
+                <button id="closeGenerateModalBtn" class="modal-close-x" type="button" aria-label="Close billing form">&times;</button>
             </div>
             <form id="billingForm">
                 <div class="modal-body">
@@ -520,7 +522,7 @@
         <div class="modal-container">
             <div class="modal-header">
                 <h3 id="viewModalLeaseNum" style="margin:0;color:var(--text-primary);">Billing statement</h3>
-                <button id="closeViewModalBtn" class="modal-close-x">&times;</button>
+                <button id="closeViewModalBtn" class="modal-close-x" type="button" aria-label="Close billing statement">&times;</button>
             </div>
             <div class="modal-body" id="viewModalContent">
                 <!-- Loaded dynamically -->
@@ -647,20 +649,28 @@
             try {
                 // Fetch Landlord Leases
                 const leaseRes = await fetch('/api/leases', { headers: { 'Authorization': `Bearer ${token}` } });
+                if (!leaseRes.ok) throw new Error(`Lease request failed with status ${leaseRes.status}`);
                 const leaseData = await leaseRes.json();
                 activeLeases = (leaseData.data || []).filter(l => l.lease_status === 'active');
 
                 // Fetch Billings
                 const billingRes = await fetch('/api/billings', { headers: { 'Authorization': `Bearer ${token}` } });
+                if (!billingRes.ok) throw new Error(`Billing request failed with status ${billingRes.status}`);
                 const billingData = await billingRes.json();
                 allBillings = billingData.data || [];
 
                 calculateSummaryStats();
                 renderActiveLeasesTable();
                 renderHistoryTable();
+                document.getElementById('activeLeasesTableBody').setAttribute('aria-busy', 'false');
+                document.getElementById('historyTableBody').setAttribute('aria-busy', 'false');
 
             } catch (err) {
                 console.error(err);
+                document.getElementById('activeLeasesTableBody').innerHTML = '<tr><td colspan="6" role="alert" style="text-align:center;color:var(--error);padding:2rem;">Active lease billing could not be loaded. Check your connection and try again.</td></tr>';
+                document.getElementById('historyTableBody').innerHTML = '<tr><td colspan="6" role="alert" style="text-align:center;color:var(--error);padding:2rem;">Billing history could not be loaded. Check your connection and try again.</td></tr>';
+                document.getElementById('activeLeasesTableBody').setAttribute('aria-busy', 'false');
+                document.getElementById('historyTableBody').setAttribute('aria-busy', 'false');
             }
         }
 

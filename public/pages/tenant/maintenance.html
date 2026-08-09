@@ -474,6 +474,8 @@
         /* ── Validation hints ───────────────────────────────── */
         .val-hint { font-size:0.73rem; color:var(--error); margin-top:0.35rem; display:none; }
     </style>
+    <link href="../../css/design-system.css" rel="stylesheet">
+    <script src="../../js/ui.js" defer></script>
 </head>
 <body class="app-loading" data-role="tenant" data-page-title="Maintenance Requests">
     <!-- Navbar -->
@@ -486,7 +488,7 @@
             <div class="navbar-menu">
                 <a href="dashboard.html" class="navbar-menu-link">Dashboard</a>
                 <a href="properties.html" class="navbar-menu-link">Property Discovery</a>
-                <a href="recommendations.html" class="navbar-menu-link">Recommendations</a>
+                <a href="properties.html" class="navbar-menu-link">Discovery</a>
                 <a href="compare.html" class="navbar-menu-link">Compare Properties</a>
                 <a href="reservations.html" class="navbar-menu-link">My Reservations</a>
                 <a href="applications.html" class="navbar-menu-link">My Applications</a>
@@ -516,28 +518,28 @@
         <!-- Stats row -->
         <div class="stats-row" id="statsRow">
             <div class="stat-card">
-                <div class="stat-icon" style="background:rgba(245,158,11,.12);">⏳</div>
+                <div class="stat-icon" style="background:rgba(245,158,11,.12);"><span data-icon="clock"></span></div>
                 <div>
                     <div class="stat-value" id="statPending">—</div>
                     <div class="stat-label">Pending</div>
                 </div>
             </div>
             <div class="stat-card">
-                <div class="stat-icon" style="background:rgba(249,115,22,.12);">🔨</div>
+                <div class="stat-icon" style="background:rgba(249,115,22,.12);"><span data-icon="wrench"></span></div>
                 <div>
                     <div class="stat-value" id="statInProgress">—</div>
                     <div class="stat-label">In Progress</div>
                 </div>
             </div>
             <div class="stat-card">
-                <div class="stat-icon" style="background:rgba(16,185,129,.12);">✅</div>
+                <div class="stat-icon" style="background:rgba(16,185,129,.12);"><span data-icon="check"></span></div>
                 <div>
                     <div class="stat-value" id="statCompleted">—</div>
                     <div class="stat-label">Completed</div>
                 </div>
             </div>
             <div class="stat-card">
-                <div class="stat-icon" style="background:rgba(139,92,246,.12);">📋</div>
+                <div class="stat-icon" style="background:rgba(139,92,246,.12);"><span data-icon="clipboard"></span></div>
                 <div>
                     <div class="stat-value" id="statTotal">—</div>
                     <div class="stat-label">Total Requests</div>
@@ -651,14 +653,14 @@
                     <!-- Category -->
                     <div class="form-section">Issue Category</div>
                     <div class="cat-grid" id="catGrid">
-                        <div class="cat-card" data-cat="plumbing">   <span class="ci">🚿</span>Plumbing</div>
-                        <div class="cat-card" data-cat="electrical"> <span class="ci">⚡</span>Electrical</div>
-                        <div class="cat-card" data-cat="aircon">     <span class="ci">❄️</span>Aircon</div>
-                        <div class="cat-card" data-cat="door">       <span class="ci">🚪</span>Door/Window</div>
-                        <div class="cat-card" data-cat="roof">       <span class="ci">🏚️</span>Roofing</div>
-                        <div class="cat-card" data-cat="internet">   <span class="ci">📶</span>Internet</div>
-                        <div class="cat-card" data-cat="appliance">  <span class="ci">🔌</span>Appliance</div>
-                        <div class="cat-card" data-cat="others">     <span class="ci">🔧</span>Others</div>
+                        <div class="cat-card" data-cat="plumbing">   <span class="ci"><span data-icon="water"></span></span>Plumbing</div>
+                        <div class="cat-card" data-cat="electrical"> <span class="ci"><span data-icon="bolt"></span></span>Electrical</div>
+                        <div class="cat-card" data-cat="aircon">     <span class="ci"><span data-icon="snowflake"></span></span>Aircon</div>
+                        <div class="cat-card" data-cat="door">       <span class="ci"><span data-icon="door"></span></span>Door/Window</div>
+                        <div class="cat-card" data-cat="roof">       <span class="ci"><span data-icon="roof"></span></span>Roofing</div>
+                        <div class="cat-card" data-cat="internet">   <span class="ci"><span data-icon="signal"></span></span>Internet</div>
+                        <div class="cat-card" data-cat="appliance">  <span class="ci"><span data-icon="plug"></span></span>Appliance</div>
+                        <div class="cat-card" data-cat="others">     <span class="ci"><span data-icon="wrench"></span></span>Others</div>
                     </div>
                     <div class="val-hint" id="catErr">Please select a category.</div>
 
@@ -740,8 +742,8 @@
         let activeFilter = 'all';
 
         const CAT_ICONS = {
-            plumbing:'🚿', electrical:'⚡', aircon:'❄️',
-            door:'🚪', roof:'🏚️', internet:'📶', appliance:'🔌', others:'🔧'
+            plumbing:'water', electrical:'bolt', aircon:'snowflake',
+            door:'door', roof:'roof', internet:'signal', appliance:'plug', others:'wrench'
         };
 
         // ── Init ──────────────────────────────────────────────
@@ -999,13 +1001,13 @@
             });
 
             if (filtered.length === 0) {
-                list.innerHTML = `<div class="empty-state"><div class="ei">📋</div><p>No requests match this filter.</p></div>`;
+                list.innerHTML = `<div class="empty-state"><div class="ei"><span data-icon="clipboard"></span></div><p>No requests match this filter.</p></div>`;
                 return;
             }
 
             list.innerHTML = '';
             filtered.forEach(req => {
-                const icon    = CAT_ICONS[req.issue_category] || '🔧';
+                const icon    = CAT_ICONS[req.issue_category] || 'wrench';
                 const dateStr = new Date(req.created_at).toLocaleDateString('en-PH', { month:'short', day:'numeric', year:'numeric' });
                 const propName = req.properties?.property_name || 'Property';
                 const unitNum  = req.unit_number || 'N/A';
@@ -1014,7 +1016,7 @@
                 card.className = 'request-card';
                 card.dataset.requestId = req.id;
                 card.innerHTML = `
-                    <div class="request-card-icon">${icon}</div>
+                    <div class="request-card-icon"><span data-icon="${icon}"></span></div>
                     <div class="request-card-body">
                         <div class="request-card-title">${req.issue_title}</div>
                         <div class="request-card-meta">${propName} · Unit ${unitNum} · ${dateStr}</div>
@@ -1030,7 +1032,7 @@
         }
 
         function showListError(msg) {
-            document.getElementById('requestsList').innerHTML = `<div class="empty-state"><div class="ei">❌</div><p>${msg}</p></div>`;
+            document.getElementById('requestsList').innerHTML = `<div class="empty-state"><div class="ei"><span data-icon="x"></span></div><p>${msg}</p></div>`;
         }
 
         // ── Badges ────────────────────────────────────────────
@@ -1057,7 +1059,7 @@
                 const updates = data.updates || [];
 
                 document.getElementById('detailsTitle').textContent = req.issue_title;
-                const icon = CAT_ICONS[req.issue_category] || '🔧';
+                const icon = CAT_ICONS[req.issue_category] || 'wrench';
                 const tech = req.assigned_maintenance?.full_name || 'Unassigned';
 
                 let html = `

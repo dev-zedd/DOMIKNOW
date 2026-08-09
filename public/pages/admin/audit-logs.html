@@ -48,6 +48,8 @@
             color: var(--text-primary);
         }
     </style>
+    <link href="../../css/design-system.css" rel="stylesheet">
+    <script src="../../js/ui.js" defer></script>
 </head>
 <body>
     <!-- Navbar -->
@@ -118,9 +120,9 @@
                         <th>Timestamp</th>
                     </tr>
                 </thead>
-                <tbody id="logsTableBody">
+                <tbody id="logsTableBody" aria-live="polite" aria-busy="true">
                     <tr>
-                        <td colspan="5" style="text-align: center; color: var(--text-muted);">Loading audit trails...</td>
+                        <td colspan="5" role="status" style="text-align: center; color: var(--text-muted);">Loading audit trails...</td>
                     </tr>
                 </tbody>
             </table>
@@ -159,7 +161,8 @@
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
                 if (!response.ok) {
-                    tableBody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: var(--error);">Failed to load audit trails.</td></tr>`;
+                    tableBody.innerHTML = `<tr><td colspan="5" role="alert" style="text-align: center; color: var(--error);">Audit trails could not be loaded. Check your permissions and try again.</td></tr>`;
+                    tableBody.setAttribute('aria-busy', 'false');
                     return;
                 }
 
@@ -167,7 +170,8 @@
                 const logs = result.data || [];
 
                 if (logs.length === 0) {
-                    tableBody.innerHTML = `<tr><td colspan="5" style="text-align: center; padding: 2rem; color: var(--text-muted);">No logs matching search criteria found.</td></tr>`;
+                    tableBody.innerHTML = `<tr><td colspan="5" role="status" style="text-align: center; padding: 2rem; color: var(--text-muted);">No audit records match these filters. Adjust the criteria and search again.</td></tr>`;
+                    tableBody.setAttribute('aria-busy', 'false');
                     return;
                 }
 
@@ -194,9 +198,11 @@
                     `;
                     tableBody.appendChild(row);
                 });
+                tableBody.setAttribute('aria-busy', 'false');
             } catch (err) {
                 console.error(err);
-                tableBody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: var(--error);">Error contacting service API.</td></tr>`;
+                tableBody.innerHTML = `<tr><td colspan="5" role="alert" style="text-align: center; color: var(--error);">The audit service could not be reached. Check your connection and try again.</td></tr>`;
+                tableBody.setAttribute('aria-busy', 'false');
             }
         }
     </script>

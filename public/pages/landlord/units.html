@@ -445,6 +445,8 @@
             color: var(--text-primary);
         }
     </style>
+    <link href="../../css/design-system.css" rel="stylesheet">
+    <script src="../../js/ui.js" defer></script>
 </head>
 <body>
     <!-- Navbar (handled dynamically by dashboard.js sidebar script) -->
@@ -956,7 +958,7 @@
                 const tag = document.createElement('span');
                 tag.className = 'other-amenity-tag';
                 tag.style.cssText = 'display: inline-flex; align-items: center; gap: 5px; font-size: 0.75rem; font-weight: 600; background-color: #ecfdf5; color: #047857; border: 1px solid #a7f3d0; padding: 0.2rem 0.55rem; border-radius: var(--radius-full); white-space: nowrap;';
-                tag.innerHTML = `${item}<button type="button" onclick="removeOtherAmenity(${idx})" style="background: none; border: none; cursor: pointer; color: inherit; padding: 0; display: inline-flex; align-items: center; margin-left: 2px; opacity: 0.8;"><svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg></button>`;
+                tag.innerHTML = `${item}<button type="button" aria-label="Remove amenity" onclick="removeOtherAmenity(${idx})" style="background: none; border: none; cursor: pointer; color: inherit; padding: 0; display: inline-flex; align-items: center; margin-left: 2px; opacity: 0.8;"><svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg></button>`;
                 wrapper.insertBefore(tag, input);
             });
         }

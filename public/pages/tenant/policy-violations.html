@@ -50,6 +50,8 @@
             color: var(--text-primary);
         }
     </style>
+    <link href="../../css/design-system.css" rel="stylesheet">
+    <script src="../../js/ui.js" defer></script>
 </head>
 <body>
     <!-- Navbar -->
@@ -62,7 +64,7 @@
             <div class="navbar-menu" style="flex-wrap: wrap; gap: 0.5rem 1rem;">
                 <a href="dashboard.html" class="navbar-menu-link">Dashboard</a>
                 <a href="properties.html" class="navbar-menu-link">Discovery</a>
-                <a href="recommendations.html" class="navbar-menu-link">Recommendations</a>
+                <a href="properties.html" class="navbar-menu-link">Discovery</a>
                 <a href="compare.html" class="navbar-menu-link">Compare</a>
                 <a href="reservations.html" class="navbar-menu-link">My Reservations</a>
                 <a href="applications.html" class="navbar-menu-link">My Applications</a>
@@ -357,7 +359,7 @@
                             <svg width="20" height="20" fill="none" stroke="#4f46e5" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
                             Platform Terms of Service &amp; Rules
                         </h3>
-                        <button id="closeUserPolicyModalBtn" style="background: none; border: none; cursor: pointer; color: var(--text-secondary); font-size: 1.5rem; font-weight: 700;">&times;</button>
+                        <button id="closeUserPolicyModalBtn" type="button" aria-label="Close platform policies" style="background: none; border: none; cursor: pointer; color: var(--text-secondary); font-size: 1.5rem; font-weight: 700;">&times;</button>
                     </div>
                     <div id="userPolicyModalBody" style="padding: 1.5rem; overflow-y: auto; flex-grow: 1;">
                         <div style="text-align: center; color: var(--text-muted); font-style: italic;">Loading published platform policies...</div>

@@ -78,6 +78,8 @@
             border-color: var(--maintenance);
         }
     </style>
+    <link href="../../css/design-system.css" rel="stylesheet">
+    <script src="../../js/ui.js" defer></script>
 </head>
 <body class="app-loading" data-role="maintenance" data-page-title="My Assigned Tasks">
     <!-- Navbar -->
@@ -104,12 +106,12 @@
         <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">Manage assigned jobs, travel to properties, execute repairs, and submit evidence reports.</p>
 
         <div class="filters-group">
-            <button class="filter-btn active" data-filter="all">All Jobs</button>
-            <button class="filter-btn" data-filter="assigned">New Offers</button>
-            <button class="filter-btn" data-filter="accepted">Accepted</button>
-            <button class="filter-btn" data-filter="in_progress">Working</button>
-            <button class="filter-btn" data-filter="completed">Completed</button>
-            <button class="filter-btn" data-filter="closed">History logs</button>
+            <button class="filter-btn active" data-filter="all" aria-pressed="true">All Jobs</button>
+            <button class="filter-btn" data-filter="assigned" aria-pressed="false">New Offers</button>
+            <button class="filter-btn" data-filter="accepted" aria-pressed="false">Accepted</button>
+            <button class="filter-btn" data-filter="in_progress" aria-pressed="false">Working</button>
+            <button class="filter-btn" data-filter="completed" aria-pressed="false">Completed</button>
+            <button class="filter-btn" data-filter="closed" aria-pressed="false">History logs</button>
         </div>
 
         <div class="list-card">
@@ -125,9 +127,9 @@
                         <th>Actions</th>
                     </tr>
                 </thead>
-                <tbody id="tasksTableBody">
+                <tbody id="tasksTableBody" aria-live="polite" aria-busy="true">
                     <tr>
-                        <td colspan="7" style="text-align: center; color: var(--text-muted);">Loading assigned tasks...</td>
+                        <td colspan="7" role="status" style="text-align: center; color: var(--text-muted);">Loading assigned tasks...</td>
                     </tr>
                 </tbody>
             </table>
@@ -149,8 +151,12 @@
                 const btn = e.target.closest('[data-filter]');
                 if (!btn) return;
 
-                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('.filter-btn').forEach(b => {
+                    b.classList.remove('active');
+                    b.setAttribute('aria-pressed', 'false');
+                });
                 btn.classList.add('active');
+                btn.setAttribute('aria-pressed', 'true');
 
                 activeFilter = btn.dataset.filter;
                 renderTasksTable();
@@ -164,17 +170,20 @@
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
                 if (!response.ok) {
-                    tableBody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: var(--error);">Failed to load assigned tasks.</td></tr>`;
+                    tableBody.innerHTML = `<tr><td colspan="7" role="alert" style="text-align: center; color: var(--error);">Assigned tasks could not be loaded. Please try again.</td></tr>`;
+                    tableBody.setAttribute('aria-busy', 'false');
                     return;
                 }
 
                 const result = await response.json();
                 myTasks = result.data || [];
                 renderTasksTable();
+                tableBody.setAttribute('aria-busy', 'false');
 
             } catch (err) {
                 console.error(err);
-                tableBody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: var(--error);">Error reaching service API.</td></tr>`;
+                tableBody.innerHTML = `<tr><td colspan="7" role="alert" style="text-align: center; color: var(--error);">The maintenance service could not be reached. Check your connection and try again.</td></tr>`;
+                tableBody.setAttribute('aria-busy', 'false');
             }
         }
 
@@ -193,7 +202,7 @@
             });
 
             if (filtered.length === 0) {
-                tableBody.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 2rem; color: var(--text-muted);">No task logs match the selected filter.</td></tr>`;
+                tableBody.innerHTML = `<tr><td colspan="7" role="status" style="text-align: center; padding: 2rem; color: var(--text-muted);">No maintenance tasks match this filter. Select another status to view more work.</td></tr>`;
                 return;
             }
 

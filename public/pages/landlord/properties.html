@@ -153,6 +153,8 @@
             color: var(--text-primary) !important;
         }
     </style>
+    <link href="../../css/design-system.css" rel="stylesheet">
+    <script src="../../js/ui.js" defer></script>
 </head>
 <body>
     <!-- Navbar -->
@@ -189,13 +191,13 @@
         </div>
 
         <!-- Tab Controls -->
-        <div style="display: flex; gap: 0.5rem; border-bottom: 2px solid var(--border-color); margin-bottom: 1.5rem;">
-            <button id="tabPending" class="tab-btn active" onclick="switchTab('pending')">Pending Review</button>
-            <button id="tabApproved" class="tab-btn" onclick="switchTab('approved')">Approved</button>
+        <div role="tablist" aria-label="Property status" style="display: flex; gap: 0.5rem; border-bottom: 2px solid var(--border-color); margin-bottom: 1.5rem;">
+            <button id="tabPending" class="tab-btn active" role="tab" aria-selected="true" onclick="switchTab('pending')">Pending Review</button>
+            <button id="tabApproved" class="tab-btn" role="tab" aria-selected="false" onclick="switchTab('approved')">Approved</button>
         </div>
 
-        <div id="propertiesGrid" class="prop-grid">
-            <p style="text-align: center; color: var(--text-muted); grid-column: 1/-1;">Loading your properties...</p>
+        <div id="propertiesGrid" class="prop-grid" aria-live="polite" aria-busy="true">
+            <p role="status" style="text-align: center; color: var(--text-muted); grid-column: 1/-1;">Loading your properties...</p>
         </div>
     </main>
 
@@ -219,17 +221,20 @@
                 });
 
                 if (!response.ok) {
-                    grid.innerHTML = `<p style="grid-column: 1/-1; text-align: center; color: var(--error);">Failed to load your properties.</p>`;
+                    grid.innerHTML = `<p role="alert" style="grid-column: 1/-1; text-align: center; color: var(--error);">Your properties could not be loaded. Please try again.</p>`;
+                    grid.setAttribute('aria-busy', 'false');
                     return;
                 }
 
                 const result = await response.json();
                 allProperties = result.data || [];
                 renderProperties();
+                grid.setAttribute('aria-busy', 'false');
 
             } catch (err) {
                 console.error(err);
-                grid.innerHTML = `<p style="grid-column: 1/-1; text-align: center; color: var(--error);">Error reaching landlord API.</p>`;
+                grid.innerHTML = `<p role="alert" style="grid-column: 1/-1; text-align: center; color: var(--error);">The property service could not be reached. Check your connection and try again.</p>`;
+                grid.setAttribute('aria-busy', 'false');
             }
         }
 
@@ -237,6 +242,8 @@
             currentTab = tab;
             document.getElementById('tabPending').classList.toggle('active', tab === 'pending');
             document.getElementById('tabApproved').classList.toggle('active', tab === 'approved');
+            document.getElementById('tabPending').setAttribute('aria-selected', String(tab === 'pending'));
+            document.getElementById('tabApproved').setAttribute('aria-selected', String(tab === 'approved'));
             renderProperties();
         }
 
@@ -253,7 +260,7 @@
 
             if (filtered.length === 0) {
                 grid.innerHTML = `
-                    <div class="empty-state">
+                    <div class="empty-state" role="status" aria-live="polite">
                         <svg width="48" height="48" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="color: var(--text-muted);"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
                         <h3>No Properties Registered</h3>
                         <p style="color: var(--text-secondary); max-width: 400px; margin: 0 auto;">No listings match this category.</p>
