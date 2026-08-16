@@ -150,6 +150,34 @@ async function handleResendCode() {
     }
 }
 
+// Helper to show verify notice with a direct action button
+function showVerifyNotice(message, email) {
+    const errorDiv = document.getElementById('errorMessage');
+    const emailParam = email ? `?email=${encodeURIComponent(email)}` : '';
+    const verifyUrl = `verify-code.html${emailParam}`;
+    
+    if (errorDiv) {
+        errorDiv.innerHTML = `
+            <div style="display: flex; flex-direction: column; gap: 0.5rem; width: 100%;">
+                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                    <span style="color: #ef4444; display: inline-flex; align-items: center; flex-shrink: 0;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                    </span>
+                    <span style="font-size: 0.875rem; font-weight: 600;">${message}</span>
+                </div>
+                <a href="${verifyUrl}" class="btn-primary" style="display: inline-block; text-align: center; font-size: 0.8125rem; padding: 0.625rem 1rem; text-decoration: none; margin-top: 0.25rem; border-radius: 8px;">
+                    Click here to enter your Verification Code &rarr;
+                </a>
+            </div>
+        `;
+        errorDiv.classList.remove('hidden');
+    } else {
+        if (confirm(`${message}\n\nDo you want to go to the verification page now?`)) {
+            window.location.href = verifyUrl;
+        }
+    }
+}
+
 // Handle Login
 async function handleLogin(e) {
     e.preventDefault();
@@ -188,7 +216,12 @@ async function handleLogin(e) {
                 else if (role === 'admin') window.location.href = '../admin/overview.html';
             }
         } else {
-            showError(result.message || 'Login failed');
+            const errorMsg = result.message || 'Login failed';
+            if (response.status === 403 && errorMsg.toLowerCase().includes('verify')) {
+                showVerifyNotice(errorMsg, data.email);
+            } else {
+                showError(errorMsg);
+            }
         }
     } catch (error) {
         showError('An error occurred during login');

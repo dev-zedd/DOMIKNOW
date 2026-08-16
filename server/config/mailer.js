@@ -1,13 +1,15 @@
 require('dotenv').config();
 const nodemailer = require('nodemailer');
 
+const smtpPass = (process.env.SMTP_PASS || '').replace(/\s+/g, '');
+
 const transporter = nodemailer.createTransport({
     host: process.env.SMTP_HOST,
     port: process.env.SMTP_PORT,
     secure: process.env.SMTP_SECURE === 'true', // true for 465, false for other ports
     auth: {
         user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASS,
+        pass: smtpPass,
     },
 });
 
@@ -35,7 +37,10 @@ const sendVerificationEmail = async (toEmail, verificationCode) => {
         console.log(`Verification email sent to ${toEmail}`);
         return true;
     } catch (error) {
-        console.error('Error sending email:', error);
+        console.error('Error sending email:', error.message || error);
+        console.log(`\n==================================================`);
+        console.log(`[DEV VERIFICATION CODE FOR ${toEmail}]: ${verificationCode}`);
+        console.log(`==================================================\n`);
         return false;
     }
 };
@@ -64,7 +69,10 @@ const sendForgotPasswordEmail = async (toEmail, resetCode) => {
         console.log(`Password reset email sent to ${toEmail}`);
         return true;
     } catch (error) {
-        console.error('Error sending password reset email:', error);
+        console.error('Error sending password reset email:', error.message || error);
+        console.log(`\n==================================================`);
+        console.log(`[DEV RESET CODE FOR ${toEmail}]: ${resetCode}`);
+        console.log(`==================================================\n`);
         return false;
     }
 };

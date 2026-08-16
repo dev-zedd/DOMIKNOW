@@ -217,9 +217,8 @@
         <form id="verifyForm" novalidate style="display: flex; flex-direction: column; gap: 1.25rem;">
             <div class="form-group">
                 <label for="email" class="form-label">Email Address *</label>
-                <input id="email" name="email" type="email" required readonly
-                       placeholder="john@example.com" class="form-input"
-                       style="background-color: var(--bg-color);">
+                <input id="email" name="email" type="email" required
+                       placeholder="john@example.com" class="form-input">
                 <small class="form-error" id="email_error" style="color: #ef4444; font-size: 0.75rem; font-weight: 600; margin-top: 0.25rem; display: block;"></small>
             </div>
 
@@ -269,8 +268,14 @@
         const urlParams = new URLSearchParams(window.location.search);
         const emailParam = urlParams.get('email');
         const redirectParam = urlParams.get('redirect');
+        const emailInput = document.getElementById('email');
         if (emailParam) {
-            document.getElementById('email').value = emailParam;
+            emailInput.value = emailParam;
+            emailInput.setAttribute('readonly', 'readonly');
+            emailInput.style.backgroundColor = 'var(--bg-color)';
+        } else {
+            emailInput.removeAttribute('readonly');
+            emailInput.style.backgroundColor = '#ffffff';
         }
         if (redirectParam) {
             const loginTarget = new URL(document.getElementById('postVerifyLogin').href, window.location.href);

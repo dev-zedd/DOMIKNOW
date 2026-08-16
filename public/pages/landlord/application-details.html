@@ -6,204 +6,374 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Application Details - DomiKnow</title>
     <link href="../../css/input.css" rel="stylesheet">
+    <link href="../../css/design-system.css" rel="stylesheet">
+    <link href="../../css/landlord.css" rel="stylesheet">
     <style>
-        body, html {
-            height: 100%;
+        html, body, .main-content-inner, .dashboard-container {
+            background-color: var(--color-bg-canvas, #f8fafc);
+            color: var(--color-text-primary, #0f172a);
+            font-family: var(--font-family, Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif);
+            height: auto !important;
+            min-height: 100vh;
             margin: 0;
-            overflow: hidden; /* Disable page scroll */
-            background-color: #f8fafc;
-            color: #1e293b;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-        }
-
-        /* Compact Navbar override */
-        .navbar {
-            height: 46px !important;
-            padding: 0 1.5rem !important;
+            overflow-x: hidden !important;
+            overflow-y: auto !important;
         }
 
         .dashboard-container {
-            height: calc(100vh - 46px);
-            display: flex;
-            flex-direction: column;
-            padding: 0.25rem 1.5rem 0.5rem 1.5rem;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 1.5rem 2rem 5rem 2rem;
             box-sizing: border-box;
-            overflow: hidden;
-            margin-top: 0 !important;
-            max-width: 100% !important;
+            height: auto !important;
+            overflow: visible !important;
         }
 
-        .nav-back {
-            margin-bottom: 0.2rem;
-            flex-shrink: 0;
+        /* Top Header Action Bar */
+        .app-detail-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-top: 0.5rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1.25rem;
+            border-bottom: 1px solid var(--color-border-default, #e2e8f0);
         }
 
-        .btn-back-arrow {
+        .header-title-group {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .btn-back-link {
             display: inline-flex;
             align-items: center;
-            justify-content: center;
-            width: 28px;
-            height: 28px;
-            background: #ffffff;
-            border: 1px solid #cbd5e1;
-            border-radius: 6px;
-            color: #0f172a;
-            font-size: 1rem;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: var(--color-bg-surface, #ffffff);
+            border: 1px solid var(--color-border-default, #e2e8f0);
+            border-radius: var(--radius-lg, 12px);
+            color: var(--color-text-secondary, #475569);
+            font-size: 0.875rem;
+            font-weight: 600;
             text-decoration: none;
-            font-weight: 700;
-            transition: all 0.15s;
-            cursor: pointer;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+            transition: all 0.2s ease;
+            box-shadow: var(--shadow-card, 0 1px 2px rgba(15, 23, 42, 0.05));
         }
 
-        .btn-back-arrow:hover {
-            background-color: #f1f5f9;
-            border-color: #94a3b8;
-            color: #000000;
+        .btn-back-link:hover {
+            color: var(--color-action-primary, #0355f3);
+            border-color: var(--color-action-primary, #0355f3);
+            background: var(--color-action-primary-subtle, #eaf0ff);
+            transform: translateX(-2px);
         }
 
+        .page-title {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--color-text-primary, #0f172a);
+            margin: 0;
+            letter-spacing: -0.02em;
+        }
+
+        .page-subtitle {
+            font-size: 0.875rem;
+            color: var(--color-text-secondary, #64748b);
+            margin: 0.25rem 0 0 0;
+        }
+
+        /* Main Details 2-Column Grid */
         .details-grid {
             display: grid;
-            grid-template-columns: 1.65fr 1.35fr;
-            gap: 0.75rem;
-            flex-grow: 1;
-            height: 0;
-            overflow: hidden;
+            grid-template-columns: 1fr 380px;
+            gap: 1.75rem;
+            align-items: start;
+            height: auto !important;
+            overflow: visible !important;
         }
 
-        @media (max-width: 900px) {
+        @media (max-width: 1024px) {
             .details-grid {
                 grid-template-columns: 1fr;
-                height: auto;
-                overflow-y: auto;
-            }
-            body, html {
-                overflow: auto;
             }
             .dashboard-container {
-                height: auto;
-                overflow: auto;
+                padding: 1rem 1rem 3rem 1rem;
             }
         }
 
         .details-left, .details-right {
             display: flex;
             flex-direction: column;
-            gap: 0.75rem;
-            height: 100%;
-            overflow-y: auto;
-            padding-right: 2px;
+            gap: 1.5rem;
+            height: auto !important;
+            overflow: visible !important;
         }
 
+        .details-right {
+            position: sticky;
+            top: 1.5rem;
+        }
+
+        /* Modern Card Styling */
         .prop-section-card {
-            background-color: #ffffff;
-            border: 1px solid #e2e8f0;
-            border-radius: 8px;
-            padding: 0.85rem;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.02);
-            flex-shrink: 0;
+            background: var(--color-bg-surface, #ffffff);
+            border: 1px solid var(--color-border-default, #e2e8f0);
+            border-radius: var(--radius-xl, 16px);
+            padding: 1.5rem;
+            box-shadow: var(--shadow-card, 0 1px 3px rgba(15, 23, 42, 0.05));
+            transition: box-shadow 0.2s ease;
+        }
+
+        .prop-section-card:hover {
+            box-shadow: 0 4px 12px rgba(15, 23, 42, 0.06);
         }
 
         .section-header-flex {
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            border-bottom: 1px solid #e2e8f0;
-            padding-bottom: 0.35rem;
-            margin-bottom: 0.6rem;
+            justify-content: space-between;
+            padding-bottom: 0.875rem;
+            margin-bottom: 1.25rem;
+            border-bottom: 1px solid var(--color-divider, #f1f5f9);
         }
 
-        .section-header-flex h3 {
+        .section-header-flex h3, .profile-card-title {
             margin: 0;
-            font-size: 0.95rem;
+            font-size: 1.05rem;
             font-weight: 700;
-            color: #0f172a;
+            color: var(--color-text-primary, #0f172a);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* Info Display Blocks */
+        .info-grid-2 {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.25rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .info-grid-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.25rem;
+            margin-bottom: 1.25rem;
+        }
+
+        @media (max-width: 640px) {
+            .info-grid-2, .info-grid-3 {
+                grid-template-columns: 1fr;
+            }
         }
 
         .info-block {
-            margin-bottom: 0.6rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
         }
 
         .info-lbl {
-            font-size: 0.65rem;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            color: #64748b;
+            font-size: 0.725rem;
             font-weight: 700;
-            margin-bottom: 0.15rem;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: var(--color-text-muted, #64748b);
         }
 
         .info-val {
-            font-size: 0.825rem;
+            font-size: 0.9375rem;
             font-weight: 600;
-            color: #0f172a;
+            color: var(--color-text-primary, #0f172a);
         }
 
+        .quote-box {
+            background-color: var(--color-bg-subtle, #f8fafc);
+            border-left: 4px solid var(--color-action-primary, #0355f3);
+            border-radius: var(--radius-md, 8px);
+            padding: 1rem 1.25rem;
+            color: var(--color-text-secondary, #334155);
+            font-size: 0.875rem;
+            line-height: 1.6;
+            margin: 0.5rem 0 1.25rem 0;
+            font-style: italic;
+        }
+
+        /* Documents List Styling */
         .doc-list {
             display: flex;
             flex-direction: column;
-            gap: 0.5rem;
+            gap: 0.75rem;
         }
 
         .doc-item {
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            padding: 0.45rem 0.65rem;
-            background-color: #f8fafc;
-            border: 1px solid #e2e8f0;
-            border-radius: 6px;
+            justify-content: space-between;
+            padding: 0.875rem 1rem;
+            background-color: var(--color-bg-subtle, #f8fafc);
+            border: 1px solid var(--color-border-default, #e2e8f0);
+            border-radius: var(--radius-lg, 12px);
+            transition: all 0.2s ease;
+        }
+
+        .doc-item:hover {
+            border-color: var(--color-action-primary, #0355f3);
+            background-color: var(--color-action-primary-subtle, #eaf0ff);
         }
 
         .doc-info {
             display: flex;
             flex-direction: column;
-            gap: 0.15rem;
+            gap: 0.25rem;
         }
 
         .doc-title {
             font-weight: 700;
-            font-size: 0.78rem;
-            color: #0f172a;
+            font-size: 0.8125rem;
+            color: var(--color-text-primary, #0f172a);
+            letter-spacing: 0.02em;
         }
 
         .doc-meta {
-            font-size: 0.725rem;
-            color: #64748b;
+            font-size: 0.775rem;
+            color: var(--color-text-muted, #64748b);
         }
 
-        .decision-panel {
-            background-color: #ffffff;
-            border: 1px solid #e2e8f0;
-            border-radius: 8px;
-            padding: 0.85rem;
-            flex-shrink: 0;
+        .doc-meta a {
+            color: var(--color-action-primary, #0355f3);
+            font-weight: 600;
+            text-decoration: underline;
         }
 
-        .profile-card-title {
-            font-size: 0.85rem;
+        /* Screening Criteria Table */
+        .criteria-table-container {
+            overflow-x: auto;
+            border-radius: var(--radius-lg, 12px);
+            border: 1px solid var(--color-border-default, #e2e8f0);
+            margin-top: 0.5rem;
+        }
+
+        .criteria-table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 0.875rem;
+        }
+
+        .criteria-table th {
+            background-color: var(--color-bg-subtle, #f1f5f9);
+            color: var(--color-text-secondary, #475569);
             font-weight: 700;
-            color: #0f172a;
-            margin: 0;
+            text-transform: uppercase;
+            font-size: 0.725rem;
+            letter-spacing: 0.06em;
+            padding: 0.875rem 1rem;
+            border-bottom: 2px solid var(--color-border-default, #e2e8f0);
         }
 
-        /* Custom Scrollbar Styles for elegant UI */
-        ::-webkit-scrollbar {
-            width: 4px;
-            height: 4px;
+        .criteria-table td {
+            padding: 0.875rem 1rem;
+            border-bottom: 1px solid var(--color-divider, #e2e8f0);
+            vertical-align: middle;
         }
-        ::-webkit-scrollbar-track {
-            background: #f1f5f9;
+
+        .criteria-table tr:last-child td {
+            border-bottom: none;
         }
-        ::-webkit-scrollbar-thumb {
-            background: #cbd5e1;
-            border-radius: 4px;
+
+        .criteria-table tr:hover td {
+            background-color: var(--color-bg-subtle, #f8fafc);
         }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #94a3b8;
+
+        /* Review Decision Panel */
+        .decision-panel {
+            background: var(--color-bg-surface, #ffffff);
+            border: 1px solid var(--color-border-default, #e2e8f0);
+            border-radius: var(--radius-xl, 16px);
+            padding: 1.5rem;
+            box-shadow: var(--shadow-card, 0 1px 3px rgba(15, 23, 42, 0.05));
+        }
+
+        .action-buttons-group {
+            display: flex;
+            gap: 0.75rem;
+            margin-top: 1rem;
+        }
+
+        .btn-approve {
+            flex: 1;
+            background-color: var(--color-success-text, #166534);
+            color: #ffffff;
+            font-weight: 700;
+            padding: 0.75rem 1rem;
+            border-radius: var(--radius-lg, 12px);
+            border: none;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 4px rgba(22, 101, 52, 0.2);
+        }
+
+        .btn-approve:hover {
+            background-color: #14532d;
+            transform: translateY(-1px);
+        }
+
+        .btn-reject {
+            flex: 1;
+            background-color: var(--color-error-bg, #fef2f2);
+            color: var(--color-error-text, #991b1b);
+            border: 1px solid var(--color-error-border, #fecaca);
+            font-weight: 700;
+            padding: 0.75rem 1rem;
+            border-radius: var(--radius-lg, 12px);
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            transition: all 0.2s ease;
+        }
+
+        .btn-reject:hover {
+            background-color: #fee2e2;
+            border-color: #fca5a5;
+        }
+
+        .preset-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .preset-chip {
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 0.35rem 0.75rem;
+            border-radius: var(--radius-full, 999px);
+            background: var(--color-bg-subtle, #f1f5f9);
+            color: var(--color-text-secondary, #475569);
+            border: 1px solid var(--color-border-default, #e2e8f0);
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .preset-chip:hover {
+            background: var(--color-action-primary-subtle, #eaf0ff);
+            color: var(--color-action-primary, #0355f3);
+            border-color: var(--color-action-primary, #0355f3);
         }
     </style>
-    <link href="../../css/design-system.css" rel="stylesheet">
     <script src="../../js/ui.js" defer></script>
 </head>
 
@@ -230,17 +400,17 @@
 
     <!-- Main Content -->
     <main class="dashboard-container">
-        <div class="nav-back">
-            <a href="applications.html" class="btn-back-arrow" title="Back to Applications" aria-label="Back to applications">←</a>
-        </div>
-
-        <div
-            style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-top: 1rem;">
-            <div>
-                <h2>Review Tenant Application</h2>
-                <p style="color: var(--text-secondary);">Verify application details and required tenant documents.</p>
+        <!-- Header & Navigation -->
+        <div class="app-detail-header">
+            <div class="header-title-group">
+                <a href="applications.html" class="btn-back-link">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                    <span>Back to Applications</span>
+                </a>
             </div>
-            <span id="appStatusBadge" class="status-badge">PENDING</span>
+            <div>
+                <span id="appStatusBadge" class="status-badge">PENDING</span>
+            </div>
         </div>
 
         <div id="generalFeedback" class="alert alert-success hidden"></div>
@@ -251,10 +421,13 @@
                 <!-- Tenant profile card -->
                 <div class="prop-section-card">
                     <div class="section-header-flex">
-                        <h3>Applicant Information</h3>
+                        <h3>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-action-primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                            Applicant Information
+                        </h3>
                     </div>
 
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <div class="info-grid-2">
                         <div class="info-block">
                             <div class="info-lbl">Full Name</div>
                             <div id="tenantName" class="info-val">-</div>
@@ -266,17 +439,14 @@
                     </div>
 
                     <div class="info-block">
-                        <div class="info-lbl">Introduce Message</div>
-                        <p id="appMessage"
-                            style="color: var(--text-secondary); line-height: 1.6; background-color: var(--bg-primary); padding: 0.75rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color); font-style: italic;">
-                            No introduction message provided.</p>
+                        <div class="info-lbl">Introduction Message</div>
+                        <div id="appMessage" class="quote-box">No introduction message provided.</div>
                     </div>
 
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <div class="info-grid-2">
                         <div class="info-block">
                             <div class="info-lbl">Desired Move-in Date</div>
-                            <div id="desiredMoveIn" class="info-val"
-                                style="color: var(--landlord); font-size: 1.125rem;">-</div>
+                            <div id="desiredMoveIn" class="info-val" style="color: var(--color-action-primary); font-size: 1.1rem; font-weight: 700;">-</div>
                         </div>
                         <div class="info-block">
                             <div class="info-lbl">Date Submitted</div>
@@ -288,13 +458,16 @@
                 <!-- Property reference card -->
                 <div class="prop-section-card">
                     <div class="section-header-flex">
-                        <h3>Target Property Profile</h3>
+                        <h3>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-action-primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+                            Target Property Profile
+                        </h3>
                     </div>
 
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <div class="info-grid-2">
                         <div class="info-block">
                             <div class="info-lbl">Property Name</div>
-                            <div id="propName" class="info-val" style="color: var(--primary);">-</div>
+                            <div id="propName" class="info-val" style="color: var(--color-action-primary); font-size: 1.05rem;">-</div>
                         </div>
                         <div class="info-block">
                             <div class="info-lbl">Address</div>
@@ -302,14 +475,14 @@
                         </div>
                     </div>
 
-                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem;">
+                    <div class="info-grid-3">
                         <div class="info-block">
                             <div class="info-lbl">Property Type</div>
                             <div id="propType" class="info-val">-</div>
                         </div>
                         <div class="info-block">
                             <div class="info-lbl">Monthly Rent</div>
-                            <div id="propRent" class="info-val">-</div>
+                            <div id="propRent" class="info-val" style="font-weight: 700; color: var(--color-success-text);">-</div>
                         </div>
                         <div class="info-block">
                             <div class="info-lbl">Max Occupants</div>
@@ -317,10 +490,10 @@
                         </div>
                     </div>
 
-                    <div style="display: grid; grid-template-columns: 1fr; gap: 1rem; margin-top: 1rem; border-top: 1px dashed var(--border-color); padding-top: 1rem;" id="targetUnitContainer" class="hidden">
+                    <div id="targetUnitContainer" class="hidden" style="margin-top: 1rem; border-top: 1px dashed var(--color-border-default); padding-top: 1rem;">
                         <div class="info-block">
-                            <div class="info-lbl" style="color: var(--accent);">Target Room / Bed Space</div>
-                            <div id="targetRoomVal" class="info-val" style="font-weight: 700; font-size: 1.1rem; color: var(--primary);">-</div>
+                            <div class="info-lbl" style="color: var(--color-action-primary);">Target Room / Bed Space</div>
+                            <div id="targetRoomVal" class="info-val" style="font-weight: 700; font-size: 1.1rem; color: var(--color-action-primary);">-</div>
                         </div>
                     </div>
                 </div>
@@ -328,39 +501,38 @@
                 <!-- Rental History Section -->
                 <div class="prop-section-card" id="rentalHistoryCard">
                     <div class="section-header-flex">
-                        <h3>Rental History</h3>
+                        <h3>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-action-primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
+                            Rental History
+                        </h3>
                     </div>
                     <div id="rentalHistoryContent">
-                        <p style="color: var(--text-muted); text-align: center; padding: 1rem;">Loading rental history
-                            details...</p>
+                        <p style="color: var(--color-text-muted); text-align: center; padding: 1.5rem;">Loading rental history details...</p>
                     </div>
                 </div>
 
                 <!-- Screening Criteria Card -->
                 <div class="prop-section-card">
                     <div class="section-header-flex">
-                        <h3>Screening Criteria Checklist</h3>
+                        <h3>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-action-primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                            Screening Criteria Checklist
+                        </h3>
                     </div>
-                    <div style="overflow-x: auto; margin-top: 1rem;">
-                        <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 0.875rem;">
+                    <div class="criteria-table-container">
+                        <table class="criteria-table">
                             <thead>
-                                <tr style="border-bottom: 2.5px solid var(--border-color); color: var(--primary);">
-                                    <th
-                                        style="padding: 0.75rem 0.5rem; font-weight: 700; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.05em; width: 30%;">
-                                        Criteria</th>
-                                    <th
-                                        style="padding: 0.75rem 0.5rem; font-weight: 700; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.05em; width: 40%;">
-                                        Description</th>
-                                    <th
-                                        style="padding: 0.75rem 0.5rem; font-weight: 700; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.05em; width: 30%;">
-                                        Verification / Status</th>
+                                <tr>
+                                    <th style="width: 32%;">Criteria</th>
+                                    <th style="width: 38%;">Description</th>
+                                    <th style="width: 30%;">Verification / Status</th>
                                 </tr>
                             </thead>
                             <tbody id="screeningCriteriaBody">
                                 <tr>
-                                    <td colspan="3"
-                                        style="text-align: center; padding: 1.5rem; color: var(--text-muted);">
-                                        Evaluating criteria details...</td>
+                                    <td colspan="3" style="text-align: center; padding: 1.5rem; color: var(--color-text-muted);">
+                                        Evaluating criteria details...
+                                    </td>
                                 </tr>
                             </tbody>
                         </table>
@@ -368,51 +540,69 @@
                 </div>
             </div>
 
-            <!-- Right Side: Documents and console decision -->
+            <!-- Right Side: Documents and decision panel -->
             <div class="details-right">
                 <!-- Documents Card -->
                 <div class="prop-section-card">
-                    <h3 class="profile-card-title" style="margin-bottom: 0.75rem;">Tenant Verification Files</h3>
-                    <p style="color: var(--text-muted); font-size: 0.8125rem; margin-bottom: 1rem;">Tenants must attach
-                        required proof of identity or income (e.g. COR, student IDs, parent IDs, valid government IDs)
-                        for your review.</p>
+                    <div class="section-header-flex">
+                        <h3>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-action-primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                            Verification Documents
+                        </h3>
+                    </div>
+                    <p style="color: var(--color-text-muted); font-size: 0.8125rem; margin-top: -0.5rem; margin-bottom: 1.25rem; line-height: 1.5;">
+                        Attached proof of identity or income (e.g. valid IDs, COR, income statements) for applicant verification.
+                    </p>
 
                     <div id="documentList" class="doc-list">
-                        <p style="color: var(--text-muted); font-size: 0.8125rem; font-style: italic;">No document
-                            uploads attached to this application.</p>
+                        <p style="color: var(--color-text-muted); font-size: 0.8125rem; font-style: italic;">No document uploads attached to this application.</p>
                     </div>
                 </div>
 
                 <!-- Decision Panel -->
                 <div class="decision-panel">
-                    <h3 class="profile-card-title"
-                        style="margin-bottom: 0.75rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem;">
-                        Review Actions</h3>
+                    <div class="section-header-flex">
+                        <h3>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-action-primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                            Review Actions
+                        </h3>
+                    </div>
 
                     <div id="decisionReviewDisplay" class="hidden" style="margin-bottom: 1rem;">
-                        <div class="info-lbl">Landlord Review Remarks</div>
-                        <p id="reviewRemarksText"
-                            style="font-size: 0.875rem; color: var(--text-secondary); line-height: 1.5; font-style: italic; background-color: white; border: 1px solid var(--border-color); padding: 0.5rem; border-radius: var(--radius-sm);">
-                            -</p>
-                        <div id="reviewedAtText"
-                            style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.25rem;">Reviewed on -
+                        <div class="info-lbl" style="margin-bottom: 0.5rem;">Landlord Review Remarks</div>
+                        <div id="reviewRemarksText" style="font-size: 0.875rem; color: var(--color-text-secondary); line-height: 1.6; font-style: italic; background-color: var(--color-bg-subtle); border: 1px solid var(--color-border-default); padding: 0.875rem; border-radius: var(--radius-md);">
+                            -
+                        </div>
+                        <div id="reviewedAtText" style="font-size: 0.775rem; color: var(--color-text-muted); margin-top: 0.5rem; font-weight: 600;">
+                            Reviewed on -
                         </div>
                     </div>
 
                     <div id="decisionFormContainer">
                         <div class="form-group">
-                            <label for="landlordRemarks" class="form-label">Review Remarks / Conditions</label>
-                            <textarea id="landlordRemarks" rows="3"
-                                placeholder="Add specific notes, approval conditions, or reasons for rejection..."
-                                class="form-textarea"></textarea>
+                            <label for="landlordRemarks" class="form-label" style="font-size: 0.8125rem; font-weight: 700; color: var(--color-text-primary); margin-bottom: 0.5rem; display: block;">Review Remarks / Conditions</label>
+                            <textarea id="landlordRemarks" rows="3" placeholder="Add specific notes, approval conditions, or reasons for rejection..." class="form-textarea" style="width: 100%; border-radius: var(--radius-lg); border: 1px solid var(--color-border-default); padding: 0.75rem; font-size: 0.875rem; box-sizing: border-box;"></textarea>
                         </div>
 
-                        <div style="display: flex; gap: 0.75rem;">
-                            <button id="btnReject" class="btn-primary"
-                                style="border-color:var(--color-error-border);background:var(--color-error-bg);color:var(--color-error-text);padding:0.6rem;"><span data-icon="x"></span> Reject</button>
-                            <button id="btnApprove" class="btn-primary"
-                                style="background-color:var(--color-action-primary);padding:0.6rem;"><span data-icon="check"></span> Approve
-                                Application</button>
+                        <!-- Quick Remarks Preset Chips -->
+                        <div style="margin-top: 0.75rem;">
+                            <span class="info-lbl" style="font-size: 0.6875rem;">Quick Remark Presets:</span>
+                            <div class="preset-chips">
+                                <button type="button" class="preset-chip" onclick="applyRemarkPreset('All documents verified and application approved. Welcome!')">✓ Verified & Approved</button>
+                                <button type="button" class="preset-chip" onclick="applyRemarkPreset('Pending security deposit payment and signed contract.')">⏳ Deposit Pending</button>
+                                <button type="button" class="preset-chip" onclick="applyRemarkPreset('Application rejected due to incomplete requirements.')">✕ Incomplete Requirements</button>
+                            </div>
+                        </div>
+
+                        <div class="action-buttons-group">
+                            <button id="btnReject" type="button" class="btn-reject">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                                <span>Reject</span>
+                            </button>
+                            <button id="btnApprove" type="button" class="btn-approve">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                <span>Approve Application</span>
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -427,6 +617,13 @@
         const urlParams = new URLSearchParams(window.location.search);
         const applicationId = urlParams.get('id');
         let currentApplication = null;
+
+        function applyRemarkPreset(text) {
+            const remarks = document.getElementById('landlordRemarks');
+            if (remarks) {
+                remarks.value = text;
+            }
+        }
 
         document.addEventListener('DOMContentLoaded', () => {
             if (!token) return;
@@ -502,7 +699,7 @@
             if (!screening) {
                 container.innerHTML = `
                     <div style="text-align: center; padding: 2rem 1rem;">
-                        <p style="color: var(--text-muted); font-style: italic;">Awaiting screening profile submission from the applicant...</p>
+                        <p style="color: var(--color-text-muted); font-style: italic;">Awaiting screening profile submission from the applicant...</p>
                     </div>
                 `;
                 return;
@@ -512,125 +709,125 @@
 
             if (history === 'positive') {
                 container.innerHTML = `
-                    <div style="margin-bottom: 1rem; padding: 0.5rem 0.75rem; background-color: #f8fafc; border-radius: var(--radius-md); border-left: 4px solid var(--landlord);">
-                        <strong style="color: var(--landlord); font-size: 0.95rem;">Rental Record #1</strong>
+                    <div style="margin-bottom: 1rem; padding: 0.5rem 0.75rem; background-color: var(--color-bg-subtle); border-radius: var(--radius-md); border-left: 4px solid var(--color-success-text);">
+                        <strong style="color: var(--color-success-text); font-size: 0.95rem;">Rental Record #1 (Verified)</strong>
                     </div>
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.5rem; margin-bottom: 1.5rem;">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.25rem; margin-bottom: 1.25rem;">
                         <div>
-                            <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700; margin-bottom: 0.25rem;">Previous Property</div>
-                            <div style="font-weight: 700; color: var(--text-primary);">Sunrise Apartment</div>
+                            <div style="font-size: 0.725rem; color: var(--color-text-muted); text-transform: uppercase; font-weight: 700; margin-bottom: 0.25rem;">Previous Property</div>
+                            <div style="font-weight: 700; color: var(--color-text-primary);">Sunrise Apartment</div>
                         </div>
                         <div>
-                            <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700; margin-bottom: 0.25rem;">Previous Landlord</div>
-                            <div style="font-weight: 700; color: var(--text-primary);">Maria Santos (Declared)</div>
+                            <div style="font-size: 0.725rem; color: var(--color-text-muted); text-transform: uppercase; font-weight: 700; margin-bottom: 0.25rem;">Previous Landlord</div>
+                            <div style="font-weight: 700; color: var(--color-text-primary);">Maria Santos (Declared)</div>
                         </div>
                         <div>
-                            <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700; margin-bottom: 0.25rem;">Rental Period</div>
-                            <div style="font-weight: 700; color: var(--text-primary);">Jan 2025 – Dec 2026</div>
+                            <div style="font-size: 0.725rem; color: var(--color-text-muted); text-transform: uppercase; font-weight: 700; margin-bottom: 0.25rem;">Rental Period</div>
+                            <div style="font-weight: 700; color: var(--color-text-primary);">Jan 2025 – Dec 2026</div>
                         </div>
                         <div>
-                            <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700; margin-bottom: 0.25rem;">Length of Stay</div>
-                            <div style="font-weight: 700; color: var(--text-primary);">24 months</div>
+                            <div style="font-size: 0.725rem; color: var(--color-text-muted); text-transform: uppercase; font-weight: 700; margin-bottom: 0.25rem;">Length of Stay</div>
+                            <div style="font-weight: 700; color: var(--color-text-primary);">24 months</div>
                         </div>
                         <div>
-                            <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700; margin-bottom: 0.25rem;">Reason for Leaving</div>
-                            <div style="font-weight: 700; color: var(--text-primary);">End of Contract</div>
+                            <div style="font-size: 0.725rem; color: var(--color-text-muted); text-transform: uppercase; font-weight: 700; margin-bottom: 0.25rem;">Reason for Leaving</div>
+                            <div style="font-weight: 700; color: var(--color-text-primary);">End of Contract</div>
                         </div>
                         <div>
-                            <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700; margin-bottom: 0.25rem;">Lease Completed</div>
-                            <div style="font-weight: 700; color: var(--text-primary);">Yes</div>
+                            <div style="font-size: 0.725rem; color: var(--color-text-muted); text-transform: uppercase; font-weight: 700; margin-bottom: 0.25rem;">Lease Completed</div>
+                            <div style="font-weight: 700; color: var(--color-success-text);">Yes (100%)</div>
                         </div>
                         <div>
-                            <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700; margin-bottom: 0.25rem;">Outstanding Balance</div>
-                            <div style="font-weight: 700; color: var(--text-primary);">₱0</div>
+                            <div style="font-size: 0.725rem; color: var(--color-text-muted); text-transform: uppercase; font-weight: 700; margin-bottom: 0.25rem;">Outstanding Balance</div>
+                            <div style="font-weight: 700; color: var(--color-success-text);">₱0</div>
                         </div>
                         <div>
-                            <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700; margin-bottom: 0.25rem;">Property Condition</div>
-                            <div style="font-weight: 700; color: var(--text-primary);">Good</div>
+                            <div style="font-size: 0.725rem; color: var(--color-text-muted); text-transform: uppercase; font-weight: 700; margin-bottom: 0.25rem;">Property Condition</div>
+                            <div style="font-weight: 700; color: var(--color-text-primary);">Good Condition</div>
                         </div>
                         <div>
-                            <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700; margin-bottom: 0.25rem;">Landlord Rating</div>
-                            <div style="font-weight: 700; color: var(--text-primary); flex; align-items: center; gap: 4px;">
+                            <div style="font-size: 0.725rem; color: var(--color-text-muted); text-transform: uppercase; font-weight: 700; margin-bottom: 0.25rem;">Landlord Rating</div>
+                            <div style="font-weight: 700; color: var(--color-warning-text); display: flex; align-items: center; gap: 4px;">
                                 <svg width="14" height="14" viewBox="0 0 24 24" fill="var(--color-warning-text)" stroke="var(--color-warning-text)" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
                                 <span>4.8 / 5</span>
                             </div>
                         </div>
                         <div>
-                            <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700; margin-bottom: 0.25rem;">Reported Incidents</div>
-                            <div style="font-weight: 700; color: var(--text-primary);">0 valid reports</div>
+                            <div style="font-size: 0.725rem; color: var(--color-text-muted); text-transform: uppercase; font-weight: 700; margin-bottom: 0.25rem;">Reported Incidents</div>
+                            <div style="font-weight: 700; color: var(--color-success-text);">0 valid reports</div>
                         </div>
                     </div>
-                    <div style="background-color: var(--bg-primary); border: 1px dashed var(--border-color); border-radius: var(--radius-md); padding: 1.25rem; margin-top: 1rem;">
-                        <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700; margin-bottom: 0.5rem;">Previous Landlord Feedback</div>
-                        <div style="font-style: italic; color: var(--text-secondary); line-height: 1.5;">
-                            "Always paid rent on time and maintained the unit well."
+                    <div style="background-color: var(--color-bg-subtle); border: 1px dashed var(--color-border-default); border-radius: var(--radius-md); padding: 1rem 1.25rem;">
+                        <div style="font-size: 0.725rem; color: var(--color-text-muted); text-transform: uppercase; font-weight: 700; margin-bottom: 0.35rem;">Previous Landlord Feedback</div>
+                        <div style="font-style: italic; color: var(--color-text-secondary); line-height: 1.5;">
+                            "Always paid rent on time and maintained the unit exceptionally well."
                         </div>
                     </div>
                 `;
             } else if (history === 'negative') {
                 container.innerHTML = `
-                    <div style="margin-bottom: 1rem; padding: 0.5rem 0.75rem; background-color: #f8fafc; border-radius: var(--radius-md); border-left: 4px solid var(--error);">
-                        <strong style="color: var(--error); font-size: 0.95rem;">Rental Record #1</strong>
+                    <div style="margin-bottom: 1rem; padding: 0.5rem 0.75rem; background-color: var(--color-error-bg); border-radius: var(--radius-md); border-left: 4px solid var(--color-error-text);">
+                        <strong style="color: var(--color-error-text); font-size: 0.95rem;">Rental Record #1 (Violations Found)</strong>
                     </div>
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.5rem; margin-bottom: 1.5rem;">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.25rem; margin-bottom: 1.25rem;">
                         <div>
-                            <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700; margin-bottom: 0.25rem;">Previous Property</div>
-                            <div style="font-weight: 700; color: var(--text-primary);">Sunset Heights</div>
+                            <div style="font-size: 0.725rem; color: var(--color-text-muted); text-transform: uppercase; font-weight: 700; margin-bottom: 0.25rem;">Previous Property</div>
+                            <div style="font-weight: 700; color: var(--color-text-primary);">Sunset Heights</div>
                         </div>
                         <div>
-                            <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700; margin-bottom: 0.25rem;">Previous Landlord</div>
-                            <div style="font-weight: 700; color: var(--text-primary);">John Doe (Declared)</div>
+                            <div style="font-size: 0.725rem; color: var(--color-text-muted); text-transform: uppercase; font-weight: 700; margin-bottom: 0.25rem;">Previous Landlord</div>
+                            <div style="font-weight: 700; color: var(--color-text-primary);">John Doe (Declared)</div>
                         </div>
                         <div>
-                            <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700; margin-bottom: 0.25rem;">Rental Period</div>
-                            <div style="font-weight: 700; color: var(--text-primary);">Jan 2026 – Aug 2026</div>
+                            <div style="font-size: 0.725rem; color: var(--color-text-muted); text-transform: uppercase; font-weight: 700; margin-bottom: 0.25rem;">Rental Period</div>
+                            <div style="font-weight: 700; color: var(--color-text-primary);">Jan 2026 – Aug 2026</div>
                         </div>
                         <div>
-                            <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700; margin-bottom: 0.25rem;">Length of Stay</div>
-                            <div style="font-weight: 700; color: var(--text-primary);">8 months</div>
+                            <div style="font-size: 0.725rem; color: var(--color-text-muted); text-transform: uppercase; font-weight: 700; margin-bottom: 0.25rem;">Length of Stay</div>
+                            <div style="font-weight: 700; color: var(--color-text-primary);">8 months</div>
                         </div>
                         <div>
-                            <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700; margin-bottom: 0.25rem;">Reason for Leaving</div>
-                            <div style="font-weight: 700; color: var(--text-primary);">Contract Interrupted</div>
+                            <div style="font-size: 0.725rem; color: var(--color-text-muted); text-transform: uppercase; font-weight: 700; margin-bottom: 0.25rem;">Reason for Leaving</div>
+                            <div style="font-weight: 700; color: var(--color-text-primary);">Contract Interrupted</div>
                         </div>
                         <div>
-                            <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700; margin-bottom: 0.25rem;">Lease Completed</div>
-                            <div style="display:inline-flex;align-items:center;gap:0.3rem;font-weight:700;color:var(--color-error-text);"><span data-icon="x"></span>No</div>
+                            <div style="font-size: 0.725rem; color: var(--color-text-muted); text-transform: uppercase; font-weight: 700; margin-bottom: 0.25rem;">Lease Completed</div>
+                            <div style="font-weight: 700; color: var(--color-error-text);">No</div>
                         </div>
                         <div>
-                            <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700; margin-bottom: 0.25rem;">Outstanding Balance</div>
-                            <div style="font-weight: 700; color: var(--error);">₱15,000</div>
+                            <div style="font-size: 0.725rem; color: var(--color-text-muted); text-transform: uppercase; font-weight: 700; margin-bottom: 0.25rem;">Outstanding Balance</div>
+                            <div style="font-weight: 700; color: var(--color-error-text);">₱15,000</div>
                         </div>
                         <div>
-                            <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700; margin-bottom: 0.25rem;">Property Condition</div>
-                            <div style="font-weight: 700; color: var(--error);">Major Damages</div>
+                            <div style="font-size: 0.725rem; color: var(--color-text-muted); text-transform: uppercase; font-weight: 700; margin-bottom: 0.25rem;">Property Condition</div>
+                            <div style="font-weight: 700; color: var(--color-error-text);">Major Damages</div>
                         </div>
                         <div>
-                            <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700; margin-bottom: 0.25rem;">Landlord Rating</div>
-                            <div style="font-weight: 700; color: var(--error);">⭐⭐ (2.0/5)</div>
+                            <div style="font-size: 0.725rem; color: var(--color-text-muted); text-transform: uppercase; font-weight: 700; margin-bottom: 0.25rem;">Landlord Rating</div>
+                            <div style="font-weight: 700; color: var(--color-error-text);">2.0 / 5</div>
                         </div>
                         <div>
-                            <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700; margin-bottom: 0.25rem;">Reported Incidents</div>
-                            <div style="font-weight: 700; color: var(--error);">3 violations reported</div>
+                            <div style="font-size: 0.725rem; color: var(--color-text-muted); text-transform: uppercase; font-weight: 700; margin-bottom: 0.25rem;">Reported Incidents</div>
+                            <div style="font-weight: 700; color: var(--color-error-text);">3 violations reported</div>
                         </div>
                     </div>
-                    <div style="background-color: var(--bg-primary); border: 1px dashed var(--border-color); border-radius: var(--radius-md); padding: 1.25rem; margin-top: 1rem;">
-                        <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700; margin-bottom: 0.5rem;">Previous Landlord Feedback</div>
-                        <div style="font-style: italic; color: var(--text-secondary); line-height: 1.5;">
+                    <div style="background-color: var(--color-error-bg); border: 1px dashed var(--color-error-border); border-radius: var(--radius-md); padding: 1rem 1.25rem;">
+                        <div style="font-size: 0.725rem; color: var(--color-error-text); text-transform: uppercase; font-weight: 700; margin-bottom: 0.35rem;">Previous Landlord Feedback</div>
+                        <div style="font-style: italic; color: var(--color-error-text); line-height: 1.5;">
                             "Late payments on multiple occasions, caused noise complaints, and left unit in poor condition."
                         </div>
                     </div>
                 `;
             } else {
                 container.innerHTML = `
-                    <div style="text-align: center; padding: 2rem 1rem;">
-                        <p style="color: var(--text-muted); margin-bottom: 1rem;">No previous rental records found.</p>
+                    <div style="text-align: center; padding: 1.5rem 1rem;">
+                        <p style="color: var(--color-text-muted); margin-bottom: 0.75rem;">No previous rental records found.</p>
                         <div style="margin-bottom: 0.5rem;">
-                            <span class="status-badge" style="background-color: var(--color-success-bg); color: var(--color-success-text); border: 1px solid var(--color-success-border); font-size: 0.85rem; padding: 0.5rem 1rem; font-weight: 700; border-radius: var(--radius-md);">
-                                <span data-icon="check"></span> First-Time Renter
+                            <span class="status-badge status-active" style="font-size: 0.85rem; padding: 0.5rem 1rem; font-weight: 700; border-radius: var(--radius-md);">
+                                ✓ First-Time Renter
                             </span>
                         </div>
-                        <p style="font-size: 0.85rem; color: var(--text-secondary); max-width: 400px; margin: 0.5rem auto 0 auto;">
+                        <p style="font-size: 0.85rem; color: var(--color-text-secondary); max-width: 420px; margin: 0.5rem auto 0 auto; line-height: 1.5;">
                             Applicant is a first-time renter. No penalties apply to their score for lack of rental history.
                         </p>
                     </div>
@@ -645,141 +842,118 @@
             const docs = application.documents || [];
             const history = screening ? screening.previous_rental_history : 'neutral';
 
-            // ── Group 1 Helper Values ──
+            // Helper Values
             const hasID = docs.some(d => ['valid_id', 'student_id', 'parent_guardian_id'].includes(d.document_type));
             const idVal = hasID
                 ? `<span style="color: var(--color-success-text); font-weight: 700; display: inline-flex; align-items: center; gap: 0.25rem;">
-                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                     Verified (ID Uploaded)
+                     ✓ Verified (ID Uploaded)
                    </span>`
                 : `<span style="color: var(--color-warning-text); font-weight: 700; display: inline-flex; align-items: center; gap: 0.25rem;">
-                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-                     Missing Government ID
-                   </span>`;
-
-            // Selfie Check
-            const selfieVal = hasID
-                ? `<span style="color: var(--color-success-text); font-weight: 700; display: inline-flex; align-items: center; gap: 0.25rem;">
-                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                     Verified (Selfie Match Passed)
-                   </span>`
-                : `<span style="color: var(--color-warning-text); font-weight: 700; display: inline-flex; align-items: center; gap: 0.25rem;">
-                     Pending ID Verification
+                     ⚠ Missing Government ID
                    </span>`;
 
             // Contact Check
             const hasContact = screening && screening.users && screening.users.contact_number;
             const contactVal = hasContact
-                ? `<span style="color: var(--color-success-text); font-weight: 700; display: inline-flex; align-items: center; gap: 0.25rem;">
-                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                     Verified (${screening.users.contact_number})
+                ? `<span style="color: var(--color-success-text); font-weight: 700;">
+                     ✓ Verified (${screening.users.contact_number})
                    </span>`
                 : `<span style="color: var(--color-warning-text); font-weight: 700;">
                      Email Verified Only
                    </span>`;
 
-            // ── Group 2 Helper Values ──
+            // Financial Values
             const empStatus = screening ? screening.employment_status : 'unemployed';
             const income = screening ? parseFloat(screening.monthly_income) : 0;
             const hasIncomeProof = docs.some(d => ['proof_of_income', 'certificate_of_registration'].includes(d.document_type));
 
-            const empStatusVal = `<span style="text-transform: capitalize; font-weight: 700; color: ${empStatus === 'unemployed' ? 'var(--color-error-text)' : 'var(--color-success-text)'};">
-                ${empStatus.replace('_', ' ')}
-            </span>`;
-
-            const incomeVal = `<span style="font-weight: 700; color: var(--text-primary);">
-                ₱${income.toLocaleString(undefined, { minimumFractionDigits: 2 })} PHP / month
-            </span>`;
-
             const incomeProofVal = hasIncomeProof
-                ? `<span style="color: var(--color-success-text); font-weight: 700; display: inline-flex; align-items: center; gap: 0.25rem;">
-                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                     Verified (Proof Uploaded)
+                ? `<span style="color: var(--color-success-text); font-weight: 700;">
+                     ✓ Verified (Proof Uploaded)
                    </span>`
-                : `<span style="color: var(--color-warning-text); font-weight: 700; display: inline-flex; align-items: center; gap: 0.25rem;">
-                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-                     Missing Proof of Income
+                : `<span style="color: var(--color-warning-text); font-weight: 700;">
+                     ⚠ Missing Proof of Income
                    </span>`;
 
-            // ── Group 3 Helper Values ──
+            // History Helper Values
             let prevRentalsVal = '', leaseCompVal = '', balanceVal = '', conditionVal = '', ratingVal = '', feedbackVal = '', reportsVal = '';
             if (screening) {
                 if (history === 'positive') {
                     prevRentalsVal = `<span style="color: var(--color-success-text); font-weight: 700;">Sunrise Apartment (Declared)</span>`;
-                    leaseCompVal = `<span style="display:inline-flex;align-items:center;gap:0.3rem;color:var(--color-success-text);font-weight:700;"><span data-icon="check"></span>100% Completed</span>`;
+                    leaseCompVal = `<span style="color: var(--color-success-text); font-weight: 700;">✓ 100% Completed</span>`;
                     balanceVal = `<span style="color: var(--color-success-text); font-weight: 700;">₱0</span>`;
                     conditionVal = `<span style="color: var(--color-success-text); font-weight: 700;">Good / Minor Wear</span>`;
-                    ratingVal = `<span style="color: var(--color-success-text); font-weight: 700;">⭐⭐⭐⭐⭐ (4.8/5)</span>`;
-                    feedbackVal = `<span style="color: var(--text-secondary); font-style: italic;">"Always paid on time..."</span>`;
+                    ratingVal = `<span style="color: var(--color-success-text); font-weight: 700;">⭐ 4.8 / 5</span>`;
+                    feedbackVal = `<span style="color: var(--color-text-secondary); font-style: italic;">"Always paid on time..."</span>`;
                     reportsVal = `<span style="color: var(--color-success-text); font-weight: 700;">0 Reported Violations</span>`;
                 } else if (history === 'negative') {
                     prevRentalsVal = `<span style="color: var(--color-error-text); font-weight: 700;">Sunset Heights (Declared)</span>`;
-                    leaseCompVal = `<span style="display:inline-flex;align-items:center;gap:0.3rem;color:var(--color-error-text);font-weight:700;"><span data-icon="x"></span>Interrupted / Terminated</span>`;
+                    leaseCompVal = `<span style="color: var(--color-error-text); font-weight: 700;">✕ Interrupted</span>`;
                     balanceVal = `<span style="color: var(--color-error-text); font-weight: 700;">₱15,000 Outstanding</span>`;
                     conditionVal = `<span style="color: var(--color-error-text); font-weight: 700;">Major Damages Reported</span>`;
-                    ratingVal = `<span style="color: var(--color-error-text); font-weight: 700;">⭐⭐ (2.0/5)</span>`;
-                    feedbackVal = `<span style="color: var(--text-secondary); font-style: italic;">"Late payments..."</span>`;
+                    ratingVal = `<span style="color: var(--color-error-text); font-weight: 700;">⭐ 2.0 / 5</span>`;
+                    feedbackVal = `<span style="color: var(--color-text-secondary); font-style: italic;">"Late payments..."</span>`;
                     reportsVal = `<span style="color: var(--color-error-text); font-weight: 700;">3 Violations Reported</span>`;
                 } else {
-                    prevRentalsVal = `<span class="status-badge status-active" style="font-weight:700;"><span data-icon="check"></span>First-Time Renter</span>`;
-                    leaseCompVal = `<span style="color: var(--text-muted);">N/A (First-Time Renter)</span>`;
+                    prevRentalsVal = `<span class="status-badge status-active" style="font-weight:700;">✓ First-Time Renter</span>`;
+                    leaseCompVal = `<span style="color: var(--color-text-muted);">N/A (First-Time Renter)</span>`;
                     balanceVal = `<span style="color: var(--color-success-text); font-weight: 700;">₱0</span>`;
-                    conditionVal = `<span style="color: var(--text-muted);">N/A (First-Time Renter)</span>`;
-                    ratingVal = `<span style="color: var(--text-muted);">N/A (First-Time Renter)</span>`;
-                    feedbackVal = `<span style="color: var(--text-muted);">N/A (First-Time Renter)</span>`;
+                    conditionVal = `<span style="color: var(--color-text-muted);">N/A (First-Time Renter)</span>`;
+                    ratingVal = `<span style="color: var(--color-text-muted);">N/A (First-Time Renter)</span>`;
+                    feedbackVal = `<span style="color: var(--color-text-muted);">N/A (First-Time Renter)</span>`;
                     reportsVal = `<span style="color: var(--color-success-text); font-weight: 700;">0 Reported Violations</span>`;
                 }
             } else {
-                prevRentalsVal = `<span style="color: var(--text-muted); font-style: italic;">Awaiting Screening Profile</span>`;
-                leaseCompVal = `<span style="color: var(--text-muted); font-style: italic;">Awaiting Screening Profile</span>`;
-                balanceVal = `<span style="color: var(--text-muted); font-style: italic;">Awaiting Screening Profile</span>`;
-                conditionVal = `<span style="color: var(--text-muted); font-style: italic;">Awaiting Screening Profile</span>`;
-                ratingVal = `<span style="color: var(--text-muted); font-style: italic;">Awaiting Screening Profile</span>`;
-                feedbackVal = `<span style="color: var(--text-muted); font-style: italic;">Awaiting Screening Profile</span>`;
-                reportsVal = `<span style="color: var(--text-muted); font-style: italic;">Awaiting Screening Profile</span>`;
+                prevRentalsVal = `<span style="color: var(--color-text-muted); font-style: italic;">Awaiting Screening Profile</span>`;
+                leaseCompVal = `<span style="color: var(--color-text-muted); font-style: italic;">Awaiting Screening Profile</span>`;
+                balanceVal = `<span style="color: var(--color-text-muted); font-style: italic;">Awaiting Screening Profile</span>`;
+                conditionVal = `<span style="color: var(--color-text-muted); font-style: italic;">Awaiting Screening Profile</span>`;
+                ratingVal = `<span style="color: var(--color-text-muted); font-style: italic;">Awaiting Screening Profile</span>`;
+                feedbackVal = `<span style="color: var(--color-text-muted); font-style: italic;">Awaiting Screening Profile</span>`;
+                reportsVal = `<span style="color: var(--color-text-muted); font-style: italic;">Awaiting Screening Profile</span>`;
             }
 
-            // ── Group 4 Helper Values ──
+            // Group 2 Document Helpers
             const validIdDoc = docs.find(d => ['valid_id', 'student_id', 'parent_guardian_id'].includes(d.document_type));
             const idDocVal = validIdDoc
-                ? `<a href="${validIdDoc.file_url}" target="_blank" style="color: var(--primary); font-weight: 700; text-decoration: underline;">
+                ? `<a href="${validIdDoc.file_url}" target="_blank" style="color: var(--color-action-primary); font-weight: 700; text-decoration: underline;">
                      ${validIdDoc.file_name}
                    </a>`
                 : `<span style="color: var(--color-warning-text); font-weight: 700;">Not Uploaded</span>`;
 
             const incomeDoc = docs.find(d => ['proof_of_income', 'certificate_of_registration'].includes(d.document_type));
             const incomeDocVal = incomeDoc
-                ? `<a href="${incomeDoc.file_url}" target="_blank" style="color: var(--primary); font-weight: 700; text-decoration: underline;">
+                ? `<a href="${incomeDoc.file_url}" target="_blank" style="color: var(--color-action-primary); font-weight: 700; text-decoration: underline;">
                      ${incomeDoc.file_name}
                    </a>`
                 : `<span style="color: var(--color-warning-text); font-weight: 700;">Not Uploaded</span>`;
 
             const empCertDoc = docs.find(d => d.document_type === 'other' && d.file_name.toLowerCase().includes('employment'));
             const empCertDocVal = empCertDoc
-                ? `<a href="${empCertDoc.file_url}" target="_blank" style="color: var(--primary); font-weight: 700; text-decoration: underline;">
+                ? `<a href="${empCertDoc.file_url}" target="_blank" style="color: var(--color-action-primary); font-weight: 700; text-decoration: underline;">
                      ${empCertDoc.file_name}
                    </a>`
-                : `<span style="color: var(--text-muted);">Not Uploaded (Optional)</span>`;
+                : `<span style="color: var(--color-text-muted);">Not Uploaded (Optional)</span>`;
 
             const otherDocs = docs.filter(d => !['valid_id', 'student_id', 'parent_guardian_id', 'proof_of_income', 'certificate_of_registration'].includes(d.document_type) && d !== empCertDoc);
-            let otherDocsVal = 'None';
+            let otherDocsVal = '<span style="color: var(--color-text-muted);">None</span>';
             if (otherDocs.length > 0) {
                 otherDocsVal = otherDocs.map(d => `
                     <div style="margin-bottom:0.25rem;">
-                        <a href="${d.file_url}" target="_blank" style="color: var(--primary); font-weight: 600; text-decoration: underline;">
+                        <a href="${d.file_url}" target="_blank" style="color: var(--color-action-primary); font-weight: 600; text-decoration: underline;">
                             ${d.file_name}
                         </a>
                     </div>
                 `).join('');
             }
 
-            // ── Group 5 Helper Values ──
+            // Group 3 Assessment Helpers
             const scoreVal = screening && screening.screening_score !== null
-                ? `<strong style="color: var(--primary); font-size: 1rem;">${screening.screening_score} / 100</strong>`
-                : `<span style="color: var(--text-muted); font-style: italic;">Awaiting Calculation</span>`;
+                ? `<strong style="color: var(--color-action-primary); font-size: 1rem;">${screening.screening_score} / 100</strong>`
+                : `<span style="color: var(--color-text-muted); font-style: italic;">Awaiting Calculation</span>`;
 
-            let riskVal = `<span style="color: var(--text-muted); font-style: italic;">Awaiting Calculation</span>`;
-            let recVal = `<span style="color: var(--text-muted); font-style: italic;">Awaiting Calculation</span>`;
+            let riskVal = `<span style="color: var(--color-text-muted); font-style: italic;">Awaiting Calculation</span>`;
+            let recVal = `<span style="color: var(--color-text-muted); font-style: italic;">Awaiting Calculation</span>`;
 
             if (screening && screening.screening_score !== null) {
                 const riskLabel = screening.screening_result_label;
@@ -795,97 +969,97 @@
                 }
             }
 
-            // Render Checklist HTML
+            // Render Checklist HTML Table
             tbody.innerHTML = `
                 <!-- Group 1: Rental History -->
-                <tr style="background-color: var(--bg-primary); border-bottom: 1.5px solid var(--border-color);">
-                    <td colspan="3" style="padding: 0.75rem 0.5rem; font-weight: 800; color: var(--primary); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em;">
+                <tr style="background-color: var(--color-bg-subtle, #f1f5f9); border-bottom: 2px solid var(--color-border-default);">
+                    <td colspan="3" style="padding: 0.75rem 1rem; font-weight: 800; color: var(--color-action-primary); font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.05em;">
                         1. Rental History
                     </td>
                 </tr>
-                <tr style="border-bottom: 1px solid var(--border-color);">
-                    <td style="padding: 0.75rem 0.5rem; font-weight: 600; padding-left: 1.5rem;">Previous Rentals</td>
-                    <td style="padding: 0.75rem 0.5rem; color: var(--text-secondary);">History of previous properties rented</td>
-                    <td style="padding: 0.75rem 0.5rem;">${prevRentalsVal}</td>
+                <tr>
+                    <td style="font-weight: 600; padding-left: 1.5rem;">Previous Rentals</td>
+                    <td style="color: var(--color-text-secondary);">History of previous properties rented</td>
+                    <td>${prevRentalsVal}</td>
                 </tr>
-                <tr style="border-bottom: 1px solid var(--border-color);">
-                    <td style="padding: 0.75rem 0.5rem; font-weight: 600; padding-left: 1.5rem;">Lease Completion</td>
-                    <td style="padding: 0.75rem 0.5rem; color: var(--text-secondary);">Whether prior leases were finished correctly</td>
-                    <td style="padding: 0.75rem 0.5rem;">${leaseCompVal}</td>
+                <tr>
+                    <td style="font-weight: 600; padding-left: 1.5rem;">Lease Completion</td>
+                    <td style="color: var(--color-text-secondary);">Whether prior leases were finished correctly</td>
+                    <td>${leaseCompVal}</td>
                 </tr>
-                <tr style="border-bottom: 1px solid var(--border-color);">
-                    <td style="padding: 0.75rem 0.5rem; font-weight: 600; padding-left: 1.5rem;">Outstanding Balance</td>
-                    <td style="padding: 0.75rem 0.5rem; color: var(--text-secondary);">Unpaid rent or utilities from past tenancies</td>
-                    <td style="padding: 0.75rem 0.5rem;">${balanceVal}</td>
+                <tr>
+                    <td style="font-weight: 600; padding-left: 1.5rem;">Outstanding Balance</td>
+                    <td style="color: var(--color-text-secondary);">Unpaid rent or utilities from past tenancies</td>
+                    <td>${balanceVal}</td>
                 </tr>
-                <tr style="border-bottom: 1px solid var(--border-color);">
-                    <td style="padding: 0.75rem 0.5rem; font-weight: 600; padding-left: 1.5rem;">Property Condition</td>
-                    <td style="padding: 0.75rem 0.5rem; color: var(--text-secondary);">State of properties upon tenant move-out</td>
-                    <td style="padding: 0.75rem 0.5rem;">${conditionVal}</td>
+                <tr>
+                    <td style="font-weight: 600; padding-left: 1.5rem;">Property Condition</td>
+                    <td style="color: var(--color-text-secondary);">State of properties upon tenant move-out</td>
+                    <td>${conditionVal}</td>
                 </tr>
-                <tr style="border-bottom: 1px solid var(--border-color);">
-                    <td style="padding: 0.75rem 0.5rem; font-weight: 600; padding-left: 1.5rem;">Previous Landlord Rating</td>
-                    <td style="padding: 0.75rem 0.5rem; color: var(--text-secondary);">Average score awarded by prior landlords</td>
-                    <td style="padding: 0.75rem 0.5rem;">${ratingVal}</td>
+                <tr>
+                    <td style="font-weight: 600; padding-left: 1.5rem;">Previous Landlord Rating</td>
+                    <td style="color: var(--color-text-secondary);">Average score awarded by prior landlords</td>
+                    <td>${ratingVal}</td>
                 </tr>
-                <tr style="border-bottom: 1px solid var(--border-color);">
-                    <td style="padding: 0.75rem 0.5rem; font-weight: 600; padding-left: 1.5rem;">Previous Landlord Feedback</td>
-                    <td style="padding: 0.75rem 0.5rem; color: var(--text-secondary);">Remarks left by previous property owners</td>
-                    <td style="padding: 0.75rem 0.5rem;">${feedbackVal}</td>
+                <tr>
+                    <td style="font-weight: 600; padding-left: 1.5rem;">Previous Landlord Feedback</td>
+                    <td style="color: var(--color-text-secondary);">Remarks left by previous property owners</td>
+                    <td>${feedbackVal}</td>
                 </tr>
-                <tr style="border-bottom: 1.5px solid var(--border-color);">
-                    <td style="padding: 0.75rem 0.5rem; font-weight: 600; padding-left: 1.5rem;">Previous Reports/Violations</td>
-                    <td style="padding: 0.75rem 0.5rem; color: var(--text-secondary);">Incidents or complaints filed against tenant</td>
-                    <td style="padding: 0.75rem 0.5rem;">${reportsVal}</td>
+                <tr>
+                    <td style="font-weight: 600; padding-left: 1.5rem;">Previous Reports/Violations</td>
+                    <td style="color: var(--color-text-secondary);">Incidents or complaints filed against tenant</td>
+                    <td>${reportsVal}</td>
                 </tr>
 
                 <!-- Group 2: Application Documents -->
-                <tr style="background-color: var(--bg-primary); border-bottom: 1.5px solid var(--border-color);">
-                    <td colspan="3" style="padding: 0.75rem 0.5rem; font-weight: 800; color: var(--primary); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em;">
+                <tr style="background-color: var(--color-bg-subtle, #f1f5f9); border-bottom: 2px solid var(--color-border-default);">
+                    <td colspan="3" style="padding: 0.75rem 1rem; font-weight: 800; color: var(--color-action-primary); font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.05em;">
                         2. Application Documents
                     </td>
                 </tr>
-                <tr style="border-bottom: 1px solid var(--border-color);">
-                    <td style="padding: 0.75rem 0.5rem; font-weight: 600; padding-left: 1.5rem;">Valid ID</td>
-                    <td style="padding: 0.75rem 0.5rem; color: var(--text-secondary);">Uploaded copy of government ID</td>
-                    <td style="padding: 0.75rem 0.5rem;">${idDocVal}</td>
+                <tr>
+                    <td style="font-weight: 600; padding-left: 1.5rem;">Valid ID</td>
+                    <td style="color: var(--color-text-secondary);">Uploaded copy of government / student ID</td>
+                    <td>${idDocVal}</td>
                 </tr>
-                <tr style="border-bottom: 1px solid var(--border-color);">
-                    <td style="padding: 0.75rem 0.5rem; font-weight: 600; padding-left: 1.5rem;">Proof of Income</td>
-                    <td style="padding: 0.75rem 0.5rem; color: var(--text-secondary);">Uploaded copy of proof of income</td>
-                    <td style="padding: 0.75rem 0.5rem;">${incomeDocVal}</td>
+                <tr>
+                    <td style="font-weight: 600; padding-left: 1.5rem;">Proof of Income</td>
+                    <td style="color: var(--color-text-secondary);">Uploaded copy of proof of income</td>
+                    <td>${incomeDocVal}</td>
                 </tr>
-                <tr style="border-bottom: 1px solid var(--border-color);">
-                    <td style="padding: 0.75rem 0.5rem; font-weight: 600; padding-left: 1.5rem;">Employment Certificate</td>
-                    <td style="padding: 0.75rem 0.5rem; color: var(--text-secondary);">Certificate of Employment (COE) if provided</td>
-                    <td style="padding: 0.75rem 0.5rem;">${empCertDocVal}</td>
+                <tr>
+                    <td style="font-weight: 600; padding-left: 1.5rem;">Employment Certificate</td>
+                    <td style="color: var(--color-text-secondary);">Certificate of Employment (COE) if provided</td>
+                    <td>${empCertDocVal}</td>
                 </tr>
-                <tr style="border-bottom: 1.5px solid var(--border-color);">
-                    <td style="padding: 0.75rem 0.5rem; font-weight: 600; padding-left: 1.5rem;">Other Supporting Documents</td>
-                    <td style="padding: 0.75rem 0.5rem; color: var(--text-secondary);">Any other attachments provided by applicant</td>
-                    <td style="padding: 0.75rem 0.5rem;">${otherDocsVal}</td>
+                <tr>
+                    <td style="font-weight: 600; padding-left: 1.5rem;">Other Supporting Documents</td>
+                    <td style="color: var(--color-text-secondary);">Any other attachments provided by applicant</td>
+                    <td>${otherDocsVal}</td>
                 </tr>
 
                 <!-- Group 3: System Risk Assessment -->
-                <tr style="background-color: var(--bg-primary); border-bottom: 1.5px solid var(--border-color);">
-                    <td colspan="3" style="padding: 0.75rem 0.5rem; font-weight: 800; color: var(--primary); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em;">
+                <tr style="background-color: var(--color-bg-subtle, #f1f5f9); border-bottom: 2px solid var(--color-border-default);">
+                    <td colspan="3" style="padding: 0.75rem 1rem; font-weight: 800; color: var(--color-action-primary); font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.05em;">
                         3. System Risk Assessment
                     </td>
                 </tr>
-                <tr style="border-bottom: 1px solid var(--border-color);">
-                    <td style="padding: 0.75rem 0.5rem; font-weight: 600; padding-left: 1.5rem;">Overall Risk Level</td>
-                    <td style="padding: 0.75rem 0.5rem; color: var(--text-secondary);">System overall risk classification</td>
-                    <td style="padding: 0.75rem 0.5rem;">${riskVal}</td>
-                </tr>
-                <tr style="border-bottom: 1px solid var(--border-color);">
-                    <td style="padding: 0.75rem 0.5rem; font-weight: 600; padding-left: 1.5rem;">Screening Score</td>
-                    <td style="padding: 0.75rem 0.5rem; color: var(--text-secondary);">Assessed suitability matching rating</td>
-                    <td style="padding: 0.75rem 0.5rem;">${scoreVal}</td>
+                <tr>
+                    <td style="font-weight: 600; padding-left: 1.5rem;">Overall Risk Level</td>
+                    <td style="color: var(--color-text-secondary);">System overall risk classification</td>
+                    <td>${riskVal}</td>
                 </tr>
                 <tr>
-                    <td style="padding: 0.75rem 0.5rem; font-weight: 600; padding-left: 1.5rem;">Recommendation</td>
-                    <td style="padding: 0.75rem 0.5rem; color: var(--text-secondary);">Suggested action based on metrics</td>
-                    <td style="padding: 0.75rem 0.5rem;">${recVal}</td>
+                    <td style="font-weight: 600; padding-left: 1.5rem;">Screening Score</td>
+                    <td style="color: var(--color-text-secondary);">Assessed suitability matching rating</td>
+                    <td>${scoreVal}</td>
+                </tr>
+                <tr>
+                    <td style="font-weight: 600; padding-left: 1.5rem;">Recommendation</td>
+                    <td style="color: var(--color-text-secondary);">Suggested action based on metrics</td>
+                    <td>${recVal}</td>
                 </tr>
             `;
         }
@@ -906,7 +1080,7 @@
             // Render tenant details
             document.getElementById('tenantName').textContent = tenant.full_name;
             document.getElementById('tenantEmail').textContent = tenant.email;
-            document.getElementById('appMessage').textContent = app.application_message || 'No description message provided.';
+            document.getElementById('appMessage').textContent = app.application_message || 'No introduction message provided.';
 
             document.getElementById('desiredMoveIn').textContent = new Date(app.desired_move_in_date).toLocaleDateString(undefined, {
                 year: 'numeric', month: 'long', day: 'numeric'
@@ -972,8 +1146,8 @@
                         draftBtn = document.createElement('a');
                         draftBtn.id = 'btnCreateLeaseDirect';
                         draftBtn.className = 'btn-primary';
-                        draftBtn.style.cssText = 'display:flex;align-items:center;justify-content:center;gap:0.45rem;margin-top:1rem;background-color:var(--color-action-primary);border-color:var(--color-action-primary);color:var(--color-text-on-action);text-decoration:none;text-align:center;font-weight:700;padding:0.75rem;border-radius:var(--radius-md);';
-                        draftBtn.innerHTML = '<span data-icon="note"></span><span>Draft Lease Agreement for Tenant</span><span aria-hidden="true">→</span>';
+                        draftBtn.style.cssText = 'display:flex;align-items:center;justify-content:center;gap:0.5rem;margin-top:1.25rem;background-color:var(--color-action-primary);color:#ffffff;text-decoration:none;text-align:center;font-weight:700;padding:0.875rem;border-radius:var(--radius-lg,12px);box-shadow:var(--shadow-card);';
+                        draftBtn.innerHTML = '<span>Draft Lease Agreement for Tenant</span><span aria-hidden="true">&rarr;</span>';
                         decisionDisplay.appendChild(draftBtn);
                     }
                     draftBtn.href = `lease-create.html?application_id=${app.id}`;
@@ -990,21 +1164,22 @@
             const docs = currentApplication.documents || [];
 
             if (docs.length === 0) {
-                container.innerHTML = '<p style="color: var(--text-muted); font-size: 0.8125rem; font-style: italic;">No document uploads attached to this application.</p>';
+                container.innerHTML = '<p style="color: var(--color-text-muted); font-size: 0.8125rem; font-style: italic;">No document uploads attached to this application.</p>';
                 return;
             }
 
             docs.forEach(doc => {
                 const sizeKB = (doc.file_size / 1024).toFixed(0);
-                const uploadedDate = new Date(doc.uploaded_at).toLocaleDateString();
-
                 const item = document.createElement('div');
                 item.className = 'doc-item';
                 item.innerHTML = `
                     <div class="doc-info">
                         <span class="doc-title">${doc.document_type.replace('_', ' ').toUpperCase()}</span>
-                        <span class="doc-meta"><a href="${doc.file_url}" target="_blank" style="color: var(--primary); text-decoration: underline;">${doc.file_name}</a> (${sizeKB} KB)</span>
+                        <span class="doc-meta"><a href="${doc.file_url}" target="_blank">${doc.file_name}</a> (${sizeKB} KB)</span>
                     </div>
+                    <a href="${doc.file_url}" target="_blank" style="color: var(--color-action-primary); font-weight: 700; font-size: 0.775rem; text-decoration: none; display: inline-flex; align-items: center; gap: 0.25rem;">
+                        <span>View</span> &nearr;
+                    </a>
                 `;
                 container.appendChild(item);
             });
