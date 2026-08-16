@@ -62,9 +62,9 @@
 
         /* Hero gradient by status */
         .hero-pending    { background: linear-gradient(135deg, #d97706, #b45309); }
-        .hero-approved   { background: linear-gradient(135deg, #2563eb, #1d4ed8); }
-        .hero-assigned   { background: linear-gradient(135deg, #7c3aed, #6d28d9); }
-        .hero-accepted   { background: linear-gradient(135deg, #7c3aed, #6d28d9); }
+        .hero-approved   { background: var(--color-action-primary); }
+        .hero-assigned   { background: var(--color-action-primary); }
+        .hero-accepted   { background: var(--color-action-primary); }
         .hero-travelling { background: linear-gradient(135deg, #ea580c, #c2410c); }
         .hero-arrived    { background: linear-gradient(135deg, #ea580c, #c2410c); }
         .hero-repairing  { background: linear-gradient(135deg, #ea580c, #c2410c); }
@@ -140,8 +140,8 @@
         .badge::before { content:''; width:6px; height:6px; border-radius:50%; background:currentColor; }
         .badge-pending    { background:rgba(245,158,11,.14); color:#f59e0b; }
         .badge-approved   { background:rgba(59,130,246,.14); color:#3b82f6; }
-        .badge-assigned   { background:rgba(139,92,246,.14); color:#8b5cf6; }
-        .badge-accepted   { background:rgba(139,92,246,.14); color:#8b5cf6; }
+        .badge-assigned   { background:var(--color-info-bg); color:var(--color-info-text); }
+        .badge-accepted   { background:var(--color-info-bg); color:var(--color-info-text); }
         .badge-repairing  { background:rgba(249,115,22,.14); color:#f97316; }
         .badge-travelling { background:rgba(249,115,22,.14); color:#f97316; }
         .badge-arrived    { background:rgba(249,115,22,.14); color:#f97316; }
@@ -398,7 +398,7 @@
                         <div id="imageContainer" class="hidden" style="margin-top: 1.25rem;">
                             <div class="info-cell-label" style="margin-bottom: 0.4rem;">Tenant Uploaded Photo</div>
                             <a id="issueImgLink" target="_blank">
-                                <img id="issueImg" style="max-width: 100%; max-height: 220px; object-fit: cover; border-radius: var(--radius-sm); border: 1px solid var(--border-color); display: block;">
+                                <img id="issueImg" alt="Tenant-provided maintenance issue evidence" style="max-width: 100%; max-height: 220px; object-fit: cover; border-radius: var(--radius-sm); border: 1px solid var(--border-color); display: block;">
                             </a>
                         </div>
 
@@ -413,7 +413,7 @@
                 <!-- Completion Report (shown only when available) -->
                 <div class="detail-card hidden" id="reportCard">
                     <div class="card-head">
-                        <span class="card-head-icon">🗒️</span>
+                        <span class="card-head-icon"><span data-icon="note"></span></span>
                         <span class="card-head-title" id="reportCardTitle">Worker Completion Report</span>
                     </div>
                     <div class="card-body">
@@ -767,7 +767,7 @@
                 title.textContent    = 'Review Tenant Request';
                 subtitle.textContent = 'Approve to proceed with dispatch, or reject with a reason.';
                 body.innerHTML = `
-                    <div id="actionAlert" style="display:none;"></div>
+                    <div data-action-alert role="status" aria-live="polite" style="display:none;"></div>
                     <div class="form-group" style="margin-top:0.25rem;">
                         <label class="form-label" for="rejectionReason">Rejection Reason <span style="color:var(--text-muted); font-weight:500;">(required on rejection)</span></label>
                         <textarea id="rejectionReason" class="form-input" rows="3" placeholder="e.g. Issue falls outside lease coverage, insufficient detail provided..."></textarea>
@@ -789,7 +789,7 @@
                 title.textContent    = `Dispatch a ${trade}`;
                 subtitle.textContent = `Assign a qualified ${trade.toLowerCase()} to handle this ${req.issue_category} job.`;
                 body.innerHTML = `
-                    <div id="actionAlert" style="display:none;"></div>
+                    <div data-action-alert role="status" aria-live="polite" style="display:none;"></div>
                     <form id="assignForm">
                         <div class="form-group">
                             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.35rem;">
@@ -854,7 +854,7 @@
                 title.textContent    = 'Assess Work Completion';
                 subtitle.textContent = `Review the ${trade.toLowerCase()}'s report and either verify or request rework.`;
                 body.innerHTML = `
-                    <div id="actionAlert" style="display:none;"></div>
+                    <div data-action-alert role="status" aria-live="polite" style="display:none;"></div>
                     <div class="form-group" style="margin-top:0.25rem;">
                         <label class="form-label" for="verifyRemarks">Rework Instructions <span style="color:var(--text-muted); font-weight:500;">(required on rework)</span></label>
                         <textarea id="verifyRemarks" class="form-input" rows="3" placeholder="Describe what still needs to be fixed or redone…"></textarea>
@@ -874,7 +874,7 @@
 
         // ── Action helpers ────────────────────────────────────
         function showActionAlert(msg, type = 'err') {
-            const el = document.getElementById('actionAlert');
+            const el = document.querySelector('[data-action-alert]');
             if (!el) return;
             el.className = `inline-alert alert-${type}`;
             el.textContent = msg;

@@ -257,7 +257,6 @@
             background: #94a3b8;
         }
     </style>
-    <link href="../../css/design-system.css" rel="stylesheet">
     <script src="../../js/ui.js" defer></script>
 </head>
 <body>
@@ -268,7 +267,7 @@
                     <a href="applications.html" style="color: #0f172a; text-decoration: none;">My Applications</a>
                     <span class="breadcrumb-separator" style="color: #94a3b8; margin: 0 0.5rem; font-weight: 400;">&gt;</span>
                     <span class="breadcrumb-current" style="color: #64748b; font-weight: 500; margin-right: 0.75rem;">Application Tracker</span>
-                    <span id="appStatusBadge" class="status-badge" style="font-size: 0.725rem; padding: 2px 8px; font-weight: 700; border-radius: 4px; display: inline-block;">PENDING</span>
+                    <span data-application-status class="status-badge" style="font-size: 0.725rem; padding: 2px 8px; font-weight: 700; border-radius: 4px; display: inline-block;">PENDING</span>
                 </div>
             </div>
             <div class="navbar-right">
@@ -290,7 +289,7 @@
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
                         <div style="display: flex; align-items: center; gap: 0.5rem;">
                             <h3 class="profile-card-title" style="margin: 0; font-size: 0.95rem; font-weight: 700; color: #0f172a;">Landlord Review Statement</h3>
-                            <span id="appStatusBadge" class="status-badge status-pending" style="font-size: 0.725rem; padding: 2px 8px; font-weight: 700; border-radius: 4px; display: inline-block;">LOADING...</span>
+                            <span data-application-status class="status-badge status-pending" style="font-size: 0.725rem; padding: 2px 8px; font-weight: 700; border-radius: 4px; display: inline-block;">LOADING...</span>
                         </div>
                         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
                     </div>
@@ -426,7 +425,7 @@
                         <a href="applications.html" style="color: #0f172a; text-decoration: none;">My Applications</a>
                         <span class="breadcrumb-separator" style="color: #94a3b8; font-weight: 400;">&gt;</span>
                         <span class="breadcrumb-current" style="color: #64748b; font-weight: 500; margin-right: 0.75rem;">Application Tracker</span>
-                        <span id="appStatusBadge" class="status-badge status-pending" style="font-size: 0.725rem; padding: 2px 8px; font-weight: 700; border-radius: 4px; display: inline-block;">LOADING...</span>
+                        <span data-application-status class="status-badge status-pending" style="font-size: 0.725rem; padding: 2px 8px; font-weight: 700; border-radius: 4px; display: inline-block;">LOADING...</span>
                     </div>
                 `;
             }
@@ -481,7 +480,7 @@
 
         async function fetchApplicationDetails() {
             try {
-                const response = await fetch(`/api/tenant/applications/${applicationId}`, {
+                const response = await fetch(`/api/tenant/applications/${encodeURIComponent(applicationId)}`, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
 
@@ -501,7 +500,7 @@
                             <a href="applications.html" style="color: #0f172a; text-decoration: none;">My Applications</a>
                             <span class="breadcrumb-separator" style="color: #94a3b8; font-weight: 400;">&gt;</span>
                             <span class="breadcrumb-current" style="color: #64748b; font-weight: 500; margin-right: 0.75rem;">Application Tracker</span>
-                            <span id="appStatusBadge" class="status-badge" style="font-size: 0.725rem; padding: 2px 8px; font-weight: 700; border-radius: 4px; display: inline-block;">PENDING</span>
+                            <span data-application-status class="status-badge" style="font-size: 0.725rem; padding: 2px 8px; font-weight: 700; border-radius: 4px; display: inline-block;">PENDING</span>
                         </div>
                     `;
                 }
@@ -519,15 +518,14 @@
             const app = currentApplication;
             const prop = currentApplication.properties;
 
-            // Render status badge (null-guarded in case element was removed)
-            const badge = document.getElementById('appStatusBadge');
-            if (badge) {
+            // Keep the header and review card status in sync.
+            document.querySelectorAll('[data-application-status]').forEach((badge) => {
                 badge.className = 'status-badge';
-                badge.textContent = app.status.toUpperCase();
+                badge.textContent = String(app.status || 'pending').toUpperCase();
                 if (app.status === 'approved') badge.classList.add('status-active');
                 else if (app.status === 'rejected') badge.classList.add('status-rejected');
                 else badge.classList.add('status-pending');
-            }
+            });
 
             // Render remarks
             const remarksText = document.getElementById('landlordRemarksText');
@@ -557,12 +555,12 @@
             }
 
             // Render property details
-            document.getElementById('propName').textContent = prop.property_name;
+            document.getElementById('propName').textContent = prop?.property_name || 'Property';
             
             // Set thumbnail image src
             const thumbImg = document.getElementById('propThumbImg');
             if (thumbImg) {
-                thumbImg.src = prop.main_image_url || 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&w=150&q=80';
+                thumbImg.src = domiknowSafeExternalUrl(prop?.main_image_url || 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&w=150&q=80');
             }
             
             let rentVal = prop.monthly_rent;
@@ -582,8 +580,8 @@
 
             document.getElementById('propRent').textContent = `₱${parseInt(rentVal).toLocaleString()}/month`;
             document.getElementById('targetSpace').textContent = spaceLabel;
-            document.getElementById('propType').textContent = prop.property_type.replace('_', ' ').toUpperCase();
-            document.getElementById('propAddress').textContent = `${prop.address}, Barangay ${prop.barangay}, Siniloan`;
+            document.getElementById('propType').textContent = String(prop?.property_type || 'Property').replace(/_/g, ' ').toUpperCase();
+            document.getElementById('propAddress').textContent = `${prop?.address || 'Address not specified'}, Barangay ${prop?.barangay || 'Not specified'}, Siniloan`;
             // Parse house_rules — may be a JSON-encoded object from the landlord form
             (function() {
                 const rulesEl = document.getElementById('propRules');
@@ -677,6 +675,9 @@
             }
 
             docs.forEach(doc => {
+                const fileUrl = domiknowSafeExternalUrl(doc.file_url);
+                const documentType = domiknowEscapeHtml(String(doc.document_type || 'document').replace(/_/g, ' ').toUpperCase());
+                const fileName = domiknowEscapeHtml(doc.file_name || 'Uploaded file');
                 const item = document.createElement('div');
                 item.style.padding = '0.5rem 0.6rem';
                 item.style.borderRadius = '6px';
@@ -695,8 +696,8 @@
                         }
                     </div>
                     <div style="flex-grow: 1; min-width: 0;">
-                        <a href="${doc.file_url}" target="_blank" style="color: #0f172a; text-decoration: none; font-weight: 600; font-size: 0.78rem; display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
-                            ${doc.document_type.replace('_', ' ').toUpperCase()} - ${doc.file_name}
+                        <a href="${fileUrl}" target="_blank" rel="noopener noreferrer" style="color: #0f172a; text-decoration: none; font-weight: 600; font-size: 0.78rem; display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                            ${documentType} - ${fileName}
                         </a>
                     </div>
                 `;
@@ -725,6 +726,17 @@
             }
 
             const file = fileInput.files[0];
+            const allowedTypes = new Set(['application/pdf', 'image/jpeg', 'image/png', 'image/webp']);
+            if (file.size > 8 * 1024 * 1024) {
+                alert('This file is larger than 8 MB. Choose a smaller document.');
+                fileInput.value = '';
+                return;
+            }
+            if (!allowedTypes.has(file.type)) {
+                alert('Upload a PDF, JPG, PNG, or WebP document.');
+                fileInput.value = '';
+                return;
+            }
             btn.disabled = true;
             btn.textContent = 'Uploading...';
 
@@ -738,7 +750,7 @@
                     base64_content: base64Content
                 };
 
-                const response = await fetch(`/api/tenant/applications/${applicationId}/documents`, {
+                const response = await fetch(`/api/tenant/applications/${encodeURIComponent(applicationId)}/documents`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',

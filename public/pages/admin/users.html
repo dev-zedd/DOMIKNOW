@@ -127,16 +127,16 @@
     <script src="../../js/ui.js" defer></script>
 </head>
 
-<body>
+<body class="app-loading" data-role="admin" data-page-title="User Access">
     <!-- Navbar -->
     <nav class="navbar navbar-admin">
         <div class="navbar-container">
             <div class="navbar-brand-group">
-                <a href="dashboard.html" style="text-decoration: none;"><span class="navbar-logo">DomiKnow</span></a>
+                <a href="overview.html" style="text-decoration: none;"><span class="navbar-logo">DomiKnow</span></a>
                 <span class="navbar-badge navbar-badge-admin">Admin</span>
             </div>
             <div class="navbar-menu">
-                <a href="dashboard.html" class="navbar-menu-link">Dashboard</a>
+                <a href="overview.html" class="navbar-menu-link">Overview</a>
                 <a href="users.html" class="navbar-menu-link active">Users</a>
                 <a href="property-review.html" class="navbar-menu-link">Property Review</a>
                 <a href="reservations.html" class="navbar-menu-link">Reservation Monitoring</a>
@@ -150,10 +150,6 @@
 
     <!-- Main Content -->
     <main class="dashboard-container">
-        <div class="nav-back">
-            <a href="reports.html" class="nav-back-link">← Back to reports triage</a>
-        </div>
-
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
             <h2>User Directory Management</h2>
             <div id="actionFeedback" class="alert alert-success hidden" style="margin-bottom: 0; padding: 0.5rem 1rem;">
@@ -249,13 +245,13 @@
                     }
 
                     row.innerHTML = `
-                        <td style="font-weight: 600;">${user.full_name}</td>
-                        <td>${user.email}</td>
-                        <td><span class="navbar-badge ${roleBadgeClass}">${user.role}</span></td>
+                        <td style="font-weight: 600;">${domiknowEscapeHtml(user.full_name)}</td>
+                        <td>${domiknowEscapeHtml(user.email)}</td>
+                        <td><span class="navbar-badge ${roleBadgeClass}">${domiknowEscapeHtml(user.role)}</span></td>
                         <td style="font-weight: 600; color: ${user.is_verified ? 'var(--success)' : 'var(--error)'};">
                             ${user.is_verified ? '✓ Yes' : '✗ No'}
                         </td>
-                        <td><span class="status-badge ${statusClass}">${user.account_status}</span></td>
+                        <td><span class="status-badge ${statusClass}">${domiknowEscapeHtml(user.account_status)}</span></td>
                         <td>${regDate}</td>
                         <td><div class="action-group">${actionsHtml}</div></td>
                     `;
@@ -280,6 +276,22 @@
         }
 
         async function updateStatus(userId, newStatus) {
+            const actionLabels = {
+                active: 'approve or reactivate this account',
+                rejected: 'reject this account request',
+                disabled: 'disable this account'
+            };
+            const requestedAction = actionLabels[newStatus] || `change this account to ${newStatus}`;
+            const confirmUpdate = await window.domiknowConfirm({
+                variant: ['rejected', 'disabled'].includes(newStatus) ? 'danger' : 'warning',
+                eyebrow: 'Account access decision',
+                title: `${newStatus.charAt(0).toUpperCase() + newStatus.slice(1)} this account?`,
+                message: `You are about to ${requestedAction}. This action is recorded in the administrative history.`,
+                confirmLabel: newStatus === 'active' ? 'Activate account' : newStatus === 'disabled' ? 'Disable account' : 'Reject account',
+                cancelLabel: 'Keep current status'
+            });
+            if (!confirmUpdate) return;
+
             const feedbackEl = document.getElementById('actionFeedback');
             try {
                 const response = await fetch(`/api/users/${userId}/status`, {

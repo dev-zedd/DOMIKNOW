@@ -258,7 +258,7 @@
     <link href="../../css/design-system.css" rel="stylesheet">
     <script src="../../js/ui.js" defer></script>
 </head>
-<body>
+<body class="app-loading" data-role="admin" data-page-title="Policy Management">
     <div id="toastBanner" class="toast-banner">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6L9 17l-5-5"/></svg>
         <span id="toastMsg">Policy updated successfully!</span>
@@ -328,20 +328,20 @@
         </div>
 
         <!-- Policy Category Navigation Tabs -->
-        <div class="policy-tabs-bar">
-            <button class="policy-tab-btn active" onclick="switchPolicyTab('tos')">
+        <div class="policy-tabs-bar" role="tablist" aria-label="Policy sections">
+            <button type="button" class="policy-tab-btn active" role="tab" aria-selected="true" onclick="switchPolicyTab('tos')">
                 <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/></svg>
                 Platform Terms of Service (TOS)
             </button>
-            <button class="policy-tab-btn" onclick="switchPolicyTab('listing_standards')">
+            <button type="button" class="policy-tab-btn" role="tab" aria-selected="false" onclick="switchPolicyTab('listing_standards')">
                 <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25"/></svg>
                 Landlord Listing Standards
             </button>
-            <button class="policy-tab-btn" onclick="switchPolicyTab('tenant_code')">
+            <button type="button" class="policy-tab-btn" role="tab" aria-selected="false" onclick="switchPolicyTab('tenant_code')">
                 <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z"/></svg>
                 Tenant Code of Conduct
             </button>
-            <button class="policy-tab-btn" onclick="switchPolicyTab('disciplinary_guidelines')">
+            <button type="button" class="policy-tab-btn" role="tab" aria-selected="false" onclick="switchPolicyTab('disciplinary_guidelines')">
                 <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
                 Disciplinary Sanction Policy
             </button>
@@ -379,8 +379,8 @@
     </main>
 
     <!-- Edit Policy Modal -->
-    <div id="editPolicyModal" class="modal-overlay">
-        <div class="modal-container">
+    <div id="editPolicyModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="editModalTitle">
+        <div class="modal-container" tabindex="-1">
             <div class="modal-header">
                 <div style="display: flex; align-items: center; gap: 10px;">
                     <div style="width: 36px; height: 36px; border-radius: var(--radius-md); background-color: #e0e7ff; color: #4f46e5; display: flex; align-items: center; justify-content: center;">
@@ -388,7 +388,7 @@
                     </div>
                     <h3 id="editModalTitle" style="margin: 0; font-size: 1.2rem; font-weight: 800; color: var(--text-primary);">Edit Policy Section</h3>
                 </div>
-                <button id="closeEditModalBtn" class="btn-icon-close" title="Close Modal">
+                <button type="button" id="closeEditModalBtn" class="btn-icon-close" aria-label="Close policy editor">
                     <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
                 </button>
             </div>
@@ -433,19 +433,19 @@
     </div>
 
     <!-- Public Presentation Preview Modal -->
-    <div id="previewModal" class="modal-overlay">
-        <div class="modal-container">
+    <div id="previewModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="previewModalTitle">
+        <div class="modal-container" tabindex="-1">
             <div class="modal-header">
                 <div style="display: flex; align-items: center; gap: 10px;">
                     <div style="width: 36px; height: 36px; border-radius: var(--radius-md); background-color: #ecfdf5; color: #059669; display: flex; align-items: center; justify-content: center;">
                         <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12c.077-.19.152-.38.229-.567C3.564 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
                     </div>
                     <div>
-                        <h3 style="margin: 0; font-size: 1.15rem; font-weight: 800; color: var(--text-primary);">Public User Presentation View</h3>
+                        <h3 id="previewModalTitle" style="margin: 0; font-size: 1.15rem; font-weight: 800; color: var(--text-primary);">Public User Presentation View</h3>
                         <span style="font-size: 0.75rem; color: var(--text-muted);">How Tenants &amp; Landlords view this policy in their portals</span>
                     </div>
                 </div>
-                <button id="closePreviewModalBtn" class="btn-icon-close" title="Close Modal">
+                <button type="button" id="closePreviewModalBtn" class="btn-icon-close" aria-label="Close policy preview">
                     <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
                 </button>
             </div>
@@ -453,7 +453,7 @@
                 <!-- Rendered preview content -->
             </div>
             <div class="modal-footer" style="justify-content: flex-end;">
-                <button type="button" onclick="document.getElementById('previewModal').classList.remove('active')" class="navbar-btn" style="padding: 0.55rem 1.25rem;">Close Preview</button>
+                <button type="button" onclick="toggleModal('previewModal', false)" class="navbar-btn" style="padding: 0.55rem 1.25rem;">Close Preview</button>
             </div>
         </div>
     </div>
@@ -464,6 +464,8 @@
         const token = localStorage.getItem('domiknow_token');
         let currentPolicyKey = 'tos';
         let allPoliciesData = {};
+        let policyEditDirty = false;
+        let policyModalReturnFocus = null;
 
         document.addEventListener('DOMContentLoaded', () => {
             if (!token) {
@@ -480,19 +482,48 @@
             document.getElementById('closePreviewModalBtn').addEventListener('click', () => toggleModal('previewModal', false));
 
             document.getElementById('editPolicyForm').addEventListener('submit', handleSavePolicySubmit);
+            document.getElementById('editPolicyForm').addEventListener('input', () => {
+                policyEditDirty = true;
+            });
+            document.addEventListener('keydown', event => {
+                if (event.key !== 'Escape') return;
+                const activeModal = document.querySelector('.modal-overlay.active');
+                if (activeModal) toggleModal(activeModal.id, false);
+            });
         });
 
-        function showToast(msg) {
+        function showToast(msg, state = 'success') {
             const toast = document.getElementById('toastBanner');
             document.getElementById('toastMsg').textContent = msg;
+            toast.dataset.state = state;
             toast.classList.add('show');
             setTimeout(() => toast.classList.remove('show'), 3500);
         }
 
-        function toggleModal(id, show) {
+        async function toggleModal(id, show) {
             const modal = document.getElementById(id);
-            if (show) modal.classList.add('active');
-            else modal.classList.remove('active');
+            if (!modal) return;
+            if (!show && id === 'editPolicyModal' && policyEditDirty) {
+                const discardChanges = await window.domiknowConfirm({
+                    variant: 'danger',
+                    eyebrow: 'Unsaved changes',
+                    title: 'Discard this policy draft?',
+                    message: 'Your unpublished clause and wording changes will be lost.',
+                    confirmLabel: 'Discard changes',
+                    cancelLabel: 'Keep editing'
+                });
+                if (!discardChanges) return;
+            }
+            if (show) {
+                policyModalReturnFocus = document.activeElement;
+                modal.classList.add('active');
+                document.body.style.overflow = 'hidden';
+                requestAnimationFrame(() => modal.querySelector('.modal-container')?.focus());
+            } else {
+                modal.classList.remove('active');
+                document.body.style.overflow = '';
+                policyModalReturnFocus?.focus?.();
+            }
         }
 
         async function fetchPolicies() {
@@ -509,6 +540,7 @@
                 }
             } catch (err) {
                 console.error(err);
+                showToast('Policies could not be loaded. Please try again.', 'error');
             }
         }
 
@@ -517,8 +549,10 @@
             document.querySelectorAll('.policy-tab-btn').forEach(btn => {
                 if (btn.getAttribute('onclick').includes(key)) {
                     btn.classList.add('active');
+                    btn.setAttribute('aria-selected', 'true');
                 } else {
                     btn.classList.remove('active');
+                    btn.setAttribute('aria-selected', 'false');
                 }
             });
             renderActivePolicy();
@@ -553,9 +587,9 @@
                 box.innerHTML = `
                     <h4 class="policy-section-title">
                         <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="color:#4f46e5;"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                        ${sec.heading}
+                        ${domiknowEscapeHtml(sec.heading)}
                     </h4>
-                    <p class="policy-section-body">${sec.content}</p>
+                    <p class="policy-section-body">${domiknowEscapeHtml(sec.content)}</p>
                 `;
                 container.appendChild(box);
             });
@@ -571,6 +605,7 @@
             document.getElementById('inputPolicySummary').value = p.summary || '';
 
             renderEditSectionInputs(p.sections || []);
+            policyEditDirty = false;
             toggleModal('editPolicyModal', true);
         }
 
@@ -580,16 +615,17 @@
 
             sections.forEach((sec, idx) => {
                 const item = document.createElement('div');
+                item.dataset.policyClause = '';
                 item.style.cssText = 'background: var(--bg-primary); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 1rem; position: relative;';
                 item.innerHTML = `
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
                         <span style="font-size: 0.75rem; font-weight: 800; color: #4f46e5; text-transform: uppercase;">Clause #${idx + 1}</span>
-                        <button type="button" onclick="this.parentElement.parentElement.remove()" style="background: none; border: none; color: var(--error); cursor: pointer; font-weight: 700; font-size: 0.8rem; display: flex; align-items: center; gap: 4px;">
+                        <button type="button" onclick="removePolicyClause(this)" style="background: none; border: none; color: var(--error); cursor: pointer; font-weight: 700; font-size: 0.8rem; display: flex; align-items: center; gap: 4px;">
                             <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"/></svg> Remove
                         </button>
                     </div>
-                    <input type="text" class="form-input sec-heading" value="${sec.heading.replace(/"/g, '&quot;')}" placeholder="Clause Title" style="margin-bottom: 0.5rem;">
-                    <textarea class="form-input sec-content" rows="2" placeholder="Clause Description & Details">${sec.content.replace(/</g, '&lt;')}</textarea>
+                    <input type="text" class="form-input sec-heading" value="${domiknowEscapeHtml(sec.heading)}" placeholder="Clause Title" style="margin-bottom: 0.5rem;">
+                    <textarea class="form-input sec-content" rows="2" placeholder="Clause Description & Details">${domiknowEscapeHtml(sec.content)}</textarea>
                 `;
                 list.appendChild(item);
             });
@@ -599,11 +635,12 @@
             const list = document.getElementById('editSectionsList');
             const idx = list.children.length + 1;
             const item = document.createElement('div');
+            item.dataset.policyClause = '';
             item.style.cssText = 'background: var(--bg-primary); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 1rem; position: relative;';
             item.innerHTML = `
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
                     <span style="font-size: 0.75rem; font-weight: 800; color: #4f46e5; text-transform: uppercase;">Clause #${idx}</span>
-                    <button type="button" onclick="this.parentElement.parentElement.remove()" style="background: none; border: none; color: var(--error); cursor: pointer; font-weight: 700; font-size: 0.8rem; display: flex; align-items: center; gap: 4px;">
+                    <button type="button" onclick="removePolicyClause(this)" style="background: none; border: none; color: var(--error); cursor: pointer; font-weight: 700; font-size: 0.8rem; display: flex; align-items: center; gap: 4px;">
                         <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"/></svg> Remove
                     </button>
                 </div>
@@ -611,10 +648,34 @@
                 <textarea class="form-input sec-content" rows="2" placeholder="Clause Description & Details"></textarea>
             `;
             list.appendChild(item);
+            policyEditDirty = true;
+        }
+
+        async function removePolicyClause(button) {
+            const removeClause = await window.domiknowConfirm({
+                variant: 'warning',
+                title: 'Remove this policy clause?',
+                message: 'The clause will be removed from the current draft. The published policy is unchanged until you publish.',
+                confirmLabel: 'Remove clause',
+                cancelLabel: 'Keep clause'
+            });
+            if (!removeClause) return;
+            button.closest('[data-policy-clause]')?.remove();
+            policyEditDirty = true;
         }
 
         async function handleSavePolicySubmit(e) {
             e.preventDefault();
+            const publishPolicy = await window.domiknowConfirm({
+                variant: 'warning',
+                eyebrow: 'Platform-wide change',
+                title: 'Publish this policy update?',
+                message: 'The revised wording will immediately become the active platform policy.',
+                details: ['The update is recorded in the audit trail.', 'Users will see the newly published version.'],
+                confirmLabel: 'Publish policy',
+                cancelLabel: 'Review draft'
+            });
+            if (!publishPolicy) return;
             const btn = document.getElementById('savePolicyBtn');
             btn.disabled = true;
             btn.textContent = 'Publishing...';
@@ -647,6 +708,7 @@
                     const result = await response.json();
                     allPoliciesData[currentPolicyKey] = result.data;
                     renderActivePolicy();
+                    policyEditDirty = false;
                     toggleModal('editPolicyModal', false);
                     showToast(`Policy "${title}" published successfully!`);
                 } else if (response.status === 401) {
@@ -675,15 +737,15 @@
             const body = document.getElementById('previewModalBody');
             body.innerHTML = `
                 <div style="background-color: var(--bg-primary); border-radius: var(--radius-md); padding: 1.25rem; border: 1px solid var(--border-color); margin-bottom: 1.25rem;">
-                    <div style="font-size: 0.75rem; font-weight: 800; color: #4f46e5; text-transform: uppercase;">${p.category || 'Platform Policy'}</div>
-                    <h3 style="margin: 0.25rem 0 0.5rem 0; font-size: 1.35rem; font-weight: 800; color: var(--text-primary);">${p.title}</h3>
-                    <p style="margin: 0; font-size: 0.88rem; color: var(--text-secondary); line-height: 1.5;">${p.summary}</p>
+                    <div style="font-size: 0.75rem; font-weight: 800; color: #4f46e5; text-transform: uppercase;">${domiknowEscapeHtml(p.category || 'Platform Policy')}</div>
+                    <h3 style="margin: 0.25rem 0 0.5rem 0; font-size: 1.35rem; font-weight: 800; color: var(--text-primary);">${domiknowEscapeHtml(p.title)}</h3>
+                    <p style="margin: 0; font-size: 0.88rem; color: var(--text-secondary); line-height: 1.5;">${domiknowEscapeHtml(p.summary)}</p>
                 </div>
                 <div>
                     ${(p.sections || []).map(s => `
                         <div style="margin-bottom: 1rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.85rem;">
-                            <h4 style="margin: 0 0 0.35rem 0; font-size: 0.95rem; font-weight: 800; color: var(--text-primary);">${s.heading}</h4>
-                            <p style="margin: 0; font-size: 0.85rem; color: var(--text-secondary); line-height: 1.5;">${s.content}</p>
+                            <h4 style="margin: 0 0 0.35rem 0; font-size: 0.95rem; font-weight: 800; color: var(--text-primary);">${domiknowEscapeHtml(s.heading)}</h4>
+                            <p style="margin: 0; font-size: 0.85rem; color: var(--text-secondary); line-height: 1.5;">${domiknowEscapeHtml(s.content)}</p>
                         </div>
                     `).join('')}
                 </div>

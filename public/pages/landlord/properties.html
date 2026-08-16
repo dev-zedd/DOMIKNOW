@@ -381,7 +381,16 @@
         }
 
         async function confirmDeleteProperty(id, name) {
-            if (!confirm(`Are you sure you want to delete "${name}"? This action cannot be undone.`)) {
+            const deleteProperty = await window.domiknowConfirm({
+                variant: 'danger',
+                eyebrow: 'Permanent deletion',
+                title: `Delete “${name}”?`,
+                message: 'This property listing and its connected public listing data will be permanently removed.',
+                details: ['This action cannot be undone.', 'Check for active units, applications, or leases before continuing.'],
+                confirmLabel: 'Delete property',
+                cancelLabel: 'Keep property'
+            });
+            if (!deleteProperty) {
                 return;
             }
 

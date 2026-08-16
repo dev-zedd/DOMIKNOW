@@ -231,7 +231,7 @@
     <!-- Main Content -->
     <main class="dashboard-container">
         <div class="nav-back">
-            <a href="applications.html" class="btn-back-arrow" title="Back to Applications">←</a>
+            <a href="applications.html" class="btn-back-arrow" title="Back to Applications" aria-label="Back to applications">←</a>
         </div>
 
         <div
@@ -409,9 +409,9 @@
 
                         <div style="display: flex; gap: 0.75rem;">
                             <button id="btnReject" class="btn-primary"
-                                style="background-color: var(--error); padding: 0.6rem;">❌ Reject</button>
+                                style="border-color:var(--color-error-border);background:var(--color-error-bg);color:var(--color-error-text);padding:0.6rem;"><span data-icon="x"></span> Reject</button>
                             <button id="btnApprove" class="btn-primary"
-                                style="background-color: var(--success); padding: 0.6rem;">⚡ Approve
+                                style="background-color:var(--color-action-primary);padding:0.6rem;"><span data-icon="check"></span> Approve
                                 Application</button>
                         </div>
                     </div>
@@ -551,7 +551,7 @@
                         <div>
                             <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700; margin-bottom: 0.25rem;">Landlord Rating</div>
                             <div style="font-weight: 700; color: var(--text-primary); flex; align-items: center; gap: 4px;">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="#f59e0b" stroke="#f59e0b"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="var(--color-warning-text)" stroke="var(--color-warning-text)" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
                                 <span>4.8 / 5</span>
                             </div>
                         </div>
@@ -595,7 +595,7 @@
                         </div>
                         <div>
                             <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700; margin-bottom: 0.25rem;">Lease Completed</div>
-                            <div style="font-weight: 700; color: var(--text-primary);">❌ No</div>
+                            <div style="display:inline-flex;align-items:center;gap:0.3rem;font-weight:700;color:var(--color-error-text);"><span data-icon="x"></span>No</div>
                         </div>
                         <div>
                             <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700; margin-bottom: 0.25rem;">Outstanding Balance</div>
@@ -626,8 +626,8 @@
                     <div style="text-align: center; padding: 2rem 1rem;">
                         <p style="color: var(--text-muted); margin-bottom: 1rem;">No previous rental records found.</p>
                         <div style="margin-bottom: 0.5rem;">
-                            <span class="status-badge" style="background-color: #ecfdf5; color: #10b981; border: 1px solid rgba(16, 185, 129, 0.3); font-size: 0.85rem; padding: 0.5rem 1rem; font-weight: 700; border-radius: var(--radius-md);">
-                                🟢 First-Time Renter
+                            <span class="status-badge" style="background-color: var(--color-success-bg); color: var(--color-success-text); border: 1px solid var(--color-success-border); font-size: 0.85rem; padding: 0.5rem 1rem; font-weight: 700; border-radius: var(--radius-md);">
+                                <span data-icon="check"></span> First-Time Renter
                             </span>
                         </div>
                         <p style="font-size: 0.85rem; color: var(--text-secondary); max-width: 400px; margin: 0.5rem auto 0 auto;">
@@ -648,33 +648,33 @@
             // ── Group 1 Helper Values ──
             const hasID = docs.some(d => ['valid_id', 'student_id', 'parent_guardian_id'].includes(d.document_type));
             const idVal = hasID
-                ? `<span style="color: #10b981; font-weight: 700; display: inline-flex; align-items: center; gap: 0.25rem;">
+                ? `<span style="color: var(--color-success-text); font-weight: 700; display: inline-flex; align-items: center; gap: 0.25rem;">
                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
                      Verified (ID Uploaded)
                    </span>`
-                : `<span style="color: #f59e0b; font-weight: 700; display: inline-flex; align-items: center; gap: 0.25rem;">
+                : `<span style="color: var(--color-warning-text); font-weight: 700; display: inline-flex; align-items: center; gap: 0.25rem;">
                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
                      Missing Government ID
                    </span>`;
 
             // Selfie Check
             const selfieVal = hasID
-                ? `<span style="color: #10b981; font-weight: 700; display: inline-flex; align-items: center; gap: 0.25rem;">
+                ? `<span style="color: var(--color-success-text); font-weight: 700; display: inline-flex; align-items: center; gap: 0.25rem;">
                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
                      Verified (Selfie Match Passed)
                    </span>`
-                : `<span style="color: #f59e0b; font-weight: 700; display: inline-flex; align-items: center; gap: 0.25rem;">
+                : `<span style="color: var(--color-warning-text); font-weight: 700; display: inline-flex; align-items: center; gap: 0.25rem;">
                      Pending ID Verification
                    </span>`;
 
             // Contact Check
             const hasContact = screening && screening.users && screening.users.contact_number;
             const contactVal = hasContact
-                ? `<span style="color: #10b981; font-weight: 700; display: inline-flex; align-items: center; gap: 0.25rem;">
+                ? `<span style="color: var(--color-success-text); font-weight: 700; display: inline-flex; align-items: center; gap: 0.25rem;">
                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
                      Verified (${screening.users.contact_number})
                    </span>`
-                : `<span style="color: #f59e0b; font-weight: 700;">
+                : `<span style="color: var(--color-warning-text); font-weight: 700;">
                      Email Verified Only
                    </span>`;
 
@@ -683,7 +683,7 @@
             const income = screening ? parseFloat(screening.monthly_income) : 0;
             const hasIncomeProof = docs.some(d => ['proof_of_income', 'certificate_of_registration'].includes(d.document_type));
 
-            const empStatusVal = `<span style="text-transform: capitalize; font-weight: 700; color: ${empStatus === 'unemployed' ? '#ef4444' : '#10b981'};">
+            const empStatusVal = `<span style="text-transform: capitalize; font-weight: 700; color: ${empStatus === 'unemployed' ? 'var(--color-error-text)' : 'var(--color-success-text)'};">
                 ${empStatus.replace('_', ' ')}
             </span>`;
 
@@ -692,11 +692,11 @@
             </span>`;
 
             const incomeProofVal = hasIncomeProof
-                ? `<span style="color: #10b981; font-weight: 700; display: inline-flex; align-items: center; gap: 0.25rem;">
+                ? `<span style="color: var(--color-success-text); font-weight: 700; display: inline-flex; align-items: center; gap: 0.25rem;">
                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
                      Verified (Proof Uploaded)
                    </span>`
-                : `<span style="color: #f59e0b; font-weight: 700; display: inline-flex; align-items: center; gap: 0.25rem;">
+                : `<span style="color: var(--color-warning-text); font-weight: 700; display: inline-flex; align-items: center; gap: 0.25rem;">
                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
                      Missing Proof of Income
                    </span>`;
@@ -705,29 +705,29 @@
             let prevRentalsVal = '', leaseCompVal = '', balanceVal = '', conditionVal = '', ratingVal = '', feedbackVal = '', reportsVal = '';
             if (screening) {
                 if (history === 'positive') {
-                    prevRentalsVal = `<span style="color: #10b981; font-weight: 700;">Sunrise Apartment (Declared)</span>`;
-                    leaseCompVal = `<span style="color: #10b981; font-weight: 700;">✅ 100% Completed</span>`;
-                    balanceVal = `<span style="color: #10b981; font-weight: 700;">₱0</span>`;
-                    conditionVal = `<span style="color: #10b981; font-weight: 700;">Good / Minor Wear</span>`;
-                    ratingVal = `<span style="color: #10b981; font-weight: 700;">⭐⭐⭐⭐⭐ (4.8/5)</span>`;
+                    prevRentalsVal = `<span style="color: var(--color-success-text); font-weight: 700;">Sunrise Apartment (Declared)</span>`;
+                    leaseCompVal = `<span style="display:inline-flex;align-items:center;gap:0.3rem;color:var(--color-success-text);font-weight:700;"><span data-icon="check"></span>100% Completed</span>`;
+                    balanceVal = `<span style="color: var(--color-success-text); font-weight: 700;">₱0</span>`;
+                    conditionVal = `<span style="color: var(--color-success-text); font-weight: 700;">Good / Minor Wear</span>`;
+                    ratingVal = `<span style="color: var(--color-success-text); font-weight: 700;">⭐⭐⭐⭐⭐ (4.8/5)</span>`;
                     feedbackVal = `<span style="color: var(--text-secondary); font-style: italic;">"Always paid on time..."</span>`;
-                    reportsVal = `<span style="color: #10b981; font-weight: 700;">0 Reported Violations</span>`;
+                    reportsVal = `<span style="color: var(--color-success-text); font-weight: 700;">0 Reported Violations</span>`;
                 } else if (history === 'negative') {
-                    prevRentalsVal = `<span style="color: #ef4444; font-weight: 700;">Sunset Heights (Declared)</span>`;
-                    leaseCompVal = `<span style="color: #ef4444; font-weight: 700;">❌ Interrupted / Terminated</span>`;
-                    balanceVal = `<span style="color: #ef4444; font-weight: 700;">₱15,000 Outstanding</span>`;
-                    conditionVal = `<span style="color: #ef4444; font-weight: 700;">Major Damages Reported</span>`;
-                    ratingVal = `<span style="color: #ef4444; font-weight: 700;">⭐⭐ (2.0/5)</span>`;
+                    prevRentalsVal = `<span style="color: var(--color-error-text); font-weight: 700;">Sunset Heights (Declared)</span>`;
+                    leaseCompVal = `<span style="display:inline-flex;align-items:center;gap:0.3rem;color:var(--color-error-text);font-weight:700;"><span data-icon="x"></span>Interrupted / Terminated</span>`;
+                    balanceVal = `<span style="color: var(--color-error-text); font-weight: 700;">₱15,000 Outstanding</span>`;
+                    conditionVal = `<span style="color: var(--color-error-text); font-weight: 700;">Major Damages Reported</span>`;
+                    ratingVal = `<span style="color: var(--color-error-text); font-weight: 700;">⭐⭐ (2.0/5)</span>`;
                     feedbackVal = `<span style="color: var(--text-secondary); font-style: italic;">"Late payments..."</span>`;
-                    reportsVal = `<span style="color: #ef4444; font-weight: 700;">3 Violations Reported</span>`;
+                    reportsVal = `<span style="color: var(--color-error-text); font-weight: 700;">3 Violations Reported</span>`;
                 } else {
-                    prevRentalsVal = `<span style="color: #10b981; font-weight: 700; background-color: #ecfdf5; padding: 0.15rem 0.4rem; border-radius: var(--radius-sm);">🟢 First-Time Renter</span>`;
+                    prevRentalsVal = `<span class="status-badge status-active" style="font-weight:700;"><span data-icon="check"></span>First-Time Renter</span>`;
                     leaseCompVal = `<span style="color: var(--text-muted);">N/A (First-Time Renter)</span>`;
-                    balanceVal = `<span style="color: #10b981; font-weight: 700;">₱0</span>`;
+                    balanceVal = `<span style="color: var(--color-success-text); font-weight: 700;">₱0</span>`;
                     conditionVal = `<span style="color: var(--text-muted);">N/A (First-Time Renter)</span>`;
                     ratingVal = `<span style="color: var(--text-muted);">N/A (First-Time Renter)</span>`;
                     feedbackVal = `<span style="color: var(--text-muted);">N/A (First-Time Renter)</span>`;
-                    reportsVal = `<span style="color: #10b981; font-weight: 700;">0 Reported Violations</span>`;
+                    reportsVal = `<span style="color: var(--color-success-text); font-weight: 700;">0 Reported Violations</span>`;
                 }
             } else {
                 prevRentalsVal = `<span style="color: var(--text-muted); font-style: italic;">Awaiting Screening Profile</span>`;
@@ -745,14 +745,14 @@
                 ? `<a href="${validIdDoc.file_url}" target="_blank" style="color: var(--primary); font-weight: 700; text-decoration: underline;">
                      ${validIdDoc.file_name}
                    </a>`
-                : `<span style="color: #f59e0b; font-weight: 700;">Not Uploaded</span>`;
+                : `<span style="color: var(--color-warning-text); font-weight: 700;">Not Uploaded</span>`;
 
             const incomeDoc = docs.find(d => ['proof_of_income', 'certificate_of_registration'].includes(d.document_type));
             const incomeDocVal = incomeDoc
                 ? `<a href="${incomeDoc.file_url}" target="_blank" style="color: var(--primary); font-weight: 700; text-decoration: underline;">
                      ${incomeDoc.file_name}
                    </a>`
-                : `<span style="color: #f59e0b; font-weight: 700;">Not Uploaded</span>`;
+                : `<span style="color: var(--color-warning-text); font-weight: 700;">Not Uploaded</span>`;
 
             const empCertDoc = docs.find(d => d.document_type === 'other' && d.file_name.toLowerCase().includes('employment'));
             const empCertDocVal = empCertDoc
@@ -785,13 +785,13 @@
                 const riskLabel = screening.screening_result_label;
                 if (riskLabel === 'low_risk') {
                     riskVal = `<span class="status-badge status-active">Low Risk</span>`;
-                    recVal = `<span style="color: #10b981; font-weight: 700;">Approve (Highly Recommended)</span>`;
+                    recVal = `<span style="color: var(--color-success-text); font-weight: 700;">Approve (Highly Recommended)</span>`;
                 } else if (riskLabel === 'moderate_risk') {
                     riskVal = `<span class="status-badge status-pending">Medium Risk</span>`;
-                    recVal = `<span style="color: #d97706; font-weight: 700;">Review (Verify documents manually)</span>`;
+                    recVal = `<span style="color: var(--color-warning-text); font-weight: 700;">Review (Verify documents manually)</span>`;
                 } else {
                     riskVal = `<span class="status-badge status-rejected">High Risk</span>`;
-                    recVal = `<span style="color: #ef4444; font-weight: 700;">Reject (Not recommended)</span>`;
+                    recVal = `<span style="color: var(--color-error-text); font-weight: 700;">Reject (Not recommended)</span>`;
                 }
             }
 
@@ -972,8 +972,8 @@
                         draftBtn = document.createElement('a');
                         draftBtn.id = 'btnCreateLeaseDirect';
                         draftBtn.className = 'btn-primary';
-                        draftBtn.style.cssText = 'display:block;margin-top:1rem;background-color:#10b981;border-color:#10b981;text-decoration:none;text-align:center;font-weight:700;padding:0.75rem;border-radius:var(--radius-md);';
-                        draftBtn.textContent = '📝 Draft Lease Agreement for Tenant →';
+                        draftBtn.style.cssText = 'display:flex;align-items:center;justify-content:center;gap:0.45rem;margin-top:1rem;background-color:var(--color-action-primary);border-color:var(--color-action-primary);color:var(--color-text-on-action);text-decoration:none;text-align:center;font-weight:700;padding:0.75rem;border-radius:var(--radius-md);';
+                        draftBtn.innerHTML = '<span data-icon="note"></span><span>Draft Lease Agreement for Tenant</span><span aria-hidden="true">→</span>';
                         decisionDisplay.appendChild(draftBtn);
                     }
                     draftBtn.href = `lease-create.html?application_id=${app.id}`;

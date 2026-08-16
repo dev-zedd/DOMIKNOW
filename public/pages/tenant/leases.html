@@ -73,12 +73,9 @@
                 <a href="dashboard.html" class="navbar-menu-link">Dashboard</a>
                 <a href="properties.html" class="navbar-menu-link">Property Discovery</a>
                 <a href="properties.html" class="navbar-menu-link">Discovery</a>
-                <a href="compare.html" class="navbar-menu-link">Compare Properties</a>
                 <a href="applications.html" class="navbar-menu-link">My Applications</a>
-                <a href="screening.html" class="navbar-menu-link">Screening</a>
                 <a href="leases.html" class="navbar-menu-link active">My Lease</a>
                 <a href="billings.html" class="navbar-menu-link">My Billings</a>
-                <a href="payments.html" class="navbar-menu-link">My Payments</a>
             </div>
             <div class="navbar-right">
                 <span class="navbar-user-welcome">Welcome, <span class="user-name">User</span></span>
@@ -203,9 +200,9 @@
                         banner.innerHTML = `
                             <div>
                                 <strong style="color:#d97706;">Action Required</strong>
-                                <div style="font-size:0.875rem;color:var(--text-secondary);margin-top:0.2rem;">The landlord drafted a lease for <strong>${propName}</strong>. Please review and sign it.</div>
+                                <div style="font-size:0.875rem;color:var(--text-secondary);margin-top:0.2rem;">The landlord drafted a lease for <strong>${domiknowEscapeHtml(propName)}</strong>. Please review and sign it.</div>
                             </div>
-                            <button class="action-btn btn-review" data-action="view" data-lease-id="${lease.id}" data-pending="true">Sign Agreement</button>
+                            <button type="button" class="action-btn btn-review" data-action="view" data-lease-id="${domiknowEscapeHtml(lease.id || '')}" data-pending="true">Sign Agreement</button>
                         `;
                         container.appendChild(banner);
                     } else if (status === 'rejected') {
@@ -219,23 +216,23 @@
 
                     let actionBtnHtml = '';
                     if (status === 'pending_tenant_acceptance') {
-                        actionBtnHtml = `<button class="action-btn btn-review" data-action="view" data-lease-id="${lease.id}" data-pending="true">Review & Sign Agreement</button>`;
+                        actionBtnHtml = `<button type="button" class="action-btn btn-review" data-action="view" data-lease-id="${domiknowEscapeHtml(lease.id || '')}" data-pending="true">Review & Sign Agreement</button>`;
                     } else {
-                        actionBtnHtml = `<button class="action-btn btn-view" data-action="view" data-lease-id="${lease.id}" data-pending="false">View Lease Agreement</button>`;
+                        actionBtnHtml = `<button type="button" class="action-btn btn-view" data-action="view" data-lease-id="${domiknowEscapeHtml(lease.id || '')}" data-pending="false">View Lease Agreement</button>`;
                     }
 
                     card.innerHTML = `
                         <div class="lease-header ${headerClass}">
                             <div>
-                                <h3 style="color:white;margin:0;font-size:1.05rem;">Lease: ${lease.lease_number || 'DRAFT'}</h3>
-                                <div style="font-size:0.85rem;opacity:0.9;margin-top:0.2rem;">${propName}</div>
+                                <h3 style="color:white;margin:0;font-size:1.05rem;">Lease: ${domiknowEscapeHtml(lease.lease_number || 'DRAFT')}</h3>
+                                <div style="font-size:0.85rem;opacity:0.9;margin-top:0.2rem;">${domiknowEscapeHtml(propName)}</div>
                             </div>
                             <span class="status-badge ${statusClass}">${statusLabel}</span>
                         </div>
                         <div class="lease-body">
                             <div class="detail-grid">
-                                <div class="detail-item"><span class="detail-label">Property Address</span><span class="detail-value">${propAddr}</span></div>
-                                ${targetUnitText ? `<div class="detail-item"><span class="detail-label">Assigned Space</span><span class="detail-value" style="color:var(--accent);font-weight:700;">${targetUnitText}</span></div>` : ''}
+                                <div class="detail-item"><span class="detail-label">Property Address</span><span class="detail-value">${domiknowEscapeHtml(propAddr)}</span></div>
+                                ${targetUnitText ? `<div class="detail-item"><span class="detail-label">Assigned Space</span><span class="detail-value" style="color:var(--accent);font-weight:700;">${domiknowEscapeHtml(targetUnitText)}</span></div>` : ''}
                                 <div class="detail-item"><span class="detail-label">Tenancy Duration</span><span class="detail-value">${start} to ${end}</span></div>
                                 <div class="detail-item"><span class="detail-label">Monthly Rent</span><span class="detail-value" style="color:#10b981;">₱${rent} PHP</span></div>
                                 <div class="detail-item"><span class="detail-label">Security Deposit</span><span class="detail-value">₱${deposit} PHP</span></div>
@@ -266,7 +263,7 @@
                         <div style="background:var(--bg-primary);padding:0.75rem;border-radius:var(--radius-md);border:1px solid var(--border-color);">
                             <div style="font-size:0.75rem;color:var(--text-muted);font-weight:700;display:flex;align-items:center;gap:0.25rem;">
                                 <svg class="svg-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--text-secondary);"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
-                                <span>${(item.name || 'Custom Utility').replace(/</g,'&lt;').replace(/>/g,'&gt;')}</span>
+                                <span>${domiknowEscapeHtml(item.name || 'Custom Utility')}</span>
                             </div>
                             <div style="margin-top:0.3rem;">${fmtSetup(item.setup || 'separate')}</div>
                         </div>
@@ -304,7 +301,7 @@
                 `;
             }
             const legacyList = Array.isArray(uConfig) ? uConfig : [];
-            return `<div class="contract-value">${legacyList.length ? legacyList.join(', ') : 'None'}</div>`;
+            return `<div class="contract-value">${domiknowEscapeHtml(legacyList.length ? legacyList.join(', ') : 'None')}</div>`;
         }
 
         async function openContract(leaseId, isPending) {
@@ -319,7 +316,7 @@
             modal.classList.remove('hidden');
 
             try {
-                const res = await fetch(`/api/leases/${leaseId}`, { headers: { 'Authorization': `Bearer ${token}` } });
+                const res = await fetch(`/api/leases/${encodeURIComponent(leaseId)}`, { headers: { 'Authorization': `Bearer ${token}` } });
                 if (!res.ok) {
                     content.innerHTML = `<div style="text-align:center;padding:2rem;color:#ef4444;">Failed to load contract details. (${res.status})</div>`;
                     footer.innerHTML  = `<div></div><button class="action-btn btn-close" data-footer-action="close">Close</button>`;
@@ -348,7 +345,7 @@
                                 <svg class="svg-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
                                 Your Appeal & Rejection Concerns
                             </div>
-                            <div style="font-size:0.85rem;color:var(--text-primary);white-space:pre-wrap;line-height:1.4;">${(lease.terms_and_conditions).replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div>
+                            <div style="font-size:0.85rem;color:var(--text-primary);white-space:pre-wrap;line-height:1.4;">${domiknowEscapeHtml(lease.terms_and_conditions)}</div>
                             <div style="font-size:0.75rem;color:var(--text-muted);margin-top:0.35rem;">Returned to landlord for review and adjustments.</div>
                         </div>
                     ` : ''}
@@ -359,13 +356,13 @@
                         <div class="parties-grid">
                             <div class="party-box">
                                 <div class="party-role">Landlord (Lessor)</div>
-                                <div class="party-name">${landlord.full_name || '—'}</div>
-                                <div class="party-detail">Phone: ${landlord.contact_number || '—'}<br>Email: ${landlord.email || '—'}</div>
+                                <div class="party-name">${domiknowEscapeHtml(landlord.full_name || '—')}</div>
+                                <div class="party-detail">Phone: ${domiknowEscapeHtml(landlord.contact_number || '—')}<br>Email: ${domiknowEscapeHtml(landlord.email || '—')}</div>
                             </div>
                             <div class="party-box">
                                 <div class="party-role">Tenant (Lessee) — You</div>
-                                <div class="party-name">${tenant.full_name || '—'}</div>
-                                <div class="party-detail">Phone: ${tenant.contact_number || '—'}<br>Email: ${tenant.email || '—'}</div>
+                                <div class="party-name">${domiknowEscapeHtml(tenant.full_name || '—')}</div>
+                                <div class="party-detail">Phone: ${domiknowEscapeHtml(tenant.contact_number || '—')}<br>Email: ${domiknowEscapeHtml(tenant.email || '—')}</div>
                             </div>
                         </div>
                     </div>
@@ -374,13 +371,13 @@
                     <div class="contract-section">
                         <div class="contract-section-title">Leased Property</div>
                         <div class="contract-grid">
-                            <div class="contract-item"><span class="contract-label">Property Name</span><span class="contract-value">${prop.property_name || '—'}</span></div>
+                            <div class="contract-item"><span class="contract-label">Property Name</span><span class="contract-value">${domiknowEscapeHtml(prop.property_name || '—')}</span></div>
                             <div class="contract-item"><span class="contract-label">Unit Number</span><span class="contract-value" style="color:#6366f1;">${
-                                lease.property_units ? `Room ${lease.property_units.unit_number}${lease.unit_beds ? ` (Bed Space: ${lease.unit_beds.bed_label})` : ''}` : 'N/A'
+                                lease.property_units ? `Room ${domiknowEscapeHtml(lease.property_units.unit_number || '—')}${lease.unit_beds ? ` (Bed Space: ${domiknowEscapeHtml(lease.unit_beds.bed_label || '—')})` : ''}` : 'N/A'
                             }</span></div>
                             <div class="contract-item"><span class="contract-label">Property Type</span><span class="contract-value">${(prop.property_type || '').replace(/_/g,' ').toUpperCase() || '—'}</span></div>
                         </div>
-                        <div style="margin-top:0.75rem;"><span class="contract-label">Full Address</span><div class="contract-value" style="font-weight:500;margin-top:0.2rem;">${buildAddress(prop)}</div></div>
+                        <div style="margin-top:0.75rem;"><span class="contract-label">Full Address</span><div class="contract-value" style="font-weight:500;margin-top:0.2rem;">${domiknowEscapeHtml(buildAddress(prop))}</div></div>
                     </div>
 
                     <!-- Financial & Duration -->
@@ -415,7 +412,7 @@
                                     ${amenList.map(a => `
                                         <div style="background:var(--bg-primary);border:1px solid var(--border-color);border-radius:var(--radius-md);padding:0.4rem 0.75rem;font-size:0.8rem;font-weight:700;color:var(--text-primary);display:inline-flex;align-items:center;gap:0.35rem;">
                                             <svg class="svg-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="color:var(--primary);"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                                            <span>${a}</span>
+                                            <span>${domiknowEscapeHtml(a)}</span>
                                         </div>
                                     `).join('')}
                                 </div>
@@ -433,8 +430,8 @@
                                 const customPols = lease.custom_policies || uCov.custom_policies || [];
                                 if (!Array.isArray(customPols) || !customPols.length) {
                                     return `
-                                        <div class="contract-item"><span class="contract-label">Pet Policy</span><span class="contract-value">${lease.pet_policy || '—'}${lease.pet_conditions ? ` — ${lease.pet_conditions}` : ''}</span></div>
-                                        <div class="contract-item"><span class="contract-label">Smoking Policy</span><span class="contract-value">${lease.smoking_policy || '—'}</span></div>
+                                        <div class="contract-item"><span class="contract-label">Pet Policy</span><span class="contract-value">${domiknowEscapeHtml(lease.pet_policy || '—')}${lease.pet_conditions ? ` — ${domiknowEscapeHtml(lease.pet_conditions)}` : ''}</span></div>
+                                        <div class="contract-item"><span class="contract-label">Smoking Policy</span><span class="contract-value">${domiknowEscapeHtml(lease.smoking_policy || '—')}</span></div>
                                     `;
                                 }
                                 return customPols.map(cp => {
@@ -443,8 +440,8 @@
                                     const valColor = isAllowed ? '#10b981' : '#ef4444';
                                     return `
                                         <div class="contract-item">
-                                            <span class="contract-label">${(cp.name).replace(/</g,'&lt;').replace(/>/g,'&gt;')}</span>
-                                            <span class="contract-value" style="color:${valColor};font-weight:700;">${cp.value || 'Not Allowed'}</span>
+                                            <span class="contract-label">${domiknowEscapeHtml(cp.name)}</span>
+                                            <span class="contract-value" style="color:${valColor};font-weight:700;">${domiknowEscapeHtml(cp.value || 'Not Allowed')}</span>
                                         </div>
                                     `;
                                 }).join('');
@@ -452,7 +449,7 @@
                         </div>
                         <div style="margin-top:0.85rem;padding-top:0.75rem;border-top:1px dashed var(--border-color);">
                             <div class="contract-label" style="margin-bottom:0.35rem;font-weight:700;">Additional House Rules & Specific Premises Guidelines</div>
-                            <div class="contract-textarea">${lease.house_rules || 'No specific house rules outlined.'}</div>
+                            <div class="contract-textarea">${domiknowEscapeHtml(lease.house_rules || 'No specific house rules outlined.')}</div>
                         </div>
                     </div>
 
@@ -460,8 +457,8 @@
                     <div class="contract-section">
                         <div class="contract-section-title">Maintenance Responsibilities</div>
                         <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
-                            <div><div class="contract-label" style="margin-bottom:0.4rem;">Landlord</div><div class="contract-textarea">${lease.landlord_responsibilities || '—'}</div></div>
-                            <div><div class="contract-label" style="margin-bottom:0.4rem;">Tenant (You)</div><div class="contract-textarea">${lease.tenant_responsibilities || '—'}</div></div>
+                            <div><div class="contract-label" style="margin-bottom:0.4rem;">Landlord</div><div class="contract-textarea">${domiknowEscapeHtml(lease.landlord_responsibilities || '—')}</div></div>
+                            <div><div class="contract-label" style="margin-bottom:0.4rem;">Tenant (You)</div><div class="contract-textarea">${domiknowEscapeHtml(lease.tenant_responsibilities || '—')}</div></div>
                         </div>
                     </div>
 
@@ -469,8 +466,8 @@
                     <div class="contract-section">
                         <div class="contract-section-title">Termination & Extra Terms</div>
                         <div class="contract-label" style="margin-bottom:0.4rem;">Termination Policy</div>
-                        <div class="contract-textarea">${lease.termination_policy || '—'}</div>
-                        ${lease.additional_terms ? `<div class="contract-label" style="margin-top:1rem;margin-bottom:0.4rem;">Additional Terms</div><div class="contract-textarea">${lease.additional_terms}</div>` : ''}
+                        <div class="contract-textarea">${domiknowEscapeHtml(lease.termination_policy || '—')}</div>
+                        ${lease.additional_terms ? `<div class="contract-label" style="margin-top:1rem;margin-bottom:0.4rem;">Additional Terms</div><div class="contract-textarea">${domiknowEscapeHtml(lease.additional_terms)}</div>` : ''}
                     </div>
 
                     <!-- Signatures -->
@@ -481,7 +478,7 @@
                                 <div class="contract-label">Landlord (Lessor)</div>
                                 <div style="font-weight:700;color:#10b981;font-size:0.85rem;margin:0.3rem 0;">SIGNED & VERIFIED</div>
                                 <div class="signature-box">
-                                    <div class="signature-name">${lease.landlord_signature_name || '—'}</div>
+                                    <div class="signature-name">${domiknowEscapeHtml(lease.landlord_signature_name || '—')}</div>
                                     <div class="sig-date">Signed on ${lease.landlord_signature_date ? fmtDateTimeLocal(lease.landlord_signature_date) : '—'}</div>
                                 </div>
                             </div>
@@ -489,7 +486,7 @@
                                 <div class="contract-label">Tenant (Lessee — You)</div>
                                 <div style="font-weight:700;color:${sigStatusColor};font-size:0.85rem;margin:0.3rem 0;">${sigStatusLabel}</div>
                                 <div class="signature-box">
-                                    <div class="signature-name" style="color:${lease.lease_status === 'rejected' ? '#ef4444' : '#6366f1'};">${lease.tenant_signature_name || '— Awaiting —'}</div>
+                                    <div class="signature-name" style="color:${lease.lease_status === 'rejected' ? '#ef4444' : '#6366f1'};">${domiknowEscapeHtml(lease.tenant_signature_name || '— Awaiting —')}</div>
                                     <div class="sig-date">${lease.tenant_signature_date ? `Signed on ${fmtDateTimeLocal(lease.tenant_signature_date)}` : 'Not yet signed.'}</div>
                                 </div>
                             </div>
@@ -502,7 +499,7 @@
                     footer.innerHTML = `
                         <div style="flex:1;min-width:200px;">
                             <label style="font-size:0.75rem;font-weight:700;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.05em;">Type your full name to sign electronically:</label>
-                            <input type="text" id="sigNameInput" class="sig-input" placeholder="${tenant.full_name || 'Your Full Name'}" autocomplete="off">
+                            <input type="text" id="sigNameInput" class="sig-input" placeholder="${domiknowEscapeHtml(tenant.full_name || 'Your Full Name')}" autocomplete="off">
                         </div>
                         <div style="display:flex;gap:0.6rem;align-items:flex-end;flex-shrink:0;">
                             <button class="action-btn btn-reject" data-footer-action="reject">Reject</button>
@@ -535,7 +532,16 @@
                     alert('Please type your signature name to sign the contract.');
                     return;
                 }
-                if (!confirm(`Are you sure you want to sign this contract as "${sigVal}"? This represents a legally binding agreement.`)) return;
+                const confirmSignature = await window.domiknowConfirm({
+                    variant: 'warning',
+                    eyebrow: 'Legal confirmation',
+                    title: `Sign this lease as “${sigVal}”?`,
+                    message: 'Your signature confirms that you accept the lease terms and creates a legally binding agreement.',
+                    details: ['Review the rent, dates, policies, and obligations before signing.', 'Your signature name will be recorded with the acceptance timestamp.'],
+                    confirmLabel: 'Sign and accept',
+                    cancelLabel: 'Review lease'
+                });
+                if (!confirmSignature) return;
 
                 if (acceptBtn) { acceptBtn.disabled = true; acceptBtn.textContent = 'Signing...'; }
                 try {
@@ -557,7 +563,21 @@
                     if (acceptBtn) { acceptBtn.disabled = false; acceptBtn.textContent = 'Sign & Accept'; }
                 }
             } else {
-                const reason = prompt('Please provide your concern or reason for rejecting/appealing this lease draft (will be sent to landlord for review):');
+                const reason = await window.domiknowPrompt({
+                    variant: 'warning',
+                    eyebrow: 'Return lease for review',
+                    title: 'What needs to be changed?',
+                    message: 'Explain your concern clearly. Your note will be sent to the landlord with this lease appeal.',
+                    confirmLabel: 'Submit concern',
+                    cancelLabel: 'Keep reviewing',
+                    input: {
+                        label: 'Concern or requested change',
+                        placeholder: 'Describe the term, amount, date, or policy you want the landlord to review…',
+                        required: true,
+                        multiline: true,
+                        maxLength: 1200
+                    }
+                });
                 if (reason === null) return;
                 if (!reason.trim()) { alert('A concern note or rejection reason is required.'); return; }
 

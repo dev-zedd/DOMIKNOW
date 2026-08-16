@@ -797,7 +797,7 @@
 
                 const editBtn = isEditable 
                     ? `<button class="action-btn btn-edit" data-edit-bill-id="${bill.id}">Edit</button>` 
-                    : (isMoveIn ? `<span style="font-size:0.75rem;color:var(--text-muted);font-weight:600;font-style:italic;" title="Move-In bill terms are locked to the signed lease agreement">🔒 Auto-Generated</span>` : '');
+                    : (isMoveIn ? `<span style="font-size:0.75rem;color:var(--text-muted);font-weight:600;font-style:italic;display:inline-flex;align-items:center;gap:0.3rem;" title="Move-In bill terms are locked to the signed lease agreement"><span data-icon="lock"></span> Auto-Generated</span>` : '');
 
                 const deleteBtn = isDeletable
                     ? `<button class="action-btn" data-delete-bill-id="${bill.id}" style="background-color:#ef4444;color:white;padding:0.35rem 0.65rem;font-size:0.75rem;border-radius:4px;border:none;margin-left:0.25rem;cursor:pointer;">Delete</button>`
@@ -999,7 +999,15 @@
                 return;
             }
 
-            if (!confirm(`Are you sure you want to delete the pending billing statement for ${bill.billing_month}?`)) {
+            const deleteBilling = await window.domiknowConfirm({
+                variant: 'danger',
+                eyebrow: 'Delete pending statement',
+                title: `Delete the ${bill.billing_month} billing?`,
+                message: 'This pending billing statement will be permanently removed and will no longer be available to the tenant.',
+                confirmLabel: 'Delete statement',
+                cancelLabel: 'Keep statement'
+            });
+            if (!deleteBilling) {
                 return;
             }
 
@@ -1051,7 +1059,7 @@
                 const targetMonthPrefix = billingMonth.slice(0, 7);
                 const existing = allBillings.find(b => b.lease_id === leaseId && b.billing_month && b.billing_month.startsWith(targetMonthPrefix));
                 if (existing) {
-                    errorDiv.textContent = `May umiiral nang billing statement (Status: ${existing.billing_status.toUpperCase()}) para sa buwang ito (${targetMonthPrefix}). Hindi na pwedeng mag-generate ng panibagong bill.`;
+                    errorDiv.textContent = `A billing statement already exists for this month (${targetMonthPrefix}) with status ${existing.billing_status.toUpperCase()}. You cannot generate another bill for the same month.`;
                     errorDiv.classList.remove('hidden');
                     return;
                 }

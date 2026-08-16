@@ -97,6 +97,31 @@ const feedbackModel = {
         return data || [];
     },
 
+    async findPublicFeedback(limit = 6) {
+        const safeLimit = Math.min(Math.max(Number.parseInt(limit, 10) || 6, 1), 12);
+        const { data, error } = await supabase
+            .from('ratings_feedback')
+            .select(`
+                id,
+                rating,
+                feedback_text,
+                feedback_type,
+                created_at,
+                properties (
+                    property_name
+                )
+            `)
+            .eq('status', 'visible')
+            .eq('is_authenticated', true)
+            .not('feedback_text', 'is', null)
+            .neq('feedback_text', '')
+            .order('created_at', { ascending: false })
+            .limit(safeLimit);
+
+        if (error) throw error;
+        return data || [];
+    },
+
     async updateFeedbackStatus(id, status) {
         const { data, error } = await supabase
             .from('ratings_feedback')

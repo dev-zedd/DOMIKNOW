@@ -36,7 +36,25 @@
         x: '<path d="m6 6 12 12M18 6 6 18"/>',
         paperclip: '<path d="m21.4 11.6-8.9 8.9a6 6 0 0 1-8.5-8.5l9.2-9.2a4 4 0 0 1 5.7 5.7l-9.2 9.2a2 2 0 0 1-2.8-2.8l8.5-8.5"/>',
         edit: '<path d="m4 16 9-9 5 5-9 9H4v-5ZM14 6l2-2a2 2 0 0 1 3 0l1 1a2 2 0 0 1 0 3l-2 2"/>',
-        arrow: '<path d="M5 12h14M13 6l6 6-6 6"/>'
+        arrow: '<path d="M5 12h14M13 6l6 6-6 6"/>',
+        'arrow-left': '<path d="M19 12H5M11 18l-6-6 6-6"/>',
+        folder: '<path d="M3 6a2 2 0 0 1 2-2h5l2 2h7a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6Z"/>',
+        lock: '<rect x="5" y="10" width="14" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3M12 14v3"/>',
+        note: '<path d="M5 3h14v14l-4 4H5V3Z"/><path d="M15 21v-4h4M8 8h8M8 12h8M8 16h4"/>',
+        message: '<path d="M21 15a4 4 0 0 1-4 4H8l-5 3 1.5-4A7 7 0 0 1 3 14V8a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4v7Z"/>',
+        flag: '<path d="M5 22V3M5 4h11l-2 4 2 4H5"/>',
+        sparkle: '<path d="m12 3 1.3 3.7L17 8l-3.7 1.3L12 13l-1.3-3.7L7 8l3.7-1.3L12 3ZM19 14l.8 2.2L22 17l-2.2.8L19 20l-.8-2.2L16 17l2.2-.8L19 14ZM5 13l.8 2.2L8 16l-2.2.8L5 19l-.8-2.2L2 16l2.2-.8L5 13Z"/>',
+        target: '<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/>',
+        list: '<path d="M9 6h11M9 12h11M9 18h11"/><circle cx="4" cy="6" r="1"/><circle cx="4" cy="12" r="1"/><circle cx="4" cy="18" r="1"/>',
+        map: '<path d="m3 6 6-3 6 3 6-3v15l-6 3-6-3-6 3V6Z"/><path d="M9 3v15M15 6v15"/>',
+        shield: '<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/><path d="m9 12 2 2 4-5"/>',
+        search: '<circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/>',
+        ban: '<circle cx="12" cy="12" r="9"/><path d="m6 6 12 12"/>',
+        building: '<path d="M4 21V5l8-3 8 3v16M8 8h2M14 8h2M8 12h2M14 12h2M8 16h2M14 16h2M10 21v-3h4v3"/>',
+        money: '<circle cx="12" cy="12" r="9"/><path d="M16 8.5c-.8-1-2-1.5-4-1.5-2.2 0-3.5 1-3.5 2.5 0 4 7 1.5 7 5 0 1.5-1.3 2.5-3.5 2.5-2 0-3.2-.5-4-1.5M12 5v14"/>',
+        trash: '<path d="M4 7h16M9 7V4h6v3M6 7l1 14h10l1-14M10 11v6M14 11v6"/>',
+        eye: '<path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12Z"/><circle cx="12" cy="12" r="2.5"/>',
+        plus: '<path d="M12 5v14M5 12h14"/>'
     };
 
     function domiknowIcon(name, label = '') {
@@ -51,6 +69,26 @@
     }
 
     window.domiknowIcon = domiknowIcon;
+
+    function ensureBrandFavicons() {
+        if (!document.head.querySelector('link[data-domiknow-favicon]')) {
+            const favicon = document.createElement('link');
+            favicon.rel = 'icon';
+            favicon.type = 'image/svg+xml';
+            favicon.sizes = 'any';
+            favicon.href = '/images/domiknow-mark.svg';
+            favicon.setAttribute('data-domiknow-favicon', '');
+            document.head.appendChild(favicon);
+        }
+
+        if (!document.head.querySelector('link[rel="apple-touch-icon"]')) {
+            const touchIcon = document.createElement('link');
+            touchIcon.rel = 'apple-touch-icon';
+            touchIcon.sizes = '180x180';
+            touchIcon.href = '/images/domiknow-apple-touch-v1.png';
+            document.head.appendChild(touchIcon);
+        }
+    }
 
     function enhanceIcons() {
         document.querySelectorAll('[data-icon]:not([data-icon-rendered])').forEach((placeholder) => {
@@ -139,6 +177,105 @@
         return path.includes('/pages/auth/') ||
             path.includes('/pages/public/') ||
             !path.includes('/pages/');
+    }
+
+    function ensureNonAdminMobileExperience() {
+        const path = window.location.pathname.replace(/\\/g, '/').toLowerCase();
+        if (path.includes('/pages/admin/')) return;
+
+        const viewport = document.head.querySelector('meta[name="viewport"]');
+        if (viewport) {
+            const directives = (viewport.content || '')
+                .split(',')
+                .map((item) => item.trim())
+                .filter(Boolean);
+            if (!directives.some((item) => item.toLowerCase().startsWith('viewport-fit='))) {
+                directives.push('viewport-fit=cover');
+                viewport.content = directives.join(', ');
+            }
+        }
+
+        let stylesheet = document.head.querySelector('link[href*="mobile-first.css"]');
+        if (!stylesheet) {
+            stylesheet = document.createElement('link');
+            stylesheet.rel = 'stylesheet';
+            stylesheet.href = '/css/mobile-first.css?v=20260817-1';
+            document.head.appendChild(stylesheet);
+        }
+        stylesheet.setAttribute('data-mobile-first', '');
+    }
+
+    function ensureDomiKnowModalSystem() {
+        if (!document.head.querySelector('link[data-domiknow-modal-system]')) {
+            const stylesheet = document.createElement('link');
+            stylesheet.rel = 'stylesheet';
+            stylesheet.href = '/css/modal-system.css?v=20260817-3';
+            stylesheet.setAttribute('data-domiknow-modal-system', '');
+            document.head.appendChild(stylesheet);
+        }
+
+        let resolveReady;
+        let rejectReady;
+        const existingReady = window.DomiKnowModalReady;
+        if (!existingReady) {
+            window.DomiKnowModalReady = new Promise((resolve, reject) => {
+                resolveReady = resolve;
+                rejectReady = reject;
+            });
+        }
+
+        if (window.DomiKnowModal) {
+            resolveReady?.(window.DomiKnowModal);
+        } else if (!document.head.querySelector('script[data-domiknow-modal-system]')) {
+            const script = document.createElement('script');
+            script.src = '/js/modal-system.js?v=20260817-2';
+            script.defer = true;
+            script.setAttribute('data-domiknow-modal-system', '');
+            script.addEventListener('load', () => resolveReady?.(window.DomiKnowModal));
+            script.addEventListener('error', () => rejectReady?.(new Error('DOMIKNOW modal system failed to load.')));
+            document.head.appendChild(script);
+        }
+
+        async function useModal(method, input, fallback) {
+            try {
+                const modal = window.DomiKnowModal || await window.DomiKnowModalReady;
+                if (modal && typeof modal[method] === 'function') return modal[method](input);
+            } catch (error) {
+                console.warn(error.message);
+            }
+            return fallback();
+        }
+
+        window.domiknowAlert = (input) => useModal('alert', input, () => {
+            window.alert(typeof input === 'string' ? input : input?.message || '');
+        });
+        window.domiknowConfirm = (input) => useModal('confirm', input, () =>
+            window.confirm(typeof input === 'string' ? input : input?.message || '')
+        );
+        window.domiknowPrompt = (input) => useModal('prompt', input, () =>
+            window.prompt(
+                typeof input === 'string' ? input : input?.message || '',
+                typeof input === 'object' ? input?.input?.value || input?.value || '' : ''
+            )
+        );
+    }
+
+    function ensureDomiKnowWalkthroughSystem() {
+        if (!document.head.querySelector('link[data-domiknow-walkthrough]')) {
+            const stylesheet = document.createElement('link');
+            stylesheet.rel = 'stylesheet';
+            stylesheet.href = '/css/walkthrough-system.css?v=20260817-1';
+            stylesheet.setAttribute('data-domiknow-walkthrough', '');
+            document.head.appendChild(stylesheet);
+        }
+
+        if (!document.head.querySelector('script[data-domiknow-walkthrough]')) {
+            const script = document.createElement('script');
+            script.src = '/js/walkthrough-system.js?v=20260817-1';
+            script.defer = true;
+            script.setAttribute('data-domiknow-walkthrough', '');
+            document.head.appendChild(script);
+        }
     }
 
     function ensureFloatingThemeToggle() {
@@ -700,6 +837,10 @@
         observeDynamicContent();
     }
 
+    ensureBrandFavicons();
+    ensureDomiKnowModalSystem();
+    ensureDomiKnowWalkthroughSystem();
+    ensureNonAdminMobileExperience();
     applyTheme(readStoredTheme() || getSystemTheme(), false);
     document.addEventListener('click', handleDocumentClick);
 

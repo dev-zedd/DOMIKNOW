@@ -66,12 +66,12 @@
             border-radius: var(--radius-full); font-size: 0.72rem;
             font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em;
         }
-        .chip-submitted    { background:#e0e7ff; color:#4f46e5; }
-        .chip-under_review { background:#fffbeb; color:#d97706; }
-        .chip-in_progress  { background:#fef3c7; color:#b45309; }
-        .chip-resolved     { background:#ecfdf5; color:#059669; }
-        .chip-closed       { background:#f1f5f9; color:#475569; }
-        .chip-rejected     { background:#fef2f2; color:#ef4444; }
+        .chip-submitted    { background:var(--color-info-bg); color:var(--color-info-text); }
+        .chip-under_review { background:var(--color-warning-bg); color:var(--color-warning-text); }
+        .chip-in_progress  { background:var(--color-warning-bg); color:var(--color-warning-text); }
+        .chip-resolved     { background:var(--color-success-bg); color:var(--color-success-text); }
+        .chip-closed       { background:var(--color-bg-subtle); color:var(--color-text-secondary); }
+        .chip-rejected     { background:var(--color-error-bg); color:var(--color-error-text); }
 
         /* ── Action Buttons ──────────────────────────────────── */
         .action-btn {
@@ -185,8 +185,8 @@
             font-size: 0.83rem; font-weight: 500; margin-bottom: 0.75rem; display: none;
         }
         .alert-bar.visible { display: block; }
-        .alert-error { background: var(--error-bg); color: var(--error); border: 1px solid #fca5a5; }
-        .alert-success { background: var(--success-bg); color: var(--success); border: 1px solid #6ee7b7; }
+        .alert-error { background: var(--color-error-bg); color: var(--color-error-text); border: 1px solid var(--color-error-border); }
+        .alert-success { background: var(--color-success-bg); color: var(--color-success-text); border: 1px solid var(--color-success-border); }
 
         /* ── Timeline ────────────────────────────────────────── */
         .timeline { margin-top: 0.5rem; }
@@ -253,15 +253,15 @@
                 <span class="stat-label">Total</span>
             </div>
             <div class="stat-card">
-                <span class="stat-value" id="statNew" style="color:#4f46e5;">—</span>
+                <span class="stat-value" id="statNew" style="color:var(--color-info-text);">—</span>
                 <span class="stat-label">Submitted</span>
             </div>
             <div class="stat-card">
-                <span class="stat-value" id="statReview" style="color:#d97706;">—</span>
+                <span class="stat-value" id="statReview" style="color:var(--color-warning-text);">—</span>
                 <span class="stat-label">Under Review</span>
             </div>
             <div class="stat-card">
-                <span class="stat-value" id="statProgress" style="color:#b45309;">—</span>
+                <span class="stat-value" id="statProgress" style="color:var(--color-warning-text);">—</span>
                 <span class="stat-label">In Progress</span>
             </div>
             <div class="stat-card">

@@ -220,7 +220,6 @@
             border-radius: 8px;
         }
     </style>
-    <link href="../../css/design-system.css" rel="stylesheet">
     <script src="../../js/ui.js" defer></script>
 </head>
 <body>
@@ -234,8 +233,6 @@
             <div class="navbar-menu">
                 <a href="dashboard.html" class="navbar-menu-link">Dashboard</a>
                 <a href="properties.html" class="navbar-menu-link">Discovery</a>
-                <a href="properties.html" class="navbar-menu-link">Discovery</a>
-                <a href="compare.html" class="navbar-menu-link">Compare</a>
                 <a href="applications.html" class="navbar-menu-link">My Applications</a>
             </div>
             <div class="navbar-right">
@@ -412,7 +409,7 @@
 
         async function fetchPropertyPreview() {
             try {
-                const response = await fetch(`/api/properties/${propertyId}`, {
+                const response = await fetch(`/api/properties/${encodeURIComponent(propertyId)}`, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
 
@@ -426,7 +423,7 @@
 
                 if (unitId) {
                     try {
-                        const unitRes = await fetch(`/api/units/${unitId}`);
+                        const unitRes = await fetch(`/api/units/${encodeURIComponent(unitId)}`);
                         if (unitRes.ok) {
                             const uResult = await unitRes.json();
                             currentUnit = uResult.data;
@@ -450,15 +447,16 @@
                     }
                 }
                 const rentDisplay = `₱${parseInt(rentVal).toLocaleString()}/month`;
-                const unitTag = currentUnit ? `<span class="badge-amenity" style="margin: 0; background-color: var(--primary); color: white; display: inline-block;">${unitText}</span>` : '';
+                const unitTag = currentUnit ? `<span class="badge-amenity" style="margin: 0; background-color: var(--primary); color: white; display: inline-block;">${domiknowEscapeHtml(unitText)}</span>` : '';
+                const previewImageUrl = domiknowSafeExternalUrl((currentUnit && currentUnit.main_image_url) || currentProperty.main_image_url || 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&w=400&q=80');
 
                 // Render snippet
                 const div = document.getElementById('propertySnippet');
                 div.innerHTML = `
-                    <img src="${(currentUnit && currentUnit.main_image_url) || currentProperty.main_image_url || 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&w=400&q=80'}" class="prop-thumb" alt="${currentProperty.property_name}">
+                    <img src="${previewImageUrl}" class="prop-thumb" alt="${domiknowEscapeHtml(currentProperty.property_name || 'Property')}">
                     <div style="display: flex; flex-direction: column; justify-content: center; gap: 0.25rem;">
-                        <h4 style="margin: 0; color: var(--primary);">${currentProperty.property_name}</h4>
-                        <span style="font-size: 0.75rem; color: var(--text-secondary);">${currentProperty.barangay}, Siniloan, Laguna</span>
+                        <h4 style="margin: 0; color: var(--primary);">${domiknowEscapeHtml(currentProperty.property_name || 'Property')}</h4>
+                        <span style="font-size: 0.75rem; color: var(--text-secondary);">${domiknowEscapeHtml(currentProperty.barangay || 'Location not specified')}, Siniloan, Laguna</span>
                         ${unitTag}
                         <span style="font-weight: 700; font-size: 0.875rem; color: var(--landlord);">${rentDisplay}</span>
                     </div>
@@ -566,6 +564,17 @@
             }
 
             const file = fileInput.files[0];
+            const allowedTypes = new Set(['application/pdf', 'image/jpeg', 'image/png', 'image/webp']);
+            if (file.size > 8 * 1024 * 1024) {
+                alert('This file is larger than 8 MB. Choose a smaller document.');
+                fileInput.value = '';
+                return;
+            }
+            if (!allowedTypes.has(file.type)) {
+                alert('Upload a PDF, JPG, PNG, or WebP document.');
+                fileInput.value = '';
+                return;
+            }
             btn.disabled = true;
             btn.textContent = 'Uploading...';
 
@@ -579,7 +588,7 @@
                     base64_content: base64Content
                 };
 
-                const response = await fetch(`/api/tenant/applications/${createdApplicationId}/documents`, {
+                const response = await fetch(`/api/tenant/applications/${encodeURIComponent(createdApplicationId)}/documents`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -600,7 +609,7 @@
                     statusDiv.innerHTML = `
                         <span class="upload-status-badge" style="background-color: #ecfdf5; color: #065f46;">
                             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                            ${file.name} uploaded successfully
+                            ${domiknowEscapeHtml(file.name)} uploaded successfully
                         </span>
                     `;
                 } else {

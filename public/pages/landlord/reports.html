@@ -188,7 +188,7 @@
             bottom: 1.5rem;
             right: 1.5rem;
             z-index: 10050;
-            background: linear-gradient(135deg, #9333ea 0%, #7e22ce 100%);
+            background: var(--color-action-primary);
             color: #ffffff;
             border: none;
             border-radius: 50px;
@@ -196,13 +196,13 @@
             display: flex;
             align-items: center;
             gap: 0.6rem;
-            box-shadow: 0 10px 25px -5px rgba(147, 51, 234, 0.5);
+            box-shadow: var(--shadow-dropdown);
             cursor: pointer;
             transition: all 0.25s ease;
         }
         .chat-head-fab:hover {
             transform: translateY(-3px) scale(1.03);
-            box-shadow: 0 14px 30px -5px rgba(147, 51, 234, 0.65);
+            box-shadow: var(--shadow-modal);
         }
         .chat-head-fab.hidden {
             display: none !important;
@@ -239,7 +239,7 @@
             display: none !important;
         }
         .chat-head-modal-header {
-            background: linear-gradient(135deg, #9333ea 0%, #7e22ce 100%);
+            background: var(--color-action-primary);
             color: #ffffff;
             padding: 0.85rem 1rem;
             display: flex;
@@ -291,11 +291,11 @@
             align-items: center;
             gap: 0.5rem;
             padding: 0.35rem 0.75rem;
-            background: rgba(147, 51, 234, 0.1);
-            border: 1px solid rgba(147, 51, 234, 0.2);
+            background: var(--color-info-bg);
+            border: 1px solid var(--color-info-border);
             border-radius: 16px;
             font-size: 0.76rem;
-            color: #7e22ce;
+            color: var(--color-info-text);
             font-weight: 600;
         }
         .messenger-dots {
@@ -306,7 +306,7 @@
         .messenger-dots span {
             width: 5px;
             height: 5px;
-            background-color: #9333ea;
+            background-color: var(--color-action-primary);
             border-radius: 50%;
             display: inline-block;
             animation: messengerWave 1.2s infinite ease-in-out;
@@ -410,7 +410,7 @@
                     <h3 style="margin:0;" id="fTitle">Report Detail</h3>
                     <div style="font-size:.78rem;color:var(--text-muted);margin-top:.2rem;" id="fSubtitle"></div>
                 </div>
-                <button type="button" class="modal-close-btn" id="filedModalCloseBtn" onclick="closeFiledModal()" title="Close">✕</button>
+                <button type="button" class="modal-close-btn" id="filedModalCloseBtn" onclick="closeFiledModal()" aria-label="Close filed report details"><span data-icon="x"></span></button>
             </div>
 
             <div class="modal-body">
@@ -496,7 +496,7 @@
                     <h3 style="margin:0;" id="mTitle">Report Detail</h3>
                     <div style="font-size:.78rem;color:var(--text-muted);margin-top:.2rem;" id="mSubtitle"></div>
                 </div>
-                <button type="button" class="modal-close-btn" id="modalCloseBtn" onclick="closeModal()" title="Close">✕</button>
+                <button type="button" class="modal-close-btn" id="modalCloseBtn" onclick="closeModal()" aria-label="Close report details"><span data-icon="x"></span></button>
             </div>
 
             <div class="modal-body">
@@ -577,7 +577,7 @@
         <div class="modal-container" style="max-width:550px;">
             <div class="modal-header">
                 <h3 style="margin:0;">Select Lease for Report</h3>
-                <button type="button" class="modal-close-btn" id="leaseModalCloseBtn" aria-label="Close lease selection" onclick="closeLeaseModal()">✕</button>
+                <button type="button" class="modal-close-btn" id="leaseModalCloseBtn" aria-label="Close lease selection" onclick="closeLeaseModal()"><span data-icon="x"></span></button>
             </div>
             <div class="modal-body">
                 <p style="color:var(--text-secondary);font-size:.875rem;margin-bottom:1.25rem;">
@@ -606,7 +606,7 @@
     <div id="chatHeadModal" class="chat-head-modal hidden">
         <div class="chat-head-modal-header">
             <div style="display:flex; align-items:center; gap:0.4rem; flex:1;">
-                <span style="font-weight:750; font-size:0.88rem; white-space:nowrap;">💬 Admin Case Inquiry Thread</span>
+                <span style="display:inline-flex;align-items:center;gap:0.4rem;font-weight:750;font-size:0.88rem;white-space:nowrap;"><span data-icon="message"></span>Admin Case Inquiry Thread</span>
             </div>
             <button type="button" id="closeChatHeadModalBtn" class="chat-head-close-btn" aria-label="Close inquiry thread">&times;</button>
         </div>
@@ -631,7 +631,7 @@
                     </label>
                     <input type="file" id="chatHeadFileInput" accept="image/*,video/*,.pdf,.doc,.docx" style="display:none;">
                     <input type="text" id="chatHeadTextInput" class="form-input" placeholder="Type message or attach evidence..." style="flex:1; font-size:0.82rem; padding:0.45rem 0.75rem;">
-                    <button type="submit" id="chatHeadSendBtn" class="btn-action-primary" style="background:#9333ea; padding:0.45rem 0.85rem; font-size:0.82rem; flex-shrink:0;">Send</button>
+                    <button type="submit" id="chatHeadSendBtn" class="btn-action-primary" style="background:var(--color-action-primary); padding:0.45rem 0.85rem; font-size:0.82rem; flex-shrink:0;">Send</button>
                 </div>
             </form>
         </div>
@@ -692,14 +692,24 @@
                 fab.addEventListener('click', () => {
                     chatModal.classList.toggle('hidden');
                     if (!chatModal.classList.contains('hidden')) {
+                        startChatHeadPolling();
                         const feed = $('chatHeadMessagesFeed');
                         if (feed) feed.scrollTop = feed.scrollHeight;
+                    } else {
+                        stopChatHeadPolling();
                     }
                 });
                 closeBtn.addEventListener('click', () => {
                     chatModal.classList.add('hidden');
+                    stopChatHeadPolling();
                 });
             }
+
+            document.addEventListener('visibilitychange', () => {
+                const modal = $('chatHeadModal');
+                if (document.hidden || modal?.classList.contains('hidden')) stopChatHeadPolling();
+                else if (activeChatReportId) startChatHeadPolling();
+            });
 
             const chatInput = $('chatHeadTextInput');
             if (chatInput) {
@@ -826,13 +836,21 @@
                 activeChatThread = thread;
                 chatLastMessageCount = -1;
                 if (fab) fab.classList.remove('hidden');
-                pollChatHeadThread();
-                if (!chatPollInterval) {
-                    chatPollInterval = setInterval(pollChatHeadThread, 800);
-                }
             } else {
                 disableChatHead();
             }
+        }
+
+        function startChatHeadPolling() {
+            if (!activeChatReportId || document.hidden) return;
+            pollChatHeadThread();
+            if (!chatPollInterval) chatPollInterval = window.setInterval(pollChatHeadThread, 4000);
+        }
+
+        function stopChatHeadPolling() {
+            if (!chatPollInterval) return;
+            window.clearInterval(chatPollInterval);
+            chatPollInterval = null;
         }
 
         function disableChatHead() {
@@ -840,10 +858,7 @@
             activeChatReportId = null;
             activeChatThread = null;
             chatLastMessageCount = -1;
-            if (chatPollInterval) {
-                clearInterval(chatPollInterval);
-                chatPollInterval = null;
-            }
+            stopChatHeadPolling();
             const fab = $('chatHeadFab');
             const modal = $('chatHeadModal');
             if (fab) fab.classList.add('hidden');
@@ -894,23 +909,25 @@
 
                 let attachmentHtml = '';
                 if (m.attachment_url) {
-                    const isImg = /\.(jpg|jpeg|png|gif|webp|svg)(\?|$)/i.test(m.attachment_url) || (m.attachment_path || '').match(/\.(jpg|jpeg|png|gif|webp|svg)$/i);
-                    if (isImg) {
-                        attachmentHtml = `<div style="margin-top:0.35rem;"><a href="${m.attachment_url}" target="_blank"><img src="${m.attachment_url}" alt="attachment" style="max-width:200px; max-height:150px; border-radius:6px; border:1px solid var(--border-color); object-fit:cover; display:block;"></a></div>`;
-                    } else {
-                        const fileName = m.attachment_path ? m.attachment_path.split('/').pop() : 'Attachment';
-                        attachmentHtml = `<div style="margin-top:0.35rem;"><a href="${m.attachment_url}" target="_blank" style="display:inline-flex; align-items:center; gap:0.35rem; color:#9333ea; font-weight:700; font-size:0.78rem; text-decoration:none; background:rgba(147,51,234,0.08); padding:0.3rem 0.6rem; border-radius:6px; border:1px solid rgba(147,51,234,0.2);">📎 ${fileName} ↗</a></div>`;
+                    const safeAttachmentUrl = domiknowSafeExternalUrl(m.attachment_url);
+                    const isImg = /\.(jpg|jpeg|png|gif|webp)(\?|$)/i.test(safeAttachmentUrl) || (m.attachment_path || '').match(/\.(jpg|jpeg|png|gif|webp)$/i);
+                    if (safeAttachmentUrl && isImg) {
+                        attachmentHtml = `<div style="margin-top:0.35rem;"><a href="${safeAttachmentUrl}" target="_blank" rel="noopener noreferrer"><img src="${safeAttachmentUrl}" alt="Message attachment" style="max-width:200px; max-height:150px; border-radius:6px; border:1px solid var(--border-color); object-fit:cover; display:block;"></a></div>`;
+                    }
+                    if (safeAttachmentUrl && !isImg) {
+                        const safeFileName = m.attachment_path ? m.attachment_path.split('/').pop() : 'Attachment';
+                        attachmentHtml = `<div style="margin-top:0.35rem;"><a class="chat-attachment-link" href="${safeAttachmentUrl}" target="_blank" rel="noopener noreferrer" style="display:inline-flex; align-items:center; gap:0.35rem; color:var(--color-info-text); font-weight:700; font-size:0.78rem; text-decoration:none; background:var(--color-info-bg); padding:0.3rem 0.6rem; border-radius:6px; border:1px solid var(--color-info-border);">📎 ${domiknowEscapeHtml(safeFileName)}</a></div>`;
                     }
                 }
 
                 const item = document.createElement('div');
-                item.style.cssText = `background:${isMe ? 'rgba(147,51,234,0.1)' : 'var(--bg-secondary)'}; border:1px solid var(--border-color); padding:0.6rem 0.85rem; border-radius:8px; font-size:0.84rem; align-self:${isMe ? 'flex-end' : 'flex-start'}; max-width:90%;`;
+                item.style.cssText = `background:${isMe ? 'var(--color-action-primary-subtle)' : 'var(--bg-secondary)'}; border:1px solid ${isMe ? 'var(--color-action-focus)' : 'var(--border-color)'}; padding:0.6rem 0.85rem; border-radius:8px; font-size:0.84rem; align-self:${isMe ? 'flex-end' : 'flex-start'}; max-width:90%;`;
                 item.innerHTML = `
                     <div style="display:flex; justify-content:space-between; margin-bottom:0.2rem; font-size:0.72rem; gap:0.5rem;">
-                        <span style="font-weight:800; color:${isMe ? '#9333ea' : 'var(--text-primary)'};">${senderName}</span>
-                        <span style="color:var(--text-muted);">${dateStr}</span>
+                        <span style="font-weight:800; color:${isMe ? 'var(--color-action-primary)' : 'var(--text-primary)'};">${domiknowEscapeHtml(senderName)}</span>
+                        <span style="color:var(--text-muted);">${domiknowEscapeHtml(dateStr)}</span>
                     </div>
-                    ${hasText ? `<div style="color:var(--text-primary); white-space:pre-wrap;">${m.message_text}</div>` : ''}
+                    ${hasText ? `<div style="color:var(--text-primary); white-space:pre-wrap;">${domiknowEscapeHtml(m.message_text)}</div>` : ''}
                     ${attachmentHtml}
                 `;
                 feed.appendChild(item);

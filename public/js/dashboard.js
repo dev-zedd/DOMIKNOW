@@ -1,5 +1,23 @@
 // Dashboard guard and initialization
 
+function domiknowEscapeHtml(value) {
+    return String(value ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+}
+
+function domiknowSafeExternalUrl(value) {
+    try {
+        const url = new URL(String(value || ''), window.location.origin);
+        return ['http:', 'https:'].includes(url.protocol) ? url.href : '#';
+    } catch (error) {
+        return '#';
+    }
+}
+
 // Run on page load
 document.addEventListener('DOMContentLoaded', async () => {
     // 1. Check token
@@ -59,7 +77,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             const landingPagesByRole = {
                 tenant: '/pages/tenant/properties.html',
                 landlord: '/pages/landlord/properties.html',
-                admin: '/pages/admin/reports.html',
+                admin: '/pages/admin/overview.html',
                 maintenance: '/pages/maintenance/dashboard.html'
             };
             window.location.href = landingPagesByRole[user.role] || '/pages/auth/login.html';
@@ -105,6 +123,17 @@ function populateDashboardUI(user) {
     const userNameEls = document.querySelectorAll('.user-name');
     userNameEls.forEach(el => el.textContent = user.full_name);
 
+    const avatar = document.querySelector('.topbar-avatar');
+    if (avatar) {
+        const initials = String(user.full_name || 'Tenant')
+            .trim()
+            .split(/\s+/)
+            .slice(0, 2)
+            .map(part => part.charAt(0).toUpperCase())
+            .join('');
+        avatar.textContent = initials || 'T';
+    }
+
     // Populate Account Status
     const statusEl = document.getElementById('accountStatus');
     if (statusEl) {
@@ -129,6 +158,118 @@ function populateDashboardUI(user) {
 
     // Modern Sidebar & Layout Injection
     renderNewDashboardLayout(user);
+}
+
+function loadTenantModuleAssets() {
+    if (!document.querySelector('link[data-tenant-module]')) {
+        const stylesheet = document.createElement('link');
+        stylesheet.rel = 'stylesheet';
+        stylesheet.href = '/css/tenant.css';
+        stylesheet.setAttribute('data-tenant-module', '');
+        document.head.appendChild(stylesheet);
+    }
+
+    loadMobileFirstAssets();
+
+    if (!document.querySelector('script[data-tenant-module]')) {
+        const script = document.createElement('script');
+        script.src = '/js/tenant.js';
+        script.defer = true;
+        script.setAttribute('data-tenant-module', '');
+        document.head.appendChild(script);
+    }
+}
+
+function loadLandlordModuleAssets() {
+    if (!document.querySelector('link[data-landlord-module]')) {
+        const stylesheet = document.createElement('link');
+        stylesheet.rel = 'stylesheet';
+        stylesheet.href = '/css/landlord.css';
+        stylesheet.setAttribute('data-landlord-module', '');
+        document.head.appendChild(stylesheet);
+    }
+
+    loadMobileFirstAssets();
+
+    if (!document.querySelector('script[data-landlord-module]')) {
+        const script = document.createElement('script');
+        script.src = '/js/landlord.js';
+        script.defer = true;
+        script.setAttribute('data-landlord-module', '');
+        document.head.appendChild(script);
+    }
+}
+
+function loadMaintenanceModuleAssets() {
+    if (!document.querySelector('link[data-maintenance-module]')) {
+        const stylesheet = document.createElement('link');
+        stylesheet.rel = 'stylesheet';
+        stylesheet.href = '/css/maintenance.css';
+        stylesheet.setAttribute('data-maintenance-module', '');
+        document.head.appendChild(stylesheet);
+    }
+
+    loadMobileFirstAssets();
+
+    if (!document.querySelector('script[data-maintenance-module]')) {
+        const script = document.createElement('script');
+        script.src = '/js/maintenance.js';
+        script.defer = true;
+        script.setAttribute('data-maintenance-module', '');
+        document.head.appendChild(script);
+    }
+}
+
+function loadMobileFirstAssets() {
+    if (document.querySelector('link[data-mobile-first]')) return;
+
+    const stylesheet = document.createElement('link');
+    stylesheet.rel = 'stylesheet';
+    stylesheet.href = '/css/mobile-first.css?v=20260817-1';
+    stylesheet.setAttribute('data-mobile-first', '');
+    document.head.appendChild(stylesheet);
+}
+
+function loadAdminModuleAssets() {
+    if (!document.querySelector('link[data-admin-module]')) {
+        const stylesheet = document.createElement('link');
+        stylesheet.rel = 'stylesheet';
+        stylesheet.href = '/css/admin.css';
+        stylesheet.setAttribute('data-admin-module', '');
+        document.head.appendChild(stylesheet);
+    }
+
+    if (!document.querySelector('script[data-admin-module]')) {
+        const script = document.createElement('script');
+        script.src = '/js/admin.js';
+        script.defer = true;
+        script.setAttribute('data-admin-module', '');
+        document.head.appendChild(script);
+    }
+}
+
+async function requestAuthenticatedLogout() {
+    if (typeof window.logout === 'function') {
+        return window.logout();
+    }
+
+    const modalOptions = {
+        variant: 'warning',
+        eyebrow: 'End your session',
+        title: 'Log out of DOMIKNOW?',
+        message: 'You will need to sign in again to access your account and continue your current work.',
+        confirmLabel: 'Log out',
+        cancelLabel: 'Stay signed in'
+    };
+    const shouldLogout = typeof window.domiknowConfirm === 'function'
+        ? await window.domiknowConfirm(modalOptions)
+        : window.confirm(modalOptions.message);
+
+    if (!shouldLogout) return false;
+    localStorage.removeItem('domiknow_token');
+    localStorage.removeItem('domiknow_role');
+    window.location.href = '/pages/auth/login.html';
+    return true;
 }
 
 function renderNewDashboardLayout(user) {
@@ -228,20 +369,31 @@ function renderNewDashboardLayout(user) {
         ],
         admin: [
             {
-                section: 'Main',
+                section: 'Command Center',
                 items: [
-                    { label: 'Users', href: 'users.html' },
-                    { label: 'Property Review', href: 'property-review.html' },
-                    { label: 'Reservation Monitoring', href: 'reservations.html' }
+                    { label: 'Overview', href: 'overview.html' }
                 ]
             },
             {
-                section: 'Monitoring & Governance',
+                section: 'Access & Listings',
                 items: [
-                    { label: 'Payment Monitor', href: 'payments.html' },
-                    { label: 'Reports Triage', href: 'reports.html' },
-                    { label: 'Policy Management', href: 'policy-management.html' },
-                    { label: 'Audit Logs', href: 'audit-logs.html' }
+                    { label: 'User Access', href: 'users.html' },
+                    { label: 'Property Approvals', href: 'property-review.html' }
+                ]
+            },
+            {
+                section: 'Platform Monitoring',
+                items: [
+                    { label: 'Reservations', href: 'reservations.html' },
+                    { label: 'Payment Verification', href: 'payments.html' }
+                ]
+            },
+            {
+                section: 'Trust & Governance',
+                items: [
+                    { label: 'Case Triage', href: 'reports.html' },
+                    { label: 'Policies', href: 'policy-management.html' },
+                    { label: 'Audit Trail', href: 'audit-logs.html' }
                 ]
             }
         ],
@@ -258,6 +410,16 @@ function renderNewDashboardLayout(user) {
 
     const role = (user && user.role) ? user.role : 'tenant';
     const menuGroups = (typeof NAVIGATION_CONFIG !== 'undefined' && NAVIGATION_CONFIG[role]) ? NAVIGATION_CONFIG[role] : (linksByRole[role] || []);
+
+    if (role === 'tenant') {
+        loadTenantModuleAssets();
+    } else if (role === 'landlord') {
+        loadLandlordModuleAssets();
+    } else if (role === 'maintenance') {
+        loadMaintenanceModuleAssets();
+    } else if (role === 'admin') {
+        loadAdminModuleAssets();
+    }
 
     // Create main container layout
     const dashboardLayout = document.createElement('div');
@@ -302,95 +464,181 @@ function renderNewDashboardLayout(user) {
     const shellUserName = (user && user.full_name) ? user.full_name : 'Checking account...';
 
     if (role === 'tenant') {
-        // Render the full tenant sidebar; mobile navigation uses the drawer.
+        const tenantGroups = [
+            {
+                section: 'Find a home',
+                items: [
+                    { label: 'Explore homes', href: 'properties.html', icon: 'Discovery' },
+                    { label: 'My applications', href: 'applications.html', icon: 'Applications' }
+                ]
+            },
+            {
+                section: 'My tenancy',
+                items: [
+                    { label: 'Lease agreement', href: 'leases.html', icon: 'Leases' },
+                    { label: 'Billing & payments', href: 'billings.html', icon: 'Payments' }
+                ]
+            },
+            {
+                section: 'Care & support',
+                items: [
+                    { label: 'Maintenance', href: 'maintenance.html', icon: 'Maintenance Requests' },
+                    { label: 'Disputes', href: 'disputes.html', icon: 'Disputes' },
+                    { label: 'Ratings & feedback', href: 'feedback.html', icon: 'Ratings and Feedback' }
+                ]
+            },
+            {
+                section: 'Safety & records',
+                items: [
+                    { label: 'Reports center', href: 'reports.html', icon: 'Reports' },
+                    { label: 'Policy violations', href: 'policy-violations.html', icon: 'Policy Violations' }
+                ]
+            }
+        ];
+
         sidebarHtml = `
             <aside class="sidebar sidebar-tenant" id="domiknowSidebar" aria-label="${roleLabel} navigation">
                 <div class="sidebar-logo-container">
                     <div class="app-brand" aria-label="DOMIKNOW">
                         <span class="app-brand-mark" aria-hidden="true">D</span>
-                        <span class="app-brand-name">DOMI<span class="app-brand-accent">KNOW</span></span>
+                        <span class="tenant-brand-copy">
+                            <span class="app-brand-name">DOMI<span class="app-brand-accent">KNOW</span></span>
+                            <span class="role-badge navbar-badge ${roleBadgeClass}">Tenant portal</span>
+                        </span>
                     </div>
-                    <span class="role-badge navbar-badge ${roleBadgeClass}">${roleLabel}</span>
                 </div>
 
                 <nav class="sidebar-menu" aria-label="Primary navigation">
-                    <div class="sidebar-section-title">Overview</div>
         `;
-        
-        const overviewGroup = menuGroups.find(g => g.section === 'Overview');
-        if (overviewGroup) {
-            overviewGroup.items.forEach(item => {
-                let isGroupActive = false;
-                if (item.subItems) {
-                    item.subItems.forEach(sub => {
-                        if (activeNavigationFilename === sub.href) {
-                            isGroupActive = true;
-                        }
-                    });
-                }
-                
-                const activeGroupKey = `domiknow_group_${item.label.toLowerCase()}`;
-                let isExpanded = sessionStorage.getItem(activeGroupKey);
-                if (isExpanded === null) {
-                    isExpanded = isGroupActive ? 'true' : 'false';
-                }
-                
-                const expandedClass = isExpanded === 'true' ? 'expanded' : '';
-                const groupActiveClass = isGroupActive ? 'group-active' : '';
-                const groupPanelId = `sidebar-group-${item.label.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`;
-                
-                if (item.subItems && item.subItems.length === 1) {
-                    const isSubActive = activeNavigationFilename === item.subItems[0].href;
-                    sidebarHtml += `
-                        <div class="sidebar-group ${groupActiveClass}" data-group="${item.label.toLowerCase()}">
-                            <a href="${item.subItems[0].href}" class="sidebar-group-header ${isSubActive ? 'active' : ''}" ${isSubActive ? 'aria-current="page"' : ''}>
-                                <span class="sidebar-group-header-left">
-                                    ${getTenantIcon(item.label)}
-                                    <span class="sidebar-group-label">${item.label}</span>
-                                </span>
-                            </a>
-                        </div>
-                    `;
-                } else {
-                    sidebarHtml += `
-                        <div class="sidebar-group ${expandedClass} ${groupActiveClass}" data-group="${item.label.toLowerCase()}">
-                            <button type="button" class="sidebar-group-header" aria-expanded="${isExpanded === 'true'}" aria-controls="${groupPanelId}">
-                                <span class="sidebar-group-header-left">
-                                    ${getTenantIcon(item.label)}
-                                    <span class="sidebar-group-label">${item.label}</span>
-                                </span>
-                                <span class="sidebar-group-arrow">
-                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                                        <polyline points="6 9 12 15 18 9"></polyline>
-                                    </svg>
-                                </span>
-                            </button>
-                            <div class="sidebar-sub-menu" id="${groupPanelId}">
-                    `;
-                    
-                    if (item.subItems) {
-                        item.subItems.forEach(sub => {
-                            const isSubActive = activeNavigationFilename === sub.href;
-                            const subActiveClass = isSubActive ? 'active' : '';
-                            sidebarHtml += `
-                                <a href="${sub.href}" class="sidebar-sub-link ${subActiveClass}" ${isSubActive ? 'aria-current="page"' : ''}>
-                                    <span class="sub-link-dot"></span>
-                                    <span class="sidebar-sub-label">${sub.label}</span>
-                                </a>
-                            `;
-                        });
-                    }
-                    
-                    sidebarHtml += `
-                            </div>
-                        </div>
-                    `;
-                }
+
+        tenantGroups.forEach(group => {
+            sidebarHtml += `<div class="sidebar-section-title">${group.section}</div>`;
+            group.items.forEach(item => {
+                const isActive = activeNavigationFilename === item.href;
+                const icon = getTenantIcon(item.icon) || getLinkIcon(item.icon);
+                sidebarHtml += `
+                    <a href="${item.href}" class="sidebar-link ${isActive ? 'active' : ''}" ${isActive ? 'aria-current="page"' : ''}>
+                        ${icon}
+                        <span>${item.label}</span>
+                    </a>
+                `;
             });
-        }
+        });
         
         sidebarHtml += `
                 </nav>
+                <div class="sidebar-footer">
+                    <button type="button" id="newLogoutBtn" class="sidebar-link sidebar-logout" aria-label="Log out of DOMIKNOW">
+                        <svg class="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                        <span>Log out</span>
+                    </button>
+                </div>
+            </aside>
+        `;
+    } else if (role === 'landlord') {
+        const landlordGroups = [
+            {
+                section: 'Portfolio',
+                items: [
+                    { label: 'My properties', href: 'properties.html', icon: 'My Properties' },
+                    { label: 'Register property', href: 'property-create.html', icon: 'Register Property' }
+                ]
+            },
+            {
+                section: 'Tenancy',
+                items: [
+                    { label: 'Tenant applications', href: 'applications.html', icon: 'Tenant Applications' },
+                    { label: 'Lease agreements', href: 'leases.html', icon: 'Leases' }
+                ]
+            },
+            {
+                section: 'Revenue',
+                items: [
+                    { label: 'Billing', href: 'billings.html', icon: 'Billings' },
+                    { label: 'Payment verification', href: 'payments.html', icon: 'Payments' }
+                ]
+            },
+            {
+                section: 'Operations',
+                items: [
+                    { label: 'Maintenance', href: 'maintenance.html', icon: 'Maintenance Management' },
+                    { label: 'Reports center', href: 'reports.html', icon: 'Reports' },
+                    { label: 'Complaints & disputes', href: 'disputes.html', icon: 'Disputes' },
+                    { label: 'Ratings & feedback', href: 'feedback.html', icon: 'Ratings and Feedback' }
+                ]
+            }
+        ];
+
+        sidebarHtml = `
+            <aside class="sidebar sidebar-landlord" id="domiknowSidebar" aria-label="Landlord navigation">
+                <div class="sidebar-logo-container">
+                    <div class="app-brand" aria-label="DOMIKNOW">
+                        <span class="app-brand-mark" aria-hidden="true">D</span>
+                        <span class="app-brand-name">DOMI<span class="app-brand-accent">KNOW</span></span>
+                    </div>
+                    <span class="role-badge navbar-badge ${roleBadgeClass}">Landlord console</span>
+                </div>
+                <nav class="sidebar-menu" aria-label="Primary navigation">
+        `;
+
+        landlordGroups.forEach(group => {
+            sidebarHtml += `<div class="sidebar-section-title">${group.section}</div>`;
+            group.items.forEach(item => {
+                const isActive = activeNavigationFilename === item.href;
+                sidebarHtml += `
+                    <a href="${item.href}" class="sidebar-link ${isActive ? 'active' : ''}" ${isActive ? 'aria-current="page"' : ''}>
+                        ${getLinkIcon(item.icon)}
+                        <span>${item.label}</span>
+                    </a>
+                `;
+            });
+        });
+
+        sidebarHtml += `
+                </nav>
+                <div class="sidebar-footer">
+                    <button type="button" id="newLogoutBtn" class="sidebar-link sidebar-logout" aria-label="Log out of DOMIKNOW">
+                        <svg class="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                        <span>Log out</span>
+                    </button>
+                </div>
+            </aside>
+        `;
+    } else if (role === 'maintenance') {
+        const maintenanceItems = [
+            { label: 'Work overview', href: 'dashboard.html', icon: 'Dashboard' },
+            { label: 'Assigned tasks', href: 'tasks.html', icon: 'Assigned Tasks' }
+        ];
+
+        sidebarHtml = `
+            <aside class="sidebar sidebar-maintenance" id="domiknowSidebar" aria-label="Maintenance personnel navigation">
+                <div class="sidebar-logo-container">
+                    <div class="app-brand" aria-label="DOMIKNOW">
+                        <span class="app-brand-mark" aria-hidden="true">D</span>
+                        <span class="app-brand-name">DOMI<span class="app-brand-accent">KNOW</span></span>
+                    </div>
+                    <span class="role-badge navbar-badge ${roleBadgeClass}">Field operations</span>
+                </div>
+                <nav class="sidebar-menu" aria-label="Primary navigation">
+                    <div class="sidebar-section-title">Workspace</div>
+        `;
+
+        maintenanceItems.forEach(item => {
+            const isActive = activeNavigationFilename === item.href;
+            sidebarHtml += `
+                <a href="${item.href}" class="sidebar-link ${isActive ? 'active' : ''}" ${isActive ? 'aria-current="page"' : ''}>
+                    ${getLinkIcon(item.icon)}
+                    <span>${item.label}</span>
+                </a>
+            `;
+        });
+
+        sidebarHtml += `
+                </nav>
+                <div class="maintenance-sidebar-note" role="note">
+                    <span class="maintenance-sidebar-note-icon" aria-hidden="true">!</span>
+                    <span>Update task status as work progresses so tenants and landlords stay informed.</span>
+                </div>
                 <div class="sidebar-footer">
                     <button type="button" id="newLogoutBtn" class="sidebar-link sidebar-logout" aria-label="Log out of DOMIKNOW">
                         <svg class="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
@@ -454,7 +702,7 @@ function renderNewDashboardLayout(user) {
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/></svg>
                     </button>
                     <div class="topbar-heading">
-                        <span class="topbar-context">${roleLabel} workspace</span>
+                        <span class="topbar-context">${role === 'tenant' ? 'Tenant portal' : role === 'landlord' ? 'Landlord console' : role === 'maintenance' ? 'Field operations' : role === 'admin' ? 'Platform control center' : `${roleLabel} workspace`}</span>
                         <h1 class="topbar-title" id="appPageTitle">${pageTitle}</h1>
                     </div>
                 </div>
@@ -463,8 +711,11 @@ function renderNewDashboardLayout(user) {
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.66 6.34l1.41-1.41"/></svg>
                     </button>
                     <div class="topbar-account" aria-label="Signed in user">
-                        <span class="topbar-account-role">${roleLabel}</span>
-                        <span class="user-name">Checking account...</span>
+                        <span class="topbar-avatar" aria-hidden="true">${shellUserName.trim().charAt(0).toUpperCase() || 'T'}</span>
+                        <span class="topbar-account-copy">
+                            <span class="topbar-account-role">${roleLabel}</span>
+                            <span class="user-name">Checking account...</span>
+                        </span>
                     </div>
                 </div>
             </header>
@@ -487,31 +738,37 @@ function renderNewDashboardLayout(user) {
             <nav class="bottom-nav-bar" aria-label="Tenant quick navigation">
                 <a href="/pages/tenant/properties.html" class="bottom-nav-item ${activeTab === 'discovery' ? 'active' : ''}" aria-label="Explore properties" ${activeTab === 'discovery' ? 'aria-current="page"' : ''}>
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                    <span>Explore</span>
                 </a>
                 <a href="/pages/tenant/applications.html" class="bottom-nav-item ${activeTab === 'applications' ? 'active' : ''}" aria-label="Applications" ${activeTab === 'applications' ? 'aria-current="page"' : ''}>
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                    <span>Applications</span>
                 </a>
                 <a href="/pages/tenant/leases.html" class="bottom-nav-item ${activeTab === 'leases' ? 'active' : ''}" aria-label="Lease" ${activeTab === 'leases' ? 'aria-current="page"' : ''}>
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                    <span>Lease</span>
                 </a>
                 <a href="/pages/tenant/billings.html" class="bottom-nav-item ${activeTab === 'payments' ? 'active' : ''}" aria-label="Payments" ${activeTab === 'payments' ? 'aria-current="page"' : ''}>
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+                    <span>Payments</span>
                 </a>
-                <a href="/pages/tenant/reports.html" class="bottom-nav-item ${activeTab === 'reports' ? 'active' : ''}" aria-label="Reports" ${activeTab === 'reports' ? 'aria-current="page"' : ''}>
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-                </a>
-                <button type="button" id="btnOpenNavSheet" class="bottom-nav-item ${activeTab === 'support' ? 'active' : ''}" aria-label="Open help and settings" aria-controls="navSheetOverlay" aria-expanded="false">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                <button type="button" id="btnOpenNavSheet" class="bottom-nav-item ${['support', 'reports'].includes(activeTab) ? 'active' : ''}" aria-label="Open more tenant tools" aria-controls="navSheetOverlay" aria-expanded="false">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/></svg>
+                    <span>More</span>
                 </button>
             </nav>
 
             <div id="navSheetOverlay" class="nav-sheet-overlay" aria-hidden="true">
                 <section class="nav-sheet" role="dialog" aria-modal="true" aria-labelledby="navSheetTitle">
                     <div class="nav-sheet-header">
-                        <h2 class="nav-sheet-title" id="navSheetTitle">Help &amp; settings</h2>
-                        <button type="button" id="btnCloseNavSheet" class="nav-sheet-close" aria-label="Close help and settings">&times;</button>
+                        <h2 class="nav-sheet-title" id="navSheetTitle">More tenant tools</h2>
+                        <button type="button" id="btnCloseNavSheet" class="nav-sheet-close" aria-label="Close tenant tools">&times;</button>
                     </div>
                     <nav class="nav-sheet-menu" aria-label="Tenant support navigation">
+                        <a href="/pages/tenant/reports.html" class="nav-sheet-item" ${activeNavigationFilename === 'reports.html' ? 'aria-current="page"' : ''}>
+                            ${getTenantIcon('Reports')}
+                            <span>Reports center</span>
+                        </a>
                         <a href="/pages/tenant/maintenance.html" class="nav-sheet-item" ${activeNavigationFilename === 'maintenance.html' ? 'aria-current="page"' : ''}>
                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
                             <span>Maintenance requests</span>
@@ -524,6 +781,10 @@ function renderNewDashboardLayout(user) {
                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
                             <span>Ratings &amp; feedback</span>
                         </a>
+                        <a href="/pages/tenant/policy-violations.html" class="nav-sheet-item" ${activeNavigationFilename === 'policy-violations.html' ? 'aria-current="page"' : ''}>
+                            ${getLinkIcon('Policy Violations')}
+                            <span>Policy violations</span>
+                        </a>
                         <button type="button" id="sheetLogoutBtn" class="nav-sheet-item logout" aria-label="Log out of DOMIKNOW">
                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
                             <span>Log out</span>
@@ -531,6 +792,89 @@ function renderNewDashboardLayout(user) {
                     </nav>
                 </section>
             </div>
+        `;
+    } else if (role === 'landlord') {
+        const activeTab = ['properties.html', 'property-create.html'].includes(activeNavigationFilename) ? 'portfolio' :
+                          activeNavigationFilename === 'applications.html' ? 'applications' :
+                          activeNavigationFilename === 'leases.html' ? 'leases' :
+                          activeNavigationFilename === 'billings.html' ? 'revenue' : 'more';
+
+        topbarHtml += `
+            <nav class="bottom-nav-bar" aria-label="Landlord quick navigation">
+                <a href="/pages/landlord/properties.html" class="bottom-nav-item ${activeTab === 'portfolio' ? 'active' : ''}" aria-label="Property portfolio" ${activeTab === 'portfolio' ? 'aria-current="page"' : ''}>
+                    ${getLinkIcon('My Properties')}
+                    <span>Portfolio</span>
+                </a>
+                <a href="/pages/landlord/applications.html" class="bottom-nav-item ${activeTab === 'applications' ? 'active' : ''}" aria-label="Tenant applications" ${activeTab === 'applications' ? 'aria-current="page"' : ''}>
+                    ${getLinkIcon('Tenant Applications')}
+                    <span>Applicants</span>
+                </a>
+                <a href="/pages/landlord/leases.html" class="bottom-nav-item ${activeTab === 'leases' ? 'active' : ''}" aria-label="Lease agreements" ${activeTab === 'leases' ? 'aria-current="page"' : ''}>
+                    ${getLinkIcon('Leases')}
+                    <span>Leases</span>
+                </a>
+                <a href="/pages/landlord/billings.html" class="bottom-nav-item ${activeTab === 'revenue' ? 'active' : ''}" aria-label="Billing and revenue" ${activeTab === 'revenue' ? 'aria-current="page"' : ''}>
+                    ${getLinkIcon('Billings')}
+                    <span>Revenue</span>
+                </a>
+                <button type="button" id="btnOpenNavSheet" class="bottom-nav-item ${activeTab === 'more' ? 'active' : ''}" aria-label="Open more landlord tools" aria-controls="navSheetOverlay" aria-expanded="false">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/></svg>
+                    <span>More</span>
+                </button>
+            </nav>
+
+            <div id="navSheetOverlay" class="nav-sheet-overlay" aria-hidden="true">
+                <section class="nav-sheet" role="dialog" aria-modal="true" aria-labelledby="navSheetTitle">
+                    <div class="nav-sheet-header">
+                        <h2 class="nav-sheet-title" id="navSheetTitle">More landlord tools</h2>
+                        <button type="button" id="btnCloseNavSheet" class="nav-sheet-close" aria-label="Close landlord tools">&times;</button>
+                    </div>
+                    <nav class="nav-sheet-menu" aria-label="Landlord operations navigation">
+                        <a href="/pages/landlord/property-create.html" class="nav-sheet-item" ${activeNavigationFilename === 'property-create.html' ? 'aria-current="page"' : ''}>
+                            ${getLinkIcon('Register Property')}
+                            <span>Register property</span>
+                        </a>
+                        <a href="/pages/landlord/payments.html" class="nav-sheet-item" ${activeNavigationFilename === 'payments.html' ? 'aria-current="page"' : ''}>
+                            ${getLinkIcon('Payments')}
+                            <span>Payment verification</span>
+                        </a>
+                        <a href="/pages/landlord/maintenance.html" class="nav-sheet-item" ${activeNavigationFilename === 'maintenance.html' ? 'aria-current="page"' : ''}>
+                            ${getLinkIcon('Maintenance Management')}
+                            <span>Maintenance</span>
+                        </a>
+                        <a href="/pages/landlord/reports.html" class="nav-sheet-item" ${activeNavigationFilename === 'reports.html' ? 'aria-current="page"' : ''}>
+                            ${getLinkIcon('Reports')}
+                            <span>Reports center</span>
+                        </a>
+                        <a href="/pages/landlord/disputes.html" class="nav-sheet-item" ${activeNavigationFilename === 'disputes.html' ? 'aria-current="page"' : ''}>
+                            ${getLinkIcon('Disputes')}
+                            <span>Complaints &amp; disputes</span>
+                        </a>
+                        <a href="/pages/landlord/feedback.html" class="nav-sheet-item" ${activeNavigationFilename === 'feedback.html' ? 'aria-current="page"' : ''}>
+                            ${getLinkIcon('Ratings and Feedback')}
+                            <span>Ratings &amp; feedback</span>
+                        </a>
+                        <button type="button" id="sheetLogoutBtn" class="nav-sheet-item logout" aria-label="Log out of DOMIKNOW">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                            <span>Log out</span>
+                        </button>
+                    </nav>
+                </section>
+            </div>
+        `;
+    } else if (role === 'maintenance') {
+        const isTasksActive = activeNavigationFilename === 'tasks.html';
+        topbarHtml += `
+            <nav class="bottom-nav-bar" aria-label="Maintenance quick navigation">
+                <a href="/pages/maintenance/dashboard.html" class="bottom-nav-item ${isTasksActive ? '' : 'active'}" ${isTasksActive ? '' : 'aria-current="page"'}>
+                    ${getLinkIcon('Dashboard')}
+                    <span>Overview</span>
+                </a>
+                <a href="/pages/maintenance/tasks.html" class="bottom-nav-item ${isTasksActive ? 'active' : ''}" ${isTasksActive ? 'aria-current="page"' : ''}>
+                    ${getLinkIcon('Assigned Tasks')}
+                    <span>Tasks</span>
+                </a>
+            </nav>
         `;
     }
 
@@ -593,11 +937,7 @@ function renderNewDashboardLayout(user) {
     // Logout button behavior
     const logoutBtn = document.getElementById('newLogoutBtn');
     if (logoutBtn) {
-        logoutBtn.addEventListener('click', () => {
-            localStorage.removeItem('domiknow_token');
-            localStorage.removeItem('domiknow_role');
-            window.location.href = '/pages/auth/login.html';
-        });
+        logoutBtn.addEventListener('click', requestAuthenticatedLogout);
     }
 
     // --- Tenant Specific Custom Interactive Behaviors ---
@@ -637,11 +977,7 @@ function renderNewDashboardLayout(user) {
         }
 
         if (sheetLogoutBtn) {
-            sheetLogoutBtn.addEventListener('click', () => {
-                localStorage.removeItem('domiknow_token');
-                localStorage.removeItem('domiknow_role');
-                window.location.href = '/pages/auth/login.html';
-            });
+            sheetLogoutBtn.addEventListener('click', requestAuthenticatedLogout);
         }
 
         if (sidebarEl) {
@@ -698,6 +1034,7 @@ function renderNewDashboardLayout(user) {
     // ⚡ INSTANT FADE-IN: Reveal layout smooth & flicker-free once sidebar is constructed
     document.body.classList.remove('app-loading');
     document.body.classList.add('app-ready');
+    document.dispatchEvent(new CustomEvent('domiknow:shell-ready', { detail: { role } }));
 }
 
 function initSidebarScrollPersistence(sidebar) {
@@ -788,6 +1125,15 @@ function getLinkIcon(label) {
         'Utilities': baseSvg('<polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>'),
         'Audit Logs': baseSvg('<line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line>')
     };
+
+    icons['Overview'] = icons['Dashboard'];
+    icons['User Access'] = icons['User Management'];
+    icons['Property Approvals'] = icons['Property Review'];
+    icons['Reservations'] = icons['Reservation Monitoring'];
+    icons['Payment Verification'] = icons['Payment Monitor'];
+    icons['Case Triage'] = icons['Reports Monitor'];
+    icons['Policies'] = icons['Policy Violations'];
+    icons['Audit Trail'] = icons['Audit Logs'];
     
     return icons[label] || baseSvg('<circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="16"></line><line x1="8" y1="12" x2="16" y2="12"></line>');
 }

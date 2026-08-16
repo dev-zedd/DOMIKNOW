@@ -6,7 +6,9 @@
     <title>Property Details - DomiKnow</title>
     <link href="../../css/input.css" rel="stylesheet">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link href="../../css/map-system.css" rel="stylesheet">
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="../../js/map-system.js" defer></script>
     <style>
         .details-grid {
             display: grid;
@@ -230,7 +232,7 @@
                         <div style="margin-bottom: 0.5rem;">
                             <div class="detail-label">Pin Location on Map</div>
                         </div>
-                        <div id="landlordMap" style="height: 240px; border-radius: var(--radius-md); border: 1px solid var(--border-color); z-index: 1;"></div>
+                        <div id="landlordMap" class="domiknow-map-frame" role="application" aria-label="Map showing the registered property location" style="height: 320px; z-index: 1;"></div>
                     </div>
 
                     <!-- Section 3. Contact Information -->
@@ -480,6 +482,7 @@
         const propertyId = urlParams.get('id');
         let currentProperty = null;
         let detailsMap = null;
+        let detailsMarker = null;
 
         document.addEventListener('DOMContentLoaded', () => {
             if (!token) return;
@@ -503,26 +506,24 @@
             // Fetch property detailed info
             fetchPropertyDetails();
 
-            // Set up initial map with CARTO Voyager HD Vector & Esri Satellite layers
-            const cartoVoyagerHD = L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-                maxZoom: 21,
-                maxNativeZoom: 20,
-                subdomains: 'abcd',
-                detectRetina: true
-            });
-            const satelliteBase = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { maxZoom: 19, detectRetina: true });
-            const labelsOverlay = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}', { maxZoom: 19, detectRetina: true });
-            const esriSatelliteHD = L.layerGroup([satelliteBase, labelsOverlay]);
+            if (typeof L === 'undefined') {
+                const mapElement = document.getElementById('landlordMap');
+                if (mapElement) mapElement.innerHTML = '<div class="empty-state" role="alert" style="padding:2rem;">The property map could not be loaded. Check your connection, then reload this page.</div>';
+                if (urlParams.get('edit') === 'true') toggleMode(true);
+                return;
+            }
 
-            detailsMap = L.map('landlordMap', {
-                zoomControl: true,
-                layers: [cartoVoyagerHD]
-            }).setView([14.425, 121.440], 15);
+            detailsMap = L.map('landlordMap', { zoomControl: true }).setView([14.4172, 121.4475], 15);
+            const domiknowBasemap = window.DomiknowMap
+                ? DomiknowMap.addBasemap(detailsMap, { maxZoom: 20, maxNativeZoom: 20 })
+                : L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(detailsMap);
+            if (window.DomiknowMap) DomiknowMap.addLayerControl(detailsMap, domiknowBasemap, { satellite: true });
 
-            L.control.layers({
-                "🗺️ CARTO HD Street Vector": cartoVoyagerHD,
-                "🛰️ Esri HD Satellite": esriSatelliteHD
-            }, null, { position: 'topright' }).addTo(detailsMap);
+            requestAnimationFrame(() => requestAnimationFrame(() => detailsMap.invalidateSize(false)));
+            const mapElement = document.getElementById('landlordMap');
+            if ('ResizeObserver' in window && mapElement) {
+                new ResizeObserver(() => detailsMap.invalidateSize(false)).observe(mapElement);
+            }
 
             if (urlParams.get('edit') === 'true') {
                 toggleMode(true);
@@ -957,13 +958,25 @@
 
         function updateMapMarker() {
             const prop = currentProperty;
-            if (prop.latitude && prop.longitude) {
-                detailsMap.setView([prop.latitude, prop.longitude], 16);
-                L.marker([prop.latitude, prop.longitude])
-                    .addTo(detailsMap)
-                    .bindPopup(`<strong>${prop.property_name}</strong><br>Brgy. ${prop.barangay}`)
-                    .openPopup();
-            }
+            const latitude = Number(prop?.latitude);
+            const longitude = Number(prop?.longitude);
+            if (!detailsMap || !Number.isFinite(latitude) || !Number.isFinite(longitude)
+                || Math.abs(latitude) > 90 || Math.abs(longitude) > 180) return;
+
+            detailsMap.setView([latitude, longitude], 16);
+            if (detailsMarker) detailsMarker.remove();
+            const propertyPin = window.DomiknowMap ? DomiknowMap.pinIcon({ selected: true }) : undefined;
+            detailsMarker = L.marker([latitude, longitude], propertyPin ? { icon: propertyPin } : {})
+                .addTo(detailsMap)
+                .bindPopup(window.DomiknowMap
+                    ? DomiknowMap.popupContent({
+                        eyebrow: 'Registered property',
+                        title: prop.property_name || 'Property',
+                        meta: `Brgy. ${prop.barangay || 'Location not specified'}`
+                    })
+                    : `${prop.property_name || 'Property'} — Brgy. ${prop.barangay || 'Location not specified'}`)
+                .openPopup();
+            requestAnimationFrame(() => detailsMap.invalidateSize(false));
         }
 
         function toggleMode(isEdit) {

@@ -7,6 +7,7 @@
     <link href="../../css/input.css" rel="stylesheet">
     <!-- Leaflet.js GIS map components -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link href="../../css/map-system.css" rel="stylesheet">
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <style>
         .compare-bar {
@@ -59,6 +60,7 @@
     <link href="../../css/design-system.css" rel="stylesheet">
     <link href="../../css/public-refinement.css" rel="stylesheet">
     <script src="../../js/ui.js" defer></script>
+    <script src="../../js/map-system.js" defer></script>
 </head>
 <body>
     <!-- Navbar -->
@@ -70,7 +72,6 @@
             </div>
             <div class="navbar-menu">
                 <a href="dashboard.html" class="navbar-menu-link">Dashboard</a>
-                <a href="properties.html" class="navbar-menu-link active">Discovery</a>
                 <a href="properties.html" class="navbar-menu-link active">Discovery</a>
                 <a href="applications.html" class="navbar-menu-link">My Applications</a>
             </div>
@@ -194,18 +195,22 @@
         let allProperties = [];
         let currentPage = 1;
         let totalPages = 1;
+        let propertyRequestController = null;
+        let filterRequestTimer = null;
 
         document.addEventListener('DOMContentLoaded', () => {
             // Initialize Leaflet Map centered in Siniloan, Laguna
-            mapInstance = L.map('map').setView([14.425, 121.440], 14);
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '&copy; OpenStreetMap contributors'
-            }).addTo(mapInstance);
+            mapInstance = L.map('map').setView([14.4172, 121.4475], 14);
+            if (window.DomiknowMap) DomiknowMap.addBasemap(mapInstance);
+            else L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '&copy; OpenStreetMap contributors' }).addTo(mapInstance);
             
             markersGroup = L.layerGroup().addTo(mapInstance);
 
-            // Default map center: Siniloan Town Center
-            mapInstance.setView([14.4172, 121.4475], 14);
+            const mapElement = document.getElementById('map');
+            requestAnimationFrame(() => requestAnimationFrame(() => mapInstance.invalidateSize(false)));
+            if ('ResizeObserver' in window && mapElement) {
+                new ResizeObserver(() => mapInstance.invalidateSize(false)).observe(mapElement);
+            }
 
             // Bind Event Listeners for Filters
             document.getElementById('filterBarangay').addEventListener('change', applyFilters);
@@ -235,6 +240,8 @@
 
         // Fetch properties with 4 Input Criteria passed to the Ranked Recommendation Engine
         async function fetchProperties() {
+            propertyRequestController?.abort();
+            propertyRequestController = new AbortController();
             try {
                 const barangay = document.getElementById('filterBarangay')?.value || '';
                 const minPrice = document.getElementById('filterMinPrice')?.value || '';
@@ -246,7 +253,7 @@
                     activeAmenities.push(cb.value);
                 });
 
-                let queryParams = `preferred_location=${encodeURIComponent(barangay)}&min_price=${minPrice}&max_price=${maxPrice}&preferred_property_type=${type}`;
+                let queryParams = `preferred_location=${encodeURIComponent(barangay)}&min_price=${encodeURIComponent(minPrice)}&max_price=${encodeURIComponent(maxPrice)}&preferred_property_type=${encodeURIComponent(type)}`;
                 activeAmenities.forEach(a => {
                     queryParams += `&amenities=${encodeURIComponent(a)}`;
                 });
@@ -256,7 +263,10 @@
                     headers['Authorization'] = `Bearer ${token}`;
                 }
 
-                const response = await fetch(`/api/properties/recommendations/ranked?${queryParams}`, { headers });
+                const response = await fetch(`/api/properties/recommendations/ranked?${queryParams}`, {
+                    headers,
+                    signal: propertyRequestController.signal
+                });
 
                 if (!response.ok) {
                     document.getElementById('propertiesGrid').innerHTML = `<p role="alert" style="grid-column: 1/-1; text-align: center; color: var(--error);">Failed to load recommended listings. Please try again.</p>`;
@@ -268,6 +278,7 @@
                 renderUI(allProperties);
 
             } catch (err) {
+                if (err.name === 'AbortError') return;
                 console.error(err);
                 document.getElementById('propertiesGrid').innerHTML = `<p role="alert" style="grid-column: 1/-1; text-align: center; color: var(--error);">Property listings could not be loaded. Please check your connection and try again.</p>`;
             }
@@ -299,16 +310,26 @@
 
             items.forEach(item => {
                 const prop = item.property || item;
-                const rank = item.rank || 1;
-                const matchPct = item.match_percentage || 100;
+                const rank = Number(item.rank) || 1;
+                const matchPct = Math.max(0, Math.min(100, Number(item.match_percentage) || 100));
                 const out = item.output_criteria || {};
+                const propertyId = String(prop.id || '');
+                const safePropertyId = encodeURIComponent(propertyId);
+                const propertyName = domiknowEscapeHtml(prop.property_name || 'Unnamed property');
+                const propertyType = domiknowEscapeHtml(String(prop.property_type || 'Property').replace(/_/g, ' '));
+                const barangayName = domiknowEscapeHtml(prop.barangay || 'Location not specified');
+                const imageUrl = domiknowSafeExternalUrl(prop.main_image_url || 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&w=400&q=80');
+                const propertyRating = Number(out.property_rating ?? prop.average_rating ?? 0);
+                const landlordRating = Number(out.landlord_rating ?? 0);
+                const trustScore = Math.max(0, Math.min(100, Number(out.trust_score) || 0));
+                const reliability = domiknowEscapeHtml(out.rental_reliability || 'Not yet rated');
                 
                 // Amenities HTML preview
                 let amenHtml = '';
                 const amenitiesList = prop.amenities || [];
                 const preview = amenitiesList.slice(0, 3);
                 preview.forEach(a => {
-                    amenHtml += `<span class="badge-amenity">${a}</span>`;
+                    amenHtml += `<span class="badge-amenity">${domiknowEscapeHtml(a)}</span>`;
                 });
                 if (amenitiesList.length > 3) {
                     amenHtml += `<span class="badge-amenity">+${amenitiesList.length - 3}</span>`;
@@ -323,11 +344,11 @@
 
                 const card = document.createElement('div');
                 card.className = 'prop-card';
-                card.dataset.propId = prop.id;
+                card.dataset.propId = propertyId;
                 
                 card.innerHTML = `
                     <div class="prop-img-wrapper" style="position: relative;">
-                        <img src="${prop.main_image_url || 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&w=400&q=80'}" alt="${prop.property_name}" class="prop-img">
+                        <img src="${imageUrl}" alt="${propertyName}" class="prop-img" loading="lazy" decoding="async">
                         <span style="position: absolute; top: 10px; left: 10px; background: ${rank === 1 ? 'var(--color-action-primary)' : 'var(--brand-navy)'}; color: white; padding: 0.2rem 0.65rem; border-radius: var(--radius-sm); font-weight: 800; font-size: 0.72rem; box-shadow: var(--shadow-card); display: inline-flex; align-items: center; gap: 0.25rem;">
                             ${rank === 1 ? `<svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"/></svg> Rank #1 Top Match` : `Rank #${rank}`}
                         </span>
@@ -337,44 +358,44 @@
                     <div class="prop-content">
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.25rem;">
                             <span style="font-size: 0.725rem; font-weight: 800; color: var(--primary); text-transform: uppercase; letter-spacing: 0.05em;">
-                                ${(prop.property_type || '').replace('_', ' ')}
+                                ${propertyType}
                             </span>
                         </div>
 
-                        <h4 class="prop-title" style="margin: 0.25rem 0;">${prop.property_name}</h4>
+                        <h4 class="prop-title" style="margin: 0.25rem 0;">${propertyName}</h4>
                         
                         <!-- 5 Output Criteria Badges Display Grid -->
                         <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.4rem; margin: 0.65rem 0; background: var(--bg-primary); padding: 0.6rem 0.75rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color);">
                             <div>
                                 <span style="font-size: 0.65rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">1. Location</span>
-                                <div style="font-size: 0.78rem; font-weight: 700; color: var(--text-primary); text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">Brgy. ${prop.barangay}</div>
+                                <div style="font-size: 0.78rem; font-weight: 700; color: var(--text-primary); text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">Brgy. ${barangayName}</div>
                             </div>
                             <div>
                                 <span style="font-size: 0.65rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">2. Property Rating</span>
                                 <div style="font-size: 0.78rem; font-weight: 700; color: #f59e0b; display: inline-flex; align-items: center; gap: 0.2rem;">
                                     <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"/></svg>
-                                    ${(out.property_rating || prop.average_rating || 4.8).toFixed(1)} / 5.0
+                                    ${Number.isFinite(propertyRating) ? propertyRating.toFixed(1) : '0.0'} / 5.0
                                 </div>
                             </div>
                             <div>
                                 <span style="font-size: 0.65rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">3. Trust Score</span>
                                     <div style="font-size: 0.78rem; font-weight: 700; color: var(--color-success-text); display: inline-flex; align-items: center; gap: 0.2rem;">
                                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-                                    ${out.trust_score || 100} / 100
+                                    ${trustScore} / 100
                                 </div>
                             </div>
                             <div>
                                 <span style="font-size: 0.65rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">4. Reliability</span>
                                 <div style="font-size: 0.78rem; font-weight: 700; color: #0284c7; display: inline-flex; align-items: center; gap: 0.2rem;">
                                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-                                    ${out.rental_reliability || '96% High'}
+                                    ${reliability}
                                 </div>
                             </div>
                             <div style="grid-column: span 2;">
                                 <span style="font-size: 0.65rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">5. Landlord Rating</span>
                                 <div style="font-size: 0.78rem; font-weight: 700; color: #8b5cf6; display: inline-flex; align-items: center; gap: 0.2rem;">
                                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                                    ${(out.landlord_rating || 4.7).toFixed(1)} / 5.0
+                                    ${Number.isFinite(landlordRating) ? landlordRating.toFixed(1) : '0.0'} / 5.0
                                 </div>
                             </div>
                         </div>
@@ -382,16 +403,16 @@
                         <div class="prop-amenities-preview" style="margin-bottom: 0.75rem;">${amenHtml}</div>
 
                         <div style="display: flex; align-items: center; justify-content: flex-end; border-top: 1px solid var(--border-color); padding-top: 0.75rem; margin-top: 0.5rem;">
-                            <a href="property-details.html?id=${prop.id}" class="btn-prop-detail" style="width: 100%; text-align: center; padding: 0.5rem 1.25rem; font-size: 0.875rem; font-weight: 700; border-radius: var(--radius-md); text-decoration: none;">View Details &amp; Reserve</a>
+                            <a href="property-details.html?id=${safePropertyId}" class="btn-prop-detail" style="width: 100%; text-align: center; padding: 0.5rem 1.25rem; font-size: 0.875rem; font-weight: 700; border-radius: var(--radius-md); text-decoration: none;">View Details &amp; Reserve</a>
                         </div>
                     </div>
                 `;
                 grid.appendChild(card);
 
                 // Add Custom Animated Leaflet Marker
-                if (prop.latitude && prop.longitude) {
-                    const lat = parseFloat(prop.latitude);
-                    const lng = parseFloat(prop.longitude);
+                const lat = Number(prop.latitude);
+                const lng = Number(prop.longitude);
+                if (Number.isFinite(lat) && Number.isFinite(lng) && Math.abs(lat) <= 90 && Math.abs(lng) <= 180) {
 
                     const markerIcon = L.divIcon({
                         className: '',
@@ -406,23 +427,23 @@
                         .bindPopup(`
                             <div style="font-family: var(--font-family); padding: 0.35rem 0.25rem;">
                                 <span style="background: ${rank === 1 ? 'var(--color-action-primary)' : 'var(--brand-navy)'}; color: white; padding: 0.2rem 0.6rem; border-radius: var(--radius-sm); font-weight: 800; font-size: 0.72rem;">${rank === 1 ? 'Top Match' : `Rank #${rank}`} (${matchPct}% Match)</span>
-                                <h4 style="margin: 0.4rem 0 0.25rem 0; font-weight: 800; color: var(--primary); font-size: 0.95rem;">${prop.property_name}</h4>
+                                <h4 style="margin: 0.4rem 0 0.25rem 0; font-weight: 800; color: var(--primary); font-size: 0.95rem;">${propertyName}</h4>
                                 <p style="margin: 0.2rem 0 0.5rem 0; font-size: 0.78rem; color: #059669; font-weight: 700; display: flex; align-items: center; gap: 0.25rem;">
                                     <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-                                    Trust Score: ${out.trust_score || 100}/100
+                                    Trust Score: ${trustScore}/100
                                 </p>
-                                <a href="property-details.html?id=${prop.id}" style="font-size: 0.78rem; font-weight: 800; text-decoration: none; color: white; background: var(--color-action-primary); padding: 0.35rem 0.75rem; border-radius: var(--radius-sm); display: inline-block;">Open Details</a>
+                                <a href="property-details.html?id=${safePropertyId}" style="font-size: 0.78rem; font-weight: 800; text-decoration: none; color: white; background: var(--color-action-primary); padding: 0.35rem 0.75rem; border-radius: var(--radius-sm); display: inline-block;">Open Details</a>
                             </div>
                         `);
                     
                     markersGroup.addLayer(marker);
                     markers.push(marker);
-                    markerMap[prop.id] = { marker, lat, lng };
+                    markerMap[propertyId] = { marker, lat, lng };
                 }
 
                 // Card Hover & Click Interactive Map Animations
                 card.addEventListener('mouseenter', () => {
-                    const data = markerMap[prop.id];
+                    const data = markerMap[propertyId];
                     if (data && data.marker) {
                         const iconElement = data.marker.getElement();
                         if (iconElement) {
@@ -433,7 +454,7 @@
                 });
 
                 card.addEventListener('mouseleave', () => {
-                    const data = markerMap[prop.id];
+                    const data = markerMap[propertyId];
                     if (data && data.marker) {
                         const iconElement = data.marker.getElement();
                         if (iconElement) {
@@ -446,7 +467,7 @@
                 card.addEventListener('click', (e) => {
                     // Avoid triggering when clicking View Details link
                     if (e.target.closest('a')) return;
-                    const data = markerMap[prop.id];
+                    const data = markerMap[propertyId];
                     if (data && data.marker) {
                         mapInstance.flyTo([data.lat, data.lng], 16, {
                             animate: true,
@@ -471,10 +492,12 @@
 
         // Apply filters dynamically by re-querying the recommendation API with active Filter Options
         function applyFilters() {
-            fetchProperties();
+            clearTimeout(filterRequestTimer);
+            filterRequestTimer = setTimeout(fetchProperties, 350);
         }
 
         function clearFilters() {
+            clearTimeout(filterRequestTimer);
             document.getElementById('filterBarangay').value = '';
             document.getElementById('filterMinPrice').value = '';
             document.getElementById('filterMaxPrice').value = '';

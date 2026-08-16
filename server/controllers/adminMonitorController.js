@@ -94,7 +94,9 @@ const adminMonitorController = {
             }
 
             if (date_to) {
-                query = query.lte('created_at', date_to);
+                const endExclusive = new Date(`${date_to}T00:00:00.000Z`);
+                endExclusive.setUTCDate(endExclusive.getUTCDate() + 1);
+                query = query.lt('created_at', endExclusive.toISOString());
             }
 
             const { data: logs, error } = await query.order('created_at', { ascending: false });

@@ -451,14 +451,9 @@
             <div class="navbar-menu" style="flex-wrap: wrap; gap: 0.5rem 1rem;">
                 <a href="dashboard.html" class="navbar-menu-link">Dashboard</a>
                 <a href="properties.html" class="navbar-menu-link">Discovery</a>
-                <a href="properties.html" class="navbar-menu-link">Discovery</a>
-                <a href="compare.html" class="navbar-menu-link">Compare</a>
-                <a href="reservations.html" class="navbar-menu-link">My Reservations</a>
                 <a href="applications.html" class="navbar-menu-link">My Applications</a>
-                <a href="screening.html" class="navbar-menu-link">Screening</a>
                 <a href="leases.html" class="navbar-menu-link">My Lease</a>
                 <a href="billings.html" class="navbar-menu-link">My Billings</a>
-                <a href="payments.html" class="navbar-menu-link">My Payments</a>
                 <a href="maintenance.html" class="navbar-menu-link">Maintenance</a>
                 <a href="reports.html" class="navbar-menu-link">Reports</a>
                 <a href="tenant-reports.html" class="navbar-menu-link">Reports Against Me</a>
@@ -778,18 +773,18 @@
                 card.className = `lease-card ${lease.is_rated ? 'rated' : ''}`;
                 card.dataset.leaseId = lease.id;
 
-                const statusLabel = lease.lease_status.replace('_', ' ');
+                const statusLabel = String(lease.lease_status || 'active').replace(/_/g, ' ');
                 const ratedBadge = lease.is_rated
                     ? `<span class="lease-rating-badge badge-submitted">Submitted</span>`
                     : `<span class="lease-rating-badge badge-not-rated">Not Yet Rated</span>`;
 
                 card.innerHTML = `
                     <div class="lease-card-info">
-                        <div class="lease-property-name">${lease.properties?.property_name || 'Property'}</div>
-                        <div class="lease-landlord-name">Landlord: ${lease.landlord?.full_name || 'N/A'}</div>
+                        <div class="lease-property-name">${domiknowEscapeHtml(lease.properties?.property_name || 'Property')}</div>
+                        <div class="lease-landlord-name">Landlord: ${domiknowEscapeHtml(lease.landlord?.full_name || 'N/A')}</div>
                         <div class="lease-contract-number">
-                            <span class="badge-status">${statusLabel}</span>
-                            ${lease.lease_number || 'No contract number'}
+                            <span class="badge-status">${domiknowEscapeHtml(statusLabel)}</span>
+                            ${domiknowEscapeHtml(lease.lease_number || 'No contract number')}
                         </div>
                     </div>
                     <div style="flex-shrink:0; display:flex; align-items:center;">
@@ -836,11 +831,11 @@
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
                     <td>
-                        <div style="font-weight:700; color:var(--text-primary);">${targetName}</div>
-                        <div style="font-size:0.72rem; color:var(--text-muted); font-family:monospace;">${rat.lease_records?.lease_number || ''}</div>
+                        <div style="font-weight:700; color:var(--text-primary);">${domiknowEscapeHtml(targetName)}</div>
+                        <div style="font-size:0.72rem; color:var(--text-muted); font-family:monospace;">${domiknowEscapeHtml(rat.lease_records?.lease_number || '')}</div>
                     </td>
                     <td style="color:var(--text-secondary); font-size:0.85rem;">
-                        ${currentTab === 'property' ? (rat.landlord?.full_name || 'N/A') : (rat.properties?.property_name || 'N/A')}
+                        ${domiknowEscapeHtml(currentTab === 'property' ? (rat.landlord?.full_name || 'N/A') : (rat.properties?.property_name || 'N/A'))}
                     </td>
                     <td>
                         ${starsHtml}
@@ -849,8 +844,8 @@
                     <td style="font-size:0.82rem; color:var(--text-secondary); white-space:nowrap;">${dateStr}</td>
                     <td>
                         <div style="display:flex; gap:0.4rem; flex-wrap:wrap;">
-                            <button class="action-btn btn-view" data-action="view" data-rating-id="${rat.id}">Details</button>
-                            ${isEditable ? `<button class="action-btn btn-edit" data-action="edit" data-rating-id="${rat.id}">Edit</button>` : ''}
+                            <button type="button" class="action-btn btn-view" data-action="view" data-rating-id="${domiknowEscapeHtml(rat.id || '')}">Details</button>
+                            ${isEditable ? `<button type="button" class="action-btn btn-edit" data-action="edit" data-rating-id="${domiknowEscapeHtml(rat.id || '')}">Edit</button>` : ''}
                         </div>
                     </td>
                 `;
@@ -918,11 +913,11 @@
                         <div class="criterion-desc">${crit.desc}</div>
                     </div>
                     <div class="criterion-stars" id="starGroup-${crit.id}">
-                        <button type="button" class="criteria-star-btn" data-val="1">&#9733;</button>
-                        <button type="button" class="criteria-star-btn" data-val="2">&#9733;</button>
-                        <button type="button" class="criteria-star-btn" data-val="3">&#9733;</button>
-                        <button type="button" class="criteria-star-btn" data-val="4">&#9733;</button>
-                        <button type="button" class="criteria-star-btn" data-val="5">&#9733;</button>
+                        <button type="button" class="criteria-star-btn" data-val="1" aria-label="${domiknowEscapeHtml(crit.name)}: 1 out of 5" aria-pressed="false">&#9733;</button>
+                        <button type="button" class="criteria-star-btn" data-val="2" aria-label="${domiknowEscapeHtml(crit.name)}: 2 out of 5" aria-pressed="false">&#9733;</button>
+                        <button type="button" class="criteria-star-btn" data-val="3" aria-label="${domiknowEscapeHtml(crit.name)}: 3 out of 5" aria-pressed="false">&#9733;</button>
+                        <button type="button" class="criteria-star-btn" data-val="4" aria-label="${domiknowEscapeHtml(crit.name)}: 4 out of 5" aria-pressed="false">&#9733;</button>
+                        <button type="button" class="criteria-star-btn" data-val="5" aria-label="${domiknowEscapeHtml(crit.name)}: 5 out of 5" aria-pressed="false">&#9733;</button>
                         <span class="criterion-label" id="critLabel-${crit.id}">Select</span>
                     </div>
                 `;
@@ -936,6 +931,7 @@
                         const btnVal = parseInt(btn.dataset.val);
                         if (persist) {
                             btn.classList.toggle('active', btnVal <= val);
+                            btn.setAttribute('aria-pressed', btnVal === val ? 'true' : 'false');
                             btn.style.color = '';
                         } else {
                             btn.style.color = btnVal <= val ? '#f59e0b' : '#d1d5db';
@@ -1089,7 +1085,7 @@
                 });
                 const result = await res.json();
                 if (!res.ok) {
-                    body.innerHTML = `<div style="color:var(--error);">${result.message || 'Failed to load details.'}</div>`;
+                    body.innerHTML = `<div role="alert" style="color:var(--error);">${domiknowEscapeHtml(result.message || 'Failed to load details.')}</div>`;
                     return;
                 }
                 currentViewRating = result.data;
@@ -1130,11 +1126,11 @@
                         <div style="margin-bottom:0.75rem; border-bottom:1px dashed var(--border-color); padding-bottom:0.5rem;">
                             <div style="font-weight:600; font-size:0.85rem; color:var(--text-primary);">${crit.name}</div>
                             <div class="edit-star-row" id="editStarRow-${crit.id}" data-crit="${crit.id}">
-                                <button type="button" class="edit-star ${currentVal >= 1 ? 'active' : ''}" data-eval="1">&#9733;</button>
-                                <button type="button" class="edit-star ${currentVal >= 2 ? 'active' : ''}" data-eval="2">&#9733;</button>
-                                <button type="button" class="edit-star ${currentVal >= 3 ? 'active' : ''}" data-eval="3">&#9733;</button>
-                                <button type="button" class="edit-star ${currentVal >= 4 ? 'active' : ''}" data-eval="4">&#9733;</button>
-                                <button type="button" class="edit-star ${currentVal >= 5 ? 'active' : ''}" data-eval="5">&#9733;</button>
+                                <button type="button" class="edit-star ${currentVal >= 1 ? 'active' : ''}" data-eval="1" aria-label="${domiknowEscapeHtml(crit.name)}: 1 out of 5" aria-pressed="${currentVal === 1}">&#9733;</button>
+                                <button type="button" class="edit-star ${currentVal >= 2 ? 'active' : ''}" data-eval="2" aria-label="${domiknowEscapeHtml(crit.name)}: 2 out of 5" aria-pressed="${currentVal === 2}">&#9733;</button>
+                                <button type="button" class="edit-star ${currentVal >= 3 ? 'active' : ''}" data-eval="3" aria-label="${domiknowEscapeHtml(crit.name)}: 3 out of 5" aria-pressed="${currentVal === 3}">&#9733;</button>
+                                <button type="button" class="edit-star ${currentVal >= 4 ? 'active' : ''}" data-eval="4" aria-label="${domiknowEscapeHtml(crit.name)}: 4 out of 5" aria-pressed="${currentVal === 4}">&#9733;</button>
+                                <button type="button" class="edit-star ${currentVal >= 5 ? 'active' : ''}" data-eval="5" aria-label="${domiknowEscapeHtml(crit.name)}: 5 out of 5" aria-pressed="${currentVal === 5}">&#9733;</button>
                                 <span id="editStarLabel-${crit.id}" style="font-size:0.78rem; color:var(--text-secondary); margin-left:0.4rem;">${STAR_LABELS[currentVal]}</span>
                             </div>
                         </div>
@@ -1144,15 +1140,15 @@
                 body.innerHTML = `
                     <div class="detail-row">
                         <span class="detail-label">Lease</span>
-                        <span class="detail-value" style="font-family:monospace;">${rat.lease_records?.lease_number || 'N/A'}</span>
+                        <span class="detail-value" style="font-family:monospace;">${domiknowEscapeHtml(rat.lease_records?.lease_number || 'N/A')}</span>
                     </div>
                     <div class="detail-row">
                         <span class="detail-label">Property</span>
-                        <span class="detail-value" style="font-weight:700;">${rat.properties?.property_name || 'N/A'}</span>
+                        <span class="detail-value" style="font-weight:700;">${domiknowEscapeHtml(rat.properties?.property_name || 'N/A')}</span>
                     </div>
                     <div class="detail-row">
                         <span class="detail-label">Landlord</span>
-                        <span class="detail-value">${rat.landlord?.full_name || 'N/A'}</span>
+                        <span class="detail-value">${domiknowEscapeHtml(rat.landlord?.full_name || 'N/A')}</span>
                     </div>
                     <hr class="detail-divider">
                     
@@ -1162,7 +1158,7 @@
 
                     <div class="form-group">
                         <label class="form-label" for="editFeedbackText">Updated Feedback</label>
-                        <textarea id="editFeedbackText" class="form-input" style="height:100px;" minlength="10" required>${rat.feedback}</textarea>
+                        <textarea id="editFeedbackText" class="form-input" style="height:100px;" minlength="10" required>${domiknowEscapeHtml(rat.feedback || '')}</textarea>
                     </div>
                 `;
 
@@ -1177,6 +1173,7 @@
                             const btnVal = parseInt(btn.dataset.eval);
                             if (persist) {
                                 btn.classList.toggle('active', btnVal <= val);
+                                btn.setAttribute('aria-pressed', btnVal === val ? 'true' : 'false');
                                 btn.style.color = '';
                             } else {
                                 btn.style.color = btnVal <= val ? '#f59e0b' : '#d1d5db';
@@ -1228,15 +1225,15 @@
                 body.innerHTML = `
                     <div class="detail-row">
                         <span class="detail-label">Property</span>
-                        <span class="detail-value" style="font-weight:700;">${rat.properties?.property_name || 'N/A'}</span>
+                        <span class="detail-value" style="font-weight:700;">${domiknowEscapeHtml(rat.properties?.property_name || 'N/A')}</span>
                     </div>
                     <div class="detail-row">
                         <span class="detail-label">Landlord</span>
-                        <span class="detail-value">${rat.landlord?.full_name || 'N/A'}</span>
+                        <span class="detail-value">${domiknowEscapeHtml(rat.landlord?.full_name || 'N/A')}</span>
                     </div>
                     <div class="detail-row">
                         <span class="detail-label">Lease</span>
-                        <span class="detail-value" style="font-family:monospace;">${rat.lease_records?.lease_number || 'N/A'}</span>
+                        <span class="detail-value" style="font-family:monospace;">${domiknowEscapeHtml(rat.lease_records?.lease_number || 'N/A')}</span>
                     </div>
                     
                     <div class="modal-breakdown-card">
@@ -1253,7 +1250,7 @@
                     </div>
                     <div class="detail-row" style="align-items:start;">
                         <span class="detail-label">Feedback Review</span>
-                        <span class="detail-value" style="white-space:pre-wrap; background:var(--bg-primary); padding:0.75rem 1rem; border-radius:var(--radius-md); border:1px solid var(--border-color);">${rat.feedback}</span>
+                        <span class="detail-value" style="white-space:pre-wrap; background:var(--bg-primary); padding:0.75rem 1rem; border-radius:var(--radius-md); border:1px solid var(--border-color);">${domiknowEscapeHtml(rat.feedback || '')}</span>
                     </div>
                     <div class="detail-row">
                         <span class="detail-label">Submitted</span>

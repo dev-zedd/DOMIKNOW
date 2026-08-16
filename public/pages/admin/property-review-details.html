@@ -156,16 +156,16 @@
     <link href="../../css/design-system.css" rel="stylesheet">
     <script src="../../js/ui.js" defer></script>
 </head>
-<body>
+<body class="app-loading" data-role="admin" data-page-title="Property Evidence Review">
     <!-- Navbar -->
     <nav class="navbar navbar-admin">
         <div class="navbar-container">
             <div class="navbar-brand-group">
-                <a href="dashboard.html" style="text-decoration: none;"><span class="navbar-logo">DomiKnow</span></a>
+                <a href="overview.html" style="text-decoration: none;"><span class="navbar-logo">DomiKnow</span></a>
                 <span class="navbar-badge navbar-badge-admin">Admin</span>
             </div>
             <div class="navbar-menu">
-                <a href="dashboard.html" class="navbar-menu-link">Dashboard</a>
+                <a href="overview.html" class="navbar-menu-link">Overview</a>
                 <a href="users.html" class="navbar-menu-link">Users</a>
                 <a href="property-review.html" class="navbar-menu-link active">Property Review</a>
                 <a href="reservations.html" class="navbar-menu-link">Reservation Monitoring</a>
@@ -389,6 +389,13 @@
                 layers: [cartoVoyagerHD]
             }).setView([14.425, 121.440], 15);
 
+            const mapContainer = document.getElementById('landlordMap');
+            requestAnimationFrame(() => requestAnimationFrame(() => adminMap.invalidateSize(false)));
+            if ('ResizeObserver' in window && mapContainer) {
+                const mapResizeObserver = new ResizeObserver(() => adminMap.invalidateSize(false));
+                mapResizeObserver.observe(mapContainer);
+            }
+
             L.control.layers({
                 "🗺️ CARTO HD Street Vector": cartoVoyagerHD,
                 "🛰️ Esri HD Satellite": esriSatelliteHD
@@ -478,7 +485,7 @@
                         tag.style.display = 'inline-flex';
                         tag.style.alignItems = 'center';
                         tag.style.gap = '4px';
-                        tag.innerHTML = `<svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="color: var(--success);"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg> ${a}`;
+                        tag.innerHTML = `<svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="color: var(--success);"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg> ${domiknowEscapeHtml(a)}`;
                         amenitiesContainer.appendChild(tag);
                     });
                 } else {
@@ -553,7 +560,8 @@
 
                 let imgHtml = '';
                 if (matchedImg) {
-                    imgHtml = `<img src="${matchedImg.image_url}" alt="${slot.label}" style="width: 100%; height: 180px; object-fit: cover; display: block; cursor: pointer;" onclick="window.open('${matchedImg.image_url}')">`;
+                    const imageUrl = domiknowSafeExternalUrl(matchedImg.image_url);
+                    imgHtml = `<a href="${imageUrl}" target="_blank" rel="noopener noreferrer" aria-label="Open ${domiknowEscapeHtml(slot.label)}"><img src="${imageUrl}" alt="${domiknowEscapeHtml(slot.label)}" style="width: 100%; height: 180px; object-fit: cover; display: block; cursor: pointer;"></a>`;
                 } else {
                     imgHtml = `
                         <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 180px; color: var(--text-muted); background-color: var(--bg-secondary);">
@@ -621,11 +629,11 @@
                             <div>
                                 <span class="doc-meta" style="display: inline-flex; align-items: center; gap: 4px;">
                                     <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                                    <a href="${matchedDoc.file_url}" target="_blank" style="color: var(--text-secondary); text-decoration: underline; font-weight: 600;">${matchedDoc.file_name}</a> (${sizeKB} KB)
+                                    <a href="${domiknowSafeExternalUrl(matchedDoc.file_url)}" target="_blank" rel="noopener noreferrer" style="color: var(--text-secondary); text-decoration: underline; font-weight: 600;">${domiknowEscapeHtml(matchedDoc.file_name)}</a> (${sizeKB} KB)
                                 </span>
                                 <span class="doc-meta" style="font-size: 0.6875rem; display: block; margin-top: 0.15rem; margin-left: 18px;">Submitted on ${uploadedDate}</span>
                             </div>
-                            <span class="status-badge ${docBadge}">${matchedDoc.status.toUpperCase()}</span>
+                            <span class="status-badge ${docBadge}">${domiknowEscapeHtml(String(matchedDoc.status || 'pending').toUpperCase())}</span>
                         </div>
                     `;
                 } else {
@@ -647,11 +655,14 @@
 
         function updateMapMarker() {
             const prop = currentDetails;
-            if (prop.latitude && prop.longitude) {
-                adminMap.setView([prop.latitude, prop.longitude], 16);
-                L.marker([prop.latitude, prop.longitude])
+            const latitude = Number(prop.latitude);
+            const longitude = Number(prop.longitude);
+            if (Number.isFinite(latitude) && Number.isFinite(longitude) && Math.abs(latitude) <= 90 && Math.abs(longitude) <= 180) {
+                adminMap.invalidateSize(false);
+                adminMap.setView([latitude, longitude], 16);
+                L.marker([latitude, longitude])
                     .addTo(adminMap)
-                    .bindPopup(`<strong>${prop.property_name}</strong><br>Brgy. ${prop.barangay}`)
+                    .bindPopup(`<strong>${domiknowEscapeHtml(prop.property_name)}</strong><br>Brgy. ${domiknowEscapeHtml(prop.barangay)}`)
                     .openPopup();
             }
         }
@@ -669,6 +680,17 @@
                 alert('Please enter a rejection reason remarks first.');
                 return;
             }
+
+            const decisionLabel = approve ? 'approve and publish this property' : 'reject this property submission';
+            const confirmDecision = await window.domiknowConfirm({
+                variant: approve ? 'warning' : 'danger',
+                eyebrow: 'Property review decision',
+                title: approve ? 'Approve and publish this property?' : 'Reject this property submission?',
+                message: `You are about to ${decisionLabel}. The decision will be recorded and the landlord will be notified.`,
+                confirmLabel: approve ? 'Approve property' : 'Reject property',
+                cancelLabel: 'Review again'
+            });
+            if (!confirmDecision) return;
 
             btnApprove.disabled = true;
             btnReject.disabled = true;

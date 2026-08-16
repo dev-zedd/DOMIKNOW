@@ -3,6 +3,24 @@ const auditLogModel = require('../models/auditLogModel');
 const responseHelper = require('../utils/responseHelper');
 
 const feedbackController = {
+    async getPublicFeedback(req, res) {
+        try {
+            const list = await feedbackModel.findPublicFeedback(req.query.limit);
+            const publicList = list.map(item => ({
+                id: item.id,
+                rating: Number(item.rating) || 0,
+                feedback: item.feedback_text,
+                type: item.feedback_type,
+                submitted_at: item.created_at,
+                property_name: item.properties?.property_name || 'Verified rental'
+            }));
+            return responseHelper.success(res, 'Verified public feedback retrieved successfully.', publicList);
+        } catch (error) {
+            console.error('Get public feedback error:', error);
+            return responseHelper.error(res, 'Failed to retrieve public feedback.', error, 500);
+        }
+    },
+
     async submitFeedback(req, res) {
         try {
             const { property_id, lease_id, rating, feedback_text, feedback_type } = req.body;

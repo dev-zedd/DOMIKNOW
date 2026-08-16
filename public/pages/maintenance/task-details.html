@@ -419,7 +419,17 @@
         }
 
         async function handleOfferResponse(response) {
-            if (response === 'decline' && !confirm('Are you sure you want to decline this job offer?')) return;
+            if (response === 'decline') {
+                const declineOffer = await window.domiknowConfirm({
+                    variant: 'warning',
+                    eyebrow: 'Job assignment',
+                    title: 'Decline this repair job?',
+                    message: 'The landlord will need to assign another maintenance person, which may delay the tenant’s repair.',
+                    confirmLabel: 'Decline job',
+                    cancelLabel: 'Keep assignment'
+                });
+                if (!declineOffer) return;
+            }
 
             try {
                 const res = await fetch(`/api/maintenance/requests/${taskId}/worker-respond`, {

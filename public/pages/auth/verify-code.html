@@ -162,9 +162,11 @@
         }
     </style>
     <link href="../../css/design-system.css" rel="stylesheet">
+    <link href="../../css/auth-module.css" rel="stylesheet">
+    <link href="../../css/mobile-first.css?v=20260817-1" rel="stylesheet">
     <script src="../../js/ui.js" defer></script>
 </head>
-<body class="auth-page">
+<body class="auth-page auth-verify-page">
     <div class="back-to-home-container">
         <a href="../../index.html" class="back-to-home-link">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
@@ -187,6 +189,14 @@
         <p class="auth-subtitle">
             We've sent a 6-digit code to your email. Enter it below to verify.
         </p>
+        <div class="auth-side-note" aria-label="Email verification progress">
+            <p>Account setup</p>
+            <ul>
+                <li><span>✓</span> Account information received</li>
+                <li><span>2</span> Verify ownership of your email</li>
+                <li><span>3</span> Sign in to open your workspace</li>
+            </ul>
+        </div>
     </div>
 
     <div class="auth-card">
@@ -241,13 +251,13 @@
         
         <div id="postVerifyActions" class="hidden" style="margin-top: 1.5rem; text-align: center;">
             <div style="padding: 1.25rem; background: #ecfdf5; border: 1px solid #a7f3d0; border-radius: 16px; margin-bottom: 1.25rem; text-align: center;">
-                <p style="color: #065f46; font-weight: 700; margin-bottom: 0.25rem; display: flex; align-items: center; justify-content: center; gap: 0.25rem;">
+                <p id="verifyStatusTitle" style="color: #065f46; font-weight: 700; margin-bottom: 0.25rem; display: flex; align-items: center; justify-content: center; gap: 0.25rem;">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
                     Email Verified Successfully!
                 </p>
-                <p style="color: var(--text-secondary); font-size: 0.8125rem;">Your account has been verified. You can now sign in.</p>
+                <p id="verifyStatusText" style="color: var(--text-secondary); font-size: 0.8125rem;">Your account has been verified. Tenant accounts can sign in immediately; other roles may require administrator approval.</p>
             </div>
-            <a href="login.html" class="btn-primary" style="display: block; text-decoration: none; text-align: center;">
+            <a href="login.html" id="postVerifyLogin" class="btn-primary" style="display: block; text-decoration: none; text-align: center;">
                 Go to Login
             </a>
         </div>
@@ -258,8 +268,14 @@
         // Auto-fill email if passed in URL
         const urlParams = new URLSearchParams(window.location.search);
         const emailParam = urlParams.get('email');
+        const redirectParam = urlParams.get('redirect');
         if (emailParam) {
             document.getElementById('email').value = emailParam;
+        }
+        if (redirectParam) {
+            const loginTarget = new URL(document.getElementById('postVerifyLogin').href, window.location.href);
+            loginTarget.searchParams.set('redirect', redirectParam);
+            document.getElementById('postVerifyLogin').href = `${loginTarget.pathname}${loginTarget.search}`;
         }
         
         const form = document.getElementById('verifyForm');

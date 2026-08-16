@@ -99,12 +99,12 @@
     <link href="../../css/design-system.css" rel="stylesheet">
     <script src="../../js/ui.js" defer></script>
 </head>
-<body>
+<body class="app-loading" data-role="admin" data-page-title="Reservation Oversight">
     <!-- Navbar -->
     <nav class="navbar navbar-admin">
         <div class="navbar-container">
             <div class="navbar-brand-group">
-                <a href="reports.html" style="text-decoration: none;"><span class="navbar-logo">DomiKnow</span></a>
+                <a href="overview.html" style="text-decoration: none;"><span class="navbar-logo">DomiKnow</span></a>
                 <span class="navbar-badge navbar-badge-admin">Admin</span>
             </div>
             <div class="navbar-menu" style="flex-wrap: wrap; gap: 0.5rem 1rem;">
@@ -124,10 +124,6 @@
 
     <!-- Main Content -->
     <main class="dashboard-container">
-        <div class="nav-back">
-            <a href="reports.html" class="nav-back-link">← Back to Reports Triage</a>
-        </div>
-
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
             <h2>Reservation Request Monitor</h2>
             <div id="actionFeedback" class="alert alert-success hidden" style="margin-bottom: 0; padding: 0.5rem 1rem;"></div>
@@ -219,16 +215,16 @@
 
                     row.innerHTML = `
                         <td>
-                            <div style="font-weight: 700;">${tenantName}</div>
-                            <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.15rem;">✉ ${tenantEmail}</div>
+                            <div style="font-weight: 700;">${domiknowEscapeHtml(tenantName)}</div>
+                            <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.15rem;">✉ ${domiknowEscapeHtml(tenantEmail)}</div>
                         </td>
-                        <td style="font-weight: 600; color: var(--primary);">${propName}</td>
+                        <td style="font-weight: 600; color: var(--primary);">${domiknowEscapeHtml(propName)}</td>
                         <td style="font-weight: 600;">${moveIn}</td>
                         <td style="font-size: 0.8125rem; color: var(--text-secondary); max-width: 200px; line-height: 1.4;">
-                            ${res.message ? res.message : '<span style="color: var(--text-muted); font-style: italic;">No message</span>'}
+                            ${res.message ? domiknowEscapeHtml(res.message) : '<span style="color: var(--text-muted); font-style: italic;">No message</span>'}
                         </td>
                         <td>${created}</td>
-                        <td><span class="status-badge ${statusClass}">${res.status}</span></td>
+                        <td><span class="status-badge ${statusClass}">${domiknowEscapeHtml(res.status)}</span></td>
                         <td><div class="action-group">${actionsHtml}</div></td>
                     `;
                     
@@ -242,6 +238,22 @@
         }
 
         async function updateReservationStatus(resId, newStatus) {
+            const actionLabels = {
+                approved: 'approve this reservation request',
+                rejected: 'reject this reservation request',
+                cancelled: 'cancel this approved booking'
+            };
+            const requestedAction = actionLabels[newStatus] || `mark this reservation as ${newStatus}`;
+            const confirmUpdate = await window.domiknowConfirm({
+                variant: ['rejected', 'cancelled'].includes(newStatus) ? 'danger' : 'warning',
+                eyebrow: 'Reservation decision',
+                title: `${newStatus.charAt(0).toUpperCase() + newStatus.slice(1)} this reservation?`,
+                message: `You are about to ${requestedAction}. This changes the reservation workflow for the tenant and landlord.`,
+                confirmLabel: newStatus === 'approved' ? 'Approve reservation' : newStatus === 'rejected' ? 'Reject reservation' : 'Confirm change',
+                cancelLabel: 'Go back'
+            });
+            if (!confirmUpdate) return;
+
             const feedbackEl = document.getElementById('actionFeedback');
             try {
                 const response = await fetch(`/api/reservations/${resId}/status`, {

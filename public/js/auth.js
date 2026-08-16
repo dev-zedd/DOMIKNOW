@@ -29,8 +29,9 @@ function showSuccess(message) {
 async function handleRegister(e) {
     e.preventDefault();
     const submitBtn = document.getElementById('submitBtn');
+    const defaultLabel = submitBtn.dataset.defaultLabel || submitBtn.textContent.trim() || 'Create account';
     submitBtn.disabled = true;
-    submitBtn.textContent = 'Registering...';
+    submitBtn.textContent = 'Creating account...';
 
     const formData = new FormData(e.target);
     const data = Object.fromEntries(formData.entries());
@@ -38,7 +39,7 @@ async function handleRegister(e) {
     if (data.password !== data.confirm_password) {
         showError('Passwords do not match');
         submitBtn.disabled = false;
-        submitBtn.textContent = 'Register';
+        submitBtn.textContent = defaultLabel;
         return;
     }
 
@@ -53,7 +54,10 @@ async function handleRegister(e) {
 
         if (response.ok) {
             // Redirect to verify page with email
-            window.location.href = `verify-code.html?email=${encodeURIComponent(data.email)}`;
+            const verifyParams = new URLSearchParams({ email: data.email });
+            const redirectUrl = new URLSearchParams(window.location.search).get('redirect');
+            if (redirectUrl) verifyParams.set('redirect', redirectUrl);
+            window.location.href = `verify-code.html?${verifyParams.toString()}`;
         } else {
             showError(result.message || 'Registration failed');
         }
@@ -61,7 +65,7 @@ async function handleRegister(e) {
         showError('An error occurred during registration');
     } finally {
         submitBtn.disabled = false;
-        submitBtn.textContent = 'Register';
+        submitBtn.textContent = defaultLabel;
     }
 }
 
@@ -91,6 +95,15 @@ async function handleVerify(e) {
             showSuccess(result.message);
             document.getElementById('verifyForm').classList.add('hidden');
             document.getElementById('resendBtn').classList.add('hidden');
+            const pendingApproval = result.data?.account_status === 'pending';
+            const statusTitle = document.getElementById('verifyStatusTitle');
+            const statusText = document.getElementById('verifyStatusText');
+            if (statusTitle) statusTitle.lastChild.textContent = pendingApproval
+                ? ' Email verified — approval pending'
+                : ' Email verified successfully!';
+            if (statusText) statusText.textContent = pendingApproval
+                ? 'An administrator must approve your role before you can sign in. You will be able to access your workspace after approval.'
+                : 'Your tenant account is ready. Continue to sign in and open your workspace.';
             document.getElementById('postVerifyActions').classList.remove('hidden');
         } else {
             showError(result.message || 'Verification failed');
@@ -172,7 +185,7 @@ async function handleLogin(e) {
                 if (role === 'tenant') window.location.href = '../tenant/properties.html';
                 else if (role === 'landlord') window.location.href = '../landlord/properties.html';
                 else if (role === 'maintenance') window.location.href = '../maintenance/dashboard.html';
-                else if (role === 'admin') window.location.href = '../admin/reports.html';
+                else if (role === 'admin') window.location.href = '../admin/overview.html';
             }
         } else {
             showError(result.message || 'Login failed');
@@ -185,17 +198,38 @@ async function handleLogin(e) {
     }
 }
 
-// Logout function
-function logout() {
-    localStorage.removeItem('domiknow_token');
-    localStorage.removeItem('domiknow_role');
-    window.location.href = '/pages/auth/login.html';
+// Shared logout function. Every shell routes through this guarded confirmation.
+let logoutConfirmationPending = false;
+async function logout() {
+    if (logoutConfirmationPending) return false;
+    logoutConfirmationPending = true;
+
+    try {
+        const shouldLogout = await window.domiknowConfirm({
+            variant: 'warning',
+            eyebrow: 'End your session',
+            title: 'Log out of DOMIKNOW?',
+            message: 'You will need to sign in again to access your account and continue your current work.',
+            confirmLabel: 'Log out',
+            cancelLabel: 'Stay signed in'
+        });
+
+        if (!shouldLogout) return false;
+
+        localStorage.removeItem('domiknow_token');
+        localStorage.removeItem('domiknow_role');
+        window.location.href = '/pages/auth/login.html';
+        return true;
+    } finally {
+        logoutConfirmationPending = false;
+    }
 }
+window.logout = logout;
 
 // Set up logout buttons if they exist
 document.addEventListener('DOMContentLoaded', () => {
     const logoutBtn = document.getElementById('logoutBtn');
     if (logoutBtn) {
-        logoutBtn.addEventListener('click', logout);
+        logoutBtn.addEventListener('click', () => window.logout());
     }
 });

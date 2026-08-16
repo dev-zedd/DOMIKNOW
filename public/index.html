@@ -8,9 +8,7 @@
     <link href="css/input.css" rel="stylesheet">
     <link href="css/design-system.css" rel="stylesheet">
     <link href="css/public-refinement.css" rel="stylesheet">
-    <!-- Leaflet.js for interactive property map -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <link rel="preload" as="image" href="images/domiknow-public-hero-v2.jpg">
     <style>
         :root {
             /* DOMIKNOW LIGHT MODE COLOR PALETTE (From Specs) */
@@ -1477,11 +1475,14 @@
             line-height: 1.6;
         }
     </style>
-    <link href="css/design-system.css" rel="stylesheet">
+    <link href="css/public-module.css?v=20260817-11" rel="stylesheet">
+    <link href="css/mobile-first.css?v=20260817-1" rel="stylesheet">
     <script src="js/ui.js" defer></script>
+    <script src="js/public-home.js?v=20260817-1" defer></script>
+    <script src="js/location-permission.js?v=20260817-9" defer></script>
 </head>
 
-<body>
+<body class="public-landing-page">
     <!-- Noise Grain Overlay -->
     <svg class="noise-overlay" xmlns="http://www.w3.org/2000/svg">
         <filter id="noiseFilter">
@@ -1507,9 +1508,10 @@
 
             <!-- Centered Nav -->
             <nav class="nav-links" aria-label="Primary navigation">
-                <a href="#searchSection" class="nav-link">Properties</a>
-                <a href="#searchMap" class="nav-link">Map</a>
+                <a href="pages/public/properties.html" class="nav-link">Browse rentals</a>
                 <a href="#howItWorks" class="nav-link">How It Works</a>
+                <a href="#communityFeedback" class="nav-link">Experience</a>
+                <a href="#faqSection" class="nav-link">FAQ</a>
             </nav>
 
             <!-- Auth / CTA Button -->
@@ -1522,11 +1524,17 @@
 
         <div class="public-hero">
             <div class="public-hero-copy">
-                <p class="hero-eyebrow">Verified rentals in Siniloan, Laguna</p>
-                <h1 class="hero-backdrop-title">Find a place. Understand the terms. Rent with clarity.</h1>
+                <div class="hero-local-context" aria-label="DomiKnow service area: Siniloan, Laguna">
+                    <span class="hero-local-context__icon" aria-hidden="true"><span data-icon="pin"></span></span>
+                    <span class="hero-local-context__copy">
+                        <span class="hero-local-context__label">Service area</span>
+                        <strong>Siniloan, Laguna</strong>
+                    </span>
+                </div>
+                <h1 class="hero-backdrop-title">Find a place. Rent with clarity.</h1>
                 <p class="hero-tagline">DOMIKNOW brings property discovery, applications, leases, billing, and maintenance into one accountable rental workspace.</p>
                 <div class="hero-cta-group">
-                    <a href="#searchSection" class="btn btn-primary">Browse verified rentals</a>
+                    <a href="pages/public/properties.html" class="btn btn-primary">Browse verified rentals</a>
                     <a href="/pages/auth/register.html" class="btn btn-secondary">List or rent a property</a>
                 </div>
                 <div class="hero-audience-switch" aria-label="DOMIKNOW is for tenants and landlords">
@@ -1537,23 +1545,9 @@
                 </div>
             </div>
 
-            <div class="hero-dashboard-preview">
-                <div class="hero-preview-topline">
-                    <span class="hero-preview-kicker">Rental workspace</span>
-                    <span class="hero-preview-status"><i aria-hidden="true"></i> Records stay connected</span>
-                </div>
-                <div class="hero-building-container" id="heroBuilding">
-                    <img src="images/new_building_clean.png" alt="Modern residential building" class="hero-building-image" loading="eager">
-                </div>
-                <div class="hero-preview-panel">
-                    <span class="hero-preview-panel-label">One place to manage the next step</span>
-                    <strong>Discovery → Application → Lease</strong>
-                    <div class="hero-preview-list">
-                        <span><b>01</b> Verified property details</span>
-                        <span><b>02</b> Clear rental records</span>
-                        <span><b>03</b> Traceable support requests</span>
-                    </div>
-                </div>
+            <div class="hero-property-caption" aria-label="Featured property image">
+                <span>Featured rental setting</span>
+                <strong>Contemporary living in Siniloan</strong>
             </div>
         </div>
     </div><!-- /aurora-hero-wrapper -->
@@ -1582,7 +1576,7 @@
     </div>
 
     <!-- Search Section (Estates UI Style) -->
-    <div class="search-container reveal-scale" id="searchSection" style="max-width: 1400px; margin: 2rem auto; padding: 0 1rem;">
+    <div class="search-container reveal-scale" id="searchSection" style="max-width: 1400px; margin: 2rem auto; padding: 0 1rem;" hidden>
         <div class="section-header search-section-header">
             <p class="section-eyebrow">Property discovery</p>
             <h2>Explore verified rentals near you</h2>
@@ -1590,7 +1584,7 @@
         </div>
         <div class="estates-wrapper">
             <!-- Left: Interactive Map Container -->
-            <div class="estates-map-box">
+            <div class="estates-map-box domiknow-map-frame">
                 <!-- Floating Top Filters Bar over Map -->
                 <div class="estates-map-floating-bar">
                     <!-- Search Pill Box -->
@@ -1639,7 +1633,15 @@
                 </div>
 
                 <!-- Leaflet Map Canvas -->
-                <div id="searchMap" role="application" aria-label="Interactive map of verified rental properties"></div>
+                <div id="searchMap" class="domiknow-map" role="application" aria-label="Interactive map of verified rental properties"></div>
+
+                <div class="domiknow-map-legend" aria-label="Map marker legend">
+                    <span class="domiknow-map-legend__item"><span class="domiknow-map-legend__swatch"></span>Available</span>
+                    <span class="domiknow-map-legend__item"><span class="domiknow-map-legend__swatch domiknow-map-legend__swatch--selected"></span>Selected</span>
+                    <span class="domiknow-map-legend__item"><span class="domiknow-map-legend__swatch domiknow-map-legend__swatch--search"></span>Your search</span>
+                </div>
+
+                <div id="mapLocationStatus" class="domiknow-map-location-status" role="status" aria-live="polite" hidden></div>
 
                 <!-- Floating Bottom Left Map Controls -->
                 <div class="estates-map-bottom-controls">
@@ -1678,6 +1680,54 @@
             </div>
         </div>
     </div>
+
+    <section class="public-discovery-bridge" aria-labelledby="discoveryBridgeTitle">
+        <div class="public-discovery-bridge__copy">
+            <p class="section-eyebrow">A focused discovery workspace</p>
+            <h2 id="discoveryBridgeTitle">Browse the map without losing the listing details.</h2>
+            <p>Search, compare, set an exact location, and review verified rentals in a dedicated map-and-list view.</p>
+            <a href="pages/public/properties.html" class="btn btn-primary">Open rental discovery</a>
+        </div>
+        <div class="public-discovery-bridge__preview" aria-hidden="true">
+            <svg class="bridge-map-scene" viewBox="0 0 720 430" preserveAspectRatio="xMidYMid slice" focusable="false">
+                <rect width="720" height="430" fill="#dfe9e7"/>
+                <path d="M570 -20C534 66 558 118 620 163C683 209 687 294 628 450H760V-20Z" fill="#b8dce9"/>
+                <path d="M45 42C128 5 206 22 242 87C264 128 236 166 164 175C85 184 24 131 45 42Z" fill="#c7dfca"/>
+                <path d="M444 280C514 247 578 269 590 327C603 390 524 426 439 401C392 387 391 305 444 280Z" fill="#c7dfca"/>
+                <g fill="none" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M-20 342C111 304 161 239 271 222C391 204 470 126 744 96" stroke="#ffffff" stroke-width="22"/>
+                    <path d="M-20 342C111 304 161 239 271 222C391 204 470 126 744 96" stroke="#f1c86e" stroke-width="10"/>
+                    <path d="M95 -20C119 79 157 132 223 192C294 256 339 329 360 458" stroke="#ffffff" stroke-width="15"/>
+                    <path d="M95 -20C119 79 157 132 223 192C294 256 339 329 360 458" stroke="#d4d9d8" stroke-width="6"/>
+                    <path d="M-10 124C85 142 129 193 179 286M245 -10C243 82 290 124 379 151M414 -20C407 67 446 113 528 142M410 166C451 206 481 238 487 301M70 385C141 354 196 349 264 371M341 291C396 305 423 346 428 432M525 215C583 234 625 273 672 333" stroke="#ffffff" stroke-width="7"/>
+                    <path d="M-10 124C85 142 129 193 179 286M245 -10C243 82 290 124 379 151M414 -20C407 67 446 113 528 142M410 166C451 206 481 238 487 301M70 385C141 354 196 349 264 371M341 291C396 305 423 346 428 432M525 215C583 234 625 273 672 333" stroke="#cbd4d3" stroke-width="2"/>
+                    <circle cx="340" cy="215" r="118" stroke="#0355f3" stroke-width="3" stroke-dasharray="8 9" opacity="0.55"/>
+                </g>
+                <g fill="#64748b" font-family="Arial, sans-serif" font-size="13" font-weight="700" letter-spacing="0.6">
+                    <text x="270" y="188">SINILOAN</text>
+                    <text x="90" y="105" font-size="11">MAGSAYSAY</text>
+                    <text x="475" y="348" font-size="11">SAN ANTONIO</text>
+                </g>
+                <text x="594" y="205" fill="#4f8297" font-family="Arial, sans-serif" font-size="11" font-weight="700" transform="rotate(67 594 205)">LAGUNA DE BAY</text>
+            </svg>
+            <div class="bridge-map-search"><span data-icon="search"></span><span>Search this area</span></div>
+            <span class="bridge-marker bridge-marker--one">&#8369;3,500</span>
+            <span class="bridge-marker bridge-marker--two">&#8369;4,200</span>
+            <span class="bridge-marker bridge-marker--three">&#8369;2,800</span>
+            <div class="bridge-map-controls"><span>+</span><span>&minus;</span></div>
+            <div class="bridge-list-card">
+                <div class="bridge-list-card__heading">
+                    <span class="bridge-list-card__icon"><span data-icon="building"></span></span>
+                    <span>
+                        <small>Selected rental</small>
+                        <strong>Listing details stay connected</strong>
+                    </span>
+                </div>
+                <div class="bridge-list-card__meta"><span>2 rooms available</span><span>1.2 km away</span></div>
+                <div class="bridge-list-card__footer"><span>Starting at</span><strong>&#8369;3,500 <small>/ month</small></strong></div>
+            </div>
+        </div>
+    </section>
 
     <!-- Features Grid Section with staggered reveal -->
     <section class="features-section" id="featuresSection">
@@ -1761,6 +1811,76 @@
         </div>
     </section>
 
+    <section class="public-feedback-section" id="communityFeedback" aria-labelledby="communityFeedbackTitle">
+        <div class="public-section-shell">
+            <div class="public-section-heading reveal-up">
+                <div>
+                    <p class="section-eyebrow">Verified resident experiences</p>
+                    <h2 id="communityFeedbackTitle">Feedback grounded in real rental journeys.</h2>
+                    <p>Only authenticated feedback connected to an eligible lease and approved for public visibility appears here.</p>
+                </div>
+                <div class="public-feedback-score" aria-label="Community feedback summary">
+                    <span class="public-feedback-score__value" id="publicFeedbackScore">&mdash;</span>
+                    <span class="public-feedback-score__stars" id="publicFeedbackStars" aria-hidden="true">&star;&star;&star;&star;&star;</span>
+                    <span class="public-feedback-score__count" id="publicFeedbackCount">Loading verified feedback&hellip;</span>
+                </div>
+            </div>
+
+            <div class="public-feedback-grid" id="publicFeedbackGrid" aria-live="polite" aria-busy="true">
+                <article class="public-feedback-card public-feedback-card--loading" aria-hidden="true"></article>
+                <article class="public-feedback-card public-feedback-card--loading" aria-hidden="true"></article>
+                <article class="public-feedback-card public-feedback-card--loading" aria-hidden="true"></article>
+            </div>
+
+            <div class="public-feedback-note reveal-up">
+                <span class="public-feedback-note__icon" aria-hidden="true"><span data-icon="shield"></span></span>
+                <div>
+                    <strong>Experience-first, privacy-conscious feedback</strong>
+                    <p>Public reviews do not expose tenant names. Eligible tenants can submit or manage their own feedback from the tenant portal.</p>
+                </div>
+                <a href="pages/auth/login.html" class="btn btn-secondary">Open tenant portal</a>
+            </div>
+        </div>
+    </section>
+
+    <section class="public-faq-section" id="faqSection" aria-labelledby="faqTitle">
+        <div class="public-section-shell public-faq-layout">
+            <div class="public-faq-intro reveal-up">
+                <p class="section-eyebrow">Frequently asked questions</p>
+                <h2 id="faqTitle">Know what happens before you continue.</h2>
+                <p>Clear answers about listings, location access, accounts, applications, and verified feedback.</p>
+                <a href="pages/public/properties.html" class="btn btn-primary">Browse rentals</a>
+            </div>
+
+            <div class="public-faq-list reveal-up">
+                <details class="public-faq-item" open>
+                    <summary>What does a verified rental mean?</summary>
+                    <div class="public-faq-answer"><p>A verified rental has passed DOMIKNOW's administrative listing review. You should still read the complete property details, confirm the address, and review every lease term before committing.</p></div>
+                </details>
+                <details class="public-faq-item">
+                    <summary>Can I browse properties without creating an account?</summary>
+                    <div class="public-faq-answer"><p>Yes. Public visitors can browse the map, compare available listings, and open property details. An account is required when you are ready to apply and manage your rental journey.</p></div>
+                </details>
+                <details class="public-faq-item">
+                    <summary>Why does DOMIKNOW request my device location?</summary>
+                    <div class="public-faq-answer"><p>Location access powers the Near Me search and distance estimates. A successful reading is cached only in your browser session for up to 15 minutes. You can deny access and select a search point directly on the map instead.</p></div>
+                </details>
+                <details class="public-faq-item">
+                    <summary>Who can create a DOMIKNOW account?</summary>
+                    <div class="public-faq-answer"><p>Tenants and landlords can register through the public sign-up flow. Maintenance personnel receive their credentials directly from the landlord who manages their work assignments.</p></div>
+                </details>
+                <details class="public-faq-item">
+                    <summary>How do public reviews become visible?</summary>
+                    <div class="public-faq-answer"><p>Feedback must come from an authenticated tenant connected to an eligible lease. It is shown publicly only after it has been reviewed and marked visible, and tenant names are not displayed.</p></div>
+                </details>
+                <details class="public-faq-item">
+                    <summary>Where can I see the complete price and rental terms?</summary>
+                    <div class="public-faq-answer"><p>Open the property details page to review monthly rent, available spaces, deposits, amenities, house rules, and location information. The signed lease remains the final source of agreed rental terms.</p></div>
+                </details>
+            </div>
+        </div>
+    </section>
+
     <!-- Footer -->
     <footer class="landing-footer">
         <div class="footer-grid">
@@ -1779,7 +1899,9 @@
             <div>
                 <div class="footer-title">Platform</div>
                 <ul class="footer-links">
-                    <li><a href="pages/auth/login.html">Explore Listings</a></li>
+                    <li><a href="pages/public/properties.html">Explore Listings</a></li>
+                    <li><a href="#communityFeedback">Resident Experiences</a></li>
+                    <li><a href="#faqSection">Frequently Asked Questions</a></li>
                     <li><a href="pages/auth/login.html">Tenant Portal</a></li>
                     <li><a href="pages/auth/login.html">Landlord Portal</a></li>
                 </ul>
@@ -1813,14 +1935,21 @@
     </footer>
 
     <script>
-        let map, searchMarker;
+        let map, searchMarker, locationAccuracyCircle;
         let propertiesData = [];
         let propertyMarkers = [];
         let selectedProperty = null;
         let zonePolygon = null;
         let isZoneVisible = true;
-        const defaultLat = 14.425;
-        const defaultLng = 121.440;
+        let activeGeolocationWatch = null;
+        let activeGeolocationTimer = null;
+        const siniloanCenter = Object.freeze({ lat: 14.42143, lng: 121.44583 });
+        const lspuSiniloanCampus = Object.freeze({ lat: 14.41338, lng: 121.44850 });
+        const defaultLat = siniloanCenter.lat;
+        const defaultLng = siniloanCenter.lng;
+        const targetLocationAccuracyMeters = 150;
+        const maximumUsableLocationAccuracyMeters = 500;
+        const locationRequestTimeoutMs = 18000;
 
         document.addEventListener('DOMContentLoaded', () => {
             // Intersection Observer for scroll reveal animations
@@ -1924,13 +2053,21 @@
                 });
             });
 
-            initializeMap();
-            loadAllProperties();
+            if (!document.getElementById('searchSection')?.hidden) {
+                initializeMap();
+                loadAllProperties();
+            }
 
             // Event Listener Bindings for Estates Floating Controls
             document.getElementById('btnMyLocation')?.addEventListener('click', getMyLocation);
-            document.getElementById('btnCenterSiniloan')?.addEventListener('click', () => searchByLocation(14.425, 121.440));
-            document.getElementById('btnNearSchool')?.addEventListener('click', () => searchByLocation(14.430, 121.445));
+            document.getElementById('btnCenterSiniloan')?.addEventListener('click', () => searchByLocation(siniloanCenter.lat, siniloanCenter.lng, {
+                eyebrow: 'Town center',
+                title: 'Siniloan Center'
+            }));
+            document.getElementById('btnNearSchool')?.addEventListener('click', () => searchByLocation(lspuSiniloanCampus.lat, lspuSiniloanCampus.lng, {
+                eyebrow: 'Campus search',
+                title: 'LSPU Siniloan Campus'
+            }));
             document.getElementById('btnShowAll')?.addEventListener('click', resetFilters);
 
             document.getElementById('mapSearchInput')?.addEventListener('input', applyFilters);
@@ -1953,12 +2090,7 @@
                 zoomControl: false
             }).setView([defaultLat, defaultLng], 14);
 
-            // Clean modern vector tile layer (CARTO Voyager HD)
-            L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-                attribution: '© OpenStreetMap, © CARTO',
-                maxZoom: 19,
-                subdomains: 'abcd'
-            }).addTo(map);
+            DomiknowMap.addBasemap(map);
 
             drawSiniloanZone();
 
@@ -1973,12 +2105,13 @@
 
             // Organic smooth circle polygon around Siniloan rental zone
             const zonePoints = [
-                [14.431, 121.434],
-                [14.435, 121.441],
-                [14.430, 121.447],
-                [14.421, 121.448],
-                [14.417, 121.441],
-                [14.419, 121.433]
+                [14.4325, 121.4335],
+                [14.4370, 121.4450],
+                [14.4280, 121.4510],
+                [14.4140, 121.4520],
+                [14.4090, 121.4460],
+                [14.4130, 121.4370],
+                [14.4210, 121.4320]
             ];
 
             zonePolygon = L.polygon(zonePoints, {
@@ -2069,6 +2202,8 @@
 
             renderEstatesView(propertiesData);
             map.setView([defaultLat, defaultLng], 14);
+            clearSearchLocation();
+            setLocationStatus('', 'idle');
         }
 
         function applyFilters() {
@@ -2276,20 +2411,17 @@
                 const isSelected = selectedProperty && selectedProperty.id === prop.id;
                 const priceText = `₱${parseFloat(prop.monthly_rent || 0).toLocaleString()}/mo`;
 
-                const priceIconHtml = `
-                    <div class="estates-price-badge ${isSelected ? 'active' : ''}">
-                        <span>${priceText}</span>
-                    </div>
-                `;
-
-                const customDivIcon = L.divIcon({
-                    className: 'estates-price-marker-wrapper',
-                    html: priceIconHtml,
-                    iconSize: [95, 36],
-                    iconAnchor: [47, 36]
+                const customDivIcon = DomiknowMap.priceIcon(priceText, {
+                    selected: isSelected,
+                    unavailable: prop.availability_status === 'unavailable'
                 });
 
-                const marker = L.marker([prop.latitude, prop.longitude], { icon: customDivIcon }).addTo(map);
+                const marker = L.marker([prop.latitude, prop.longitude], {
+                    icon: customDivIcon,
+                    keyboard: true,
+                    title: `${prop.property_name || 'Rental property'}, ${priceText}`,
+                    alt: `${prop.property_name || 'Rental property'} map marker`
+                }).addTo(map);
 
                 marker.on('click', () => {
                     selectEstatesProperty(prop.id);
@@ -2299,27 +2431,54 @@
             });
         }
 
-        function searchByLocation(lat, lng) {
+        function searchByLocation(lat, lng, options = {}) {
+            if (options.source !== 'device') {
+                stopActiveGeolocationRequest();
+                setNearMeBusy(false);
+            }
+
             if (searchMarker) {
                 map.removeLayer(searchMarker);
             }
 
+            if (locationAccuracyCircle) {
+                map.removeLayer(locationAccuracyCircle);
+                locationAccuracyCircle = null;
+            }
+
+            if (Number.isFinite(options.accuracy) && options.accuracy > 0) {
+                locationAccuracyCircle = L.circle([lat, lng], {
+                    radius: options.accuracy,
+                    color: '#0355f3',
+                    weight: 1.5,
+                    opacity: 0.78,
+                    fillColor: '#0355f3',
+                    fillOpacity: 0.09,
+                    dashArray: '5 5',
+                    interactive: false
+                }).addTo(map);
+            }
+
             searchMarker = L.marker([lat, lng], {
-                icon: L.icon({
-                    iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
-                    shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
-                    iconSize: [25, 41],
-                    iconAnchor: [12, 41],
-                    popupAnchor: [1, -34],
-                    shadowSize: [41, 41]
-                })
+                icon: DomiknowMap.pinIcon({ kind: 'search' }),
+                keyboard: true,
+                title: options.title || 'Selected search location',
+                alt: 'Selected search location marker'
             }).addTo(map);
 
-            searchMarker.bindPopup('<b style="color:#0f172a;">Location Pin</b>').openPopup();
+            searchMarker.bindPopup(DomiknowMap.popupContent({
+                eyebrow: options.eyebrow || 'Map search',
+                title: options.title || 'Selected location',
+                meta: options.meta || 'Showing rentals within 5 km'
+            })).openPopup();
             map.setView([lat, lng], 15);
 
             const nearby = findNearbyProperties(lat, lng, 5);
             renderEstatesView(nearby);
+
+            if (options.source !== 'device') {
+                setLocationStatus(`${options.title || 'Map search point'} selected. Showing rentals within 5 km.`, 'info');
+            }
         }
 
         function findNearbyProperties(lat, lng, radiusKm) {
@@ -2328,6 +2487,17 @@
                 .map(p => ({ ...p, distance: calculateDistance(lat, lng, p.latitude, p.longitude) }))
                 .filter(p => p.distance <= radiusKm)
                 .sort((a, b) => a.distance - b.distance);
+        }
+
+        function clearSearchLocation() {
+            if (searchMarker && map) {
+                map.removeLayer(searchMarker);
+                searchMarker = null;
+            }
+            if (locationAccuracyCircle && map) {
+                map.removeLayer(locationAccuracyCircle);
+                locationAccuracyCircle = null;
+            }
         }
 
         function calculateDistance(lat1, lon1, lat2, lon2) {
@@ -2344,26 +2514,133 @@
             window.location.href = `/pages/public/property-details.html?id=${propertyId}`;
         }
 
-        function getMyLocation() {
+        function formatLocationAccuracy(accuracy) {
+            if (!Number.isFinite(accuracy)) return 'unknown accuracy';
+            if (accuracy >= 1000) return `±${(accuracy / 1000).toFixed(1)} km`;
+            return `±${Math.max(10, Math.round(accuracy / 10) * 10)} m`;
+        }
+
+        function setLocationStatus(message, state = 'info') {
+            const status = document.getElementById('mapLocationStatus');
+            if (!status) return;
+            status.hidden = !message;
+            status.textContent = message;
+            status.dataset.state = state;
+        }
+
+        function setNearMeBusy(isBusy) {
             const btn = document.getElementById('btnMyLocation');
-            if (btn) btn.innerHTML = '<span>Locating...</span>';
+            if (!btn) return;
+            if (!btn.dataset.defaultMarkup) btn.dataset.defaultMarkup = btn.innerHTML;
+            btn.disabled = isBusy;
+            btn.setAttribute('aria-busy', String(isBusy));
+            btn.innerHTML = isBusy ? '<span>Improving accuracy…</span>' : btn.dataset.defaultMarkup;
+        }
+
+        function stopActiveGeolocationRequest() {
+            if (activeGeolocationWatch !== null) {
+                navigator.geolocation.clearWatch(activeGeolocationWatch);
+                activeGeolocationWatch = null;
+            }
+            if (activeGeolocationTimer !== null) {
+                window.clearTimeout(activeGeolocationTimer);
+                activeGeolocationTimer = null;
+            }
+        }
+
+        function getMyLocation() {
+            stopActiveGeolocationRequest();
+            setNearMeBusy(true);
+            setLocationStatus('Requesting a precise device location…', 'loading');
 
             if (!navigator.geolocation) {
-                alert('Geolocation is not supported by your browser');
-                if (btn) btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M22 12h-4M6 12H2M12 2v4M12 18v4"/></svg><span>Near Me</span>';
+                setLocationStatus('This browser does not support device location. Tap the map to choose a search point.', 'error');
+                setNearMeBusy(false);
                 return;
             }
 
-            navigator.geolocation.getCurrentPosition(
+            if (!window.isSecureContext) {
+                setLocationStatus('Precise location requires HTTPS. Open the secure site or tap the map to choose a search point.', 'error');
+                setNearMeBusy(false);
+                return;
+            }
+
+            let bestPosition = null;
+            let requestFinished = false;
+
+            const finishRequest = (position, force = false) => {
+                if (requestFinished) return;
+                const accuracy = Number(position?.coords?.accuracy);
+
+                if (!Number.isFinite(accuracy) || accuracy > maximumUsableLocationAccuracyMeters) {
+                    if (!force) return;
+                    requestFinished = true;
+                    stopActiveGeolocationRequest();
+                    setNearMeBusy(false);
+                    setLocationStatus(
+                        `Your device only provided an approximate location (${formatLocationAccuracy(accuracy)}). Enable precise location or GPS, then try again; you can also tap the map.`,
+                        'warning'
+                    );
+                    return;
+                }
+
+                requestFinished = true;
+                stopActiveGeolocationRequest();
+                searchByLocation(position.coords.latitude, position.coords.longitude, {
+                    accuracy,
+                    eyebrow: 'Device location',
+                    title: 'Your current location',
+                    meta: `${formatLocationAccuracy(accuracy)} accuracy · rentals within 5 km`,
+                    source: 'device'
+                });
+                setNearMeBusy(false);
+                setLocationStatus(`Location updated with ${formatLocationAccuracy(accuracy)} accuracy.`, 'success');
+            };
+
+            const handleLocationError = (error) => {
+                if (requestFinished) return;
+                if (bestPosition) {
+                    finishRequest(bestPosition, true);
+                    return;
+                }
+
+                requestFinished = true;
+                stopActiveGeolocationRequest();
+                setNearMeBusy(false);
+                const message = error.code === 1
+                    ? 'Location permission is blocked. Allow precise location for this site, then try again.'
+                    : error.code === 3
+                        ? 'A reliable location could not be acquired in time. Turn on GPS or Wi-Fi, then try again.'
+                        : 'Your location is unavailable. Check device location services or tap the map to choose a search point.';
+                setLocationStatus(message, 'error');
+            };
+
+            activeGeolocationWatch = navigator.geolocation.watchPosition(
                 (position) => {
-                    searchByLocation(position.coords.latitude, position.coords.longitude);
-                    if (btn) btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M22 12h-4M6 12H2M12 2v4M12 18v4"/></svg><span>Near Me</span>';
+                    const accuracy = Number(position.coords.accuracy);
+                    const bestAccuracy = Number(bestPosition?.coords?.accuracy);
+                    if (!bestPosition || (Number.isFinite(accuracy) && (!Number.isFinite(bestAccuracy) || accuracy < bestAccuracy))) {
+                        bestPosition = position;
+                    }
+
+                    setLocationStatus(`Improving device accuracy… current reading ${formatLocationAccuracy(accuracy)}.`, 'loading');
+                    if (accuracy <= targetLocationAccuracyMeters) finishRequest(position);
                 },
-                (error) => {
-                    alert('Unable to get your location. Please click on the map.');
-                    if (btn) btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M22 12h-4M6 12H2M12 2v4M12 18v4"/></svg><span>Near Me</span>';
+                handleLocationError,
+                {
+                    enableHighAccuracy: true,
+                    maximumAge: 0,
+                    timeout: locationRequestTimeoutMs
                 }
             );
+
+            activeGeolocationTimer = window.setTimeout(() => {
+                if (bestPosition) {
+                    finishRequest(bestPosition, true);
+                } else {
+                    handleLocationError({ code: 3, TIMEOUT: 3 });
+                }
+            }, locationRequestTimeoutMs);
         }
     </script>
 </body>

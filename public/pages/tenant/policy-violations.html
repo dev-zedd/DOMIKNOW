@@ -6,36 +6,104 @@
     <title>Policy Violations - DomiKnow</title>
     <link href="../../css/input.css" rel="stylesheet">
     <style>
+        .policy-overview-card {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+            padding: 1.25rem 1.5rem;
+            overflow: hidden;
+            background: linear-gradient(135deg, color-mix(in srgb, var(--tenant) 12%, var(--bg-secondary)), var(--bg-secondary));
+            border: 1px solid color-mix(in srgb, var(--tenant) 30%, var(--border-color));
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-sm);
+            position: relative;
+        }
+        .policy-overview-card::before {
+            width: 4px;
+            background: var(--tenant);
+            content: '';
+            position: absolute;
+            inset: 0 auto 0 0;
+        }
+        .policy-overview-copy {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.875rem;
+            min-width: 0;
+        }
+        .policy-overview-icon {
+            display: grid;
+            width: 38px;
+            height: 38px;
+            flex: 0 0 38px;
+            place-items: center;
+            color: var(--tenant);
+            background: color-mix(in srgb, var(--tenant) 13%, var(--bg-secondary));
+            border-radius: var(--radius-md);
+        }
+        .policy-overview-card h2,
+        .policy-card-heading h2 {
+            margin: 0;
+            color: var(--text-primary);
+        }
+        .policy-overview-card h2 {
+            font-size: 1rem;
+        }
+        .policy-overview-card p,
+        .policy-section-description {
+            margin: 0.3rem 0 0;
+            color: var(--text-secondary);
+            font-size: 0.83rem;
+            line-height: 1.55;
+        }
+        .policy-rules-button {
+            flex: 0 0 auto;
+            white-space: nowrap;
+        }
         .violations-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 2rem;
-            margin-top: 1.5rem;
-        }
-        @media (max-width: 1024px) {
-            .violations-grid {
-                grid-template-columns: 1fr;
-            }
+            grid-template-columns: minmax(320px, 380px) minmax(0, 1fr);
+            gap: 1.25rem;
+            align-items: start;
         }
         .form-card, .history-card {
+            min-width: 0;
             background-color: var(--bg-secondary);
             border: 1px solid var(--border-color);
             border-radius: var(--radius-lg);
-            padding: 2rem;
-            box-shadow: var(--shadow-lg);
-            height: fit-content;
+            padding: 1.35rem;
+            box-shadow: var(--shadow-sm);
         }
         .history-card {
+            grid-column: 2;
+            grid-row: 1;
+        }
+        .form-card {
+            grid-column: 1;
+            grid-row: 1;
+            position: sticky;
+            top: 5.5rem;
+        }
+        .policy-card-heading {
+            margin-bottom: 1.25rem;
+        }
+        .policy-card-heading h2 {
+            font-size: 1rem;
+        }
+        .policy-history-table-wrap {
+            width: 100%;
             overflow-x: auto;
         }
-        table {
+        .policy-history-table-wrap table {
             width: 100%;
+            min-width: 720px;
             border-collapse: collapse;
             text-align: left;
             font-size: 0.9rem;
-            margin-top: 1rem;
         }
-        th {
+        .policy-history-table-wrap th {
             font-weight: 700;
             color: var(--text-secondary);
             padding: 0.75rem 1rem;
@@ -44,10 +112,37 @@
             font-size: 0.75rem;
             letter-spacing: 0.05em;
         }
-        td {
+        .policy-history-table-wrap td {
             padding: 1rem;
             border-bottom: 1px solid var(--border-color);
             color: var(--text-primary);
+        }
+        @media (max-width: 1080px) {
+            .violations-grid {
+                grid-template-columns: 1fr;
+            }
+            .history-card,
+            .form-card {
+                grid-column: 1;
+                position: static;
+            }
+            .form-card { grid-row: 1; }
+            .history-card { grid-row: 2; }
+        }
+        @media (max-width: 640px) {
+            .policy-overview-card {
+                align-items: stretch;
+                flex-direction: column;
+                padding: 1rem;
+            }
+            .policy-rules-button {
+                width: 100%;
+                justify-content: center;
+            }
+            .form-card,
+            .history-card {
+                padding: 1rem;
+            }
         }
     </style>
     <link href="../../css/design-system.css" rel="stylesheet">
@@ -64,14 +159,9 @@
             <div class="navbar-menu" style="flex-wrap: wrap; gap: 0.5rem 1rem;">
                 <a href="dashboard.html" class="navbar-menu-link">Dashboard</a>
                 <a href="properties.html" class="navbar-menu-link">Discovery</a>
-                <a href="properties.html" class="navbar-menu-link">Discovery</a>
-                <a href="compare.html" class="navbar-menu-link">Compare</a>
-                <a href="reservations.html" class="navbar-menu-link">My Reservations</a>
                 <a href="applications.html" class="navbar-menu-link">My Applications</a>
-                <a href="screening.html" class="navbar-menu-link">Screening</a>
                 <a href="leases.html" class="navbar-menu-link">My Lease</a>
                 <a href="billings.html" class="navbar-menu-link">My Billings</a>
-                <a href="payments.html" class="navbar-menu-link">My Payments</a>
                 <a href="maintenance.html" class="navbar-menu-link">Maintenance</a>
                 <a href="reports.html" class="navbar-menu-link">Reports</a>
                 <a href="tenant-reports.html" class="navbar-menu-link">Reports Against Me</a>
@@ -86,23 +176,29 @@
         </div>
     </nav>
 
-        <div style="background: linear-gradient(135deg, #0f172a 0%, #312e81 40%, #4f46e5 100%); color: white; padding: 1.25rem 1.75rem; border-radius: var(--radius-lg); margin-bottom: 1.75rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; box-shadow: var(--shadow-md);">
-            <div>
-                <h3 style="margin: 0 0 0.25rem 0; font-size: 1.15rem; font-weight: 800; color: white; display: flex; align-items: center; gap: 8px;">
-                    <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-                    Platform Terms of Service &amp; Community Rules
-                </h3>
-                <p style="margin: 0; font-size: 0.88rem; color: rgba(255,255,255,0.88);">Review published housing standards, quiet hours rules, and admin disciplinary penalty guidelines.</p>
+    <main class="dashboard-container">
+        <section class="policy-overview-card" aria-labelledby="policyOverviewTitle">
+            <div class="policy-overview-copy">
+                <span class="policy-overview-icon" aria-hidden="true">
+                    <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.25" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                </span>
+                <div>
+                    <h2 id="policyOverviewTitle">Platform terms and community rules</h2>
+                    <p>Review housing standards, quiet-hour rules, and disciplinary guidelines before filing a report.</p>
+                </div>
             </div>
-            <button type="button" id="openPlatformPolicyModalBtn" class="btn-primary" style="background: white; color: #4f46e5; font-weight: 800; border: none; padding: 0.6rem 1.25rem; border-radius: var(--radius-md); font-size: 0.88rem; cursor: pointer;">
-                View Platform TOS &amp; Rules
+            <button type="button" id="openPlatformPolicyModalBtn" class="btn-secondary policy-rules-button">
+                View terms and rules
             </button>
-        </div>
+        </section>
 
         <div class="violations-grid">
             <!-- Submit Form -->
             <div class="form-card">
-                <h3 style="margin-bottom: 1.5rem; color: var(--primary);">Report a Policy Violation</h3>
+                <div class="policy-card-heading">
+                    <h2>Report a policy violation</h2>
+                    <p class="policy-section-description">Connect the report to a lease and describe only what you directly observed.</p>
+                </div>
                 <div id="errorMessage" class="status-badge status-rejected hidden" style="width:100%; margin-bottom: 1rem; padding: 0.75rem;"></div>
                 <div id="successMessage" class="status-badge status-active hidden" style="width:100%; margin-bottom: 1rem; padding: 0.75rem;"></div>
 
@@ -136,6 +232,7 @@
                     <div class="form-group">
                         <label class="form-label" for="evidenceFile">Upload Evidence Document / Image (Optional)</label>
                         <input type="file" id="evidenceFile" accept="image/*,application/pdf" class="form-input">
+                        <p class="form-help">Accepted formats: images or PDF. Attach only evidence relevant to this report.</p>
                     </div>
 
                     <button type="submit" id="submitBtn" class="btn-primary" style="background-color: var(--tenant); border-color: var(--tenant); width: 100%;">
@@ -146,7 +243,11 @@
 
             <!-- History List -->
             <div class="history-card">
-                <h3 style="margin-bottom: 1.5rem;">Policy Violations History</h3>
+                <div class="policy-card-heading">
+                    <h2>Policy violation history</h2>
+                    <p class="policy-section-description">Track review status, administrative action, and the date each report was filed.</p>
+                </div>
+                <div class="policy-history-table-wrap">
                 <table>
                     <thead>
                         <tr>
@@ -162,6 +263,7 @@
                         </tr>
                     </tbody>
                 </table>
+                </div>
             </div>
         </div>
     </main>
@@ -235,20 +337,20 @@
                     const row = document.createElement('tr');
                     row.innerHTML = `
                         <td>
-                            <div style="font-weight:700; color:var(--text-primary);">🏢 ${viol.properties?.property_name || 'Property'}</div>
+                            <div style="font-weight:700; color:var(--text-primary);">${domiknowEscapeHtml(viol.properties?.property_name || 'Property')}</div>
                             <div style="font-size:0.75rem; color:var(--text-muted);">
-                                👤 Reporter: ${viol.reporter?.full_name || 'You'}<br>
-                                👤 Violator: ${viol.violator?.full_name || 'Landlord'}
+                                Reporter: ${domiknowEscapeHtml(viol.reporter?.full_name || 'You')}<br>
+                                Violator: ${domiknowEscapeHtml(viol.violator?.full_name || 'Landlord')}
                             </div>
                         </td>
                         <td>
-                            <div style="text-transform:capitalize; font-size:0.8rem;"><strong>${viol.violation_type.replace('_', ' ')}</strong></div>
-                            <div style="font-size:0.75rem; color:var(--text-muted);">${viol.violation_description.substring(0, 50)}...</div>
+                            <div style="text-transform:capitalize; font-size:0.8rem;"><strong>${domiknowEscapeHtml(String(viol.violation_type || 'other').replace(/_/g, ' '))}</strong></div>
+                            <div style="font-size:0.75rem; color:var(--text-muted);">${domiknowEscapeHtml(String(viol.violation_description || '').substring(0, 50))}${String(viol.violation_description || '').length > 50 ? '…' : ''}</div>
                         </td>
                         <td>
-                            <span class="status-badge ${statusBadgeClass}" style="text-transform:capitalize;">${viol.status.replace('_', ' ')}</span>
+                            <span class="status-badge ${statusBadgeClass}" style="text-transform:capitalize;">${domiknowEscapeHtml(String(viol.status || 'pending').replace(/_/g, ' '))}</span>
                             <div style="font-size:0.75rem; color:var(--text-muted); margin-top:0.25rem;">
-                                🛡️ Action: ${viol.action_taken || 'Under official review'}
+                                Action: ${domiknowEscapeHtml(viol.action_taken || 'Under official review')}
                             </div>
                         </td>
                         <td>${createdDate}</td>
@@ -352,10 +454,10 @@
 
         // Platform Policy Viewer Modal Logic
         const modalHtml = `
-            <div id="userPolicyModal" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(15, 23, 42, 0.65); backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; z-index: 9999; opacity: 0; pointer-events: none; transition: opacity 0.25s ease;">
-                <div style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-lg); width: 100%; max-width: 760px; max-height: 85vh; display: flex; flex-direction: column; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); overflow: hidden;">
+            <div id="userPolicyModal" role="dialog" aria-modal="true" aria-labelledby="userPolicyModalTitle" aria-hidden="true" tabindex="-1" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(15, 23, 42, 0.65); backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; z-index: 9999; opacity: 0; pointer-events: none; transition: opacity 0.25s ease;">
+                <div tabindex="-1" style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-lg); width: min(calc(100% - 32px), 760px); max-height: 85vh; display: flex; flex-direction: column; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); overflow: hidden;">
                     <div style="padding: 1.25rem 1.75rem; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; background: var(--bg-secondary);">
-                        <h3 style="margin: 0; font-size: 1.2rem; font-weight: 800; color: var(--text-primary); display: flex; align-items: center; gap: 8px;">
+                        <h3 id="userPolicyModalTitle" style="margin: 0; font-size: 1.2rem; font-weight: 800; color: var(--text-primary); display: flex; align-items: center; gap: 8px;">
                             <svg width="20" height="20" fill="none" stroke="#4f46e5" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
                             Platform Terms of Service &amp; Rules
                         </h3>
@@ -365,7 +467,7 @@
                         <div style="text-align: center; color: var(--text-muted); font-style: italic;">Loading published platform policies...</div>
                     </div>
                     <div style="padding: 1rem 1.75rem; border-top: 1px solid var(--border-color); text-align: right; background: var(--bg-primary);">
-                        <button onclick="document.getElementById('userPolicyModal').style.opacity='0'; document.getElementById('userPolicyModal').style.pointerEvents='none';" class="navbar-btn" style="padding: 0.5rem 1.25rem;">Close Rules</button>
+                        <button type="button" id="closeUserPolicyModalFooterBtn" class="navbar-btn" style="padding: 0.5rem 1.25rem;">Close Rules</button>
                     </div>
                 </div>
             </div>
@@ -375,11 +477,25 @@
         const openBtn = document.getElementById('openPlatformPolicyModalBtn');
         const modal = document.getElementById('userPolicyModal');
         const closeBtn = document.getElementById('closeUserPolicyModalBtn');
+        const closeFooterBtn = document.getElementById('closeUserPolicyModalFooterBtn');
+        let policyModalReturnFocus = null;
+
+        const closePolicyModal = () => {
+            modal.style.opacity = '0';
+            modal.style.pointerEvents = 'none';
+            modal.setAttribute('aria-hidden', 'true');
+            document.body.classList.remove('tenant-modal-open');
+            policyModalReturnFocus?.focus?.();
+        };
 
         if (openBtn && modal) {
             openBtn.addEventListener('click', async () => {
+                policyModalReturnFocus = document.activeElement;
                 modal.style.opacity = '1';
                 modal.style.pointerEvents = 'auto';
+                modal.setAttribute('aria-hidden', 'false');
+                document.body.classList.add('tenant-modal-open');
+                requestAnimationFrame(() => modal.querySelector('[tabindex="-1"]')?.focus());
                 
                 try {
                     const res = await fetch('/api/policies');
@@ -389,14 +505,14 @@
                         const body = document.getElementById('userPolicyModalBody');
                         body.innerHTML = policies.map(p => `
                             <div style="background: var(--bg-primary); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 1.25rem; margin-bottom: 1.25rem;">
-                                <div style="font-size: 0.75rem; font-weight: 800; color: #4f46e5; text-transform: uppercase;">${p.category || 'Policy Section'} · ${p.version || 'v1.0'}</div>
-                                <h4 style="margin: 0.25rem 0 0.5rem 0; font-size: 1.15rem; font-weight: 800; color: var(--text-primary);">${p.title}</h4>
-                                <p style="margin: 0 0 1rem 0; font-size: 0.88rem; color: var(--text-secondary); line-height: 1.5; font-weight: 500;">${p.summary}</p>
+                                <div style="font-size: 0.75rem; font-weight: 800; color: #4f46e5; text-transform: uppercase;">${domiknowEscapeHtml(p.category || 'Policy Section')} &middot; ${domiknowEscapeHtml(p.version || 'v1.0')}</div>
+                                <h4 style="margin: 0.25rem 0 0.5rem 0; font-size: 1.15rem; font-weight: 800; color: var(--text-primary);">${domiknowEscapeHtml(p.title || 'Untitled policy')}</h4>
+                                <p style="margin: 0 0 1rem 0; font-size: 0.88rem; color: var(--text-secondary); line-height: 1.5; font-weight: 500;">${domiknowEscapeHtml(p.summary || '')}</p>
                                 <div>
                                     ${(p.sections || []).map(s => `
                                         <div style="margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px dashed var(--border-color);">
-                                            <div style="font-weight: 800; font-size: 0.9rem; color: var(--text-primary); margin-bottom: 0.25rem;">${s.heading}</div>
-                                            <div style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.5;">${s.content}</div>
+                                            <div style="font-weight: 800; font-size: 0.9rem; color: var(--text-primary); margin-bottom: 0.25rem;">${domiknowEscapeHtml(s.heading || '')}</div>
+                                            <div style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.5;">${domiknowEscapeHtml(s.content || '')}</div>
                                         </div>
                                     `).join('')}
                                 </div>
@@ -409,11 +525,15 @@
             });
 
             if (closeBtn) {
-                closeBtn.addEventListener('click', () => {
-                    modal.style.opacity = '0';
-                    modal.style.pointerEvents = 'none';
-                });
+                closeBtn.addEventListener('click', closePolicyModal);
             }
+            closeFooterBtn?.addEventListener('click', closePolicyModal);
+            modal.addEventListener('click', event => {
+                if (event.target === modal) closePolicyModal();
+            });
+            document.addEventListener('keydown', event => {
+                if (event.key === 'Escape' && modal.getAttribute('aria-hidden') === 'false') closePolicyModal();
+            });
         }
     </script>
 </body>

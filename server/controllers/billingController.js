@@ -93,7 +93,7 @@ const billingController = {
             const leaseStartMonthPrefix = lease.lease_start_date ? lease.lease_start_date.slice(0, 7) : '';
 
             if (leaseStartMonthPrefix && targetMonthPrefix < leaseStartMonthPrefix) {
-                return responseHelper.error(res, `Hindi pwedeng gumawa ng bill para sa buwan na mas maaga kaysa sa Lease Start Date (${lease.lease_start_date}).`);
+                return responseHelper.error(res, `You cannot create a bill for a month earlier than the lease start date (${lease.lease_start_date}).`);
             }
 
             // Uniqueness validation: Only one billing statement per lease/tenant for a given month (pending, paid, overdue, or move-in)
@@ -112,9 +112,9 @@ const billingController = {
             if (duplicateBill) {
                 const statusStr = (duplicateBill.billing_status || 'existing').toUpperCase();
                 if (targetMonthPrefix === leaseStartMonthPrefix) {
-                    return responseHelper.error(res, `Ang buwan ng ${targetMonthPrefix} ay nakapaloob na sa Move-In Bill ng tenant. Hindi na pwedeng mag-generate ng panibagong bill.`);
+                    return responseHelper.error(res, `The month ${targetMonthPrefix} is already included in the tenant's move-in bill. You cannot generate another bill for the same month.`);
                 }
-                return responseHelper.error(res, `May umiiral nang billing statement (Status: ${statusStr}) para sa buwan ng ${targetMonthPrefix}. Hindi na pwedeng mag-generate ng pangalawang bill para sa kaparehong buwan.`);
+                return responseHelper.error(res, `A billing statement already exists for ${targetMonthPrefix} with status ${statusStr}. You cannot generate a second bill for the same month.`);
             }
 
             // Read utilities configuration from lease

@@ -799,11 +799,11 @@
                     </div>
                     <div class="complaint-card-body">
                         <div class="complaint-card-title">${escHtml(c.subject)}</div>
-                        <div class="complaint-card-meta">${propName} · ${CATEGORY_LABELS[c.category] || c.category} · ${dateStr}</div>
+                        <div class="complaint-card-meta">${escHtml(propName)} &middot; ${escHtml(CATEGORY_LABELS[c.category] || c.category)} &middot; ${escHtml(dateStr)}</div>
                     </div>
                     <div class="complaint-card-right">
                         ${statusBadge(c.status)}
-                        <span style="font-size:0.75rem; color:var(--text-muted); font-family:monospace;">${c.complaint_number}</span>
+                        <span style="font-size:0.75rem; color:var(--text-muted); font-family:monospace;">${escHtml(c.complaint_number)}</span>
                     </div>
                 `;
                 list.appendChild(card);
@@ -811,12 +811,13 @@
         }
 
         function showListError(msg) {
-            document.getElementById('complaintsList').innerHTML = `<div class="empty-state"><p>${msg}</p></div>`;
+            document.getElementById('complaintsList').innerHTML = `<div class="empty-state"><p>${escHtml(msg)}</p></div>`;
         }
 
         function statusBadge(status) {
-            const label = status.replace(/_/g,' ');
-            return `<span class="badge badge-${status}">${label}</span>`;
+            const safeStatus = String(status || 'submitted').toLowerCase();
+            const label = safeStatus.replace(/_/g,' ');
+            return `<span class="badge badge-${safeStatus.replace(/[^a-z0-9_-]/g, '')}">${escHtml(label)}</span>`;
         }
 
         // ── Load Complaint Details ────────────────────────────
@@ -827,7 +828,7 @@
             try {
                 const res = await fetch(`/api/tenant/complaints/${complaintId}`, { headers: { Authorization: `Bearer ${token}` } });
                 const result = await res.json();
-                if (!res.ok) { document.getElementById('detailsBody').innerHTML = `<div class="form-alert err">${result.message || 'Failed to load details.'}</div>`; return; }
+                if (!res.ok) { document.getElementById('detailsBody').innerHTML = `<div class="form-alert err">${escHtml(result.message || 'Failed to load details.')}</div>`; return; }
 
                 const c = result.data;
                 const logs = c.status_logs || [];
@@ -871,23 +872,23 @@
                     <div class="detail-grid">
                         <div>
                             <div class="dc-label">Complaint Number</div>
-                            <div class="dc-val" style="font-family:monospace;">${c.complaint_number}</div>
+                            <div class="dc-val" style="font-family:monospace;">${escHtml(c.complaint_number)}</div>
                         </div>
                         <div>
                             <div class="dc-label">Category</div>
-                            <div class="dc-val">${CATEGORY_LABELS[c.category] || c.category}</div>
+                            <div class="dc-val">${escHtml(CATEGORY_LABELS[c.category] || c.category)}</div>
                         </div>
                         <div>
                             <div class="dc-label">Property</div>
-                            <div class="dc-val">${c.properties?.property_name || '—'}</div>
+                            <div class="dc-val">${escHtml(c.properties?.property_name || '—')}</div>
                         </div>
                         <div>
                             <div class="dc-label">Landlord</div>
-                            <div class="dc-val">${c.landlord?.full_name || '—'}</div>
+                            <div class="dc-val">${escHtml(c.landlord?.full_name || '—')}</div>
                         </div>
                         <div>
                             <div class="dc-label">Contract Number</div>
-                            <div class="dc-val" style="font-family:monospace;">${c.lease_records?.lease_number || 'N/A'}</div>
+                            <div class="dc-val" style="font-family:monospace;">${escHtml(c.lease_records?.lease_number || 'N/A')}</div>
                         </div>
                         <div>
                             <div class="dc-label">Status</div>
@@ -903,10 +904,11 @@
                 `;
 
                 if (c.attachment_url) {
+                    const safeAttachmentUrl = domiknowSafeExternalUrl(c.attachment_url);
                     html += `
                         <div style="margin-bottom:1.25rem;">
                             <div class="dc-label" style="margin-bottom:0.4rem;">Attachment</div>
-                            <a href="${c.attachment_url}" target="_blank" class="btn-cancel" style="display:inline-flex; align-items:center; gap:0.4rem; font-size:0.8rem; text-decoration:none;">
+                            <a href="${safeAttachmentUrl}" target="_blank" rel="noopener noreferrer" class="btn-cancel" style="display:inline-flex; align-items:center; gap:0.4rem; font-size:0.8rem; text-decoration:none;">
                                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
                                 View Attachment File
                             </a>
@@ -1024,7 +1026,7 @@
 
         function escHtml(str) {
             if (!str) return '';
-            return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+            return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');
         }
     </script>
 </body>

@@ -41,7 +41,7 @@ const registerValidation = [
         .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/).withMessage('Password must contain at least one uppercase letter, one lowercase letter, and one number'),
     body('role')
         .notEmpty().withMessage('Role is required')
-        .isIn(['tenant', 'landlord', 'maintenance', 'admin']).withMessage('Invalid role'),
+        .isIn(['tenant', 'landlord']).withMessage('Public registration is available only for tenants and landlords'),
     body('contact_number')
         .optional()
         .trim()

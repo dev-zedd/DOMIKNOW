@@ -657,14 +657,24 @@
                 fab.addEventListener('click', () => {
                     chatModal.classList.toggle('hidden');
                     if (!chatModal.classList.contains('hidden')) {
+                        startChatHeadPolling();
                         const feed = $('chatHeadMessagesFeed');
                         if (feed) feed.scrollTop = feed.scrollHeight;
+                    } else {
+                        stopChatHeadPolling();
                     }
                 });
                 closeBtn.addEventListener('click', () => {
                     chatModal.classList.add('hidden');
+                    stopChatHeadPolling();
                 });
             }
+
+            document.addEventListener('visibilitychange', () => {
+                const modal = $('chatHeadModal');
+                if (document.hidden || modal?.classList.contains('hidden')) stopChatHeadPolling();
+                else if (activeChatReportId) startChatHeadPolling();
+            });
 
             const chatInput = $('chatHeadTextInput');
             if (chatInput) {
@@ -784,13 +794,21 @@
                 activeChatThread = thread;
                 chatLastMessageCount = -1;
                 if (fab) fab.classList.remove('hidden');
-                pollChatHeadThread();
-                if (!chatPollInterval) {
-                    chatPollInterval = setInterval(pollChatHeadThread, 800);
-                }
             } else {
                 disableChatHead();
             }
+        }
+
+        function startChatHeadPolling() {
+            if (!activeChatReportId || document.hidden) return;
+            pollChatHeadThread();
+            if (!chatPollInterval) chatPollInterval = window.setInterval(pollChatHeadThread, 4000);
+        }
+
+        function stopChatHeadPolling() {
+            if (!chatPollInterval) return;
+            window.clearInterval(chatPollInterval);
+            chatPollInterval = null;
         }
 
         function disableChatHead() {
@@ -798,10 +816,7 @@
             activeChatReportId = null;
             activeChatThread = null;
             chatLastMessageCount = -1;
-            if (chatPollInterval) {
-                clearInterval(chatPollInterval);
-                chatPollInterval = null;
-            }
+            stopChatHeadPolling();
             const fab = $('chatHeadFab');
             const modal = $('chatHeadModal');
             if (fab) fab.classList.add('hidden');
@@ -852,12 +867,13 @@
 
                 let attachmentHtml = '';
                 if (m.attachment_url) {
+                    const safeAttachmentUrl = domiknowSafeExternalUrl(m.attachment_url);
                     const isImg = /\.(jpg|jpeg|png|gif|webp|svg)(\?|$)/i.test(m.attachment_url) || (m.attachment_path || '').match(/\.(jpg|jpeg|png|gif|webp|svg)$/i);
                     if (isImg) {
-                        attachmentHtml = `<div style="margin-top:0.35rem;"><a href="${m.attachment_url}" target="_blank"><img src="${m.attachment_url}" alt="attachment" style="max-width:200px; max-height:150px; border-radius:6px; border:1px solid var(--border-color); object-fit:cover; display:block;"></a></div>`;
+                        attachmentHtml = `<div style="margin-top:0.35rem;"><a href="${safeAttachmentUrl}" target="_blank" rel="noopener noreferrer"><img src="${safeAttachmentUrl}" alt="Message attachment" style="max-width:200px; max-height:150px; border-radius:6px; border:1px solid var(--border-color); object-fit:cover; display:block;"></a></div>`;
                     } else {
                         const fileName = m.attachment_path ? m.attachment_path.split('/').pop() : 'Attachment';
-                        attachmentHtml = `<div style="margin-top:0.35rem;"><a href="${m.attachment_url}" target="_blank" style="display:inline-flex; align-items:center; gap:0.35rem; color:#9333ea; font-weight:700; font-size:0.78rem; text-decoration:none; background:rgba(147,51,234,0.08); padding:0.3rem 0.6rem; border-radius:6px; border:1px solid rgba(147,51,234,0.2);">📎 ${fileName} ↗</a></div>`;
+                        attachmentHtml = `<div style="margin-top:0.35rem;"><a href="${safeAttachmentUrl}" target="_blank" rel="noopener noreferrer" style="display:inline-flex; align-items:center; gap:0.35rem; color:#9333ea; font-weight:700; font-size:0.78rem; text-decoration:none; background:rgba(147,51,234,0.08); padding:0.3rem 0.6rem; border-radius:6px; border:1px solid rgba(147,51,234,0.2);">${domiknowEscapeHtml(fileName)}</a></div>`;
                     }
                 }
 
@@ -865,10 +881,10 @@
                 item.style.cssText = `background:${isMe ? 'rgba(147,51,234,0.1)' : 'var(--bg-secondary)'}; border:1px solid var(--border-color); padding:0.6rem 0.85rem; border-radius:8px; font-size:0.84rem; align-self:${isMe ? 'flex-end' : 'flex-start'}; max-width:90%;`;
                 item.innerHTML = `
                     <div style="display:flex; justify-content:space-between; margin-bottom:0.2rem; font-size:0.72rem; gap:0.5rem;">
-                        <span style="font-weight:800; color:${isMe ? '#9333ea' : 'var(--text-primary)'}">${senderName}</span>
-                        <span style="color:var(--text-muted);">${dateStr}</span>
+                        <span style="font-weight:800; color:${isMe ? '#9333ea' : 'var(--text-primary)'}">${domiknowEscapeHtml(senderName)}</span>
+                        <span style="color:var(--text-muted);">${domiknowEscapeHtml(dateStr)}</span>
                     </div>
-                    ${hasText ? `<div style="color:var(--text-primary); white-space:pre-wrap;">${m.message_text}</div>` : ''}
+                    ${hasText ? `<div style="color:var(--text-primary); white-space:pre-wrap;">${domiknowEscapeHtml(m.message_text)}</div>` : ''}
                     ${attachmentHtml}
                 `;
                 feed.appendChild(item);
@@ -886,7 +902,7 @@
             const verb = typers.length > 1 ? 'are' : 'is';
             container.innerHTML = `
                 <div class="typing-indicator-box">
-                    <span><strong>${roleLabels}</strong> ${verb} typing</span>
+                    <span><strong>${domiknowEscapeHtml(roleLabels)}</strong> ${verb} typing</span>
                     <div class="messenger-dots">
                         <span></span>
                         <span></span>
@@ -988,7 +1004,7 @@
                 const json = await res.json();
 
                 if (!res.ok) {
-                    container.innerHTML = `<div style="padding:2rem;text-align:center;color:#ef4444;">${json.message || 'Failed to load filed reports.'}</div>`;
+                    container.innerHTML = `<div role="alert" style="padding:2rem;text-align:center;color:#ef4444;">${domiknowEscapeHtml(json.message || 'Failed to load filed reports.')}</div>`;
                     return;
                 }
 
@@ -1015,17 +1031,17 @@
 
                     card.innerHTML = `
                         <div>
-                            <div class="report-category">${capWords(r.report_category)}</div>
+                            <div class="report-category">${domiknowEscapeHtml(capWords(r.report_category))}</div>
                             <div class="report-meta">
                                 <span class="meta-item">${svgCalendar} Incident: ${fmtDate(r.incident_date)}</span>
-                                <span class="meta-item">${svgHome} ${r.properties?.property_name || '—'} (Unit ${r.properties?.unit_number || '—'})</span>
-                                <span class="meta-item">${svgUser} Landlord: ${r.landlord?.full_name || '—'}</span>
+                                <span class="meta-item">${svgHome} ${domiknowEscapeHtml(r.properties?.property_name || '—')} (Unit ${domiknowEscapeHtml(r.properties?.unit_number || '—')})</span>
+                                <span class="meta-item">${svgUser} Landlord: ${domiknowEscapeHtml(r.landlord?.full_name || '—')}</span>
                                 <span class="meta-item">${svgCalendar} Filed: ${fmtDate(r.created_at)}</span>
                             </div>
                         </div>
                         <div style="display:flex;flex-direction:column;align-items:flex-end;gap:.4rem;">
-                            <span class="status-badge ${statusClass(r.status)}">${statusLabel(r.status)}</span>
-                            <span class="status-badge ${sevClass(r.severity)}" style="font-size:.72rem;text-transform:capitalize;">${r.severity}</span>
+                            <span class="status-badge ${statusClass(r.status)}">${domiknowEscapeHtml(statusLabel(r.status))}</span>
+                            <span class="status-badge ${sevClass(r.severity)}" style="font-size:.72rem;text-transform:capitalize;">${domiknowEscapeHtml(r.severity || 'normal')}</span>
                         </div>
                     `;
                     container.appendChild(card);
@@ -1095,7 +1111,7 @@
                 $('fCategory').textContent     = capWords(r.report_category);
                 $('fIncidentDate').textContent = fmtDate(r.incident_date);
                 $('fDescription').textContent  = r.incident_description || '—';
-                $('fSeverity').innerHTML        = `<span class="status-badge ${sevClass(r.severity)}" style="text-transform:capitalize;">${r.severity}</span>`;
+                $('fSeverity').innerHTML        = `<span class="status-badge ${sevClass(r.severity)}" style="text-transform:capitalize;">${domiknowEscapeHtml(r.severity || 'normal')}</span>`;
 
                 if (r.evidence?.length) {
                     $('fEvidenceSection').style.display = 'block';
@@ -1125,8 +1141,11 @@
 
             files.forEach(f => {
                 const a = document.createElement('a');
-                a.href = f.file_url;
+                const safeFileUrl = domiknowSafeExternalUrl(f.file_url);
+                const safeFileName = domiknowEscapeHtml(f.file_name || 'Evidence file');
+                a.href = safeFileUrl;
                 a.target = '_blank';
+                a.rel = 'noopener noreferrer';
                 a.className = 'ev-thumb';
 
                 const isImage = (f.file_type || '').startsWith('image/') || 
@@ -1134,9 +1153,9 @@
                                 /\.(jpg|jpeg|png|webp|gif)$/i.test(f.file_name || '');
 
                 if (isImage) {
-                    a.innerHTML = `<img src="${f.file_url}" alt="${f.file_name}"><div class="ev-label">${f.file_name}</div>`;
+                    a.innerHTML = `<img src="${safeFileUrl}" alt="${safeFileName}"><div class="ev-label">${safeFileName}</div>`;
                 } else {
-                    a.innerHTML = `<div class="ev-icon-box"><svg class="svg-icon" width="24" height="24" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg></div><div class="ev-label">${f.file_name}</div>`;
+                    a.innerHTML = `<div class="ev-icon-box"><svg class="svg-icon" width="24" height="24" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg></div><div class="ev-label">${safeFileName}</div>`;
                 }
                 grid.appendChild(a);
             });
@@ -1162,7 +1181,7 @@
                 const json = await res.json();
 
                 if (!res.ok) {
-                    container.innerHTML = `<div style="padding:2rem;text-align:center;color:#ef4444;">${json.message || 'Failed to load reports against you.'}</div>`;
+                    container.innerHTML = `<div role="alert" style="padding:2rem;text-align:center;color:#ef4444;">${domiknowEscapeHtml(json.message || 'Failed to load reports against you.')}</div>`;
                     return;
                 }
 
@@ -1194,17 +1213,17 @@
 
                     card.innerHTML = `
                         <div>
-                            <div class="report-category">${capWords(r.report_category)}</div>
+                            <div class="report-category">${domiknowEscapeHtml(capWords(r.report_category))}</div>
                             <div class="report-meta">
                                 <span class="meta-item">${svgCalendar} Incident: ${fmtDate(r.incident_date)}</span>
-                                <span class="meta-item">${svgHome} ${r.properties?.property_name || '—'} · Unit ${r.properties?.unit_number || '—'}</span>
-                                <span class="meta-item">${svgUser} Filed By: ${r.landlord?.full_name || '—'}</span>
+                                <span class="meta-item">${svgHome} ${domiknowEscapeHtml(r.properties?.property_name || '—')} &middot; Unit ${domiknowEscapeHtml(r.properties?.unit_number || '—')}</span>
+                                <span class="meta-item">${svgUser} Filed By: ${domiknowEscapeHtml(r.landlord?.full_name || '—')}</span>
                                 <span class="meta-item">${svgCalendar} Filed: ${fmtDate(r.created_at)}</span>
                             </div>
                         </div>
                         <div style="display:flex;flex-direction:column;align-items:flex-end;gap:.4rem;">
-                            <span class="status-badge ${statusClass(r.status)}">${statusLabel(r.status)}</span>
-                            <span class="status-badge ${sevClass(r.severity)}" style="font-size:.72rem;text-transform:capitalize;">${r.severity}</span>
+                            <span class="status-badge ${statusClass(r.status)}">${domiknowEscapeHtml(statusLabel(r.status))}</span>
+                            <span class="status-badge ${sevClass(r.severity)}" style="font-size:.72rem;text-transform:capitalize;">${domiknowEscapeHtml(r.severity || 'normal')}</span>
                         </div>
                     `;
                     container.appendChild(card);
@@ -1265,7 +1284,7 @@
                 $('mIncidentDate').textContent = fmtDate(r.incident_date);
                 $('mFiledBy').textContent      = r.landlord?.full_name || '—';
                 $('mDescription').textContent  = r.incident_description || '—';
-                $('mSeverity').innerHTML       = `<span class="status-badge ${sevClass(r.severity)}" style="text-transform:capitalize;">${r.severity}</span>`;
+                $('mSeverity').innerHTML       = `<span class="status-badge ${sevClass(r.severity)}" style="text-transform:capitalize;">${domiknowEscapeHtml(r.severity || 'normal')}</span>`;
 
                 if (r.status !== 'pending_admin_review' && r.evidence?.length) {
                     $('mEvidenceSection').style.display = 'block';
@@ -1317,10 +1336,10 @@
                     item.style.cssText = `background:${isMe ? 'rgba(59,130,246,0.1)' : 'var(--bg-secondary)'}; border:1px solid var(--border-color); padding:0.5rem 0.75rem; border-radius:6px; font-size:0.8rem;`;
                     item.innerHTML = `
                         <div style="display:flex; justify-content:space-between; margin-bottom:0.15rem; font-size:0.7rem;">
-                            <span style="font-weight:800; color:${isMe ? 'var(--primary)' : 'var(--text-primary)'};">${senderName} (${m.sender_role.toUpperCase()})</span>
-                            <span style="color:var(--text-muted);">${dateStr}</span>
+                            <span style="font-weight:800; color:${isMe ? 'var(--primary)' : 'var(--text-primary)'};">${domiknowEscapeHtml(senderName)} (${domiknowEscapeHtml(String(m.sender_role || '').toUpperCase())})</span>
+                            <span style="color:var(--text-muted);">${domiknowEscapeHtml(dateStr)}</span>
                         </div>
-                        <div style="color:var(--text-primary); white-space:pre-wrap;">${m.message_text}</div>
+                        <div style="color:var(--text-primary); white-space:pre-wrap;">${domiknowEscapeHtml(m.message_text)}</div>
                     `;
                     feed.appendChild(item);
                 });
@@ -1339,14 +1358,17 @@
 
             files.forEach(f => {
                 const a = document.createElement('a');
-                a.href = f.file_url;
+                const safeFileUrl = domiknowSafeExternalUrl(f.file_url);
+                const safeFileName = domiknowEscapeHtml(f.file_name || 'Evidence file');
+                a.href = safeFileUrl;
                 a.target = '_blank';
+                a.rel = 'noopener noreferrer';
                 a.className = 'ev-thumb';
 
                 if ((f.file_type || '').startsWith('image/')) {
-                    a.innerHTML = `<img src="${f.file_url}" alt="${f.file_name}"><div class="ev-label">${f.file_name}</div>`;
+                    a.innerHTML = `<img src="${safeFileUrl}" alt="${safeFileName}"><div class="ev-label">${safeFileName}</div>`;
                 } else {
-                    a.innerHTML = `<div class="ev-icon-box"><svg class="svg-icon" width="24" height="24" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg></div><div class="ev-label">${f.file_name}</div>`;
+                    a.innerHTML = `<div class="ev-icon-box"><svg class="svg-icon" width="24" height="24" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg></div><div class="ev-label">${safeFileName}</div>`;
                 }
                 grid.appendChild(a);
             });

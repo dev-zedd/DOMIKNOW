@@ -4,6 +4,8 @@ const feedbackController = require('../controllers/feedbackController');
 const requireAuth = require('../middleware/authMiddleware');
 const requireRole = require('../middleware/roleMiddleware');
 
+router.get('/public/feedback', feedbackController.getPublicFeedback);
+
 router.use(requireAuth);
 
 router.post('/tenant/feedback', requireRole('tenant'), feedbackController.submitFeedback);

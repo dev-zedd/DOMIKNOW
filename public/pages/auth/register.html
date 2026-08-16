@@ -163,9 +163,11 @@
         }
     </style>
     <link href="../../css/design-system.css" rel="stylesheet">
+    <link href="../../css/auth-module.css" rel="stylesheet">
+    <link href="../../css/mobile-first.css?v=20260817-1" rel="stylesheet">
     <script src="../../js/ui.js" defer></script>
 </head>
-<body class="auth-page">
+<body class="auth-page auth-register-page">
     <div class="back-to-home-container">
         <a href="../../index.html" class="back-to-home-link">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
@@ -186,9 +188,17 @@
         </div>
         <h1 class="auth-title">Create your account</h1>
         <p class="auth-subtitle">
-            Choose your role and enter your details to get started. Already registered?
-            <a href="login.html" class="auth-link">Sign in</a>
+            A guided setup for your DOMIKNOW rental workspace. Already registered?
+            <a href="login.html" class="auth-link" data-preserve-redirect>Sign in</a>
         </p>
+        <div class="auth-side-note" aria-label="What happens after registration">
+            <p>What happens next</p>
+            <ul>
+                <li><span>1</span> Create the right workspace for your role</li>
+                <li><span>2</span> Verify your email address securely</li>
+                <li><span>3</span> Landlords complete administrator approval</li>
+            </ul>
+        </div>
     </div>
 
     <div class="auth-card">
@@ -206,208 +216,133 @@
             <span class="alert-text" style="font-size: 0.875rem; font-weight: 600;">Success message</span>
         </div>
 
-        <form id="registerForm" novalidate style="display: flex; flex-direction: column; gap: 1.25rem;">
-            <div class="form-group">
-                <label for="full_name" class="form-label">Full Name *</label>
-                <input id="full_name" name="full_name" type="text" required 
-                       placeholder="John Doe" class="form-input"
-                       minlength="2" maxlength="255">
-                <small class="form-error" id="full_name_error" style="color: #ef4444; font-size: 0.75rem; font-weight: 600; margin-top: 0.25rem; display: block;"></small>
+        <nav class="registration-stepper" aria-label="Account setup progress">
+            <div class="registration-step is-active" data-step-indicator="1" aria-current="step">
+                <span>1</span><strong>Workspace</strong>
             </div>
-
-            <div class="form-group">
-                <label for="email" class="form-label">Email Address *</label>
-                <input id="email" name="email" type="email" required 
-                       placeholder="john@example.com" class="form-input">
-                <small class="form-error" id="email_error" style="color: #ef4444; font-size: 0.75rem; font-weight: 600; margin-top: 0.25rem; display: block;"></small>
+            <div class="registration-step" data-step-indicator="2">
+                <span>2</span><strong>Profile</strong>
             </div>
+            <div class="registration-step" data-step-indicator="3">
+                <span>3</span><strong>Security</strong>
+            </div>
+            <div class="registration-step" data-step-indicator="4">
+                <span>4</span><strong>Review</strong>
+            </div>
+        </nav>
 
-            <div class="form-group">
-                <label for="password" class="form-label">Password *</label>
-                <div style="position: relative;">
-                    <input id="password" name="password" type="password" required 
-                           placeholder="••••••••" class="form-input"
-                           minlength="8">
-                    <button type="button" id="togglePassword" 
-                            style="position: absolute; right: 0.75rem; top: 50%; transform: translateY(-50%); 
-                                   background: none; border: none; cursor: pointer; font-size: 0.8125rem; 
-                                   color: var(--primary); font-weight: 700;">
-                        Show
-                    </button>
+        <div class="registration-progress-copy" aria-live="polite">
+            <span id="registrationStepCount">Step 1 of 4</span>
+            <strong id="registrationStepTitle">Choose your workspace</strong>
+        </div>
+
+        <form id="registerForm" novalidate class="registration-form">
+            <section class="registration-panel is-active" data-registration-step="1" aria-labelledby="workspaceStepTitle">
+                <div class="registration-panel__heading">
+                    <p class="auth-eyebrow">Start with your role</p>
+                    <h2 id="workspaceStepTitle">How will you use DOMIKNOW?</h2>
+                    <p>Your role determines the tools, dashboard, and onboarding guidance you receive.</p>
                 </div>
-                <small class="form-help">Must be at least 8 characters with uppercase, lowercase, and number</small>
-                <small class="form-error" id="password_error" style="color: #ef4444; font-size: 0.75rem; font-weight: 600; margin-top: 0.25rem; display: block;"></small>
-                <div id="passwordStrength" style="margin-top: 0.5rem;"></div>
-            </div>
+                <fieldset class="role-choice-group">
+                    <legend class="sr-only">Choose your account role</legend>
+                    <label class="role-choice">
+                        <input type="radio" name="role" value="tenant" checked required>
+                        <span class="role-choice__icon" aria-hidden="true">T</span>
+                        <span><strong>Tenant</strong><small>Find a home, apply, manage leases, bills, and requests.</small></span>
+                        <span class="role-choice__check" aria-hidden="true">✓</span>
+                    </label>
+                    <label class="role-choice">
+                        <input type="radio" name="role" value="landlord" required>
+                        <span class="role-choice__icon" aria-hidden="true">L</span>
+                        <span><strong>Landlord</strong><small>Publish rentals and manage applications, leases, and billing.</small></span>
+                        <span class="role-choice__check" aria-hidden="true">✓</span>
+                    </label>
+                </fieldset>
+            </section>
 
-            <div class="form-group">
-                <label for="confirm_password" class="form-label">Confirm Password *</label>
-                <input id="confirm_password" name="confirm_password" type="password" required 
-                       placeholder="••••••••" class="form-input">
-                <small class="form-error" id="confirm_password_error" style="color: #ef4444; font-size: 0.75rem; font-weight: 600; margin-top: 0.25rem; display: block;"></small>
-            </div>
+            <section class="registration-panel" data-registration-step="2" aria-labelledby="profileStepTitle" hidden>
+                <div class="registration-panel__heading">
+                    <p class="auth-eyebrow">Your profile</p>
+                    <h2 id="profileStepTitle">Tell us who you are</h2>
+                    <p>Use details that landlords, tenants, or rental teams can recognize.</p>
+                </div>
+                <div class="registration-field-grid">
+                    <div class="form-group registration-field--wide">
+                        <label for="full_name" class="form-label">Full name <span aria-hidden="true">*</span></label>
+                        <input id="full_name" name="full_name" type="text" required placeholder="e.g. Juan Dela Cruz" class="form-input" minlength="2" maxlength="255" autocomplete="name">
+                        <small class="form-error" id="full_name_error"></small>
+                    </div>
+                    <div class="form-group">
+                        <label for="contact_number" class="form-label">Contact number <span class="form-optional">Optional</span></label>
+                        <input id="contact_number" name="contact_number" type="tel" placeholder="+63 900 000 0000" class="form-input" autocomplete="tel">
+                        <small class="form-help">Used for rental coordination and account notices.</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="address" class="form-label">Current address <span class="form-optional">Optional</span></label>
+                        <textarea id="address" name="address" rows="3" placeholder="Street, barangay, municipality" class="form-textarea" autocomplete="street-address"></textarea>
+                    </div>
+                </div>
+            </section>
 
-            <div class="form-group">
-                <label for="role" class="form-label">I am a...</label>
-                <select id="role" name="role" required class="form-select">
-                    <option value="tenant">Tenant</option>
-                    <option value="landlord">Landlord</option>
-                    <option value="maintenance">Maintenance Personnel</option>
-                </select>
-            </div>
+            <section class="registration-panel" data-registration-step="3" aria-labelledby="securityStepTitle" hidden>
+                <div class="registration-panel__heading">
+                    <p class="auth-eyebrow">Sign-in details</p>
+                    <h2 id="securityStepTitle">Secure your account</h2>
+                    <p>We will send a six-digit verification code to this email after registration.</p>
+                </div>
+                <div class="registration-field-grid">
+                    <div class="form-group registration-field--wide">
+                        <label for="email" class="form-label">Email address <span aria-hidden="true">*</span></label>
+                        <input id="email" name="email" type="email" required placeholder="name@example.com" class="form-input" autocomplete="email">
+                        <small class="form-error" id="email_error"></small>
+                    </div>
+                    <div class="form-group">
+                        <label for="password" class="form-label">Password <span aria-hidden="true">*</span></label>
+                        <div class="password-field">
+                            <input id="password" name="password" type="password" required placeholder="At least 8 characters" class="form-input" minlength="8" autocomplete="new-password">
+                            <button type="button" id="togglePassword" class="password-toggle" aria-label="Show password">Show</button>
+                        </div>
+                        <small class="form-help">Use uppercase, lowercase, and a number.</small>
+                        <small class="form-error" id="password_error"></small>
+                        <div id="passwordStrength" class="password-strength" aria-live="polite"></div>
+                    </div>
+                    <div class="form-group">
+                        <label for="confirm_password" class="form-label">Confirm password <span aria-hidden="true">*</span></label>
+                        <input id="confirm_password" name="confirm_password" type="password" required placeholder="Repeat your password" class="form-input" autocomplete="new-password">
+                        <small class="form-error" id="confirm_password_error"></small>
+                    </div>
+                </div>
+            </section>
 
-            <div class="form-group">
-                <label for="contact_number" class="form-label">Contact Number (Optional)</label>
-                <input id="contact_number" name="contact_number" type="tel" placeholder="+63 900 000 0000" class="form-input">
-            </div>
+            <section class="registration-panel" data-registration-step="4" aria-labelledby="reviewStepTitle" hidden>
+                <div class="registration-panel__heading">
+                    <p class="auth-eyebrow">Final check</p>
+                    <h2 id="reviewStepTitle">Review your account</h2>
+                    <p>Confirm these details before we create your workspace and send the verification code.</p>
+                </div>
+                <dl class="registration-review">
+                    <div><dt>Workspace</dt><dd id="reviewRole">Tenant</dd></div>
+                    <div><dt>Full name</dt><dd id="reviewName">—</dd></div>
+                    <div><dt>Email</dt><dd id="reviewEmail">—</dd></div>
+                    <div><dt>Contact</dt><dd id="reviewContact">Not provided</dd></div>
+                    <div><dt>Address</dt><dd id="reviewAddress">Not provided</dd></div>
+                </dl>
+                <div class="registration-next-note">
+                    <strong id="reviewNextTitle">Next: verify your email</strong>
+                    <span id="reviewNextText">A six-digit code will be sent to the email above. Tenant access opens after verification and sign-in.</span>
+                </div>
+            </section>
 
-            <div class="form-group">
-                <label for="address" class="form-label">Address (Optional)</label>
-                <textarea id="address" name="address" rows="2" placeholder="Your street address" class="form-textarea"></textarea>
-            </div>
-
-            <div class="form-group" style="margin-top: 0.5rem;">
-                <button type="submit" id="submitBtn" class="btn-primary">
-                    Register
-                </button>
+            <div class="registration-actions">
+                <button type="button" id="registrationBack" class="btn btn-secondary" hidden>Back</button>
+                <span class="registration-saved-note">Your entries stay in place while you move between steps.</span>
+                <button type="button" id="registrationNext" class="btn btn-primary">Continue</button>
+                <button type="submit" id="submitBtn" class="btn btn-primary" hidden>Create account</button>
             </div>
         </form>
     </div>
 
     <script src="../../js/auth.js"></script>
-    <script>
-        const form = document.getElementById('registerForm');
-        const passwordInput = document.getElementById('password');
-        const confirmPasswordInput = document.getElementById('confirm_password');
-        const togglePasswordBtn = document.getElementById('togglePassword');
-        
-        // Toggle password visibility
-        togglePasswordBtn.addEventListener('click', function() {
-            const type = passwordInput.type === 'password' ? 'text' : 'password';
-            passwordInput.type = type;
-            confirmPasswordInput.type = type;
-            this.textContent = type === 'password' ? 'Show' : 'Hide';
-        });
-        
-        // Password strength indicator
-        passwordInput.addEventListener('input', function() {
-            const password = this.value;
-            const strengthDiv = document.getElementById('passwordStrength');
-            
-            if (!password) {
-                strengthDiv.innerHTML = '';
-                return;
-            }
-            
-            let strength = 0;
-            let feedback = [];
-            
-            if (password.length >= 8) strength++;
-            else feedback.push('at least 8 characters');
-            
-            if (/[a-z]/.test(password)) strength++;
-            else feedback.push('lowercase letter');
-            
-            if (/[A-Z]/.test(password)) strength++;
-            else feedback.push('uppercase letter');
-            
-            if (/\d/.test(password)) strength++;
-            else feedback.push('number');
-            
-            if (/[^a-zA-Z0-9]/.test(password)) strength++;
-            
-            const colors = ['#ef4444', '#f59e0b', '#eab308', '#84cc16', '#10b981'];
-            const labels = ['Very Weak', 'Weak', 'Fair', 'Good', 'Strong'];
-            
-            strengthDiv.innerHTML = `
-                <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
-                    <div style="flex: 1; min-width: 100px; height: 4px; background: #e5e7eb; border-radius: 2px; overflow: hidden;">
-                        <div style="width: ${strength * 20}%; height: 100%; background: ${colors[strength - 1] || colors[0]}; transition: all 0.3s;"></div>
-                    </div>
-                    <span style="font-size: 0.75rem; color: ${colors[strength - 1] || colors[0]}; font-weight: 600;">
-                        ${labels[strength - 1] || labels[0]}
-                    </span>
-                </div>
-                ${feedback.length > 0 ? `<small style="color: var(--text-secondary); font-size: 0.725rem; display: block; margin-top: 0.25rem;">Need: ${feedback.join(', ')}</small>` : ''}
-            `;
-        });
-        
-        // Client-side validation
-        function validateForm() {
-            let isValid = true;
-            
-            // Clear previous errors
-            document.querySelectorAll('.form-error').forEach(el => el.textContent = '');
-            document.querySelectorAll('.form-input, .form-select, .form-textarea').forEach(el => {
-                el.style.borderColor = '';
-            });
-            
-            // Full name validation
-            const fullName = document.getElementById('full_name').value.trim();
-            if (!fullName) {
-                showFieldError('full_name', 'Full name is required');
-                isValid = false;
-            } else if (fullName.length < 2) {
-                showFieldError('full_name', 'Full name must be at least 2 characters');
-                isValid = false;
-            } else if (fullName.length > 255) {
-                showFieldError('full_name', 'Full name is too long');
-                isValid = false;
-            }
-            
-            // Email validation
-            const email = document.getElementById('email').value.trim();
-            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (!email) {
-                showFieldError('email', 'Email is required');
-                isValid = false;
-            } else if (!emailRegex.test(email)) {
-                showFieldError('email', 'Please enter a valid email address');
-                isValid = false;
-            }
-            
-            // Password validation
-            const password = document.getElementById('password').value;
-            const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
-            if (!password) {
-                showFieldError('password', 'Password is required');
-                isValid = false;
-            } else if (!passwordRegex.test(password)) {
-                showFieldError('password', 'Password must be at least 8 characters with uppercase, lowercase, and number');
-                isValid = false;
-            }
-            
-            // Confirm password validation
-            const confirmPassword = document.getElementById('confirm_password').value;
-            if (!confirmPassword) {
-                showFieldError('confirm_password', 'Please confirm your password');
-                isValid = false;
-            } else if (password !== confirmPassword) {
-                showFieldError('confirm_password', 'Passwords do not match');
-                isValid = false;
-            }
-            
-            return isValid;
-        }
-        
-        function showFieldError(fieldId, message) {
-            const errorEl = document.getElementById(`${fieldId}_error`);
-            const inputEl = document.getElementById(fieldId);
-            if (errorEl) errorEl.textContent = message;
-            if (inputEl) inputEl.style.borderColor = '#ef4444';
-        }
-        
-        form.addEventListener('submit', async function(e) {
-            e.preventDefault();
-            
-            // Validate form
-            if (!validateForm()) {
-                return;
-            }
-            
-            // Call existing handleRegister function
-            await handleRegister(e);
-        });
-    </script>
+    <script src="../../js/auth-flow.js"></script>
 </body>
 </html>

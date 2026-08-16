@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Browse Verified Rentals — DOMIKNOW</title>
+    <link href="../../css/input.css" rel="stylesheet">
+    <link href="../../css/design-system.css" rel="stylesheet">
+    <link href="../../css/public-refinement.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <link href="../../css/public-module.css?v=20260817-10" rel="stylesheet">
+    <link href="../../css/map-system.css?v=20260817-9" rel="stylesheet">
+    <link href="../../css/mobile-first.css?v=20260817-1" rel="stylesheet">
+    <script src="../../js/ui.js" defer></script>
+    <script src="../../js/map-system.js" defer></script>
+    <script src="../../js/location-permission.js?v=20260817-9" defer></script>
+    <script src="../../js/public-properties.js?v=20260817-8" defer></script>
+</head>
+<body class="public-listings-page">
+    <header class="public-workspace-header">
+        <a href="../../index.html" class="logo brand-lockup" aria-label="DOMIKNOW home">
+            <span class="brand-mark" aria-hidden="true">
+                <span class="brand-mark-dot brand-mark-dot-primary"></span>
+                <span class="brand-mark-dot brand-mark-dot-left"></span>
+                <span class="brand-mark-dot brand-mark-dot-right"></span>
+            </span>
+            <span class="brand-wordmark"><span class="brand-wordmark-domi">DOMI</span><span class="brand-wordmark-know">KNOW</span></span>
+        </a>
+        <nav class="public-workspace-nav" aria-label="Public navigation">
+            <a href="../../index.html">Home</a>
+            <a href="properties.html" aria-current="page">Browse rentals</a>
+            <a href="../../index.html#howItWorks">How it works</a>
+        </nav>
+        <div class="public-workspace-actions">
+            <a href="../auth/login.html" class="btn btn-secondary">Log in</a>
+            <a href="../auth/register.html" class="btn btn-primary">Create account</a>
+            <button type="button" class="theme-toggle" data-theme-toggle aria-label="Switch color theme"></button>
+        </div>
+    </header>
+
+    <main class="public-discovery-main">
+        <section class="discovery-heading" aria-labelledby="discoveryTitle">
+            <div>
+                <p class="section-eyebrow">Rental discovery</p>
+                <h1 id="discoveryTitle">Find the right place with the facts in view.</h1>
+                <p>Compare location, monthly rent, capacity, and availability before opening the full listing.</p>
+            </div>
+            <div class="discovery-heading__note">
+                <span class="discovery-heading__note-icon" aria-hidden="true"><span data-icon="target"></span></span>
+                <span><strong>Search with confidence</strong><small>Device location is only accepted when its accuracy is reliable and visible to you.</small></span>
+            </div>
+        </section>
+
+        <section class="discovery-filter-panel" aria-labelledby="filterPanelTitle">
+            <div class="discovery-filter-panel__header">
+                <div>
+                    <h2 id="filterPanelTitle">Refine rentals</h2>
+                    <p>Use only the filters that matter to you.</p>
+                </div>
+                <button id="resetPropertyFilters" class="filter-clear-action" type="button" disabled>Clear all</button>
+            </div>
+
+            <div class="discovery-controls" aria-label="Property filters">
+                <label class="discovery-field discovery-field--search">
+                    <span>Search</span>
+                    <span class="discovery-search-control">
+                        <span aria-hidden="true" data-icon="search"></span>
+                        <input id="propertySearch" type="search" placeholder="Property, street, or barangay" autocomplete="off">
+                    </span>
+                </label>
+                <label class="discovery-field">
+                    <span>Property type</span>
+                    <select id="propertyTypeFilter">
+                        <option value="">All types</option>
+                        <option value="apartment">Apartment</option>
+                        <option value="boarding_house">Boarding house</option>
+                        <option value="bedspace">Bedspace</option>
+                        <option value="room">Room</option>
+                    </select>
+                </label>
+                <label class="discovery-field">
+                    <span>Monthly rent</span>
+                    <select id="propertyPriceFilter">
+                        <option value="">Any rent</option>
+                        <option value="3000">Up to ₱3,000</option>
+                        <option value="5000">Up to ₱5,000</option>
+                        <option value="7500">Up to ₱7,500</option>
+                        <option value="10000">Up to ₱10,000</option>
+                    </select>
+                </label>
+                <label class="discovery-field">
+                    <span>Barangay</span>
+                    <select id="propertyBarangayFilter">
+                        <option value="">All barangays</option>
+                        <option value="G. Redor">G. Redor</option>
+                        <option value="Halayhayin">Halayhayin</option>
+                        <option value="Acevida">Acevida</option>
+                        <option value="Bagong Pag-asa">Bagong Pag-asa</option>
+                        <option value="Macasipac">Macasipac</option>
+                        <option value="Pandeño">Pandeño</option>
+                        <option value="Salubungan">Salubungan</option>
+                        <option value="Liyang">Liyang</option>
+                        <option value="Kapatalan">Kapatalan</option>
+                    </select>
+                </label>
+            </div>
+
+            <div class="location-toolbar" aria-label="Location search tools">
+                <div class="location-toolbar__actions">
+                    <button id="useDeviceLocation" class="location-action location-action--primary" type="button">
+                        <span aria-hidden="true" data-icon="target"></span>Near me
+                    </button>
+                    <button id="chooseMapLocation" class="location-action" type="button">
+                        <span aria-hidden="true" data-icon="pin"></span>Choose on map
+                    </button>
+                    <button id="searchNearLspu" class="location-action" type="button">
+                        <span aria-hidden="true" data-icon="building"></span>Near LSPU
+                    </button>
+                    <button id="clearLocationSearch" class="location-action" type="button" hidden>
+                        <span aria-hidden="true" data-icon="x"></span>Clear location
+                    </button>
+                </div>
+                <div id="locationFeedback" class="location-feedback" role="status" aria-live="polite">
+                    Add a search point to see rentals within 5 km.
+                </div>
+            </div>
+        </section>
+
+        <div class="discovery-view-toggle" role="group" aria-label="Choose discovery view">
+            <button type="button" data-discovery-view="list" aria-pressed="true"><span aria-hidden="true" data-icon="list"></span>List</button>
+            <button type="button" data-discovery-view="map" aria-pressed="false"><span aria-hidden="true" data-icon="map"></span>Map</button>
+        </div>
+
+        <section class="discovery-workspace" data-active-view="list">
+            <div class="discovery-map-panel domiknow-map-frame">
+                <div id="publicPropertiesMap" class="domiknow-map" role="application" aria-label="Map of verified rental properties"></div>
+                <div id="mapResultCount" class="map-result-summary" aria-live="polite">Loading map results…</div>
+                <div class="domiknow-map-legend" aria-label="Map marker legend">
+                    <span class="domiknow-map-legend__item"><span class="domiknow-map-legend__swatch"></span>Available</span>
+                    <span class="domiknow-map-legend__item"><span class="domiknow-map-legend__swatch domiknow-map-legend__swatch--selected"></span>Selected</span>
+                    <span class="domiknow-map-legend__item"><span class="domiknow-map-legend__swatch domiknow-map-legend__swatch--search"></span>Search point</span>
+                </div>
+                <div class="manual-location-hint" id="manualLocationHint" hidden>Click the map to place your search pin. You can drag it afterward.</div>
+            </div>
+
+            <div class="discovery-results-panel">
+                <div class="discovery-results-header">
+                    <div>
+                        <p class="section-eyebrow">Search results</p>
+                        <h2 id="propertyResultCount">Loading rentals…</h2>
+                    </div>
+                    <label class="results-sort">
+                        <span>Sort</span>
+                        <select id="propertySort">
+                            <option value="recommended">Recommended</option>
+                            <option value="price_asc">Lowest rent</option>
+                            <option value="price_desc">Highest rent</option>
+                            <option value="distance">Nearest</option>
+                        </select>
+                    </label>
+                </div>
+                <div class="discovery-results-list">
+                    <div class="discovery-results-list__heading">
+                        <strong>All matching rentals</strong>
+                        <span>Select a card to open its details on the map.</span>
+                    </div>
+                    <div id="propertyResults" class="property-results" aria-live="polite"></div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="public-compact-footer">
+        <span>© 2026 DOMIKNOW</span>
+        <span>Verified rental discovery for Siniloan, Laguna</span>
+    </footer>
+</body>
+</html>

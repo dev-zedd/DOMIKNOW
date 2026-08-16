@@ -3,69 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Audit Logs Monitoring - DomiKnow</title>
+    <title>Audit Trail - DomiKnow</title>
     <link href="../../css/input.css" rel="stylesheet">
-    <style>
-        .filter-card {
-            background-color: var(--bg-secondary);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-lg);
-            padding: 1.5rem;
-            box-shadow: var(--shadow-md);
-            margin-top: 1.5rem;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)) auto;
-            gap: 1rem;
-            align-items: flex-end;
-        }
-        .list-card {
-            background-color: var(--bg-secondary);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-lg);
-            padding: 2rem;
-            box-shadow: var(--shadow-lg);
-            overflow-x: auto;
-            margin-top: 1.5rem;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            text-align: left;
-            font-size: 0.9rem;
-        }
-        th {
-            font-weight: 700;
-            color: var(--text-secondary);
-            padding: 0.75rem 1rem;
-            border-bottom: 2px solid var(--border-color);
-            text-transform: uppercase;
-            font-size: 0.75rem;
-            letter-spacing: 0.05em;
-        }
-        td {
-            padding: 1rem;
-            border-bottom: 1px solid var(--border-color);
-            color: var(--text-primary);
-        }
-    </style>
     <link href="../../css/design-system.css" rel="stylesheet">
     <script src="../../js/ui.js" defer></script>
 </head>
-<body>
-    <!-- Navbar -->
+<body class="app-loading" data-role="admin" data-page-title="Audit Trail">
     <nav class="navbar navbar-admin">
         <div class="navbar-container">
             <div class="navbar-brand-group">
-                <a href="reports.html" style="text-decoration: none;"><span class="navbar-logo">DomiKnow</span></a>
+                <a href="overview.html" style="text-decoration: none;"><span class="navbar-logo">DomiKnow</span></a>
                 <span class="navbar-badge navbar-badge-admin">Admin</span>
-            </div>
-            <div class="navbar-menu" style="flex-wrap: wrap; gap: 0.5rem 1rem;">
-                <a href="users.html" class="navbar-menu-link">Users</a>
-                <a href="property-review.html" class="navbar-menu-link">Property Review</a>
-                <a href="reservations.html" class="navbar-menu-link">Reservation Monitoring</a>
-                <a href="payments.html" class="navbar-menu-link">Payment Monitor</a>
-                <a href="reports.html" class="navbar-menu-link">Reports Triage</a>
-                <a href="audit-logs.html" class="navbar-menu-link active">Audit Logs</a>
             </div>
             <div class="navbar-right">
                 <span class="navbar-user-welcome">Welcome, <span class="user-name">User</span></span>
@@ -74,136 +22,260 @@
         </div>
     </nav>
 
-    <!-- Main Content -->
-    <main class="dashboard-container">
-        <h2>System Audit Trails</h2>
-        <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">Review security logs, transactional events, and administrative activities.</p>
+    <main class="dashboard-container audit-page">
+        <section class="audit-filter-panel" aria-labelledby="auditFilterTitle">
+            <div class="audit-panel-heading">
+                <div>
+                    <p class="audit-panel-eyebrow">Search records</p>
+                    <h2 id="auditFilterTitle">Filter audit activity</h2>
+                </div>
+                <button type="button" id="resetFiltersBtn" class="audit-reset-button">Reset filters</button>
+            </div>
 
-        <!-- Filters Form -->
-        <div class="filter-card">
-            <div class="form-group" style="margin-bottom:0;">
-                <label class="form-label" for="filterRole">User Role</label>
-                <select id="filterRole" class="form-input" style="height:38px;">
-                    <option value="">-- All Roles --</option>
-                    <option value="tenant">Tenant</option>
-                    <option value="landlord">Landlord</option>
-                    <option value="maintenance">Maintenance</option>
-                    <option value="admin">Administrator</option>
-                </select>
-            </div>
-            <div class="form-group" style="margin-bottom:0;">
-                <label class="form-label" for="filterAction">Action Query</label>
-                <input type="text" id="filterAction" class="form-input" style="height:38px;" placeholder="e.g. LOGIN, SUBMIT">
-            </div>
-            <div class="form-group" style="margin-bottom:0;">
-                <label class="form-label" for="filterDateFrom">Date From</label>
-                <input type="date" id="filterDateFrom" class="form-input" style="height:38px;">
-            </div>
-            <div class="form-group" style="margin-bottom:0;">
-                <label class="form-label" for="filterDateTo">Date To</label>
-                <input type="date" id="filterDateTo" class="form-input" style="height:38px;">
-            </div>
-            <button id="filterBtn" class="btn-primary" style="height:38px; padding: 0 1.5rem; background-color: var(--admin); border-color: var(--admin); cursor: pointer;">
-                Apply Filters
-            </button>
-        </div>
+            <form id="auditFilterForm" class="audit-filter-form">
+                <div class="form-group">
+                    <label class="form-label" for="filterRole">Actor role</label>
+                    <select id="filterRole" class="form-input">
+                        <option value="">All roles</option>
+                        <option value="tenant">Tenant</option>
+                        <option value="landlord">Landlord</option>
+                        <option value="maintenance">Maintenance personnel</option>
+                        <option value="admin">Administrator</option>
+                    </select>
+                </div>
+                <div class="form-group audit-action-field">
+                    <label class="form-label" for="filterAction">Action contains</label>
+                    <input type="search" id="filterAction" class="form-input" placeholder="Example: LOGIN or PROPERTY" autocomplete="off">
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="filterDateFrom">From date</label>
+                    <input type="date" id="filterDateFrom" class="form-input">
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="filterDateTo">To date</label>
+                    <input type="date" id="filterDateTo" class="form-input">
+                </div>
+                <button id="filterBtn" type="submit" class="btn-primary audit-apply-button">
+                    <span>Apply filters</span>
+                </button>
+            </form>
 
-        <!-- Logs Registry List -->
-        <div class="list-card">
-            <table>
-                <thead>
-                    <tr>
-                        <th>User Name</th>
-                        <th>User Role</th>
-                        <th>Action Logged</th>
-                        <th>Description Details</th>
-                        <th>Timestamp</th>
-                    </tr>
-                </thead>
-                <tbody id="logsTableBody" aria-live="polite" aria-busy="true">
-                    <tr>
-                        <td colspan="5" role="status" style="text-align: center; color: var(--text-muted);">Loading audit trails...</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
+            <div id="auditFilterFeedback" class="audit-filter-feedback" role="status" aria-live="polite">
+                Showing the latest activity across all roles and actions.
+            </div>
+        </section>
+
+        <section class="audit-list-panel" aria-labelledby="auditRecordsTitle">
+            <div class="audit-list-heading">
+                <div>
+                    <p class="audit-panel-eyebrow">Immutable activity record</p>
+                    <h2 id="auditRecordsTitle">System events</h2>
+                </div>
+                <span id="auditResultCount" class="audit-result-count">Loading records</span>
+            </div>
+
+            <div class="audit-table-scroll">
+                <table class="audit-table">
+                    <thead>
+                        <tr>
+                            <th scope="col">Actor</th>
+                            <th scope="col">Role</th>
+                            <th scope="col">Action</th>
+                            <th scope="col">Details</th>
+                            <th scope="col">Date and time</th>
+                        </tr>
+                    </thead>
+                    <tbody id="logsTableBody" aria-live="polite" aria-busy="true">
+                        <tr class="audit-state-row">
+                            <td colspan="5" role="status">Loading audit records...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
     </main>
 
     <script src="../../js/auth.js"></script>
     <script src="../../js/dashboard.js"></script>
     <script>
         const token = localStorage.getItem('domiknow_token');
+        const filterForm = document.getElementById('auditFilterForm');
+        const resetFiltersBtn = document.getElementById('resetFiltersBtn');
 
         document.addEventListener('DOMContentLoaded', () => {
             if (!token) return;
+            syncDateLimits();
             fetchAuditTrails();
-
-            document.getElementById('filterBtn').addEventListener('click', fetchAuditTrails);
+            filterForm.addEventListener('submit', event => {
+                event.preventDefault();
+                fetchAuditTrails();
+            });
+            resetFiltersBtn.addEventListener('click', () => {
+                filterForm.reset();
+                syncDateLimits();
+                fetchAuditTrails();
+            });
+            document.getElementById('filterDateFrom').addEventListener('change', syncDateLimits);
+            document.getElementById('filterDateTo').addEventListener('change', syncDateLimits);
         });
+
+        function syncDateLimits() {
+            const fromInput = document.getElementById('filterDateFrom');
+            const toInput = document.getElementById('filterDateTo');
+            toInput.min = fromInput.value || '';
+            fromInput.max = toInput.value || '';
+        }
+
+        function getFilters() {
+            return {
+                role: document.getElementById('filterRole').value,
+                action: document.getElementById('filterAction').value.trim(),
+                from: document.getElementById('filterDateFrom').value,
+                to: document.getElementById('filterDateTo').value
+            };
+        }
+
+        function describeFilters(filters) {
+            const applied = [];
+            if (filters.role) applied.push(`${formatLabel(filters.role)} actors`);
+            if (filters.action) applied.push(`actions containing "${filters.action}"`);
+            if (filters.from) applied.push(`from ${formatDate(filters.from)}`);
+            if (filters.to) applied.push(`through ${formatDate(filters.to)}`);
+            return applied.length
+                ? `Filtered by ${applied.join(', ')}.`
+                : 'Showing the latest activity across all roles and actions.';
+        }
 
         async function fetchAuditTrails() {
             const tableBody = document.getElementById('logsTableBody');
-            
-            const role = document.getElementById('filterRole').value;
-            const action = document.getElementById('filterAction').value;
-            const from = document.getElementById('filterDateFrom').value;
-            const to = document.getElementById('filterDateTo').value;
+            const resultCount = document.getElementById('auditResultCount');
+            const feedback = document.getElementById('auditFilterFeedback');
+            const submitButton = document.getElementById('filterBtn');
+            const filters = getFilters();
 
-            // Build query params
+            if (filters.from && filters.to && filters.from > filters.to) {
+                feedback.textContent = 'The start date must be earlier than or equal to the end date.';
+                feedback.dataset.state = 'error';
+                document.getElementById('filterDateFrom').focus();
+                return;
+            }
+
             const params = new URLSearchParams();
-            if (role) params.append('user_role', role);
-            if (action) params.append('action', action);
-            if (from) params.append('date_from', from);
-            if (to) params.append('date_to', to);
+            if (filters.role) params.append('user_role', filters.role);
+            if (filters.action) params.append('action', filters.action);
+            if (filters.from) params.append('date_from', filters.from);
+            if (filters.to) params.append('date_to', filters.to);
+
+            tableBody.setAttribute('aria-busy', 'true');
+            tableBody.replaceChildren(createStateRow('Loading matching audit records...', 'status'));
+            resultCount.textContent = 'Loading records';
+            submitButton.disabled = true;
+            submitButton.querySelector('span').textContent = 'Applying...';
+            feedback.dataset.state = '';
 
             try {
                 const response = await fetch(`/api/admin/audit-logs?${params.toString()}`, {
-                    headers: { 'Authorization': `Bearer ${token}` }
+                    headers: { Authorization: `Bearer ${token}` }
                 });
-                if (!response.ok) {
-                    tableBody.innerHTML = `<tr><td colspan="5" role="alert" style="text-align: center; color: var(--error);">Audit trails could not be loaded. Check your permissions and try again.</td></tr>`;
-                    tableBody.setAttribute('aria-busy', 'false');
-                    return;
-                }
+                if (!response.ok) throw new Error(`Audit service returned ${response.status}`);
 
                 const result = await response.json();
-                const logs = result.data || [];
+                const logs = Array.isArray(result.data) ? result.data : [];
+                tableBody.replaceChildren();
 
-                if (logs.length === 0) {
-                    tableBody.innerHTML = `<tr><td colspan="5" role="status" style="text-align: center; padding: 2rem; color: var(--text-muted);">No audit records match these filters. Adjust the criteria and search again.</td></tr>`;
-                    tableBody.setAttribute('aria-busy', 'false');
-                    return;
+                if (!logs.length) {
+                    tableBody.appendChild(createStateRow('No audit records match these filters. Try broadening the role, action, or date range.', 'status'));
+                    resultCount.textContent = '0 records';
+                } else {
+                    logs.forEach(log => tableBody.appendChild(createAuditRow(log)));
+                    resultCount.textContent = `${logs.length} ${logs.length === 1 ? 'record' : 'records'}`;
                 }
 
-                tableBody.innerHTML = '';
-                logs.forEach(log => {
-                    let roleBadgeClass = 'status-pending';
-                    if (log.users?.role === 'admin') roleBadgeClass = 'status-active';
-                    if (log.users?.role === 'tenant') roleBadgeClass = 'status-active';
-                    if (log.users?.role === 'landlord') roleBadgeClass = 'status-pending';
-
-                    const timestampStr = new Date(log.created_at).toLocaleString();
-
-                    const row = document.createElement('tr');
-                    row.innerHTML = `
-                        <td><strong>${log.users?.full_name || 'N/A'}</strong></td>
-                        <td>
-                            <span class="status-badge ${roleBadgeClass}" style="text-transform: capitalize; font-size: 0.8rem;">
-                                ${log.users?.role || 'N/A'}
-                            </span>
-                        </td>
-                        <td><code style="background-color: var(--bg-primary); padding: 0.2rem 0.5rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color); font-weight:700; color: var(--primary);">${log.action}</code></td>
-                        <td>${log.description || 'No description provided.'}</td>
-                        <td style="font-size: 0.85rem; color: var(--text-secondary);">${timestampStr}</td>
-                    `;
-                    tableBody.appendChild(row);
-                });
+                feedback.textContent = describeFilters(filters);
+                feedback.dataset.state = 'success';
+            } catch (error) {
+                console.error('Audit trail load error:', error);
+                tableBody.replaceChildren(createStateRow('The audit service could not be reached. Check your connection and try again.', 'alert'));
+                resultCount.textContent = 'Unavailable';
+                feedback.textContent = 'Audit records were not updated.';
+                feedback.dataset.state = 'error';
+            } finally {
                 tableBody.setAttribute('aria-busy', 'false');
-            } catch (err) {
-                console.error(err);
-                tableBody.innerHTML = `<tr><td colspan="5" role="alert" style="text-align: center; color: var(--error);">The audit service could not be reached. Check your connection and try again.</td></tr>`;
-                tableBody.setAttribute('aria-busy', 'false');
+                submitButton.disabled = false;
+                submitButton.querySelector('span').textContent = 'Apply filters';
             }
+        }
+
+        function createAuditRow(log) {
+            const row = document.createElement('tr');
+            const actorCell = createCell('Actor');
+            const actorName = document.createElement('strong');
+            actorName.className = 'audit-actor-name';
+            actorName.textContent = log.users?.full_name || 'Unknown actor';
+            actorCell.appendChild(actorName);
+
+            const roleCell = createCell('Role');
+            const role = log.users?.role || 'unknown';
+            const roleBadge = document.createElement('span');
+            roleBadge.className = `audit-role-badge audit-role-badge--${role}`;
+            roleBadge.textContent = formatLabel(role);
+            roleCell.appendChild(roleBadge);
+
+            const actionCell = createCell('Action');
+            const actionCode = document.createElement('code');
+            actionCode.className = 'audit-action-code';
+            actionCode.textContent = log.action || 'UNSPECIFIED_ACTION';
+            actionCell.appendChild(actionCode);
+
+            const descriptionCell = createCell('Details');
+            descriptionCell.classList.add('audit-description-cell');
+            descriptionCell.textContent = log.description || 'No description provided.';
+
+            const timestampCell = createCell('Date and time');
+            const timestamp = new Date(log.created_at);
+            const timeElement = document.createElement('time');
+            timeElement.className = 'audit-timestamp';
+            if (!Number.isNaN(timestamp.getTime())) {
+                timeElement.dateTime = timestamp.toISOString();
+                timeElement.textContent = timestamp.toLocaleString(undefined, {
+                    year: 'numeric', month: 'short', day: 'numeric',
+                    hour: 'numeric', minute: '2-digit'
+                });
+            } else {
+                timeElement.textContent = 'Unknown time';
+            }
+            timestampCell.appendChild(timeElement);
+
+            row.append(actorCell, roleCell, actionCell, descriptionCell, timestampCell);
+            return row;
+        }
+
+        function createCell(label) {
+            const cell = document.createElement('td');
+            cell.dataset.label = label;
+            return cell;
+        }
+
+        function createStateRow(message, role) {
+            const row = document.createElement('tr');
+            row.className = 'audit-state-row';
+            const cell = document.createElement('td');
+            cell.colSpan = 5;
+            cell.setAttribute('role', role);
+            cell.textContent = message;
+            row.appendChild(cell);
+            return row;
+        }
+
+        function formatLabel(value) {
+            return String(value || '').replace(/_/g, ' ').replace(/\b\w/g, character => character.toUpperCase());
+        }
+
+        function formatDate(value) {
+            const date = new Date(`${value}T00:00:00`);
+            return Number.isNaN(date.getTime())
+                ? value
+                : date.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
         }
     </script>
 </body>

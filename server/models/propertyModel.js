@@ -100,13 +100,13 @@ const propertyModel = {
         // Fetch units for all these properties
         const { data: unitsRecords } = await supabase
             .from('property_units')
-            .select('id, property_id, monthly_rent, rental_style')
+            .select('id, property_id, monthly_rent, rental_style, unit_type, status')
             .in('property_id', propertyIds);
 
         const unitIds = unitsRecords ? unitsRecords.map(u => u.id) : [];
         const { data: bedsRecords } = await supabase
             .from('unit_beds')
-            .select('unit_id, monthly_rent')
+            .select('unit_id, monthly_rent, status')
             .in('unit_id', unitIds.length > 0 ? unitIds : ['00000000-0000-0000-0000-000000000000']);
 
         // Group units by property_id
@@ -135,14 +135,26 @@ const propertyModel = {
         let results = properties.map(p => {
             const propUnits = unitsMap[p.id] || [];
             let rents = [];
+            let totalSpaces = 0;
+            let availableSpaces = 0;
             propUnits.forEach(u => {
-                if (u.rental_style === 'per_bed') {
+                if (u.rental_style === 'per_bed' || u.unit_type === 'bedspace') {
                     const unitBeds = bedsMap[u.id] || [];
                     unitBeds.forEach(b => {
                         if (parseFloat(b.monthly_rent) > 0) rents.push(parseFloat(b.monthly_rent));
+                        totalSpaces += 1;
+                        if (String(b.status || '').toLowerCase() === 'available') availableSpaces += 1;
                     });
+                    // Treat a bedspace unit without individual bed records as one rentable space.
+                    if (unitBeds.length === 0) {
+                        if (parseFloat(u.monthly_rent) > 0) rents.push(parseFloat(u.monthly_rent));
+                        totalSpaces += 1;
+                        if (String(u.status || '').toLowerCase() === 'available') availableSpaces += 1;
+                    }
                 } else {
                     if (parseFloat(u.monthly_rent) > 0) rents.push(parseFloat(u.monthly_rent));
+                    totalSpaces += 1;
+                    if (String(u.status || '').toLowerCase() === 'available') availableSpaces += 1;
                 }
             });
 
@@ -153,7 +165,9 @@ const propertyModel = {
                 ...p,
                 amenities: amenitiesMap[p.id] || [],
                 min_monthly_rent: minRent,
-                max_monthly_rent: maxRent
+                max_monthly_rent: maxRent,
+                total_space_count: totalSpaces,
+                available_space_count: totalSpaces > 0 ? availableSpaces : null
             };
         });
 

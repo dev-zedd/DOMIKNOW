@@ -7,6 +7,7 @@
     <link href="../../css/input.css" rel="stylesheet">
     <!-- Leaflet.js map components -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link href="../../css/map-system.css" rel="stylesheet">
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <style>
         /* Prevent layout flashing shift on page load */
@@ -518,6 +519,7 @@
     </style>
     <link href="../../css/design-system.css" rel="stylesheet">
     <script src="../../js/ui.js" defer></script>
+    <script src="../../js/map-system.js" defer></script>
 </head>
 <body>
     <nav class="navbar navbar-tenant">
@@ -581,7 +583,7 @@
                     headers['Authorization'] = `Bearer ${token}`;
                 }
 
-                const response = await fetch(`/api/properties/${propertyId}`, { headers });
+                const response = await fetch(`/api/properties/${encodeURIComponent(propertyId)}`, { headers });
 
                 if (!response.ok) {
                     document.getElementById('propertyDetailsContent').innerHTML = `<p style="text-align: center; color: var(--error);">Failed to load property details. It may not exist.</p>`;
@@ -612,12 +614,19 @@
 
         function renderProfileUI(prop) {
             const container = document.getElementById('propertyDetailsContent');
+            const safePropertyId = encodeURIComponent(String(prop.id || ''));
+            const propertyName = domiknowEscapeHtml(prop.property_name || 'Unnamed property');
+            const propertyType = domiknowEscapeHtml(String(prop.property_type || 'Property').replace(/_/g, ' '));
+            const tenantSuitability = domiknowEscapeHtml(prop.tenant_type_suitability || 'Not specified');
+            const propertyAddress = domiknowEscapeHtml(prop.address || 'Address not specified');
+            const propertyDescription = domiknowEscapeHtml(prop.description || 'No description provided.');
+            const mainImageUrl = domiknowSafeExternalUrl(prop.main_image_url || 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&w=800&q=80');
 
             // Format amenities items (no emojis!)
             let amenityItemsHtml = '';
             if (prop.amenities && prop.amenities.length > 0) {
                 prop.amenities.forEach(a => {
-                    amenityItemsHtml += `<div class="detail-amenity-item">${a}</div>`;
+                    amenityItemsHtml += `<div class="detail-amenity-item">${domiknowEscapeHtml(a)}</div>`;
                 });
             } else {
                 amenityItemsHtml = '<p style="color: var(--text-muted); font-size: 0.85rem; margin: 0;">No specific amenities listed.</p>';
@@ -629,14 +638,14 @@
                 feedbackSummaryHtml = `
                     <div style="font-size: 1.1rem; font-weight: 700; margin-bottom: 0.75rem; color: #0f172a; display: flex; align-items: center; gap: 4px;">
                         ★ ${parseFloat(prop.feedback_summary.rating_average).toFixed(1)} 
-                        <span style="color: var(--text-muted); font-weight: 500; font-size: 0.8rem;">(${prop.feedback_summary.total_feedback} ratings)</span>
+                        <span style="color: var(--text-muted); font-weight: 500; font-size: 0.8rem;">(${Number(prop.feedback_summary.total_feedback) || 0} ratings)</span>
                     </div>
                     <div class="feedback-bullets">
                         <div class="feedback-bullet feedback-bullet-pos">
-                            <strong>Positive Highlights:</strong><br>${prop.feedback_summary.positive_summary || 'N/A'}
+                            <strong>Positive Highlights:</strong><br>${domiknowEscapeHtml(prop.feedback_summary.positive_summary || 'N/A')}
                         </div>
                         <div class="feedback-bullet feedback-bullet-neg">
-                            <strong>Minor Drawbacks:</strong><br>${prop.feedback_summary.negative_summary || 'N/A'}
+                            <strong>Minor Drawbacks:</strong><br>${domiknowEscapeHtml(prop.feedback_summary.negative_summary || 'N/A')}
                         </div>
                     </div>
                 `;
@@ -674,17 +683,17 @@
                 }
 
                 // Render main rule text as bullet points (split by period or newline)
-                const ruleLines = rawRules
+                const ruleLines = String(rawRules || '')
                     .split(/\.\s+|\n/)
                     .map(r => r.trim())
                     .filter(r => r.length > 0);
 
-                rulesHtml = ruleLines.map(r => `<li>${r}</li>`).join('');
+                rulesHtml = ruleLines.map(r => `<li>${domiknowEscapeHtml(r)}</li>`).join('');
 
                 // Append custom policies as additional items
                 if (parsedPolicies.length > 0) {
                     rulesHtml += parsedPolicies
-                        .map(p => `<li><strong>${p.name}:</strong> ${p.value}</li>`)
+                        .map(p => `<li><strong>${domiknowEscapeHtml(p.name)}:</strong> ${domiknowEscapeHtml(p.value)}</li>`)
                         .join('');
                 }
             }
@@ -695,8 +704,11 @@
             if (units.length > 0) {
                 unitsListHtml = `<div class="room-card-grid">`;
                 units.forEach(u => {
-                    const statusClass = u.status === 'available' ? 'status-active' : u.status === 'occupied' ? 'status-rejected' : 'status-pending';
-                    const unitAmenities = (u.amenities || []).map(am => `<span class="room-card-amenity-tag">${am}</span>`).join(' ');
+                    const unitStatus = String(u.status || 'unknown').toLowerCase();
+                    const statusClass = unitStatus === 'available' ? 'status-active' : unitStatus === 'occupied' ? 'status-rejected' : 'status-pending';
+                    const unitId = domiknowEscapeHtml(u.id || '');
+                    const unitNumber = domiknowEscapeHtml(u.unit_number || 'Unit');
+                    const unitAmenities = (u.amenities || []).map(am => `<span class="room-card-amenity-tag">${domiknowEscapeHtml(am)}</span>`).join(' ');
                     
                     let bedsListHtml = '';
                     if (u.rental_style === 'per_bed') {
@@ -710,17 +722,18 @@
                                     
                                     if (token) {
                                         if (isAvailable) {
-                                            actionBtnHtml = `<button class="btn-action-apply-small btn-apply-bed-trigger" data-unit-id="${u.id}" data-bed-id="${bed.id}" data-unit-num="${u.unit_number}" data-bed-label="${bed.bed_label}">Apply</button>`;
+                                            actionBtnHtml = `<button type="button" class="btn-action-apply-small btn-apply-bed-trigger" data-unit-id="${unitId}" data-bed-id="${domiknowEscapeHtml(bed.id || '')}" data-unit-num="${unitNumber}" data-bed-label="${domiknowEscapeHtml(bed.bed_label || 'Bed')}">Apply</button>`;
                                         } else {
-                                            actionBtnHtml = `<span class="status-pill status-${bed.status}" style="font-size: 0.68rem; text-transform: capitalize; padding: 1px 6px;">${bed.status}</span>`;
+                                            const bedStatus = String(bed.status || 'unavailable').toLowerCase();
+                                            actionBtnHtml = `<span class="status-pill status-${bedStatus.replace(/[^a-z0-9_-]/g, '')}" style="font-size: 0.68rem; text-transform: capitalize; padding: 1px 6px;">${domiknowEscapeHtml(bedStatus)}</span>`;
                                         }
                                     } else {
-                                        actionBtnHtml = `<button class="btn-action-apply-small btn-login-trigger">Login</button>`;
+                                        actionBtnHtml = `<button type="button" class="btn-action-apply-small btn-login-trigger">Login</button>`;
                                     }
                                     
                                     return `
                                         <div class="bed-list-item">
-                                            <span>${bed.bed_label}</span>
+                                            <span>${domiknowEscapeHtml(bed.bed_label || 'Bed')}</span>
                                             <div style="display: flex; align-items: center; gap: 8px;">
                                                 <span class="bed-rent">₱${parseFloat(bed.monthly_rent).toLocaleString()}</span>
                                                 ${actionBtnHtml}
@@ -738,12 +751,12 @@
                     } else {
                         actionsAreaHtml = `
                             <div style="margin-top: auto; padding-top: 0.5rem;">
-                                ${token && u.status === 'available' ? `
-                                    <button class="btn-action-apply btn-apply-unit-trigger" data-unit-id="${u.id}" data-unit-num="${u.unit_number}">Apply for ${u.unit_number}</button>
-                                ` : u.status === 'available' ? `
-                                    <button class="btn-action-apply btn-login-trigger">Login to Apply</button>
+                                ${token && unitStatus === 'available' ? `
+                                    <button type="button" class="btn-action-apply btn-apply-unit-trigger" data-unit-id="${unitId}" data-unit-num="${unitNumber}">Apply for ${unitNumber}</button>
+                                ` : unitStatus === 'available' ? `
+                                    <button type="button" class="btn-action-apply btn-login-trigger">Login to Apply</button>
                                 ` : `
-                                    <button disabled class="btn-action-disabled">Currently ${u.status}</button>
+                                    <button type="button" disabled class="btn-action-disabled">Currently ${domiknowEscapeHtml(unitStatus)}</button>
                                 `}
                             </div>
                         `;
@@ -753,15 +766,15 @@
                         <div class="room-card-item">
                             <div class="room-card-header">
                                 <div>
-                                    <h4 class="room-card-title">${u.unit_number}</h4>
-                                    <span class="room-card-subtitle">${u.unit_type.replace('_', ' ').toUpperCase()} • ${u.floor_area_sqm || 20} sqm</span>
+                                    <h4 class="room-card-title">${unitNumber}</h4>
+                                    <span class="room-card-subtitle">${domiknowEscapeHtml(String(u.unit_type || 'unit').replace(/_/g, ' ').toUpperCase())} &bull; ${Number(u.floor_area_sqm) || 0} sqm</span>
                                 </div>
-                                <span class="status-badge ${statusClass}">${u.status}</span>
+                                <span class="status-badge ${statusClass}">${domiknowEscapeHtml(unitStatus)}</span>
                             </div>
                             
                             <div class="room-card-specs">
                                 <p style="margin: 0 0 0.25rem 0;"><strong>Rent:</strong> <span style="color: var(--landlord); font-weight: 700;">₱${parseInt(u.monthly_rent).toLocaleString()}</span> / mo</p>
-                                <p style="margin: 0 0 0.25rem 0;"><strong>Capacity:</strong> ${u.capacity} persons</p>
+                                <p style="margin: 0 0 0.25rem 0;"><strong>Capacity:</strong> ${Number(u.capacity) || 0} persons</p>
                             </div>
  
                             ${unitAmenities ? `<div class="room-card-amenities">${unitAmenities}</div>` : ''}
@@ -794,26 +807,26 @@
                     <!-- Left Section: Basic details, image, descriptions -->
                     <div class="detail-main">
                         <div class="detail-header-compact">
-                            <img src="${prop.main_image_url || 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&w=800&q=80'}" alt="${prop.property_name}">
+                            <img src="${mainImageUrl}" alt="${propertyName}" loading="eager" decoding="async">
                             <div style="flex-grow: 1; display: flex; flex-direction: column; gap: 0.25rem;">
-                                <h2 class="detail-title">${prop.property_name}</h2>
+                                <h2 class="detail-title">${propertyName}</h2>
                                 <div class="detail-meta-pills">
-                                    <span class="detail-pill detail-pill-type">${prop.property_type.replace('_', ' ')}</span>
-                                    <span class="detail-pill detail-pill-suit">For: ${prop.tenant_type_suitability}</span>
+                                    <span class="detail-pill detail-pill-type">${propertyType}</span>
+                                    <span class="detail-pill detail-pill-suit">For: ${tenantSuitability}</span>
                                     <span class="detail-pill detail-pill-price">${rentRange}</span>
                                 </div>
-                                <p style="color: #64748b; font-size: 0.8rem; margin: 0.25rem 0 0 0; font-weight: 500;">Address: ${prop.address}</p>
+                                <p style="color: #64748b; font-size: 0.8rem; margin: 0.25rem 0 0 0; font-weight: 500;">Address: ${propertyAddress}</p>
                             </div>
                         </div>
 
                         <div class="tabbed-card">
-                            <div class="tab-headers">
-                                <button class="tab-btn active" data-tab="overview">Overview</button>
-                                <button class="tab-btn" data-tab="amenities">Amenities</button>
-                                <button class="tab-btn" data-tab="rules">House Rules</button>
+                            <div class="tab-headers" role="tablist" aria-label="Property information">
+                                <button type="button" role="tab" aria-selected="true" class="tab-btn active" data-tab="overview">Overview</button>
+                                <button type="button" role="tab" aria-selected="false" class="tab-btn" data-tab="amenities">Amenities</button>
+                                <button type="button" role="tab" aria-selected="false" class="tab-btn" data-tab="rules">House Rules</button>
                             </div>
                             <div class="tab-content-box" id="tabContentBox">
-                                <p style="margin: 0; line-height: 1.6;">${prop.description || 'No description provided.'}</p>
+                                <p style="margin: 0; line-height: 1.6;">${propertyDescription}</p>
                             </div>
                         </div>
 
@@ -848,15 +861,19 @@
 
             // Bind tab switching programmatically
             const tabContents = {
-                overview: `<p style="margin: 0; line-height: 1.6;">${prop.description || 'No description provided.'}</p>`,
+                overview: `<p style="margin: 0; line-height: 1.6;">${propertyDescription}</p>`,
                 amenities: `<div class="detail-amenity-grid">${amenityItemsHtml}</div>`,
                 rules: `<ul style="margin: 0; padding-left: 1.25rem; line-height: 1.6;">${rulesHtml}</ul>`
             };
 
             container.querySelectorAll('.tab-btn').forEach(btn => {
                 btn.addEventListener('click', () => {
-                    container.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                    container.querySelectorAll('.tab-btn').forEach(b => {
+                        b.classList.remove('active');
+                        b.setAttribute('aria-selected', 'false');
+                    });
                     btn.classList.add('active');
+                    btn.setAttribute('aria-selected', 'true');
                     const tabName = btn.getAttribute('data-tab');
                     container.querySelector('#tabContentBox').innerHTML = tabContents[tabName];
                 });
@@ -867,7 +884,7 @@
             container.querySelectorAll('.btn-apply-unit-trigger').forEach(unitBtn => {
                 unitBtn.addEventListener('click', () => {
                     const unitId = unitBtn.getAttribute('data-unit-id');
-                    window.location.href = `apply.html?id=${prop.id}&unit_id=${unitId}`;
+                    window.location.href = `apply.html?id=${safePropertyId}&unit_id=${encodeURIComponent(unitId)}`;
                 });
             });
 
@@ -875,7 +892,7 @@
                 bedBtn.addEventListener('click', () => {
                     const unitId = bedBtn.getAttribute('data-unit-id');
                     const bedId = bedBtn.getAttribute('data-bed-id');
-                    window.location.href = `apply.html?id=${prop.id}&unit_id=${unitId}&bed_id=${bedId}`;
+                    window.location.href = `apply.html?id=${safePropertyId}&unit_id=${encodeURIComponent(unitId)}&bed_id=${encodeURIComponent(bedId)}`;
                 });
             });
 
@@ -886,12 +903,19 @@
             });
 
             // Render single Leaflet Marker
-            if (prop.latitude && prop.longitude) {
+            const propertyLatitude = Number(prop.latitude);
+            const propertyLongitude = Number(prop.longitude);
+            if (Number.isFinite(propertyLatitude) && Number.isFinite(propertyLongitude)
+                && Math.abs(propertyLatitude) <= 90 && Math.abs(propertyLongitude) <= 180) {
                 setTimeout(() => {
-                    const detailsMap = L.map('detailsMap').setView([prop.latitude, prop.longitude], 15);
-                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                        attribution: '&copy; OpenStreetMap contributors'
-                    }).addTo(detailsMap);
+                    const detailsMapElement = document.getElementById('detailsMap');
+                    const detailsMap = L.map(detailsMapElement).setView([propertyLatitude, propertyLongitude], 15);
+                    if (window.DomiknowMap) DomiknowMap.addBasemap(detailsMap);
+                    else L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '&copy; OpenStreetMap contributors' }).addTo(detailsMap);
+                    requestAnimationFrame(() => requestAnimationFrame(() => detailsMap.invalidateSize(false)));
+                    if ('ResizeObserver' in window && detailsMapElement) {
+                        new ResizeObserver(() => detailsMap.invalidateSize(false)).observe(detailsMapElement);
+                    }
 
                     const markerRent = (() => {
                         let rentRangeDisplay = `₱${parseFloat(prop.monthly_rent).toLocaleString()}/mo`;
@@ -907,9 +931,9 @@
                         return rentRangeDisplay;
                     })();
 
-                    L.marker([prop.latitude, prop.longitude])
+                    L.marker([propertyLatitude, propertyLongitude])
                         .addTo(detailsMap)
-                        .bindPopup(`<strong>${prop.property_name}</strong><br>${markerRent}`)
+                        .bindPopup(`<strong>${propertyName}</strong><br>${domiknowEscapeHtml(markerRent)}`)
                         .openPopup();
                 }, 100);
             }

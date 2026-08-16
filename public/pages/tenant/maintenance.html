@@ -489,12 +489,9 @@
                 <a href="dashboard.html" class="navbar-menu-link">Dashboard</a>
                 <a href="properties.html" class="navbar-menu-link">Property Discovery</a>
                 <a href="properties.html" class="navbar-menu-link">Discovery</a>
-                <a href="compare.html" class="navbar-menu-link">Compare Properties</a>
-                <a href="reservations.html" class="navbar-menu-link">My Reservations</a>
                 <a href="applications.html" class="navbar-menu-link">My Applications</a>
                 <a href="leases.html" class="navbar-menu-link">My Lease</a>
                 <a href="billings.html" class="navbar-menu-link">My Billings</a>
-                <a href="payments.html" class="navbar-menu-link">My Payments</a>
                 <a href="maintenance.html" class="navbar-menu-link active">Maintenance</a>
             </div>
             <div class="navbar-right">
@@ -1018,8 +1015,8 @@
                 card.innerHTML = `
                     <div class="request-card-icon"><span data-icon="${icon}"></span></div>
                     <div class="request-card-body">
-                        <div class="request-card-title">${req.issue_title}</div>
-                        <div class="request-card-meta">${propName} · Unit ${unitNum} · ${dateStr}</div>
+                        <div class="request-card-title">${domiknowEscapeHtml(req.issue_title || 'Maintenance request')}</div>
+                        <div class="request-card-meta">${domiknowEscapeHtml(propName)} &middot; Unit ${domiknowEscapeHtml(unitNum)} &middot; ${domiknowEscapeHtml(dateStr)}</div>
                     </div>
                     <div class="request-card-right">
                         ${statusBadge(req.status)}
@@ -1032,17 +1029,19 @@
         }
 
         function showListError(msg) {
-            document.getElementById('requestsList').innerHTML = `<div class="empty-state"><div class="ei"><span data-icon="x"></span></div><p>${msg}</p></div>`;
+            document.getElementById('requestsList').innerHTML = `<div class="empty-state"><div class="ei"><span data-icon="x"></span></div><p>${domiknowEscapeHtml(msg)}</p></div>`;
         }
 
         // ── Badges ────────────────────────────────────────────
         function statusBadge(status) {
             const map = { travelling:'repairing', arrived:'repairing' };
-            const cls = map[status] || status;
-            return `<span class="badge badge-${cls}">${status.replace(/_/g,' ')}</span>`;
+            const safeStatus = String(status || 'pending').toLowerCase();
+            const cls = String(map[safeStatus] || safeStatus).replace(/[^a-z0-9_-]/g, '');
+            return `<span class="badge badge-${cls}">${domiknowEscapeHtml(safeStatus.replace(/_/g,' '))}</span>`;
         }
         function prioBadge(prio) {
-            return `<span class="badge badge-prio-${prio}" style="font-size:0.64rem;">${prio}</span>`;
+            const safePriority = String(prio || 'normal').toLowerCase();
+            return `<span class="badge badge-prio-${safePriority.replace(/[^a-z0-9_-]/g, '')}" style="font-size:0.64rem;">${domiknowEscapeHtml(safePriority)}</span>`;
         }
 
         // ── Load request details ──────────────────────────────
@@ -1066,15 +1065,15 @@
                     <div class="detail-grid">
                         <div>
                             <div class="dc-label">Property</div>
-                            <div class="dc-val">${req.properties?.property_name || '—'}</div>
+                            <div class="dc-val">${domiknowEscapeHtml(req.properties?.property_name || '—')}</div>
                         </div>
                         <div>
                             <div class="dc-label">Unit</div>
-                            <div class="dc-val">${req.unit_number || '—'}</div>
+                            <div class="dc-val">${domiknowEscapeHtml(req.unit_number || '—')}</div>
                         </div>
                         <div>
                             <div class="dc-label">Category</div>
-                            <div class="dc-val">${icon} ${req.issue_category}</div>
+                            <div class="dc-val">${domiknowEscapeHtml(String(req.issue_category || 'other').replace(/_/g, ' '))}</div>
                         </div>
                         <div>
                             <div class="dc-label">Priority</div>
@@ -1086,40 +1085,41 @@
                         </div>
                         <div>
                             <div class="dc-label">Preferred Schedule</div>
-                            <div class="dc-val" style="font-size:0.8rem;">${req.preferred_schedule || '—'}</div>
+                            <div class="dc-val" style="font-size:0.8rem;">${domiknowEscapeHtml(req.preferred_schedule || '—')}</div>
                         </div>
                         <div style="grid-column:span 2;">
                             <div class="dc-label">Assigned Technician</div>
-                            <div class="dc-val" style="color:var(--tenant);">${tech}</div>
+                            <div class="dc-val" style="color:var(--tenant);">${domiknowEscapeHtml(tech)}</div>
                         </div>
                     </div>
 
                     <div style="margin-bottom:1.25rem;">
                         <div class="dc-label" style="margin-bottom:0.4rem;">Description</div>
-                        <div style="background:var(--bg-primary);border:1px solid var(--border-color);border-radius:var(--radius-sm);padding:0.85rem;font-size:0.875rem;color:var(--text-secondary);white-space:pre-wrap;line-height:1.6;">${req.issue_description}</div>
+                        <div style="background:var(--bg-primary);border:1px solid var(--border-color);border-radius:var(--radius-sm);padding:0.85rem;font-size:0.875rem;color:var(--text-secondary);white-space:pre-wrap;line-height:1.6;">${domiknowEscapeHtml(req.issue_description || 'No description provided.')}</div>
                     </div>
                 `;
 
                 if (req.rejection_reason) {
-                    html += `<div style="background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.25);border-radius:var(--radius-sm);padding:0.85rem;margin-bottom:1.25rem;"><div style="font-size:0.68rem;font-weight:800;text-transform:uppercase;color:#ef4444;margin-bottom:0.3rem;">Rejection Reason</div><div style="font-size:0.875rem;color:#ef4444;">${req.rejection_reason}</div></div>`;
+                    html += `<div style="background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.25);border-radius:var(--radius-sm);padding:0.85rem;margin-bottom:1.25rem;"><div style="font-size:0.68rem;font-weight:800;text-transform:uppercase;color:#ef4444;margin-bottom:0.3rem;">Rejection Reason</div><div style="font-size:0.875rem;color:#ef4444;">${domiknowEscapeHtml(req.rejection_reason)}</div></div>`;
                 }
                 if (req.landlord_remarks) {
-                    html += `<div style="background:rgba(59,130,246,.06);border:1px solid rgba(59,130,246,.2);border-radius:var(--radius-sm);padding:0.85rem;margin-bottom:1.25rem;"><div style="font-size:0.68rem;font-weight:800;text-transform:uppercase;color:#3b82f6;margin-bottom:0.3rem;">Landlord Instructions</div><div style="font-size:0.875rem;color:var(--text-secondary);">${req.landlord_remarks}</div></div>`;
+                    html += `<div style="background:rgba(59,130,246,.06);border:1px solid rgba(59,130,246,.2);border-radius:var(--radius-sm);padding:0.85rem;margin-bottom:1.25rem;"><div style="font-size:0.68rem;font-weight:800;text-transform:uppercase;color:#3b82f6;margin-bottom:0.3rem;">Landlord Instructions</div><div style="font-size:0.875rem;color:var(--text-secondary);">${domiknowEscapeHtml(req.landlord_remarks)}</div></div>`;
                 }
                 if (req.image_url) {
-                    html += `<div style="margin-bottom:1.25rem;"><div class="dc-label" style="margin-bottom:0.4rem;">Tenant Photo</div><a href="${req.image_url}" target="_blank"><img src="${req.image_url}" style="max-width:100%;max-height:220px;border-radius:var(--radius-sm);border:1px solid var(--border-color);object-fit:cover;display:block;"></a></div>`;
+                    const requestImageUrl = domiknowSafeExternalUrl(req.image_url);
+                    html += `<div style="margin-bottom:1.25rem;"><div class="dc-label" style="margin-bottom:0.4rem;">Tenant Photo</div><a href="${requestImageUrl}" target="_blank" rel="noopener noreferrer"><img src="${requestImageUrl}" alt="Maintenance request attachment" style="max-width:100%;max-height:220px;border-radius:var(--radius-sm);border:1px solid var(--border-color);object-fit:cover;display:block;"></a></div>`;
                 }
                 if (report && report.problem_found) {
                     html += `
                         <div style="border-top:1px solid var(--border-color);padding-top:1.25rem;margin-bottom:1.25rem;">
                             <div style="font-weight:800;font-size:0.9rem;color:var(--text-primary);margin-bottom:0.75rem;">🗒️ Technician Completion Report</div>
                             <div class="detail-grid">
-                                <div style="grid-column:span 2;"><div class="dc-label">Problem Found</div><div class="dc-val" style="font-weight:500;">${report.problem_found}</div></div>
-                                <div style="grid-column:span 2;"><div class="dc-label">Repair Performed</div><div class="dc-val" style="font-weight:500;">${report.repair_performed}</div></div>
+                                <div style="grid-column:span 2;"><div class="dc-label">Problem Found</div><div class="dc-val" style="font-weight:500;">${domiknowEscapeHtml(report.problem_found)}</div></div>
+                                <div style="grid-column:span 2;"><div class="dc-label">Repair Performed</div><div class="dc-val" style="font-weight:500;">${domiknowEscapeHtml(report.repair_performed || 'Not specified')}</div></div>
                                 <div><div class="dc-label">Labor Cost</div><div class="dc-val">₱${parseFloat(report.labor_cost||0).toLocaleString(undefined,{minimumFractionDigits:2})}</div></div>
                                 <div><div class="dc-label">Material Cost</div><div class="dc-val">₱${parseFloat(report.material_cost||0).toLocaleString(undefined,{minimumFractionDigits:2})}</div></div>
-                                ${report.materials_used?`<div style="grid-column:span 2;"><div class="dc-label">Materials Used</div><div class="dc-val" style="font-weight:500;">${report.materials_used}</div></div>`:''}
-                                ${report.recommendations?`<div style="grid-column:span 2;"><div class="dc-label">Recommendations</div><div class="dc-val" style="font-weight:500;">${report.recommendations}</div></div>`:''}
+                                ${report.materials_used?`<div style="grid-column:span 2;"><div class="dc-label">Materials Used</div><div class="dc-val" style="font-weight:500;">${domiknowEscapeHtml(report.materials_used)}</div></div>`:''}
+                                ${report.recommendations?`<div style="grid-column:span 2;"><div class="dc-label">Recommendations</div><div class="dc-val" style="font-weight:500;">${domiknowEscapeHtml(report.recommendations)}</div></div>`:''}
                             </div>
                         </div>
                     `;
@@ -1130,7 +1130,7 @@
                 if (updates.length > 0) {
                     updates.forEach(u => {
                         const dt = new Date(u.created_at).toLocaleString('en-PH', { month:'short', day:'numeric', hour:'2-digit', minute:'2-digit' });
-                        html += `<div class="tl-item tla"><div class="tl-meta">${dt} · ${u.status_update.replace(/_/g,' ')}</div><div class="tl-notes">${u.notes}</div></div>`;
+                        html += `<div class="tl-item tla"><div class="tl-meta">${domiknowEscapeHtml(dt)} &middot; ${domiknowEscapeHtml(String(u.status_update || 'update').replace(/_/g,' '))}</div><div class="tl-notes">${domiknowEscapeHtml(u.notes || 'No notes provided.')}</div></div>`;
                     });
                 } else {
                     html += `<div class="tl-item"><div class="tl-notes" style="color:var(--text-muted);">No updates logged yet.</div></div>`;
@@ -1143,8 +1143,8 @@
                 const canEvaluate = ['completed','verified'].includes(req.status);
                 document.getElementById('detailsFoot').innerHTML = canEvaluate
                     ? `<button class="btn-m btn-m-gray" data-action="close">Cancel</button>
-                       <button class="btn-m btn-m-red"  data-action="rework"  data-id="${req.id}">Request Rework</button>
-                       <button class="btn-m btn-m-green" data-action="confirm" data-id="${req.id}">✓ Confirm Completion</button>`
+                       <button type="button" class="btn-m btn-m-red"  data-action="rework"  data-id="${domiknowEscapeHtml(req.id || '')}">Request Rework</button>
+                       <button type="button" class="btn-m btn-m-green" data-action="confirm" data-id="${domiknowEscapeHtml(req.id || '')}">Confirm Completion</button>`
                     : `<button class="btn-m btn-m-gray" data-action="close">Close</button>`;
 
             } catch (err) {
@@ -1158,11 +1158,33 @@
         async function handleConfirm(reqId, decision) {
             let remarks = '';
             if (decision === 'rework') {
-                remarks = prompt('Describe what still needs to be fixed:');
+                remarks = await window.domiknowPrompt({
+                    variant: 'warning',
+                    eyebrow: 'Request additional work',
+                    title: 'What still needs to be fixed?',
+                    message: 'Describe the remaining issue so the maintenance person and landlord know what action is needed.',
+                    confirmLabel: 'Request rework',
+                    cancelLabel: 'Go back',
+                    input: {
+                        label: 'Remaining issue',
+                        placeholder: 'Describe what is incomplete or still not working…',
+                        required: true,
+                        multiline: true,
+                        maxLength: 1000
+                    }
+                });
                 if (remarks === null) return;
                 if (!remarks.trim()) { alert('Rework description is required.'); return; }
             } else {
-                if (!confirm('Confirm that the repair was successfully completed? This will close the ticket.')) return;
+                const closeTicket = await window.domiknowConfirm({
+                    variant: 'warning',
+                    eyebrow: 'Close maintenance ticket',
+                    title: 'Confirm the repair is complete?',
+                    message: 'Confirm only after checking that the reported issue has been resolved. This will close the maintenance ticket.',
+                    confirmLabel: 'Confirm and close',
+                    cancelLabel: 'Check again'
+                });
+                if (!closeTicket) return;
             }
             try {
                 const res = await fetch(`/api/maintenance/requests/${reqId}/tenant-confirm`, {

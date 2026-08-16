@@ -293,13 +293,9 @@
                 <a href="dashboard.html" class="navbar-menu-link">Dashboard</a>
                 <a href="properties.html" class="navbar-menu-link">Property Discovery</a>
                 <a href="properties.html" class="navbar-menu-link">Discovery</a>
-                <a href="compare.html" class="navbar-menu-link">Compare Properties</a>
-                <a href="reservations.html" class="navbar-menu-link">My Reservations</a>
                 <a href="applications.html" class="navbar-menu-link">My Applications</a>
-                <a href="screening.html" class="navbar-menu-link">Screening</a>
                 <a href="leases.html" class="navbar-menu-link">My Lease</a>
                 <a href="billings.html" class="navbar-menu-link active">My Billings</a>
-                <a href="payments.html" class="navbar-menu-link">My Payments</a>
             </div>
             <div class="navbar-right">
                 <span class="navbar-user-welcome">Welcome, <span class="user-name">User</span></span>
@@ -608,7 +604,7 @@
                             </div>
                             <div style="display:flex; flex-direction:column; align-items:flex-end; gap:0.5rem;">
                                 <span class="current-bill-status-badge" id="bannerStatusBadge">${statusLabel}</span>
-                                <button class="action-btn btn-detail" data-bill-id="${earliestBill.id}" style="background-color:white; color:#4f46e5; border:none; margin-top:0.5rem;">View Earliest Invoice & Pay</button>
+                                <button type="button" class="action-btn btn-detail" data-bill-id="${domiknowEscapeHtml(earliestBill.id || '')}" style="background-color:white; color:#4f46e5; border:none; margin-top:0.5rem;">View Earliest Invoice & Pay</button>
                             </div>
                         </div>
                     `;
@@ -618,7 +614,7 @@
                     // Latest paid bill as summary
                     const latestPaid = visibleBills.find(b => b.billing_status === 'paid');
                     const paidMsg = latestPaid 
-                        ? `Your latest billing cycle for <strong>${latestPaid.billing_month}</strong> was fully paid.`
+                        ? `Your latest billing cycle for <strong>${domiknowEscapeHtml(latestPaid.billing_month || 'the latest period')}</strong> was fully paid.`
                         : 'No pending statements currently require action.';
                     
                     dashboard.innerHTML = `
@@ -652,14 +648,14 @@
 
                     const tr = document.createElement('tr');
                     tr.innerHTML = `
-                        <td style="font-weight:700;color:var(--primary);">${bill.billing_month}</td>
-                        <td>${bill.properties?.property_name || 'Property'}</td>
+                        <td style="font-weight:700;color:var(--primary);">${domiknowEscapeHtml(bill.billing_month || 'N/A')}</td>
+                        <td>${domiknowEscapeHtml(bill.properties?.property_name || 'Property')}</td>
                         <td>₱${rent}</td>
                         <td style="font-weight:700;color:var(--text-primary);">₱${total}</td>
                         <td style="font-weight:600;">${due}</td>
                         <td><span class="status-badge ${badgeClass}">${statusLabel.replace('_',' ').toUpperCase()}</span></td>
                         <td>
-                            <button class="action-btn btn-detail" data-bill-id="${bill.id}">View Details</button>
+                            <button type="button" class="action-btn btn-detail" data-bill-id="${domiknowEscapeHtml(bill.id || '')}">View Details</button>
                         </td>
                     `;
                     tbody.appendChild(tr);
@@ -765,9 +761,9 @@
 
                 content.innerHTML = `
                     <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:1.5rem; background-color:var(--bg-primary); border:1px solid var(--border-color); border-radius:var(--radius-md); padding:1rem;">
-                        <div class="detail-item"><span class="detail-label">Property Unit</span><span class="detail-value">${prop.property_name || '—'}</span></div>
-                        <div class="detail-item"><span class="detail-label">Landlord Name</span><span class="detail-value">${landlord.full_name || '—'}</span></div>
-                        <div class="detail-item"><span class="detail-label">Billing Cycle Month</span><span class="detail-value">${bill.billing_month}</span></div>
+                        <div class="detail-item"><span class="detail-label">Property Unit</span><span class="detail-value">${domiknowEscapeHtml(prop.property_name || '—')}</span></div>
+                        <div class="detail-item"><span class="detail-label">Landlord Name</span><span class="detail-value">${domiknowEscapeHtml(landlord.full_name || '—')}</span></div>
+                        <div class="detail-item"><span class="detail-label">Billing Cycle Month</span><span class="detail-value">${domiknowEscapeHtml(bill.billing_month || 'N/A')}</span></div>
                         <div class="detail-item"><span class="detail-label">Payment Due Date</span><span class="detail-value">${new Date(bill.due_date).toLocaleDateString('en-PH', { year:'numeric', month:'long', day:'numeric' })}</span></div>
                         <div class="detail-item" style="grid-column: span 2;"><span class="detail-label">Invoice Status</span><span class="detail-value" id="modalStatusText" style="font-weight:800;">${statusLabel.replace('_',' ').toUpperCase()}</span></div>
                     </div>
@@ -777,7 +773,7 @@
                         ${breakdownRows.join('')}
                     </div>
 
-                    ${bill.remarks ? `<div style="margin-top:1rem;"><span class="detail-label">Landlord Remarks & Breakdown Details</span><div style="font-size:0.875rem; color:var(--text-secondary); background:var(--bg-primary); border:1px solid var(--border-color); padding:0.75rem; border-radius:4px; margin-top:0.25rem;">${bill.remarks}</div></div>` : ''}
+                    ${bill.remarks ? `<div style="margin-top:1rem;"><span class="detail-label">Landlord Remarks & Breakdown Details</span><div style="font-size:0.875rem; color:var(--text-secondary); background:var(--bg-primary); border:1px solid var(--border-color); padding:0.75rem; border-radius:4px; margin-top:0.25rem;">${domiknowEscapeHtml(bill.remarks)}</div></div>` : ''}
                 `;
 
                 const statusTxt = document.getElementById('modalStatusText');
@@ -790,7 +786,7 @@
                 if (canPay) {
                     footer.innerHTML = `
                         <button class="action-btn btn-close" data-action="close">Close</button>
-                        <button class="action-btn btn-pay" data-action="pay" data-bill-id="${bill.id}">Pay Now</button>
+                        <button type="button" class="action-btn btn-pay" data-action="pay" data-bill-id="${domiknowEscapeHtml(bill.id || '')}">Pay Now</button>
                     `;
                 } else {
                     footer.innerHTML = `
@@ -974,14 +970,14 @@
                     const row = document.createElement('tr');
                     row.innerHTML = `
                         <td>${submitDate}</td>
-                        <td style="font-weight: 700; color: var(--primary);">${pay.billing_records?.billing_month || 'N/A'}</td>
-                        <td>${pay.properties?.property_name || 'Property'}</td>
+                        <td style="font-weight: 700; color: var(--primary);">${domiknowEscapeHtml(pay.billing_records?.billing_month || 'N/A')}</td>
+                        <td>${domiknowEscapeHtml(pay.properties?.property_name || 'Property')}</td>
                         <td style="font-weight:700; color: var(--text-primary);">₱${amount}</td>
-                        <td style="text-transform: capitalize;">${pay.payment_method.replace('_', ' ')}</td>
-                        <td style="font-family: monospace; font-size: 0.85rem; font-weight: 600;">${pay.payment_reference_number}</td>
+                        <td style="text-transform: capitalize;">${domiknowEscapeHtml(String(pay.payment_method || 'unspecified').replace(/_/g, ' '))}</td>
+                        <td style="font-family: monospace; font-size: 0.85rem; font-weight: 600;">${domiknowEscapeHtml(pay.payment_reference_number || 'N/A')}</td>
                         <td><span class="status-badge ${statusClass}">${statusLabel}</span></td>
                         <td>
-                            <button class="action-btn btn-view" data-payment-id="${pay.id}">View Details</button>
+                            <button type="button" class="action-btn btn-view" data-payment-id="${domiknowEscapeHtml(pay.id || '')}">View Details</button>
                         </td>
                     `;
                     tableBody.appendChild(row);
@@ -1002,6 +998,7 @@
             
             const submitDate = new Date(pay.submitted_at).toLocaleString();
             const amount = parseFloat(pay.payment_amount).toLocaleString(undefined, { minimumFractionDigits: 2 });
+            const proofUrl = domiknowSafeExternalUrl(pay.payment_proof_url);
             
             let statusColor = '#f59e0b';
             let statusLabel = 'PENDING VERIFICATION';
@@ -1015,10 +1012,10 @@
 
             content.innerHTML = `
                 <div class="details-grid">
-                    <div class="details-item"><span class="details-lbl">Billing Cycle</span><span class="details-val">${pay.billing_records?.billing_month || 'N/A'}</span></div>
+                    <div class="details-item"><span class="details-lbl">Billing Cycle</span><span class="details-val">${domiknowEscapeHtml(pay.billing_records?.billing_month || 'N/A')}</span></div>
                     <div class="details-item"><span class="details-lbl">Amount Paid</span><span class="details-val" style="color:${statusColor};">₱${amount} PHP</span></div>
-                    <div class="details-item"><span class="details-lbl">Method / Channel</span><span class="details-val" style="text-transform: capitalize;">${pay.payment_method.replace('_', ' ')}</span></div>
-                    <div class="details-item"><span class="details-lbl">Reference Number</span><span class="details-val" style="font-family:monospace;">${pay.payment_reference_number}</span></div>
+                    <div class="details-item"><span class="details-lbl">Method / Channel</span><span class="details-val" style="text-transform: capitalize;">${domiknowEscapeHtml(String(pay.payment_method || 'unspecified').replace(/_/g, ' '))}</span></div>
+                    <div class="details-item"><span class="details-lbl">Reference Number</span><span class="details-val" style="font-family:monospace;">${domiknowEscapeHtml(pay.payment_reference_number || 'N/A')}</span></div>
                     <div class="details-item"><span class="details-lbl">Submitted On</span><span class="details-val">${submitDate}</span></div>
                     <div class="details-item"><span class="details-lbl">Verification Status</span><span class="details-val" style="color:${statusColor}; font-weight:800;">${statusLabel}</span></div>
                 </div>
@@ -1026,8 +1023,8 @@
                 <div style="margin-bottom:1.5rem; margin-top: 1rem;">
                     <span class="details-lbl">Proof of Payment</span>
                     <div>
-                        <a href="${pay.payment_proof_url}" target="_blank">
-                            <img src="${pay.payment_proof_url}" class="receipt-preview" alt="Proof Receipt">
+                        <a href="${proofUrl}" target="_blank" rel="noopener noreferrer">
+                            <img src="${proofUrl}" class="receipt-preview" alt="Proof of payment">
                         </a>
                     </div>
                 </div>
@@ -1035,7 +1032,7 @@
                 <div>
                     <span class="details-lbl">Landlord Evaluation Notes</span>
                     <div style="font-size:0.875rem; color:var(--text-secondary); background:var(--bg-primary); border:1px solid var(--border-color); padding:0.75rem; border-radius:4px; margin-top:0.25rem;">
-                        ${pay.verification_remarks ? pay.verification_remarks : '<span style="color:var(--text-muted); font-style:italic;">Awaiting review by property landlord.</span>'}
+                        ${pay.verification_remarks ? domiknowEscapeHtml(pay.verification_remarks) : '<span style="color:var(--text-muted); font-style:italic;">Awaiting review by property landlord.</span>'}
                     </div>
                 </div>
             `;

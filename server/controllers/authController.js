@@ -18,9 +18,9 @@ const authController = {
             }
 
             // 2. Validate role
-            const allowedRoles = ['tenant', 'landlord', 'maintenance'];
+            const allowedRoles = ['tenant', 'landlord'];
             if (!allowedRoles.includes(role)) {
-                return responseHelper.error(res, 'Invalid role. Allowed roles: tenant, landlord, maintenance.');
+                return responseHelper.error(res, 'Invalid role. Public registration is available only for tenants and landlords.');
             }
 
             // 3. Check duplicate email

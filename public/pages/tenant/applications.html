@@ -62,8 +62,6 @@
             <div class="navbar-menu">
                 <a href="dashboard.html" class="navbar-menu-link">Dashboard</a>
                 <a href="properties.html" class="navbar-menu-link">Discovery</a>
-                <a href="properties.html" class="navbar-menu-link">Discovery</a>
-                <a href="compare.html" class="navbar-menu-link">Compare</a>
                 <a href="applications.html" class="navbar-menu-link active">My Applications</a>
             </div>
             <div class="navbar-right">
@@ -171,22 +169,22 @@
                     const row = document.createElement('tr');
                     row.innerHTML = `
                         <td>
-                            <div style="font-weight: 700; color: var(--primary);">${pName}</div>
-                            ${targetUnitText ? `<div style="font-size:0.75rem;color:var(--accent);font-weight:700;">${targetUnitText}</div>` : `<div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.15rem;">📍 ${pAddress}</div>`}
+                            <div style="font-weight: 700; color: var(--primary);">${domiknowEscapeHtml(pName)}</div>
+                            ${targetUnitText ? `<div style="font-size:0.75rem;color:var(--accent);font-weight:700;">${domiknowEscapeHtml(targetUnitText)}</div>` : `<div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.15rem;">${domiknowEscapeHtml(pAddress)}</div>`}
                         </td>
                         <td>
-                            <div style="font-weight: 600; color: var(--text-primary);">${lName}</div>
+                            <div style="font-weight: 600; color: var(--text-primary);">${domiknowEscapeHtml(lName)}</div>
                         </td>
                         <td style="font-weight: 600;">${moveInDate}</td>
                         <td>
                             <div class="remarks-text">
-                                ${app.landlord_remarks ? app.landlord_remarks : '<span style="color: var(--text-muted); font-style: italic;">Awaiting review</span>'}
+                                ${app.landlord_remarks ? domiknowEscapeHtml(app.landlord_remarks) : '<span style="color: var(--text-muted); font-style: italic;">Awaiting review</span>'}
                             </div>
                         </td>
                         <td>${submittedDate}</td>
-                        <td><span class="status-badge ${statusClass}">${app.status}</span></td>
+                        <td><span class="status-badge ${statusClass}">${domiknowEscapeHtml(app.status || 'pending')}</span></td>
                         <td>
-                            <a href="application-details.html?id=${app.id}" class="btn-primary" style="width: auto; padding: 0.45rem 1rem; font-size: 0.8125rem; text-decoration: none; background-color: var(--primary);">Details</a>
+                            <a href="application-details.html?id=${encodeURIComponent(app.id)}" class="btn-primary" style="width: auto; padding: 0.45rem 1rem; font-size: 0.8125rem; text-decoration: none; background-color: var(--primary);">Details</a>
                         </td>
                     `;
                     tableBody.appendChild(row);

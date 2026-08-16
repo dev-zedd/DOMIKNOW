@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Overview - DomiKnow</title>
+    <link href="../../css/input.css" rel="stylesheet">
+    <link href="../../css/design-system.css" rel="stylesheet">
+    <script src="../../js/ui.js" defer></script>
+</head>
+<body class="app-loading" data-role="admin" data-page-title="Admin Overview">
+    <main class="dashboard-container admin-overview" aria-labelledby="appPageTitle">
+        <section class="admin-priority-grid" aria-label="Current administrative workload">
+            <a class="admin-priority-card" href="users.html">
+                <span class="admin-priority-card__label">Account approvals</span>
+                <strong id="overviewPendingUsers">—</strong>
+                <span>Landlord and staff accounts awaiting review</span>
+            </a>
+            <a class="admin-priority-card" href="property-review.html">
+                <span class="admin-priority-card__label">Property reviews</span>
+                <strong id="overviewPendingProperties">—</strong>
+                <span>Listings not yet approved for discovery</span>
+            </a>
+            <a class="admin-priority-card" href="reports.html">
+                <span class="admin-priority-card__label">Active cases</span>
+                <strong id="overviewOpenCases">—</strong>
+                <span>Reports requiring triage, evidence, or decision</span>
+            </a>
+            <a class="admin-priority-card" href="payments.html">
+                <span class="admin-priority-card__label">Payment checks</span>
+                <strong id="overviewPendingPayments">—</strong>
+                <span>Receipts still awaiting verification</span>
+            </a>
+            <a class="admin-priority-card" href="reservations.html">
+                <span class="admin-priority-card__label">Reservations</span>
+                <strong id="overviewPendingReservations">—</strong>
+                <span>Pending requests in the system queue</span>
+            </a>
+        </section>
+
+        <div id="overviewLoadNotice" class="admin-overview-notice" role="status" aria-live="polite">
+            Building the latest operational snapshot…
+        </div>
+
+        <section class="admin-overview-layout">
+            <div class="admin-overview-panel">
+                <div class="admin-overview-panel__header">
+                    <div>
+                        <p class="admin-panel-eyebrow">Priority queue</p>
+                        <h2>Items requiring attention</h2>
+                    </div>
+                    <a href="reports.html">Open all cases</a>
+                </div>
+                <div id="adminPriorityQueue" class="admin-queue-list" aria-live="polite">
+                    <div class="admin-queue-empty">Loading the current queue…</div>
+                </div>
+            </div>
+
+            <aside class="admin-overview-panel admin-control-panel" aria-labelledby="controlPrinciplesTitle">
+                <div class="admin-overview-panel__header">
+                    <div>
+                        <p class="admin-panel-eyebrow">Decision standard</p>
+                        <h2 id="controlPrinciplesTitle">Review before action</h2>
+                    </div>
+                </div>
+                <ol class="admin-control-list">
+                    <li><div><strong>Confirm scope</strong><small>Match the record to the correct user, property, transaction, or case.</small></div></li>
+                    <li><div><strong>Review evidence</strong><small>Check documents, dates, history, and both parties’ submissions.</small></div></li>
+                    <li><div><strong>Record a reason</strong><small>Make the outcome understandable and traceable in the audit trail.</small></div></li>
+                </ol>
+                <a class="admin-secondary-action" href="audit-logs.html">Review recent audit activity</a>
+            </aside>
+        </section>
+    </main>
+
+    <script src="../../js/auth.js"></script>
+    <script src="../../js/dashboard.js"></script>
+</body>
+</html>

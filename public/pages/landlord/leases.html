@@ -222,14 +222,14 @@
                             <span class="status-badge ${statusClass}">${statusLabel}</span>
                             ${lease.lease_status === 'rejected' && lease.terms_and_conditions ? `
                                 <div style="font-size:0.75rem;color:#ef4444;margin-top:0.35rem;font-weight:600;max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="Tenant Concern Note: ${(lease.terms_and_conditions).replace(/"/g, '&quot;')}">
-                                    💬 Note: ${(lease.terms_and_conditions).replace(/</g, '&lt;').replace(/>/g, '&gt;')}
+                                    <span data-icon="message"></span> Note: ${(lease.terms_and_conditions).replace(/</g, '&lt;').replace(/>/g, '&gt;')}
                                 </div>
                             ` : ''}
                         </td>
                         <td>
                             <button class="action-btn btn-view" data-action="view" data-lease-id="${lease.id}">View</button>
                             ${editBtn}
-                            <a href="tenant-report-form.html?lease_id=${lease.id}" class="action-btn" style="background-color:rgba(239,68,68,0.1);color:#ef4444;border-color:rgba(239,68,68,0.3);margin-left:0.5rem;" title="Report this tenant">⚑ Report Tenant</a>
+                            <a href="tenant-report-form.html?lease_id=${lease.id}" class="action-btn" style="background:var(--color-error-bg);color:var(--color-error-text);border-color:var(--color-error-border);margin-left:0.5rem;" title="Report this tenant"><span data-icon="flag"></span> Report Tenant</a>
                         </td>
                     `;
                     tbody.appendChild(tr);
@@ -282,7 +282,7 @@
                         </div>
                         <div style="background:var(--bg-primary);padding:0.75rem;border-radius:var(--radius-md);border:1px solid var(--border-color);">
                             <div style="font-size:0.75rem;color:var(--text-muted);font-weight:700;display:flex;align-items:center;gap:0.25rem;">
-                                <svg class="svg-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:#8b5cf6;"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg> Association Fee
+                                <svg class="svg-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--color-action-primary);" aria-hidden="true"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg> Association Fee
                             </div>
                             <div style="margin-top:0.3rem;">${fmtSetup(uConfig.association_fee || 'separate')}</div>
                         </div>

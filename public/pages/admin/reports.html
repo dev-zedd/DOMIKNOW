@@ -531,14 +531,14 @@
         </div>
 
         <!-- Filter Buttons -->
-        <div class="filters-group">
-            <button class="filter-btn active" data-filter="all">All Tickets</button>
-            <button class="filter-btn" data-filter="pending">New / Pending</button>
-            <button class="filter-btn" data-filter="in_review">In Review</button>
-            <button class="filter-btn" data-filter="needs_more_evidence">Waiting for User</button>
-            <button class="filter-btn" data-filter="high_prio">High / Critical Triage</button>
-            <button class="filter-btn" data-filter="resolved">Enforced / Resolved</button>
-            <button class="filter-btn" data-filter="dismissed">Dismissed</button>
+        <div class="filters-group" role="group" aria-label="Filter incident tickets">
+            <button type="button" class="filter-btn active" data-filter="all" aria-pressed="true">All Tickets</button>
+            <button type="button" class="filter-btn" data-filter="pending" aria-pressed="false">New / Pending</button>
+            <button type="button" class="filter-btn" data-filter="in_review" aria-pressed="false">In Review</button>
+            <button type="button" class="filter-btn" data-filter="needs_more_evidence" aria-pressed="false">Waiting for User</button>
+            <button type="button" class="filter-btn" data-filter="high_prio" aria-pressed="false">High / Critical Triage</button>
+            <button type="button" class="filter-btn" data-filter="resolved" aria-pressed="false">Enforced / Resolved</button>
+            <button type="button" class="filter-btn" data-filter="dismissed" aria-pressed="false">Dismissed</button>
         </div>
 
         <!-- List Table -->
@@ -778,16 +778,20 @@
                 const btn = e.target.closest('[data-filter]');
                 if (!btn) return;
 
-                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('.filter-btn').forEach(b => {
+                    b.classList.remove('active');
+                    b.setAttribute('aria-pressed', 'false');
+                });
                 btn.classList.add('active');
+                btn.setAttribute('aria-pressed', 'true');
 
                 activeFilter = btn.dataset.filter;
                 renderTable();
             });
 
-            document.getElementById('saveTriageBtn').addEventListener('click', handleSaveTriage);
-            document.getElementById('executeDecisionBtn').addEventListener('click', handleExecuteDecision);
-            document.getElementById('postInquiryForm').addEventListener('submit', handlePostInquiry);
+            document.getElementById('saveTriageBtn')?.addEventListener('click', handleSaveTriage);
+            document.getElementById('executeDecisionBtn')?.addEventListener('click', handleExecuteDecision);
+            document.getElementById('postInquiryForm')?.addEventListener('submit', handlePostInquiry);
         });
 
         async function fetchAllReports() {
@@ -875,24 +879,24 @@
                 row.innerHTML = `
                     <td>
                         ${typeChip}
-                        <div style="font-size:0.75rem; color:var(--text-muted); margin-top:0.35rem; font-weight:600;">ID: #${t.id.slice(0,8)}</div>
+                        <div style="font-size:0.75rem; color:var(--text-muted); margin-top:0.35rem; font-weight:600;">ID: #${domiknowEscapeHtml(String(t.id || '').slice(0,8))}</div>
                     </td>
                     <td>
-                        <div style="font-size:0.85rem; font-weight:600;"><strong>From:</strong> ${reporterName}</div>
+                        <div style="font-size:0.85rem; font-weight:600;"><strong>From:</strong> ${domiknowEscapeHtml(reporterName)}</div>
                         <div style="color:var(--error); font-weight:700; font-size:0.8rem; margin-top:0.25rem; display:flex; align-items:center; gap:0.25rem;">
                             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                            Target: ${targetName}
+                            Target: ${domiknowEscapeHtml(targetName)}
                         </div>
                     </td>
                     <td>
-                        <div style="font-weight:750; text-transform:capitalize; color:var(--text-primary); margin-bottom:0.15rem;">${categoryText}</div>
-                        <div style="font-size:0.75rem; color:var(--text-secondary); max-width: 250px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${description}</div>
+                        <div style="font-weight:750; text-transform:capitalize; color:var(--text-primary); margin-bottom:0.15rem;">${domiknowEscapeHtml(categoryText)}</div>
+                        <div style="font-size:0.75rem; color:var(--text-secondary); max-width: 250px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${domiknowEscapeHtml(description)}</div>
                     </td>
-                    <td><span class="prio-badge ${prioClass}">${t.severity || 'normal'}</span></td>
+                    <td><span class="prio-badge ${prioClass}">${domiknowEscapeHtml(t.severity || 'normal')}</span></td>
                     <td>${statusBadge}</td>
                     <td style="font-size:0.82rem; font-weight:600; color:var(--text-secondary);">${createdDate}</td>
                     <td style="text-align: center;">
-                        <a href="report-detail.html?id=${t.id}&type=${t._type}" class="btn-open-report">
+                        <a href="report-detail.html?id=${encodeURIComponent(t.id)}&type=${encodeURIComponent(t._type)}" class="btn-open-report">
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
                             Open Report
                         </a>
@@ -927,11 +931,11 @@
                     item.style.cssText = `background:${isMe ? 'rgba(59,130,246,0.1)' : 'var(--bg-primary)'}; border:1px solid var(--border-color); padding:0.6rem 0.85rem; border-radius:6px; font-size:0.82rem;`;
                     item.innerHTML = `
                         <div style="display:flex; justify-content:space-between; margin-bottom:0.2rem; font-size:0.72rem;">
-                            <span style="font-weight:800; color:${isMe ? 'var(--landlord)' : 'var(--text-primary)'};">${senderName} (${m.sender_role.toUpperCase()}) ➔ ${m.recipient_role.toUpperCase()}</span>
-                            <span style="color:var(--text-muted);">${dateStr}</span>
+                            <span style="font-weight:800; color:${isMe ? 'var(--landlord)' : 'var(--text-primary)'};">${domiknowEscapeHtml(senderName)} (${domiknowEscapeHtml(String(m.sender_role || '').toUpperCase())}) &rarr; ${domiknowEscapeHtml(String(m.recipient_role || '').toUpperCase())}</span>
+                            <span style="color:var(--text-muted);">${domiknowEscapeHtml(dateStr)}</span>
                         </div>
-                        <div style="color:var(--text-primary); white-space:pre-wrap;">${m.message_text}</div>
-                        ${m.attachment_url ? `<div style="margin-top:0.35rem;"><a href="${m.attachment_url}" target="_blank" style="color:var(--landlord); font-weight:700; font-size:0.75rem;">📎 View Attached Media ↗</a></div>` : ''}
+                        <div style="color:var(--text-primary); white-space:pre-wrap;">${domiknowEscapeHtml(m.message_text)}</div>
+                        ${m.attachment_url ? `<div style="margin-top:0.35rem;"><a href="${domiknowSafeExternalUrl(m.attachment_url)}" target="_blank" rel="noopener noreferrer" style="color:var(--landlord); font-weight:700; font-size:0.75rem;">View attached media</a></div>` : ''}
                     `;
                     feed.appendChild(item);
                 });

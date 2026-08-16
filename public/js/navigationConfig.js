@@ -87,18 +87,30 @@ const NAVIGATION_CONFIG = {
   ],
   admin: [
     {
-      section: 'Main',
+      section: 'Command Center',
       items: [
-        { label: 'User Management', href: 'users.html' },
-        { label: 'Property Review', href: 'property-review.html' },
-        { label: 'Reservation Monitoring', href: 'reservations.html' }
+        { label: 'Overview', href: 'overview.html' }
       ]
     },
     {
-      section: 'Monitoring & Logs',
+      section: 'Access & Listings',
       items: [
-        { label: 'Payment Monitor', href: 'payments.html' },
-        { label: 'Reports Triage', href: 'reports.html' },
+        { label: 'User Access', href: 'users.html' },
+        { label: 'Property Approvals', href: 'property-review.html' }
+      ]
+    },
+    {
+      section: 'Platform Monitoring',
+      items: [
+        { label: 'Reservations', href: 'reservations.html' },
+        { label: 'Payment Verification', href: 'payments.html' }
+      ]
+    },
+    {
+      section: 'Trust & Governance',
+      items: [
+        { label: 'Case Triage', href: 'reports.html' },
+        { label: 'Policies', href: 'policy-management.html' },
         { label: 'Audit Logs', href: 'audit-logs.html' }
       ]
     }

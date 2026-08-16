@@ -42,7 +42,7 @@
     <link href="../../css/design-system.css" rel="stylesheet">
     <script src="../../js/ui.js" defer></script>
 </head>
-<body>
+<body class="app-loading" data-role="admin" data-page-title="Payment Verification Monitor">
     <!-- Navbar -->
     <nav class="navbar navbar-admin">
         <div class="navbar-container">
@@ -127,6 +127,7 @@
                 tableBody.innerHTML = '';
                 list.forEach(pay => {
                     const amount = parseFloat(pay.payment_amount).toLocaleString(undefined, { minimumFractionDigits: 2 });
+                    const proofUrl = domiknowSafeExternalUrl(pay.payment_proof_url);
                     
                     const submitDate = new Date(pay.submitted_at).toLocaleDateString(undefined, { 
                         year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' 
@@ -146,22 +147,22 @@
                     row.innerHTML = `
                         <td>${submitDate}</td>
                         <td>
-                            <div style="font-weight: 700;">${pay.users?.full_name || 'Tenant'}</div>
-                            <div style="font-size: 0.75rem; color: var(--text-muted);">${pay.users?.email || ''}</div>
+                            <div style="font-weight: 700;">${domiknowEscapeHtml(pay.users?.full_name || 'Tenant')}</div>
+                            <div style="font-size: 0.75rem; color: var(--text-muted);">${domiknowEscapeHtml(pay.users?.email || '')}</div>
                         </td>
                         <td>
-                            <div style="font-weight: 600;">${pay.landlord?.full_name || 'Landlord'}</div>
-                            <div style="font-size: 0.75rem; color: var(--text-muted);">${pay.landlord?.email || ''}</div>
+                            <div style="font-weight: 600;">${domiknowEscapeHtml(pay.landlord?.full_name || 'Landlord')}</div>
+                            <div style="font-size: 0.75rem; color: var(--text-muted);">${domiknowEscapeHtml(pay.landlord?.email || '')}</div>
                         </td>
                         <td>
-                            <div style="font-weight: 600;">${pay.properties?.property_name || 'Property'}</div>
-                            <div style="font-size:0.75rem; color:var(--primary); font-weight:700;">Month: ${pay.billing_records?.billing_month || 'N/A'}</div>
+                            <div style="font-weight: 600;">${domiknowEscapeHtml(pay.properties?.property_name || 'Property')}</div>
+                            <div style="font-size:0.75rem; color:var(--primary); font-weight:700;">Month: ${domiknowEscapeHtml(pay.billing_records?.billing_month || 'N/A')}</div>
                         </td>
                         <td style="font-weight:700; color:var(--text-primary);">₱${amount}</td>
-                        <td style="text-transform: capitalize;">${pay.payment_method.replace('_', ' ')}</td>
-                        <td style="font-family: monospace; font-size: 0.85rem; font-weight: 600;">${pay.payment_reference_number}</td>
+                        <td style="text-transform: capitalize;">${domiknowEscapeHtml(String(pay.payment_method || 'Unknown').replace('_', ' '))}</td>
+                        <td style="font-family: monospace; font-size: 0.85rem; font-weight: 600;">${domiknowEscapeHtml(pay.payment_reference_number)}</td>
                         <td>
-                            <a href="${pay.payment_proof_url}" target="_blank" class="btn-primary" style="padding: 0.4rem 0.8rem; font-size: 0.75rem; width: auto; background-color: var(--text-secondary); text-decoration: none; cursor: pointer; display: inline-block;">View File</a>
+                            <a href="${proofUrl}" target="_blank" rel="noopener noreferrer" class="btn-primary" style="padding: 0.4rem 0.8rem; font-size: 0.75rem; width: auto; background-color: var(--text-secondary); text-decoration: none; cursor: pointer; display: inline-block;">View File</a>
                         </td>
                         <td><span class="status-badge ${statusClass}">${statusLabel}</span></td>
                     `;

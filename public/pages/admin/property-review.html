@@ -85,16 +85,16 @@
     <script src="../../js/ui.js" defer></script>
 </head>
 
-<body>
+<body class="app-loading" data-role="admin" data-page-title="Property Approvals">
     <!-- Navbar -->
     <nav class="navbar navbar-admin">
         <div class="navbar-container">
             <div class="navbar-brand-group">
-                <a href="dashboard.html" style="text-decoration: none;"><span class="navbar-logo">DomiKnow</span></a>
+                <a href="overview.html" style="text-decoration: none;"><span class="navbar-logo">DomiKnow</span></a>
                 <span class="navbar-badge navbar-badge-admin">Admin</span>
             </div>
             <div class="navbar-menu">
-                <a href="dashboard.html" class="navbar-menu-link">Dashboard</a>
+                <a href="overview.html" class="navbar-menu-link">Overview</a>
                 <a href="users.html" class="navbar-menu-link">Users</a>
                 <a href="property-review.html" class="navbar-menu-link active">Property Review</a>
                 <a href="reservations.html" class="navbar-menu-link">Reservation Monitoring</a>
@@ -114,12 +114,12 @@
 
         <div class="review-card">
             <!-- Tabs to filter properties -->
-            <div class="filter-tabs">
-                <button onclick="switchTab('all')" id="tab-all" class="tab-btn active">All Listings</button>
-                <button onclick="switchTab('pending_review')" id="tab-pending_review" class="tab-btn">Pending
+            <div class="filter-tabs" role="tablist" aria-label="Filter property review queue">
+                <button type="button" role="tab" aria-selected="true" onclick="switchTab('all')" id="tab-all" class="tab-btn active">All Listings</button>
+                <button type="button" role="tab" aria-selected="false" onclick="switchTab('pending_review')" id="tab-pending_review" class="tab-btn">Pending
                     Review</button>
-                <button onclick="switchTab('approved')" id="tab-approved" class="tab-btn">Approved</button>
-                <button onclick="switchTab('rejected')" id="tab-rejected" class="tab-btn">Rejected</button>
+                <button type="button" role="tab" aria-selected="false" onclick="switchTab('approved')" id="tab-approved" class="tab-btn">Approved</button>
+                <button type="button" role="tab" aria-selected="false" onclick="switchTab('rejected')" id="tab-rejected" class="tab-btn">Rejected</button>
             </div>
 
             <table>
@@ -183,8 +183,13 @@
             activeTabFilter = status;
 
             // Toggle active styles on buttons
-            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-            document.getElementById(`tab-${status}`).classList.add('active');
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+                btn.setAttribute('aria-selected', 'false');
+            });
+            const activeTab = document.getElementById(`tab-${status}`);
+            activeTab.classList.add('active');
+            activeTab.setAttribute('aria-selected', 'true');
 
             renderTable();
         }
@@ -228,19 +233,19 @@
                 const row = document.createElement('tr');
                 row.innerHTML = `
                     <td>
-                        <div style="font-weight: 700; color: var(--primary);">${prop.property_name}</div>
+                        <div style="font-weight: 700; color: var(--primary);">${domiknowEscapeHtml(prop.property_name)}</div>
                     </td>
                     <td>
-                        <div style="font-weight: 600; color: var(--text-primary);">${prop.landlord_name}</div>
-                        <div style="font-size: 0.75rem; color: var(--text-muted);">${prop.landlord_email}${phoneText}</div>
+                        <div style="font-weight: 600; color: var(--text-primary);">${domiknowEscapeHtml(prop.landlord_name)}</div>
+                        <div style="font-size: 0.75rem; color: var(--text-muted);">${domiknowEscapeHtml(prop.landlord_email)}${domiknowEscapeHtml(phoneText)}</div>
                     </td>
                     <td>
-                        <span class="detail-pill detail-pill-type" style="padding: 0.2rem 0.5rem; font-size: 0.7rem; text-transform: capitalize;">${prop.property_type.replace('_', ' ')}</span>
+                        <span class="detail-pill detail-pill-type" style="padding: 0.2rem 0.5rem; font-size: 0.7rem; text-transform: capitalize;">${domiknowEscapeHtml(String(prop.property_type || 'Unknown').replace('_', ' '))}</span>
                     </td>
-                    <td style="font-size: 0.8125rem; color: var(--text-secondary); max-width: 200px;">${locationText}</td>
+                    <td style="font-size: 0.8125rem; color: var(--text-secondary); max-width: 200px;">${domiknowEscapeHtml(locationText)}</td>
                     <td style="text-align: center; font-weight: 700; color: var(--primary);">${docCount}</td>
                     <td style="font-size: 0.8125rem;">${registeredDate}</td>
-                    <td><span class="status-badge ${statusClass}">${prop.status.replace('_', ' ')}</span></td>
+                    <td><span class="status-badge ${statusClass}">${domiknowEscapeHtml(String(prop.status || 'Unknown').replace('_', ' '))}</span></td>
                     <td>
                         <a href="property-review-details.html?id=${prop.id}" class="btn-primary" style="width: auto; padding: 0.45rem 1rem; font-size: 0.8125rem; text-decoration: none;">Verify</a>
                     </td>

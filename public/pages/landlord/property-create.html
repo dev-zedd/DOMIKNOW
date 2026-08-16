@@ -7,16 +7,18 @@
     <link href="../../css/input.css" rel="stylesheet">
     <!-- Leaflet.js GIS map components -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link href="../../css/map-system.css" rel="stylesheet">
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="../../js/map-system.js" defer></script>
     <style>
         #locationMap {
-            height: 380px;
+            height: 420px;
             width: 100%;
-            border-radius: var(--radius-md);
-            border: 2px solid var(--border-color);
+            border: 1px solid var(--color-border-default);
+            border-radius: var(--radius-xl);
             margin-bottom: 1rem;
             z-index: 1;
-            background-color: #f0f0f0;
+            background-color: var(--color-bg-subtle);
         }
         .map-instructions {
             background-color: var(--primary-light);
@@ -338,6 +340,7 @@
                             <option value="Wawa">Wawa</option>
                         </select>
                         <span id="bgyDetectStatus" style="display: block; font-size: 0.725rem; margin-top: 0.25rem; min-height: 1rem;"></span>
+                        <span id="locationAccuracyStatus" role="status" aria-live="polite" style="display: block; font-size: 0.725rem; margin-top: 0.2rem; min-height: 1rem; color: var(--text-muted);"></span>
                     </div>
 
                     <div class="form-group">
@@ -373,11 +376,11 @@
                         Search by Address
                     </button>
                     <button type="button" id="btnCenterSiniloan" onclick="centerSiniloanMap()" class="location-btn" style="display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; background-color: var(--primary); color: white; border-color: var(--primary);">
-                        🎯 Center on Siniloan Town
+                        <span data-icon="target"></span> Center on Siniloan Town
                     </button>
                 </div>
 
-                <div id="locationMap" style="position: relative; border-radius: 12px; overflow: hidden; border: 1px solid var(--border-color); box-shadow: 0 4px 16px rgba(0,0,0,0.06);">
+                <div id="locationMap" class="domiknow-map-frame" role="application" aria-label="Interactive map for placing the rental property" style="position: relative;">
                     <div id="mapLoadingIndicator" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1000; background: rgba(255,255,255,0.95); padding: 1rem 1.5rem; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.12); backdrop-filter: blur(4px);">
                         <div style="text-align: center; display: flex; flex-direction: column; align-items: center; gap: 0.5rem;">
                             <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="spin-icon">
@@ -412,7 +415,7 @@
                     <div class="form-group">
                         <label for="contactEmail" class="form-label">Email Address * (Account Email)</label>
                         <input type="email" id="contactEmail" required readonly class="form-input" style="background-color: var(--bg-secondary); cursor: not-allowed;" title="Auto-filled from your registered landlord account">
-                        <span style="display: block; font-size: 0.725rem; margin-top: 0.25rem; color: #10b981; font-weight: 500;">✓ Auto-filled from landlord account</span>
+                        <span style="display:flex;align-items:center;gap:0.3rem;font-size:0.725rem;margin-top:0.25rem;color:var(--color-success-text);font-weight:500;"><span data-icon="check"></span>Auto-filled from landlord account</span>
                     </div>
                     <div class="form-group">
                         <label for="contactNumber" class="form-label">Contact Number *</label>
@@ -663,8 +666,8 @@
 
             <div class="card-action-bar" style="justify-content: space-between;">
                 <button type="button" id="btnBackToStep2" onclick="goToStep(2)" class="location-btn">← Back to Documents</button>
-                <button type="button" id="btnFinishRegistration" onclick="uploadStep3Photos()" class="btn-primary" style="width: auto; padding: 0.75rem 2.5rem; background-color: var(--success);">
-                    Complete Property Registration 🎉
+                <button type="button" id="btnFinishRegistration" onclick="uploadStep3Photos()" class="btn-primary" style="width: auto; padding: 0.75rem 2.5rem; background-color: var(--color-action-primary);">
+                    <span data-icon="check"></span> Complete Property Registration
                 </button>
             </div>
         </div>
@@ -674,7 +677,7 @@
     <script src="../../js/dashboard.js"></script>
     <script>
         const token = localStorage.getItem('domiknow_token');
-        let map, marker;
+        let map, marker, accuracyCircle;
         const defaultLat = 14.4172;
         const defaultLng = 121.4475;
         let createdPropertyId = null;
@@ -779,7 +782,7 @@
             card.innerHTML = `
                 <div style="display:flex;justify-space-between;align-items:center;margin-bottom:0.35rem;">
                     <label class="form-label" style="font-weight:700;font-size:0.85rem;color:var(--text-primary);margin-bottom:0;word-break:break-word;">${name.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</label>
-                    <button type="button" onclick="removeCustomPolicyCard(${index}, this)" style="background:none;border:none;color:var(--text-muted);cursor:pointer;padding:0;font-size:0.75rem;line-height:1;" title="Remove Policy">✕</button>
+                    <button type="button" onclick="removeCustomPolicyCard(${index}, this)" style="background:none;border:none;color:var(--text-muted);cursor:pointer;padding:0;line-height:1;" aria-label="Remove policy"><span data-icon="x"></span></button>
                 </div>
                 <div class="radio-card-group">
                     <label class="radio-card ${defaultValue === 'Allowed' ? 'selected' : ''}" style="padding:0.45rem;">
@@ -963,7 +966,7 @@
                         if (u.contact_number && u.contact_number.trim() !== '') {
                             phoneInput.value = u.contact_number.trim();
                             if (noticeSpan) {
-                                noticeSpan.style.color = '#10b981';
+                                noticeSpan.style.color = 'var(--color-success-text)';
                                 noticeSpan.textContent = '✓ Auto-filled from profile';
                             }
                         } else {
@@ -1042,7 +1045,7 @@
 
                 const statusLabel = document.getElementById('bgyDetectStatus');
                 if (statusLabel) {
-                    statusLabel.style.color = '#10b981';
+                    statusLabel.style.color = 'var(--color-success-text)';
                     statusLabel.textContent = `✓ Pin aligned to Barangay ${bgyObj.name}`;
                 }
                 if (marker && marker.unbindPopup) {
@@ -1053,71 +1056,63 @@
         window.onBarangayDropdownChange = onBarangayDropdownChange;
 
         function initializeMap() {
-            if (typeof L === 'undefined') return;
+            if (typeof L === 'undefined') {
+                const mapElement = document.getElementById('locationMap');
+                if (mapElement) mapElement.innerHTML = '<div class="empty-state" role="alert" style="padding:2rem;">The map could not be loaded. Check your connection, then reload this page.</div>';
+                return;
+            }
 
             try {
-                // High Resolution Map Layers
-                const cartoVoyagerHD = L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-                    maxZoom: 21,
-                    maxNativeZoom: 20,
-                    subdomains: 'abcd',
-                    detectRetina: true,
-                    attribution: '&copy; <a href="https://carto.com/">CARTO</a> &copy; OpenStreetMap'
-                });
+                map = L.map('locationMap', { zoomControl: true }).setView([defaultLat, defaultLng], 17);
+                const domiknowBasemap = window.DomiknowMap
+                    ? DomiknowMap.addBasemap(map, { maxZoom: 20, maxNativeZoom: 20 })
+                    : L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(map);
+                if (window.DomiknowMap) DomiknowMap.addLayerControl(map, domiknowBasemap, { satellite: true });
 
-                const satelliteBase = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { maxZoom: 19, detectRetina: true });
-                const labelsOverlay = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}', { maxZoom: 19, detectRetina: true });
-                const esriSatelliteHD = L.layerGroup([satelliteBase, labelsOverlay]);
-
-                const osmStandard = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, detectRetina: true });
-
-                const baseMaps = {
-                    "🗺️ CARTO HD Street Vector (Recommended)": cartoVoyagerHD,
-                    "🛰️ Esri HD Satellite Hybrid": esriSatelliteHD,
-                    "🌐 OpenStreetMap Standard": osmStandard
-                };
-
-                map = L.map('locationMap', {
-                    zoomControl: true,
-                    layers: [cartoVoyagerHD]
-                }).setView([defaultLat, defaultLng], 17);
-
-                L.control.layers(baseMaps, null, { position: 'topright' }).addTo(map);
-
-                const customPinIcon = L.divIcon({
-                    className: 'custom-map-pin',
-                    html: `
-                        <div style="background: linear-gradient(135deg, #2563eb, #1d4ed8); width: 38px; height: 38px; border-radius: 50% 50% 50% 0; transform: rotate(-45deg); display: flex; align-items: center; justify-content: center; box-shadow: 0 6px 18px rgba(37,99,235,0.5); border: 2.5px solid #ffffff;">
-                            <div style="transform: rotate(45deg);">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
-                                </svg>
-                            </div>
-                        </div>
-                    `,
-                    iconSize: [38, 38],
-                    iconAnchor: [19, 38]
-                });
-
-                marker = L.marker([defaultLat, defaultLng], { draggable: true, icon: customPinIcon }).addTo(map);
+                const propertyPin = window.DomiknowMap
+                    ? DomiknowMap.pinIcon({ selected: true })
+                    : undefined;
+                marker = L.marker([defaultLat, defaultLng], {
+                    draggable: true,
+                    ...(propertyPin ? { icon: propertyPin } : {})
+                }).addTo(map);
+                marker.bindPopup(window.DomiknowMap
+                    ? DomiknowMap.popupContent({ eyebrow: 'Property pin', title: 'Drag or click to adjust', meta: 'Siniloan, Laguna' })
+                    : 'Drag or click to adjust the property pin');
 
                 const loadingIndicator = document.getElementById('mapLoadingIndicator');
                 if (loadingIndicator) loadingIndicator.style.display = 'none';
 
-                setTimeout(() => map.invalidateSize(), 200);
+                requestAnimationFrame(() => requestAnimationFrame(() => map.invalidateSize(false)));
+                const mapElement = document.getElementById('locationMap');
+                if ('ResizeObserver' in window && mapElement) {
+                    new ResizeObserver(() => map.invalidateSize(false)).observe(mapElement);
+                }
 
                 marker.on('dragend', function() {
                     const pos = marker.getLatLng();
+                    if (accuracyCircle) {
+                        accuracyCircle.remove();
+                        accuracyCircle = null;
+                    }
                     updateCoordinates(pos.lat, pos.lng);
                     reverseGeocode(pos.lat, pos.lng, true);
+                    const accuracyStatus = document.getElementById('locationAccuracyStatus');
+                    if (accuracyStatus) accuracyStatus.textContent = 'Pin adjusted manually.';
                 });
 
                 map.on('click', function(e) {
                     const { lat, lng } = e.latlng;
                     marker.setLatLng([lat, lng]);
                     map.panTo([lat, lng]);
+                    if (accuracyCircle) {
+                        accuracyCircle.remove();
+                        accuracyCircle = null;
+                    }
                     updateCoordinates(lat, lng);
                     reverseGeocode(lat, lng, true);
+                    const accuracyStatus = document.getElementById('locationAccuracyStatus');
+                    if (accuracyStatus) accuracyStatus.textContent = 'Pin placed manually.';
                 });
 
                 updateCoordinates(defaultLat, defaultLng);
@@ -1154,14 +1149,25 @@
 
         function getUserLocation() {
             const btn = document.getElementById('btnGetLocation');
+            const accuracyStatus = document.getElementById('locationAccuracyStatus');
             if (btn) {
                 btn.disabled = true;
                 btn.textContent = 'Getting location...';
             }
+            if (accuracyStatus) {
+                accuracyStatus.style.color = 'var(--text-secondary)';
+                accuracyStatus.textContent = 'Requesting a high-accuracy position…';
+            }
 
             if (!navigator.geolocation) {
-                alert('Geolocation is not supported by your browser');
-                if (btn) btn.disabled = false;
+                if (accuracyStatus) {
+                    accuracyStatus.style.color = 'var(--error)';
+                    accuracyStatus.textContent = 'This browser does not support location services. Search or place the pin manually.';
+                }
+                if (btn) {
+                    btn.disabled = false;
+                    btn.textContent = 'Get My Current Location';
+                }
                 return;
             }
 
@@ -1169,24 +1175,67 @@
                 (position) => {
                     const lat = position.coords.latitude;
                     const lng = position.coords.longitude;
+                    const accuracy = Math.max(0, Number(position.coords.accuracy) || 0);
+                    const toRadians = (value) => value * Math.PI / 180;
+                    const latDelta = toRadians(lat - defaultLat);
+                    const lngDelta = toRadians(lng - defaultLng);
+                    const distanceFactor = Math.sin(latDelta / 2) ** 2
+                        + Math.cos(toRadians(defaultLat)) * Math.cos(toRadians(lat)) * Math.sin(lngDelta / 2) ** 2;
+                    const distanceFromSiniloanKm = 6371 * 2 * Math.atan2(Math.sqrt(distanceFactor), Math.sqrt(1 - distanceFactor));
+                    if (distanceFromSiniloanKm > 25) {
+                        if (accuracyStatus) {
+                            accuracyStatus.style.color = 'var(--color-warning-text)';
+                            accuracyStatus.textContent = 'Your device location is outside the Siniloan service area. The property pin was not moved; use address search or place it manually.';
+                        }
+                        if (btn) {
+                            btn.disabled = false;
+                            btn.textContent = 'Get My Current Location';
+                        }
+                        return;
+                    }
                     if (marker && map) {
                         marker.setLatLng([lat, lng]);
-                        map.setView([lat, lng], 17);
+                        map.setView([lat, lng], accuracy > 250 ? 15 : 17);
+                        if (accuracyCircle) accuracyCircle.remove();
+                        accuracyCircle = L.circle([lat, lng], {
+                            radius: accuracy || 25,
+                            color: '#0355f3',
+                            fillColor: '#0355f3',
+                            fillOpacity: 0.08,
+                            weight: 1.5,
+                            interactive: false
+                        }).addTo(map);
                     }
                     updateCoordinates(lat, lng);
                     reverseGeocode(lat, lng, true);
+                    if (accuracyStatus) {
+                        const roundedAccuracy = Math.max(1, Math.round(accuracy));
+                        accuracyStatus.style.color = accuracy > 250 ? 'var(--color-warning-text)' : 'var(--color-success-text)';
+                        accuracyStatus.textContent = accuracy > 250
+                            ? `Approximate location (±${roundedAccuracy} m). Drag the pin to the exact property before saving.`
+                            : `Location acquired with approximately ±${roundedAccuracy} m accuracy.`;
+                    }
                     if (btn) {
                         btn.disabled = false;
                         btn.textContent = 'Get My Current Location';
                     }
                 },
                 (error) => {
-                    alert('Unable to get location automatically.');
+                    if (accuracyStatus) {
+                        const messages = {
+                            1: 'Location permission was denied. Allow access or place the pin manually.',
+                            2: 'A reliable location could not be determined. Search or place the pin manually.',
+                            3: 'Location lookup timed out. Try again outdoors or place the pin manually.'
+                        };
+                        accuracyStatus.style.color = 'var(--error)';
+                        accuracyStatus.textContent = messages[error.code] || 'Unable to get your location. Place the pin manually.';
+                    }
                     if (btn) {
                         btn.disabled = false;
                         btn.textContent = 'Get My Current Location';
                     }
-                }
+                },
+                { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
             );
         }
 
@@ -1290,7 +1339,7 @@
                 if (matchedOption) {
                     selectElem.value = matchedOption.value;
                 }
-                selectElem.style.borderColor = '#10b981';
+                selectElem.style.borderColor = 'var(--color-success-text)';
                 selectElem.style.boxShadow = '0 0 0 3px rgba(16, 185, 129, 0.25)';
                 setTimeout(() => {
                     selectElem.style.borderColor = '';
@@ -1299,7 +1348,7 @@
             }
 
             if (statusLabel) {
-                statusLabel.style.color = '#10b981';
+                statusLabel.style.color = 'var(--color-success-text)';
                 statusLabel.textContent = `✓ Detected Barangay: ${matchedBarangay}`;
             }
 
@@ -1309,7 +1358,21 @@
         }
 
         async function searchByAddress() {
-            const address = prompt('Enter street or location in Siniloan:');
+            const address = await window.domiknowPrompt({
+                variant: 'info',
+                eyebrow: 'Map location search',
+                title: 'Search for an address',
+                message: 'Enter a street, landmark, or location within Siniloan, Laguna.',
+                confirmLabel: 'Search map',
+                cancelLabel: 'Cancel',
+                input: {
+                    label: 'Street or location',
+                    placeholder: 'Example: P. Burgos Street, Siniloan',
+                    required: true,
+                    multiline: false,
+                    maxLength: 160
+                }
+            });
             if (!address) return;
 
             try {

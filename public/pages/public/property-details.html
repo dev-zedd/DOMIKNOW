@@ -297,9 +297,13 @@
         }
     </style>
     <link href="../../css/design-system.css" rel="stylesheet">
+    <link href="../../css/public-module.css" rel="stylesheet">
+    <link href="../../css/map-system.css" rel="stylesheet">
+    <link href="../../css/mobile-first.css?v=20260817-1" rel="stylesheet">
     <script src="../../js/ui.js" defer></script>
+    <script src="../../js/map-system.js" defer></script>
 </head>
-<body>
+<body class="public-property-page">
     <header class="public-header">
         <a href="../../index.html" class="logo brand-lockup" aria-label="DOMIKNOW home">
             <span class="brand-mark" aria-hidden="true">
@@ -310,7 +314,7 @@
             <span class="brand-wordmark"><span class="brand-wordmark-domi">DOMI</span><span class="brand-wordmark-know">KNOW</span></span>
         </a>
         <nav class="public-detail-nav" aria-label="Property navigation">
-            <a href="../../index.html#searchSection" class="back-btn">
+            <a href="properties.html" class="back-btn">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
                 <span>Back to properties</span>
             </a>
@@ -322,13 +326,21 @@
         </div>
     </header>
 
-    <main style="max-width: 1300px; margin: 0 auto; padding: 0 1rem;">
+    <main class="public-property-main">
         <!-- Loading Container -->
-        <div id="loadingMessage" style="text-align: center; padding: 8rem 2rem;">
-            <div style="margin-bottom: 1.5rem; color: var(--primary); display: flex; justify-content: center;">
+        <div id="loadingMessage" class="property-loading-state">
+            <div class="property-loading-state__icon">
                 <svg class="animate-spin" xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="animation: spin 1.5s linear infinite;"><line x1="12" y1="2" x2="12" y2="6"></line><line x1="12" y1="18" x2="12" y2="22"></line><line x1="4.93" y1="4.93" x2="7.76" y2="7.76"></line><line x1="16.24" y1="16.24" x2="19.07" y2="19.07"></line><line x1="2" y1="12" x2="6" y2="12"></line><line x1="18" y1="12" x2="22" y2="12"></line><line x1="4.93" y1="19.07" x2="7.76" y2="16.24"></line><line x1="16.24" y1="7.76" x2="19.07" y2="4.93"></svg>
             </div>
-            <h3 style="color: var(--primary); font-weight: 700;">Loading property details...</h3>
+            <h3>Loading property details…</h3>
+            <p>Checking the latest verified listing information.</p>
+        </div>
+
+        <div id="propertyError" class="property-error-state hidden" role="alert">
+            <span class="property-error-state__icon" aria-hidden="true">!</span>
+            <h1 id="propertyErrorTitle">Property unavailable</h1>
+            <p id="propertyErrorMessage">This listing could not be loaded.</p>
+            <a href="properties.html" class="btn btn-primary">Return to rental discovery</a>
         </div>
 
         <!-- Content Container -->
@@ -337,6 +349,7 @@
             <div class="main-info-column">
                 <!-- Image Banner -->
                 <div id="propertyHeroImage" class="property-image-banner">
+                    <img id="propertyHeroMedia" alt="" hidden>
                     <div class="property-image-placeholder">
                         <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
                         <h4 style="margin-top: 1rem; font-weight: 700; color: var(--primary);">Property Image</h4>
@@ -345,10 +358,10 @@
 
                 <!-- Core Details Card -->
                 <div class="detail-card">
-                    <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; flex-wrap: wrap; margin-bottom: 1rem;">
+                    <div class="property-title-row">
                         <div>
                             <h1 id="propertyName" style="font-size: 2.25rem; font-weight: 800; color: var(--primary); line-height: 1.2; margin-bottom: 0.5rem;">Property Name</h1>
-                            <div style="display: flex; align-items: center; gap: 0.375rem; color: var(--text-muted); font-size: 0.9375rem; font-weight: 500;">
+                            <div class="property-address-row">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--accent);"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
                                 <span id="address">Address, Barangay, Siniloan</span>
                             </div>
@@ -362,12 +375,24 @@
                             <div class="info-pill-val" id="propertyType">-</div>
                         </div>
                         <div class="info-pill-card">
-                            <div class="info-pill-lbl">Max Capacity</div>
+                            <div class="info-pill-lbl">Available Spaces</div>
+                            <div class="info-pill-val" id="availableSpaces">-</div>
+                        </div>
+                        <div class="info-pill-card">
+                            <div class="info-pill-lbl">Building Capacity</div>
                             <div class="info-pill-val" id="maxOccupants">-</div>
                         </div>
                         <div class="info-pill-card">
                             <div class="info-pill-lbl">Tenant Type</div>
                             <div class="info-pill-val" id="tenantType">-</div>
+                        </div>
+                        <div class="info-pill-card">
+                            <div class="info-pill-lbl">Building</div>
+                            <div class="info-pill-val" id="propertyFloors">-</div>
+                        </div>
+                        <div class="info-pill-card">
+                            <div class="info-pill-lbl">Community Rating</div>
+                            <div class="info-pill-val" id="propertyRating">-</div>
                         </div>
                     </div>
                 </div>
@@ -378,7 +403,19 @@
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
                         Description
                     </h3>
-                    <p id="description" style="line-height: 1.7; font-size: 0.95rem; color: #334155;">-</p>
+                    <p id="description" class="property-body-copy">-</p>
+                </div>
+
+                <!-- Unit Availability Card -->
+                <div class="detail-card" id="availableSpacesSection">
+                    <div class="property-section-heading">
+                        <h3 class="detail-section-title">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v16"></path><path d="M9 21v-6h6v6"></path><path d="M9 7h.01M15 7h.01M9 11h.01M15 11h.01"></path></svg>
+                            Rooms &amp; spaces
+                        </h3>
+                        <span id="unitSectionSummary" class="property-section-summary">Checking availability…</span>
+                    </div>
+                    <div id="unitList" class="property-unit-list" aria-live="polite"></div>
                 </div>
 
                 <!-- Amenities Card -->
@@ -387,7 +424,7 @@
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
                         Amenities & Facilities
                     </h3>
-                    <div id="amenitiesList" style="display: flex; flex-wrap: wrap; gap: 0.75rem;">-</div>
+                    <div id="amenitiesList" class="property-amenities">-</div>
                 </div>
 
                 <!-- House Rules Card -->
@@ -396,7 +433,7 @@
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
                         House Rules
                     </h3>
-                    <p id="houseRules" style="line-height: 1.7; font-size: 0.95rem; color: #334155;">-</p>
+                    <div id="houseRules" class="property-rules-list">-</div>
                 </div>
 
                 <!-- Location Map Card -->
@@ -405,23 +442,45 @@
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"></polygon></svg>
                         Property Location
                     </h3>
-                    <div id="propertyMap"></div>
+                    <div class="domiknow-map-frame">
+                        <div id="propertyMap" class="domiknow-map" role="application" aria-label="Interactive map showing this property's location"></div>
+                        <div class="domiknow-map-legend" aria-label="Map marker legend">
+                            <span class="domiknow-map-legend__item"><span class="domiknow-map-legend__swatch domiknow-map-legend__swatch--selected"></span>Property location</span>
+                        </div>
+                    </div>
+                    <p class="property-map-note">Map coordinates come from the verified listing. Confirm the complete address before entering a lease.</p>
                 </div>
             </div>
 
             <!-- Right Sidebar Column -->
             <div class="sidebar-column">
                 <div class="sticky-card">
-                    <div>
-                        <div style="font-size: 0.8125rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 0.25rem;">Monthly Rent</div>
-                        <div id="monthlyRent" style="font-size: 2rem; font-weight: 800; color: var(--accent);">-</div>
+                    <div class="property-rent-summary">
+                        <div class="property-rent-summary__label">Monthly rent</div>
+                        <div id="monthlyRent">-</div>
+                        <p id="rentSummaryNote">Based on the spaces currently listed for this property.</p>
                     </div>
+
+                    <dl class="property-cost-list">
+                        <div>
+                            <dt>Available now</dt>
+                            <dd id="sidebarAvailability">-</dd>
+                        </div>
+                        <div>
+                            <dt>Security deposit</dt>
+                            <dd id="securityDeposit">-</dd>
+                        </div>
+                        <div>
+                            <dt>Lease &amp; utilities</dt>
+                            <dd>Confirmed before signing</dd>
+                        </div>
+                    </dl>
 
                     <div style="border-top: 1px solid var(--border-color); padding-top: 1.25rem;">
                         <a href="../auth/login.html" class="btn-action btn-reserve" style="width: 100%; padding: 0.875rem; text-align: center; font-size: 0.95rem;">
                             Log in to apply
                         </a>
-                        <p style="font-size: 0.75rem; color: var(--text-muted); text-align: center; margin-top: 0.75rem; line-height: 1.4;">
+                        <p id="applicationHelperText" style="font-size: 0.75rem; color: var(--text-muted); text-align: center; margin-top: 0.75rem; line-height: 1.4;">
                             Submit a digital application. You will be redirected to log in first.
                         </p>
                     </div>
@@ -441,15 +500,15 @@
                     </div>
 
                     <!-- Lock Notice -->
-                    <div class="login-notice">
+                    <div class="login-notice property-account-guidance">
                         <div class="login-notice-title">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
                             Secure Booking
                         </div>
                         <div class="login-notice-text">Log in or create a DomiKnow account to reserve, schedule screenings, and sign agreements.</div>
                         <div style="display: flex; gap: 0.5rem; width: 100%;">
-                            <a href="../auth/login.html" class="btn-action btn-login" style="flex: 1; font-size: 0.8125rem; padding: 0.5rem;">Login</a>
-                            <a href="../auth/register.html" class="btn-action btn-reserve" style="flex: 1; font-size: 0.8125rem; padding: 0.5rem;">Register</a>
+                            <a href="../auth/login.html" class="btn-action btn-login" style="flex: 1; padding: 0.5rem;">Log in</a>
+                            <a href="../auth/register.html" class="btn-action btn-reserve" style="flex: 1; padding: 0.5rem;">Register</a>
                         </div>
                     </div>
                 </div>
@@ -461,11 +520,12 @@
         const urlParams = new URLSearchParams(window.location.search);
         const propertyId = urlParams.get('id');
         let propertyMap;
+        let propertyMapResizeObserver;
+        let propertyMapResizeFrame;
 
         document.addEventListener('DOMContentLoaded', () => {
             if (!propertyId) {
-                alert('Property ID missing');
-                window.location.href = '../../index.html';
+                showPropertyError('Property link is incomplete', 'Return to rental discovery and choose a listing to view its details.');
                 return;
             }
 
@@ -547,15 +607,21 @@
         async function loadPropertyDetails() {
             try {
                 const response = await fetch(`/api/properties/${propertyId}`);
-                const result = await response.json();
+                const result = await response.json().catch(() => ({}));
 
                 if (!response.ok) {
-                    alert('Property not found or not available');
-                    window.location.href = '../../index.html';
+                    showPropertyError(
+                        response.status === 404 ? 'Property not found' : 'Property unavailable',
+                        result.message || 'This listing may have been removed or is temporarily unavailable.'
+                    );
                     return;
                 }
 
                 const property = result.data;
+                if (!property || typeof property !== 'object') {
+                    showPropertyError('Property data is incomplete', 'This listing cannot be displayed safely right now.');
+                    return;
+                }
                 displayProperty(property);
 
                 document.getElementById('loadingMessage').classList.add('hidden');
@@ -563,62 +629,508 @@
 
             } catch (err) {
                 console.error(err);
-                alert('Error loading property');
-                window.location.href = '../../index.html';
+                showPropertyError('Unable to load this property', 'Check your connection and try again from the rental discovery page.');
             }
         }
 
         function displayProperty(property) {
-            document.getElementById('propertyName').textContent = property.property_name;
-            document.getElementById('monthlyRent').textContent = `₱${parseFloat(property.monthly_rent).toLocaleString()} / month`;
-            document.getElementById('address').textContent = `${property.address}, ${property.barangay}, ${property.municipality}, ${property.province}`;
-            document.getElementById('propertyType').textContent = property.property_type.replace('_', ' ');
-            document.getElementById('maxOccupants').textContent = `${property.max_occupants} Pax`;
-            document.getElementById('tenantType').textContent = property.tenant_type_suitability.charAt(0).toUpperCase() + property.tenant_type_suitability.slice(1);
+            const propertyName = property.property_name || 'Verified rental';
+            const units = Array.isArray(property.units) ? property.units : [];
+            const rentalOptions = getRentalOptions(units);
+            const availableOptions = rentalOptions.filter(option => option.available);
+            const hasManagedInventory = units.length > 0;
+            const unitRents = units
+                .map(unit => Number(unit.monthly_rent))
+                .filter(value => Number.isFinite(value) && value > 0);
+            const propertyRent = Number(property.monthly_rent);
+            const displayedRents = unitRents.length
+                ? unitRents
+                : Number.isFinite(propertyRent) && propertyRent > 0 ? [propertyRent] : [];
+            const minimumRent = displayedRents.length ? Math.min(...displayedRents) : Number.NaN;
+            const maximumRent = displayedRents.length ? Math.max(...displayedRents) : Number.NaN;
+            const addressParts = [
+                property.address,
+                property.barangay && `Brgy. ${property.barangay}`,
+                property.municipality || 'Siniloan',
+                property.province || 'Laguna'
+            ].filter(Boolean);
+            const availability = String(property.availability_status || property.status || 'available').toLowerCase();
+            const listingIsActive = !['unavailable', 'occupied', 'inactive', 'rejected'].includes(availability);
+            const available = listingIsActive && (!hasManagedInventory || availableOptions.length > 0);
+
+            document.title = `${propertyName} — DOMIKNOW`;
+            document.getElementById('propertyName').textContent = propertyName;
+            document.getElementById('monthlyRent').textContent = formatRentRange(minimumRent, maximumRent);
+            document.getElementById('address').textContent = addressParts.join(' · ') || 'Address available on request';
+            document.getElementById('propertyType').textContent = formatLabel(property.property_type || 'Rental');
+            document.getElementById('availableSpaces').textContent = hasManagedInventory
+                ? `${availableOptions.length} of ${rentalOptions.length}`
+                : available ? 'Contact to confirm' : 'None listed';
+            const capacity = Number(property.total_capacity || property.max_occupants);
+            document.getElementById('maxOccupants').textContent = Number.isFinite(capacity) && capacity > 0
+                ? `${capacity} people`
+                : 'Not specified';
+            document.getElementById('tenantType').textContent = formatLabel(property.tenant_type_suitability || 'Any tenant');
+            const floors = Number(property.total_floors);
+            document.getElementById('propertyFloors').textContent = Number.isFinite(floors) && floors > 0
+                ? `${floors} ${floors === 1 ? 'floor' : 'floors'}`
+                : 'Not specified';
+            const rating = Number(property.average_rating);
+            const ratingCount = Number(property.rating_count || property.feedback_count || 0);
+            document.getElementById('propertyRating').textContent = Number.isFinite(rating) && ratingCount > 0
+                ? `${rating.toFixed(1)} / 5 · ${ratingCount} ${ratingCount === 1 ? 'rating' : 'ratings'}`
+                : 'No ratings yet';
             document.getElementById('description').textContent = property.description || 'No description provided.';
-            document.getElementById('houseRules').textContent = property.house_rules || 'No specific rules.';
-            
-            const landlordName = property.landlord?.full_name || 'N/A';
+            renderHouseRules(property.house_rules);
+            renderUnits(units, propertyName);
+            renderRentalSummary(units, rentalOptions, availableOptions, minimumRent, maximumRent);
+            configurePrimaryApplicationAction(available, hasManagedInventory, availableOptions);
+
+            const status = document.getElementById('propertyStatus');
+            status.textContent = hasManagedInventory
+                ? available ? `${availableOptions.length} ${availableOptions.length === 1 ? 'VACANCY' : 'VACANCIES'}` : 'NO VACANCIES'
+                : available ? 'AVAILABLE' : formatLabel(availability).toUpperCase();
+            status.classList.toggle('status-active', available);
+            status.classList.toggle('status-inactive', !available);
+            if (!available) {
+                const applyButton = document.querySelector('.sticky-card .btn-reserve');
+                if (applyButton) {
+                    applyButton.removeAttribute('href');
+                    applyButton.setAttribute('aria-disabled', 'true');
+                    applyButton.style.pointerEvents = 'none';
+                    applyButton.textContent = hasManagedInventory ? 'No spaces available' : 'Currently unavailable';
+                }
+                const helperText = document.getElementById('applicationHelperText');
+                if (helperText) helperText.textContent = 'Applications reopen when the landlord marks a room or bedspace as available.';
+                const accountGuidance = document.querySelector('.property-account-guidance');
+                if (accountGuidance) {
+                    accountGuidance.replaceChildren();
+                    const guidanceTitle = document.createElement('strong');
+                    guidanceTitle.textContent = 'Applications are closed';
+                    const guidanceText = document.createElement('span');
+                    guidanceText.textContent = 'Return to rental discovery to review currently available properties.';
+                    accountGuidance.append(guidanceTitle, guidanceText);
+                }
+            }
+
+            const landlordName = property.landlord?.full_name || 'Landlord details available after login';
             document.getElementById('landlordName').textContent = landlordName;
-            
-            // Set initials
-            if (landlordName !== 'N/A') {
-                const parts = landlordName.split(' ');
-                const initials = parts.map(p => p.charAt(0)).join('').substring(0, 2).toUpperCase();
-                document.getElementById('landlordInitials').textContent = initials;
+            const initials = landlordName.split(/\s+/).filter(Boolean).map(part => part.charAt(0)).join('').substring(0, 2).toUpperCase();
+            document.getElementById('landlordInitials').textContent = initials || 'L';
+
+            const imageUrl = property.main_image_url
+                || property.images?.find?.(image => image.is_main)?.image_url
+                || property.images?.[0]?.image_url;
+            if (imageUrl) {
+                const media = document.getElementById('propertyHeroMedia');
+                const placeholder = document.querySelector('#propertyHeroImage .property-image-placeholder');
+                media.src = imageUrl;
+                media.alt = `${propertyName} rental property`;
+                media.hidden = false;
+                placeholder.hidden = true;
+                media.addEventListener('error', () => {
+                    media.hidden = true;
+                    placeholder.hidden = false;
+                }, { once: true });
             }
 
-            // Set main image if available
-            if (property.main_image_url) {
-                const heroImg = document.getElementById('propertyHeroImage');
-                heroImg.style.backgroundImage = `url('${property.main_image_url}')`;
-                // Clear the placeholder text
-                heroImg.innerHTML = '';
-            }
-
-            // Amenities
             const amenitiesDiv = document.getElementById('amenitiesList');
-            if (property.amenities && property.amenities.length > 0) {
-                amenitiesDiv.innerHTML = property.amenities.map(a => 
-                    `<span class="amenity-tag">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                        <span>${a}</span>
-                    </span>`
-                ).join('');
+            amenitiesDiv.replaceChildren();
+            if (Array.isArray(property.amenities) && property.amenities.length) {
+                property.amenities.forEach(amenity => {
+                    const tag = document.createElement('span');
+                    tag.className = 'amenity-tag';
+                    tag.textContent = `✓ ${amenity}`;
+                    amenitiesDiv.appendChild(tag);
+                });
             } else {
                 amenitiesDiv.textContent = 'No amenities listed';
             }
 
-            // Initialize map
-            propertyMap = L.map('propertyMap').setView([property.latitude, property.longitude], 16);
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '© OpenStreetMap contributors'
-            }).addTo(propertyMap);
+            const latitude = Number(property.latitude);
+            const longitude = Number(property.longitude);
+            const coordinatesMissing = property.latitude === null || property.latitude === undefined || property.latitude === ''
+                || property.longitude === null || property.longitude === undefined || property.longitude === '';
+            if (coordinatesMissing || !Number.isFinite(latitude) || !Number.isFinite(longitude) || Math.abs(latitude) > 90 || Math.abs(longitude) > 180) {
+                renderUnavailableMap();
+                return;
+            }
 
-            L.marker([property.latitude, property.longitude])
+            // Leaflet must measure a visible container. The property panel is revealed
+            // immediately after this function returns, so initialize on the next frame.
+            window.requestAnimationFrame(() => {
+                initializePropertyMap({
+                    latitude,
+                    longitude,
+                    propertyName,
+                    address: addressParts.join(' · ')
+                });
+            });
+        }
+
+        function getRentalOptions(units) {
+            return units.flatMap(unit => {
+                const beds = Array.isArray(unit.beds) ? unit.beds : [];
+                const rentsByBed = unit.rental_style === 'per_bed' || unit.unit_type === 'bedspace';
+                if (rentsByBed && beds.length) {
+                    return beds.map(bed => ({
+                        unit,
+                        bed,
+                        available: String(bed.status || '').toLowerCase() === 'available'
+                    }));
+                }
+                return [{
+                    unit,
+                    bed: null,
+                    available: String(unit.status || '').toLowerCase() === 'available'
+                }];
+            });
+        }
+
+        function formatCurrency(value) {
+            const amount = Number(value);
+            return Number.isFinite(amount)
+                ? `₱${amount.toLocaleString('en-PH', { maximumFractionDigits: 0 })}`
+                : 'Not specified';
+        }
+
+        function formatRentRange(minimum, maximum) {
+            if (!Number.isFinite(minimum) || !Number.isFinite(maximum)) return 'Price on request';
+            if (minimum === maximum) return `${formatCurrency(minimum)} / month`;
+            return `${formatCurrency(minimum)}–${formatCurrency(maximum)} / month`;
+        }
+
+        function renderRentalSummary(units, rentalOptions, availableOptions, minimumRent, maximumRent) {
+            const hasManagedInventory = units.length > 0;
+            const availabilityText = hasManagedInventory
+                ? `${availableOptions.length} of ${rentalOptions.length} ${rentalOptions.length === 1 ? 'space' : 'spaces'}`
+                : 'Confirm with landlord';
+            document.getElementById('sidebarAvailability').textContent = availabilityText;
+            document.getElementById('unitSectionSummary').textContent = hasManagedInventory
+                ? availableOptions.length
+                    ? `${availableOptions.length} currently open`
+                    : 'No current vacancies'
+                : 'Availability confirmed during inquiry';
+
+            const deposits = units
+                .map(unit => Number(unit.security_deposit))
+                .filter(value => Number.isFinite(value) && value >= 0);
+            const depositMinimum = deposits.length ? Math.min(...deposits) : Number.NaN;
+            const depositMaximum = deposits.length ? Math.max(...deposits) : Number.NaN;
+            document.getElementById('securityDeposit').textContent = deposits.length
+                ? depositMinimum === depositMaximum
+                    ? formatCurrency(depositMinimum)
+                    : `${formatCurrency(depositMinimum)}–${formatCurrency(depositMaximum)}`
+                : 'Confirmed before applying';
+
+            const rentNote = document.getElementById('rentSummaryNote');
+            if (rentNote) {
+                rentNote.textContent = hasManagedInventory
+                    ? availableOptions.length
+                        ? 'Price range is based on the rooms and bedspaces listed below.'
+                        : 'These are listed room rates; there are currently no vacancies.'
+                    : Number.isFinite(minimumRent) && Number.isFinite(maximumRent)
+                        ? 'Property-level rate; confirm the exact space and move-in terms.'
+                        : 'Ask the landlord for the complete rate and move-in terms.';
+            }
+        }
+
+        function renderHouseRules(rawRules) {
+            const container = document.getElementById('houseRules');
+            container.replaceChildren();
+            let parsed = rawRules;
+            if (typeof rawRules === 'string') {
+                try {
+                    parsed = JSON.parse(rawRules);
+                } catch {
+                    parsed = rawRules.trim();
+                }
+            }
+
+            const rules = [];
+            if (typeof parsed === 'string' && parsed) rules.push(parsed);
+            if (Array.isArray(parsed)) rules.push(...parsed.filter(Boolean).map(String));
+            if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
+                if (parsed.house_rules) rules.push(String(parsed.house_rules));
+                if (Array.isArray(parsed.custom_policies)) {
+                    parsed.custom_policies.forEach(policy => {
+                        if (!policy) return;
+                        const name = policy.name ? `${policy.name}: ` : '';
+                        const value = policy.value || policy.description || '';
+                        if (name || value) rules.push(`${name}${value}`.trim());
+                    });
+                }
+            }
+
+            if (!rules.length) {
+                const empty = document.createElement('p');
+                empty.className = 'property-body-copy';
+                empty.textContent = 'No specific rules have been listed. Confirm guest, quiet-hour, pet, and smoking policies before applying.';
+                container.appendChild(empty);
+                return;
+            }
+
+            rules.forEach(rule => {
+                const item = document.createElement('div');
+                item.className = 'property-rule-item';
+                const marker = document.createElement('span');
+                marker.className = 'property-rule-item__marker';
+                marker.setAttribute('aria-hidden', 'true');
+                marker.textContent = '✓';
+                const text = document.createElement('span');
+                text.textContent = rule;
+                item.append(marker, text);
+                container.appendChild(item);
+            });
+        }
+
+        function getApplicationHref(unitId, bedId = null) {
+            const params = new URLSearchParams({ id: propertyId });
+            if (unitId) params.set('unit_id', unitId);
+            if (bedId) params.set('bed_id', bedId);
+            const target = `/pages/tenant/apply.html?${params.toString()}`;
+            const token = localStorage.getItem('domiknow_token');
+            const role = localStorage.getItem('domiknow_role');
+            if (token && role === 'tenant') return target;
+            if (token) return null;
+            return `/pages/auth/login.html?redirect=${encodeURIComponent(target)}`;
+        }
+
+        function configurePrimaryApplicationAction(available, hasManagedInventory, availableOptions) {
+            const applyButton = document.querySelector('.sticky-card .btn-reserve');
+            if (!applyButton || !available || !hasManagedInventory) return;
+
+            applyButton.removeAttribute('aria-disabled');
+            applyButton.style.pointerEvents = '';
+            applyButton.style.opacity = '';
+            if (availableOptions.length > 1) {
+                applyButton.href = '#availableSpacesSection';
+                applyButton.textContent = 'Choose an available space';
+                document.getElementById('applicationHelperText').textContent = 'Select a specific room or bedspace below before starting your application.';
+                return;
+            }
+
+            const option = availableOptions[0];
+            const href = getApplicationHref(option.unit.id, option.bed?.id);
+            if (!href) {
+                applyButton.removeAttribute('href');
+                applyButton.setAttribute('aria-disabled', 'true');
+                applyButton.style.pointerEvents = 'none';
+                applyButton.style.opacity = '0.55';
+                applyButton.textContent = 'Tenant account required';
+                return;
+            }
+            applyButton.href = href;
+            applyButton.textContent = localStorage.getItem('domiknow_token') ? 'Apply for this space' : 'Log in to apply';
+        }
+
+        function renderUnits(units, propertyName) {
+            const container = document.getElementById('unitList');
+            container.replaceChildren();
+            if (!units.length) {
+                const empty = document.createElement('div');
+                empty.className = 'property-unit-empty';
+                const title = document.createElement('strong');
+                title.textContent = 'No room inventory has been published yet';
+                const text = document.createElement('span');
+                text.textContent = 'The landlord will confirm the specific room, capacity, deposit, and availability before an application proceeds.';
+                empty.append(title, text);
+                container.appendChild(empty);
+                return;
+            }
+
+            const orderedUnits = [...units].sort((left, right) => {
+                const leftAvailable = getRentalOptions([left]).some(option => option.available);
+                const rightAvailable = getRentalOptions([right]).some(option => option.available);
+                return Number(rightAvailable) - Number(leftAvailable);
+            });
+
+            orderedUnits.forEach(unit => {
+                const options = getRentalOptions([unit]);
+                const availableOptions = options.filter(option => option.available);
+                const unitAvailable = availableOptions.length > 0;
+                const card = document.createElement('article');
+                card.className = `property-unit-card${unitAvailable ? '' : ' property-unit-card--unavailable'}`;
+
+                const media = document.createElement('div');
+                media.className = 'property-unit-card__media';
+                const imageUrl = unit.main_image_url || unit.images?.find?.(image => image.is_main)?.image_url || unit.images?.[0]?.image_url;
+                if (imageUrl) {
+                    const image = document.createElement('img');
+                    image.src = imageUrl;
+                    image.alt = `${propertyName} ${unit.room_name || unit.unit_number || 'rental space'}`;
+                    image.loading = 'lazy';
+                    image.addEventListener('error', () => media.classList.add('property-unit-card__media--empty'), { once: true });
+                    media.appendChild(image);
+                } else {
+                    media.classList.add('property-unit-card__media--empty');
+                    media.textContent = 'Room';
+                }
+
+                const content = document.createElement('div');
+                content.className = 'property-unit-card__content';
+                const heading = document.createElement('div');
+                heading.className = 'property-unit-card__heading';
+                const titleWrap = document.createElement('div');
+                const eyebrow = document.createElement('span');
+                eyebrow.className = 'property-unit-card__eyebrow';
+                eyebrow.textContent = [unit.floor, formatLabel(unit.rental_style || unit.unit_type || 'Rental space')].filter(Boolean).join(' · ');
+                const title = document.createElement('h4');
+                title.textContent = unit.room_name
+                    ? `${unit.room_name}${unit.unit_number ? ` · ${unit.unit_number}` : ''}`
+                    : unit.unit_number ? `Unit ${unit.unit_number}` : 'Rental space';
+                titleWrap.append(eyebrow, title);
+                const status = document.createElement('span');
+                status.className = `property-unit-status property-unit-status--${unitAvailable ? 'available' : 'unavailable'}`;
+                status.textContent = unitAvailable
+                    ? `${availableOptions.length} ${availableOptions.length === 1 ? 'space' : 'spaces'} open`
+                    : formatLabel(unit.status || 'Unavailable');
+                heading.append(titleWrap, status);
+
+                const rent = document.createElement('p');
+                rent.className = 'property-unit-card__rent';
+                rent.textContent = `${formatCurrency(unit.monthly_rent)} / month`;
+
+                const facts = document.createElement('div');
+                facts.className = 'property-unit-card__facts';
+                const factValues = [
+                    Number(unit.capacity) > 0 && `Up to ${Number(unit.capacity)} people`,
+                    Number(unit.bedrooms) > 0 && `${Number(unit.bedrooms)} ${Number(unit.bedrooms) === 1 ? 'bedroom' : 'bedrooms'}`,
+                    Number(unit.bathrooms) > 0 && `${Number(unit.bathrooms)} ${Number(unit.bathrooms) === 1 ? 'bathroom' : 'bathrooms'}`,
+                    Number(unit.floor_area_sqm) > 0 && `${Number(unit.floor_area_sqm)} m²`,
+                    unit.gender_restriction && `${formatLabel(unit.gender_restriction)} tenants`
+                ].filter(Boolean);
+                factValues.forEach(value => {
+                    const fact = document.createElement('span');
+                    fact.textContent = value;
+                    facts.appendChild(fact);
+                });
+
+                const amenities = document.createElement('p');
+                amenities.className = 'property-unit-card__amenities';
+                amenities.textContent = Array.isArray(unit.amenities) && unit.amenities.length
+                    ? `Includes: ${unit.amenities.slice(0, 5).join(', ')}${unit.amenities.length > 5 ? '…' : ''}`
+                    : 'No unit-specific amenities listed.';
+
+                const footer = document.createElement('div');
+                footer.className = 'property-unit-card__footer';
+                const deposit = document.createElement('span');
+                deposit.innerHTML = '<strong>Security deposit</strong>';
+                deposit.append(` ${formatCurrency(unit.security_deposit)}`);
+                const actions = document.createElement('div');
+                actions.className = 'property-unit-card__actions';
+                if (unitAvailable) {
+                    availableOptions.forEach((option, index) => {
+                        const href = getApplicationHref(unit.id, option.bed?.id);
+                        if (href) {
+                            const link = document.createElement('a');
+                            link.className = 'btn btn-primary property-unit-apply';
+                            link.href = href;
+                            link.textContent = option.bed?.bed_label || (availableOptions.length > 1 ? `Space ${index + 1}` : 'Apply for this space');
+                            actions.appendChild(link);
+                        } else {
+                            const note = document.createElement('span');
+                            note.className = 'property-unit-account-note';
+                            note.textContent = 'Tenant account required';
+                            actions.appendChild(note);
+                        }
+                    });
+                } else {
+                    const unavailable = document.createElement('span');
+                    unavailable.className = 'property-unit-account-note';
+                    unavailable.textContent = 'Not accepting applications';
+                    actions.appendChild(unavailable);
+                }
+                footer.append(deposit, actions);
+                content.append(heading, rent, facts, amenities, footer);
+                card.append(media, content);
+                container.appendChild(card);
+            });
+        }
+
+        function initializePropertyMap({ latitude, longitude, propertyName, address }) {
+            const mapElement = document.getElementById('propertyMap');
+            if (!mapElement || mapElement.offsetWidth === 0 || mapElement.offsetHeight === 0) {
+                // Give responsive layout one more paint cycle before measuring again.
+                window.requestAnimationFrame(() => initializePropertyMap({
+                    latitude,
+                    longitude,
+                    propertyName,
+                    address
+                }));
+                return;
+            }
+
+            propertyMapResizeObserver?.disconnect();
+            if (propertyMap) {
+                propertyMap.remove();
+            }
+
+            propertyMap = L.map(mapElement, {
+                zoomControl: true,
+                scrollWheelZoom: false
+            }).setView([latitude, longitude], 16);
+            DomiknowMap.addBasemap(propertyMap);
+
+            L.marker([latitude, longitude], {
+                icon: DomiknowMap.pinIcon({ selected: true }),
+                keyboard: true,
+                title: propertyName,
+                alt: `${propertyName} location marker`
+            })
                 .addTo(propertyMap)
-                .bindPopup(`<b>${property.property_name}</b><br>${property.address}`)
+                .bindPopup(DomiknowMap.popupContent({
+                    eyebrow: 'Verified rental',
+                    title: propertyName,
+                    meta: address
+                }))
                 .openPopup();
+
+            const refreshMapLayout = () => {
+                if (!propertyMap || !mapElement.isConnected) return;
+                propertyMap.invalidateSize({ animate: false, pan: false });
+                propertyMap.setView([latitude, longitude], propertyMap.getZoom(), { animate: false });
+            };
+
+            // Recalculate once after Leaflet creates its panes, then again after fonts,
+            // imagery, and the responsive details columns have had time to settle.
+            window.requestAnimationFrame(refreshMapLayout);
+            window.setTimeout(refreshMapLayout, 200);
+
+            if ('ResizeObserver' in window) {
+                propertyMapResizeObserver = new ResizeObserver(() => {
+                    window.cancelAnimationFrame(propertyMapResizeFrame);
+                    propertyMapResizeFrame = window.requestAnimationFrame(refreshMapLayout);
+                });
+                propertyMapResizeObserver.observe(mapElement);
+            }
+        }
+
+        function formatLabel(value) {
+            return String(value || '').replace(/_/g, ' ').replace(/\b\w/g, character => character.toUpperCase());
+        }
+
+        function renderUnavailableMap() {
+            const frame = document.getElementById('propertyMap')?.closest('.domiknow-map-frame');
+            if (!frame) return;
+            frame.classList.add('property-map-unavailable');
+            frame.replaceChildren();
+            const message = document.createElement('div');
+            message.className = 'property-map-empty-state';
+            const title = document.createElement('strong');
+            title.textContent = 'Map location unavailable';
+            const detail = document.createElement('span');
+            detail.textContent = 'The listing does not contain valid coordinates. Use the written address and confirm it with the landlord.';
+            message.append(title, detail);
+            frame.appendChild(message);
+        }
+
+        function showPropertyError(title, message) {
+            document.getElementById('loadingMessage')?.classList.add('hidden');
+            document.getElementById('propertyContent')?.classList.add('hidden');
+            document.getElementById('propertyErrorTitle').textContent = title;
+            document.getElementById('propertyErrorMessage').textContent = message;
+            document.getElementById('propertyError').classList.remove('hidden');
         }
     </script>
 </body>
