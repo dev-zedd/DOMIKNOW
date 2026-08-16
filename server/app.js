@@ -79,6 +79,18 @@ app.use(compression());
 app.use(express.json({ limit: '100mb' }));
 app.use(express.urlencoded({ limit: '100mb', extended: true }));
 
+// Lightweight deployment health check. This intentionally avoids external
+// dependencies so the hosting platform can verify the Express process itself.
+app.get('/api/health', (req, res) => {
+    res.set('Cache-Control', 'no-store');
+    res.status(200).json({
+        success: true,
+        service: 'domiknow',
+        status: 'healthy',
+        timestamp: new Date().toISOString()
+    });
+});
+
 // Serve static files from the 'public' folder
 app.use(express.static(path.join(__dirname, '../public')));
 
@@ -135,7 +147,7 @@ app.get('/favicon.ico', (req, res) => res.status(204).end());
 
 // Default Route
 app.get('/', (req, res) => {
-    res.redirect('/pages/auth/login.html');
+    res.sendFile(path.join(__dirname, '../public/index.html'));
 });
 
 // Start the server

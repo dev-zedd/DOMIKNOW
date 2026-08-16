@@ -60,7 +60,19 @@ This objective includes authentication, email verification, role-based access, r
 
 7. **Access the application**
    - Open your browser and visit `http://localhost:3000`
-   - You'll be redirected to the login page
+   - The public rental landing page opens at the root URL
+
+## Free Render Demo Deployment
+
+The included `render.yaml` creates one free Node.js web service in Render's Singapore region.
+
+1. Push the repository to GitHub without committing `.env`.
+2. In Render, select **New > Blueprint** and connect the repository.
+3. Confirm the `domiknow-demo` free web service.
+4. Enter every secret requested by the Blueprint. Use the production Render URL for `ALLOWED_ORIGINS`, for example `https://domiknow-demo.onrender.com`.
+5. Deploy, then verify `/api/health` and the public root page.
+
+For a reliable presentation, open the Render URL several minutes before the demo so the free service has time to wake up. Confirm that the Supabase project is active and use small demonstration uploads.
 
 ## Security
 
