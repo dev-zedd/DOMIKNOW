@@ -465,49 +465,317 @@
 
         /* ── Floating Chat Head FAB & Drawer ────────────────────────────── */
         .chat-head-fab {
-            position: fixed;
-            bottom: 2rem;
-            right: 2rem;
-            z-index: 1000;
-            display: flex;
-            align-items: center;
-            gap: 0.65rem;
-            background: linear-gradient(135deg, #9333ea 0%, #7e22ce 100%);
-            color: #ffffff;
-            border: none;
-            padding: 0.85rem 1.45rem;
-            border-radius: 50px;
-            box-shadow: 0 10px 25px -5px rgba(147, 51, 234, 0.45);
-            cursor: pointer;
-            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+            position: fixed !important;
+            bottom: 1.75rem !important;
+            right: 1.75rem !important;
+            z-index: 10050 !important;
+            width: 56px !important;
+            height: 56px !important;
+            min-width: 56px !important;
+            max-width: 56px !important;
+            min-height: 56px !important;
+            max-height: 56px !important;
+            border-radius: 50% !important;
+            background: linear-gradient(135deg, #0355f3 0%, #1d4ed8 100%) !important;
+            color: #ffffff !important;
+            border: none !important;
+            padding: 0 !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            box-shadow: 0 10px 25px -5px rgba(3, 85, 243, 0.45) !important;
+            cursor: pointer !important;
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
         }
 
         .chat-head-fab:hover {
-            transform: translateY(-3px) scale(1.02);
-            box-shadow: 0 15px 30px -5px rgba(147, 51, 234, 0.55);
+            transform: translateY(-3px) scale(1.08) !important;
+            box-shadow: 0 14px 30px -5px rgba(3, 85, 243, 0.6) !important;
+        }
+
+        .chat-head-fab.hidden {
+            display: none !important;
         }
 
         .chat-head-modal {
-            position: fixed;
-            bottom: 6rem;
-            right: 2rem;
-            width: 390px;
-            height: 520px;
-            background: var(--bg-secondary);
-            border: 1px solid var(--border-color);
-            border-radius: 20px;
-            box-shadow: 0 20px 40px -10px rgba(0,0,0,0.25);
-            display: flex;
-            flex-direction: column;
-            z-index: 1001;
-            overflow: hidden;
-            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-            transform-origin: bottom right;
+            position: fixed !important;
+            bottom: 5.5rem !important;
+            right: 1.75rem !important;
+            width: 410px !important;
+            max-width: calc(100vw - 2rem) !important;
+            height: 560px !important;
+            max-height: calc(100vh - 7rem) !important;
+            background: #f8fafc !important;
+            border: 1px solid #cbd5e1 !important;
+            border-radius: 20px !important;
+            box-shadow: 0 20px 45px -10px rgba(15, 23, 42, 0.35) !important;
+            z-index: 10060 !important;
+            display: flex !important;
+            flex-direction: column !important;
+            overflow: hidden !important;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
         }
 
         .chat-head-modal.hidden {
-            opacity: 0;
-            pointer-events: none;
+            display: none !important;
+            opacity: 0 !important;
+            pointer-events: none !important;
+        }
+
+        /* Modal Header - Dark Navy Gradient */
+        .chat-head-modal-header {
+            padding: 0.9rem 1.2rem !important;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%) !important;
+            color: #ffffff !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: space-between !important;
+            gap: 0.6rem !important;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+            flex-shrink: 0 !important;
+            min-height: 60px !important;
+        }
+
+        .chat-head-header-title {
+            display: flex !important;
+            align-items: center !important;
+            gap: 0.5rem !important;
+            flex: 1 !important;
+            min-width: 0 !important;
+            overflow: hidden !important;
+            font-weight: 800 !important;
+            font-size: 0.9rem !important;
+            color: #ffffff !important;
+            white-space: nowrap !important;
+            text-overflow: ellipsis !important;
+        }
+
+        /* Pill Switch Button - Light Cream Pill with Accent Text */
+        .chat-head-switch-btn {
+            background: #fef3c7 !important;
+            color: #0f766e !important;
+            border: none !important;
+            font-size: 0.78rem !important;
+            font-weight: 800 !important;
+            padding: 0.4rem 0.85rem !important;
+            border-radius: 9999px !important;
+            cursor: pointer !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            gap: 0.35rem !important;
+            white-space: nowrap !important;
+            transition: all 0.2s ease !important;
+            flex-shrink: 0 !important;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1) !important;
+        }
+
+        .chat-head-switch-btn:hover {
+            background: #fde68a !important;
+            transform: translateY(-1px) !important;
+        }
+
+        /* Close Button */
+        .chat-head-close-btn {
+            background: #334155 !important;
+            border: none !important;
+            color: #ffffff !important;
+            width: 32px !important;
+            height: 32px !important;
+            min-width: 32px !important;
+            min-height: 32px !important;
+            border-radius: 50% !important;
+            cursor: pointer !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            flex-shrink: 0 !important;
+            transition: background 0.2s ease !important;
+        }
+
+        .chat-head-close-btn:hover {
+            background: #475569 !important;
+        }
+
+        .chat-head-modal-body {
+            display: flex !important;
+            flex-direction: column !important;
+            flex: 1 !important;
+            min-height: 0 !important;
+            overflow: hidden !important;
+            background: #f8fafc !important;
+            padding: 0 !important;
+        }
+
+        .chat-head-feed {
+            flex: 1 !important;
+            overflow-y: auto !important;
+            display: flex !important;
+            flex-direction: column !important;
+            gap: 0.85rem !important;
+            padding: 0.85rem !important;
+            background: #f8fafc !important;
+            border-radius: 12px !important;
+        }
+
+        /* Date Separator */
+        .chat-date-separator {
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            margin: 0.75rem 0 !important;
+            position: relative !important;
+        }
+        .chat-date-separator::before {
+            content: '' !important;
+            position: absolute !important;
+            top: 50% !important;
+            left: 0 !important;
+            right: 0 !important;
+            height: 1px !important;
+            background: #cbd5e1 !important;
+            z-index: 1 !important;
+        }
+        .chat-date-separator span {
+            position: relative !important;
+            z-index: 2 !important;
+            background: #f8fafc !important;
+            padding: 0 0.75rem !important;
+            font-size: 0.68rem !important;
+            font-weight: 800 !important;
+            color: #64748b !important;
+            letter-spacing: 0.05em !important;
+            text-transform: uppercase !important;
+        }
+
+        /* ── Message Rows & Avatars ── */
+        .chat-msg-row {
+            display: flex !important;
+            align-items: flex-end !important;
+            gap: 0.5rem !important;
+            max-width: 86% !important;
+            margin-bottom: 0.25rem !important;
+        }
+
+        .chat-msg-row.me {
+            align-self: flex-end !important;
+            flex-direction: row-reverse !important;
+        }
+
+        .chat-msg-row.other {
+            align-self: flex-start !important;
+            flex-direction: row !important;
+        }
+
+        .chat-avatar {
+            width: 32px !important;
+            height: 32px !important;
+            min-width: 32px !important;
+            min-height: 32px !important;
+            border-radius: 50% !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            font-size: 0.78rem !important;
+            font-weight: 800 !important;
+            flex-shrink: 0 !important;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.08) !important;
+        }
+
+        .chat-msg-row.other .chat-avatar {
+            background: #e2e8f0 !important;
+            color: #475569 !important;
+            border: 1px solid #cbd5e1 !important;
+        }
+
+        .chat-msg-row.me .chat-avatar {
+            background: #0f766e !important;
+            color: #ffffff !important;
+        }
+
+        .chat-msg-content-wrapper {
+            display: inline-flex !important;
+            flex-direction: column !important;
+            width: fit-content !important;
+            max-width: 100% !important;
+        }
+
+        .chat-msg-row.me .chat-msg-content-wrapper {
+            align-items: flex-end !important;
+        }
+
+        .chat-msg-row.other .chat-msg-content-wrapper {
+            align-items: flex-start !important;
+        }
+
+        .chat-msg-meta {
+            font-size: 0.7rem !important;
+            font-weight: 600 !important;
+            color: #64748b !important;
+            margin-bottom: 0.2rem !important;
+            display: flex !important;
+            align-items: center !important;
+            gap: 0.35rem !important;
+            padding: 0 0.2rem !important;
+            white-space: nowrap !important;
+        }
+
+        .chat-msg-meta strong {
+            color: #334155 !important;
+        }
+
+        /* Speech Bubbles */
+        .chat-msg-bubble {
+            display: inline-block !important;
+            position: relative !important;
+            width: auto !important;
+            max-width: 100% !important;
+            padding: 0.6rem 0.85rem !important;
+            font-size: 0.84rem !important;
+            line-height: 1.45 !important;
+            word-break: break-word !important;
+            white-space: pre-wrap !important;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05) !important;
+        }
+
+        .chat-msg-row.me .chat-msg-bubble {
+            background: #0f766e !important;
+            color: #ffffff !important;
+            border-radius: 16px 16px 4px 16px !important;
+        }
+
+        .chat-msg-row.other .chat-msg-bubble {
+            background: #ffffff !important;
+            color: #0f172a !important;
+            border: 1px solid #cbd5e1 !important;
+            border-radius: 16px 16px 16px 4px !important;
+        }
+
+        .chat-msg-time-inline {
+            font-size: 0.65rem !important;
+            margin-top: 0.25rem !important;
+            opacity: 0.75 !important;
+            text-align: right !important;
+        }
+
+        /* File Attachment Card (Mockup Style) */
+        .chat-file-card {
+            display: flex !important;
+            align-items: center !important;
+            gap: 0.75rem !important;
+            padding: 0.6rem 0.85rem !important;
+            background: #ffffff !important;
+            border: 1.5px solid #0f766e !important;
+            border-radius: 12px !important;
+            margin-top: 0.4rem !important;
+            text-decoration: none !important;
+        }
+
+        .chat-msg-row.me .chat-msg-attachment-link {
+            background: rgba(255, 255, 255, 0.2) !important;
+            color: #ffffff !important;
+        }
+
+        .chat-msg-row.other .chat-msg-attachment-link {
             transform: scale(0.85) translateY(20px);
         }
 
@@ -623,7 +891,6 @@
             <div class="navbar-menu" style="flex-wrap: wrap; gap: 0.5rem 1rem;">
                 <a href="users.html" class="navbar-menu-link">Users</a>
                 <a href="property-review.html" class="navbar-menu-link">Property Review</a>
-                <a href="reservations.html" class="navbar-menu-link">Reservation Monitoring</a>
                 <a href="payments.html" class="navbar-menu-link">Payment Monitor</a>
                 <a href="reports.html" class="navbar-menu-link active">Reports Triage</a>
                 <a href="audit-logs.html" class="navbar-menu-link">Audit Logs</a>
@@ -945,32 +1212,27 @@
     </main>
 
     <!-- Floating Chat Head FAB Button -->
-    <button id="chatHeadFab" class="chat-head-fab" title="Open Case Inquiry & Discussion Thread">
-        <div class="chat-head-icon" style="display:flex; align-items:center;">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-            </svg>
-        </div>
-        <span class="chat-head-label" style="font-weight:800; font-size:0.88rem;">Case Inquiry Thread</span>
+    <button id="chatHeadFab" class="chat-head-fab" title="Open Case Inquiry & Discussion Thread" aria-label="Open Case Inquiry Thread">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21a9 9 0 1 0-9-9c0 1.48.36 2.88 1 4.11L3 21l4.89-1c1.23.64 2.63 1 4.11 1z"/><circle cx="8" cy="12" r="1" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1" fill="currentColor" stroke-none"/><circle cx="16" cy="12" r="1" fill="currentColor" stroke-none"/></svg>
     </button>
 
     <!-- Floating Chat Head Drawer Modal -->
     <div id="chatHeadModal" class="chat-head-modal hidden" role="dialog" aria-modal="false" aria-labelledby="chatHeaderTitle">
         <div class="chat-head-modal-header">
-            <div style="display:flex; align-items:center; gap:0.5rem; flex:1; overflow:hidden;">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-                </svg>
-                <span id="chatHeaderTitle" style="font-weight:800; font-size:0.88rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">Reporter Convo</span>
+            <div style="display:flex; align-items:center; gap:0.5rem; flex:1; min-width:0; overflow:hidden;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21a9 9 0 1 0-9-9c0 1.48.36 2.88 1 4.11L3 21l4.89-1c1.23.64 2.63 1 4.11 1z"/><circle cx="8" cy="12" r="1" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1" fill="currentColor" stroke-none"/><circle cx="16" cy="12" r="1" fill="currentColor" stroke-none"/></svg>
+                <span id="chatHeaderTitle" style="font-weight:800; font-size:0.88rem; color:#ffffff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">Reporter Convo</span>
             </div>
             <div style="display:flex; align-items:center; gap:0.5rem; flex-shrink:0;">
                 <button type="button" id="switchConvoBtn" class="chat-head-switch-btn">
-                    Switch to Target
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                    <span>Switch to Target</span>
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                         <path d="M5 12h14M12 5l7 7-7 7"/>
                     </svg>
                 </button>
-                <button id="closeChatHeadModalBtn" class="chat-head-close-btn" type="button" aria-label="Close inquiry thread">&times;</button>
+                <button id="closeChatHeadModalBtn" class="chat-head-close-btn" type="button" aria-label="Close inquiry thread">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </button>
             </div>
         </div>
         <div class="chat-head-modal-body">
@@ -982,10 +1244,18 @@
             <div id="typingIndicatorContainer" style="margin-bottom:0.4rem;"></div>
             <!-- Inquiry Form -->
             <form id="postInquiryForm" class="chat-head-form">
-                <div style="display:flex; gap:0.5rem;">
-                    <input type="text" id="msgTextInput" class="form-input" placeholder="Type inquiry to Reporter..."
-                        style="flex:1; font-size:0.84rem; padding:0.55rem 0.85rem; border-radius:50px;">
-                    <button type="submit" class="btn-action-primary" style="background:#9333ea; padding:0.55rem 1rem; font-size:0.84rem; border-radius:50px;">Send</button>
+                <!-- Input row -->
+                <div class="chat-head-form-row">
+                    <div class="chat-input-wrapper">
+                        <button type="button" class="chat-attach-btn" title="Attach file" aria-label="Attach file">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
+                        </button>
+                        <input type="text" id="msgTextInput" class="chat-input-field" placeholder="Type message to Reporter...">
+                    </div>
+                    <button type="submit" class="chat-send-btn">
+                        <span>Send</span>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
+                    </button>
                 </div>
             </form>
         </div>
@@ -1615,27 +1885,83 @@
             if (!feed) return;
             if (!data || data.length === 0) {
                 const isReporter = activeThread === 'reporter';
-                feed.innerHTML = `<div style="font-size:0.85rem; color:var(--text-muted); font-style:italic;">No inquiry messages posted yet in ${isReporter ? 'Reporter' : 'Target'} thread.</div>`;
+                feed.innerHTML = `<div style="font-size:0.85rem; color:var(--text-muted); font-style:italic; text-align:center; padding:1.5rem;">No inquiry messages posted yet in ${isReporter ? 'Reporter' : 'Target'} thread.</div>`;
                 return;
             }
 
-            feed.innerHTML = '';
-            data.forEach(m => {
-                const isMe = m.sender_role === 'admin';
-                const senderName = m.sender?.full_name || (m.sender_role === 'admin' ? 'System Admin' : m.sender_role);
-                const dateStr = new Date(m.created_at).toLocaleString();
+            const myUserId = (function() {
+                try {
+                    const token = localStorage.getItem('domiknow_token');
+                    if (!token) return null;
+                    const p = JSON.parse(atob(token.split('.')[1]));
+                    return p.id || p.userId || p.sub || null;
+                } catch(e) { return null; }
+            })();
 
-                const item = document.createElement('div');
-                item.style.cssText = `background:${isMe ? 'rgba(59,130,246,0.1)' : 'var(--bg-secondary)'}; border:1px solid var(--border-color); padding:0.75rem 1rem; border-radius:var(--radius-md); font-size:0.88rem;`;
-                item.innerHTML = `
-                <div style="display:flex; justify-content:space-between; margin-bottom:0.3rem; font-size:0.75rem;">
-                    <span style="font-weight:800; color:${isMe ? 'var(--landlord)' : 'var(--text-primary)'};">${domiknowEscapeHtml(senderName)} (${domiknowEscapeHtml(String(m.sender_role || '').toUpperCase())})</span>
-                    <span style="color:var(--text-muted);">${domiknowEscapeHtml(dateStr)}</span>
-                </div>
-                <div style="color:var(--text-primary); white-space:pre-wrap; line-height:1.5;">${domiknowEscapeHtml(m.message_text)}</div>
-                ${m.attachment_url ? `<div style="margin-top:0.4rem;"><a href="${domiknowSafeExternalUrl(m.attachment_url)}" target="_blank" rel="noopener noreferrer" style="color:var(--landlord); font-weight:700; font-size:0.8rem; display:inline-flex; align-items:center; gap:0.3rem;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg> View Attached Media</a></div>` : ''}
-            `;
-                feed.appendChild(item);
+            feed.innerHTML = '';
+            let lastDateStr = null;
+
+            data.forEach(m => {
+                const text = (m.message_text || '').trim();
+                if (!text && !m.attachment_url) return;
+
+                const msgDate = new Date(m.created_at);
+                const dateFormatted = msgDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+                if (dateFormatted !== lastDateStr) {
+                    lastDateStr = dateFormatted;
+                    const sep = document.createElement('div');
+                    sep.className = 'chat-date-separator';
+                    sep.innerHTML = `<span>${domiknowEscapeHtml(dateFormatted.toUpperCase())}</span>`;
+                    feed.appendChild(sep);
+                }
+
+                // Admin side: messages sent by any admin role = "me" (right side).
+                // Additionally confirm via userId if available.
+                const isMe = m.sender_role === 'admin' ||
+                             (myUserId != null && String(m.sender_id) === String(myUserId));
+                const senderName = isMe ? 'You (Admin)' : (m.sender?.full_name || capWords(m.sender_role || 'User'));
+                const timeStr = msgDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                const fullDateStr = msgDate.toLocaleString();
+
+                const initialName = senderName.replace(/^You \([^)]+\)/, 'You');
+                const initial = (initialName.charAt(0) || 'U').toUpperCase();
+
+                const row = document.createElement('div');
+                row.className = `chat-msg-row ${isMe ? 'me' : 'other'}`;
+
+                let attachmentHtml = '';
+                if (m.attachment_url) {
+                    const safeUrl = domiknowSafeExternalUrl(m.attachment_url);
+                    const isImg = /\.(jpg|jpeg|png|webp|gif|svg)$/i.test(m.attachment_url) || (m.attachment_path || '').match(/\.(jpg|jpeg|png|webp|gif|svg)$/i);
+                    if (isImg) {
+                        attachmentHtml = `<div class="chat-msg-attachment"><a href="${safeUrl}" target="_blank" rel="noopener noreferrer"><img src="${safeUrl}" alt="Attachment"></a></div>`;
+                    } else {
+                        const fileName = m.attachment_path ? m.attachment_path.split('/').pop() : 'Attachment';
+                        attachmentHtml = `
+                            <a href="${safeUrl}" target="_blank" rel="noopener noreferrer" class="chat-file-card">
+                                <div class="chat-file-icon">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+                                </div>
+                                <div class="chat-file-info">
+                                    <div class="chat-file-name">${domiknowEscapeHtml(fileName)}</div>
+                                    <div class="chat-file-actions">Download &bull; View</div>
+                                </div>
+                            </a>
+                        `;
+                    }
+                }
+
+                row.innerHTML = `
+                    <div class="chat-avatar">${domiknowEscapeHtml(initial)}</div>
+                    <div class="chat-msg-content-wrapper">
+                        <div class="chat-msg-meta">
+                            <strong>${domiknowEscapeHtml(senderName)}</strong> &bull; <span>${domiknowEscapeHtml(fullDateStr)}</span>
+                        </div>
+                        ${text ? `<div class="chat-msg-bubble">${domiknowEscapeHtml(text)}<div class="chat-msg-time-inline">${domiknowEscapeHtml(timeStr)}</div></div>` : ''}
+                        ${attachmentHtml}
+                    </div>
+                `;
+                feed.appendChild(row);
             });
         }
 

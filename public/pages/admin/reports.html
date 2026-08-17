@@ -418,8 +418,7 @@
             <div class="navbar-menu" style="flex-wrap: wrap; gap: 0.5rem 1rem;">
                 <a href="users.html" class="navbar-menu-link">Users</a>
                 <a href="property-review.html" class="navbar-menu-link">Property Review</a>
-                <a href="reservations.html" class="navbar-menu-link">Reservation Monitoring</a>
-                <a href="payments.html" class="navbar-menu-link">Payment Monitor</a>
+                <a href="payments.html" class="navbar-menu-link">Payment Verification</a>
                 <a href="reports.html" class="navbar-menu-link active">Reports Triage</a>
                 <a href="audit-logs.html" class="navbar-menu-link">Audit Logs</a>
             </div>
@@ -774,7 +773,7 @@
             fetchAllReports();
 
             // Filters
-            document.querySelector('.filters-group').addEventListener('click', (e) => {
+            document.querySelector('.filters-group')?.addEventListener('click', (e) => {
                 const btn = e.target.closest('[data-filter]');
                 if (!btn) return;
 

@@ -379,7 +379,7 @@
     </main>
 
     <!-- Edit Policy Modal -->
-    <div id="editPolicyModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="editModalTitle">
+    <div id="editPolicyModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="editModalTitle" style="display:none;">
         <div class="modal-container" tabindex="-1">
             <div class="modal-header">
                 <div style="display: flex; align-items: center; gap: 10px;">
@@ -433,7 +433,7 @@
     </div>
 
     <!-- Public Presentation Preview Modal -->
-    <div id="previewModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="previewModalTitle">
+    <div id="previewModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="previewModalTitle" style="display:none;">
         <div class="modal-container" tabindex="-1">
             <div class="modal-header">
                 <div style="display: flex; align-items: center; gap: 10px;">
@@ -475,14 +475,14 @@
 
             fetchPolicies();
 
-            document.getElementById('editActivePolicyBtn').addEventListener('click', openEditModal);
-            document.getElementById('previewPublicBtn').addEventListener('click', openPreviewModal);
-            document.getElementById('closeEditModalBtn').addEventListener('click', () => toggleModal('editPolicyModal', false));
-            document.getElementById('cancelEditModalBtn').addEventListener('click', () => toggleModal('editPolicyModal', false));
-            document.getElementById('closePreviewModalBtn').addEventListener('click', () => toggleModal('previewModal', false));
+            document.getElementById('editActivePolicyBtn')?.addEventListener('click', openEditModal);
+            document.getElementById('previewPublicBtn')?.addEventListener('click', openPreviewModal);
+            document.getElementById('closeEditModalBtn')?.addEventListener('click', () => toggleModal('editPolicyModal', false));
+            document.getElementById('cancelEditModalBtn')?.addEventListener('click', () => toggleModal('editPolicyModal', false));
+            document.getElementById('closePreviewModalBtn')?.addEventListener('click', () => toggleModal('previewModal', false));
 
-            document.getElementById('editPolicyForm').addEventListener('submit', handleSavePolicySubmit);
-            document.getElementById('editPolicyForm').addEventListener('input', () => {
+            document.getElementById('editPolicyForm')?.addEventListener('submit', handleSavePolicySubmit);
+            document.getElementById('editPolicyForm')?.addEventListener('input', () => {
                 policyEditDirty = true;
             });
             document.addEventListener('keydown', event => {
@@ -516,12 +516,24 @@
             }
             if (show) {
                 policyModalReturnFocus = document.activeElement;
-                modal.classList.add('active');
-                document.body.style.overflow = 'hidden';
-                requestAnimationFrame(() => modal.querySelector('.modal-container')?.focus());
+                modal.style.display = 'flex';
+                // Allow display:flex to paint before triggering transition
+                requestAnimationFrame(() => {
+                    modal.classList.add('active');
+                    document.body.style.overflow = 'hidden';
+                    modal.querySelector('.modal-container')?.focus();
+                });
             } else {
                 modal.classList.remove('active');
                 document.body.style.overflow = '';
+                // Hide after any CSS transition ends
+                modal.addEventListener('transitionend', () => {
+                    if (!modal.classList.contains('active')) modal.style.display = 'none';
+                }, { once: true });
+                // Fallback in case no transition fires
+                setTimeout(() => {
+                    if (!modal.classList.contains('active')) modal.style.display = 'none';
+                }, 350);
                 policyModalReturnFocus?.focus?.();
             }
         }

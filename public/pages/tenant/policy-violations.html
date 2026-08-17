@@ -3,153 +3,269 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Policy Violations - DomiKnow</title>
+    <title>Platform Terms & Community Rules - DomiKnow</title>
     <link href="../../css/input.css" rel="stylesheet">
     <style>
-        .policy-overview-card {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 1.5rem;
-            margin-bottom: 1.5rem;
-            padding: 1.25rem 1.5rem;
-            overflow: hidden;
-            background: linear-gradient(135deg, color-mix(in srgb, var(--tenant) 12%, var(--bg-secondary)), var(--bg-secondary));
-            border: 1px solid color-mix(in srgb, var(--tenant) 30%, var(--border-color));
+        .policy-hero-card {
+            background: linear-gradient(135deg, #047857 0%, #065f46 100%);
+            color: #ffffff;
             border-radius: var(--radius-lg);
-            box-shadow: var(--shadow-sm);
+            padding: 2rem 2.25rem;
+            margin-bottom: 1.75rem;
+            box-shadow: 0 10px 30px -5px rgba(4, 120, 87, 0.35);
             position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.15);
         }
-        .policy-overview-card::before {
-            width: 4px;
-            background: var(--tenant);
+        .policy-hero-card::after {
             content: '';
             position: absolute;
-            inset: 0 auto 0 0;
+            top: -40px;
+            right: -40px;
+            width: 220px;
+            height: 220px;
+            background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0) 70%);
+            border-radius: 50%;
+            pointer-events: none;
         }
-        .policy-overview-copy {
-            display: flex;
-            align-items: flex-start;
-            gap: 0.875rem;
-            min-width: 0;
+        .policy-hero-badge {
+            background: rgba(255, 255, 255, 0.18);
+            backdrop-filter: blur(4px);
+            color: #ffffff;
+            padding: 0.3rem 0.85rem;
+            border-radius: var(--radius-full);
+            font-size: 0.75rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 0.75rem;
         }
-        .policy-overview-icon {
-            display: grid;
-            width: 38px;
-            height: 38px;
-            flex: 0 0 38px;
-            place-items: center;
-            color: var(--tenant);
-            background: color-mix(in srgb, var(--tenant) 13%, var(--bg-secondary));
-            border-radius: var(--radius-md);
-        }
-        .policy-overview-card h2,
-        .policy-card-heading h2 {
+        .policy-hero-title {
             margin: 0;
-            color: var(--text-primary);
+            font-size: 1.85rem;
+            font-weight: 800;
+            color: #ffffff;
+            letter-spacing: -0.02em;
         }
-        .policy-overview-card h2 {
-            font-size: 1rem;
+        .policy-hero-desc {
+            margin: 0.6rem 0 0 0;
+            color: rgba(255, 255, 255, 0.88);
+            font-size: 0.95rem;
+            max-width: 720px;
+            line-height: 1.6;
         }
-        .policy-overview-card p,
-        .policy-section-description {
-            margin: 0.3rem 0 0;
+
+        /* ── Tabs Bar ── */
+        .policy-tabs-bar {
+            display: flex;
+            gap: 0.6rem;
+            margin-bottom: 1.5rem;
+            overflow-x: auto;
+            padding-bottom: 4px;
+            scrollbar-width: thin;
+        }
+        .policy-tab-btn {
+            background-color: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 0.75rem 1.25rem;
+            font-size: 0.88rem;
+            font-weight: 700;
             color: var(--text-secondary);
-            font-size: 0.83rem;
-            line-height: 1.55;
-        }
-        .policy-rules-button {
-            flex: 0 0 auto;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.6rem;
             white-space: nowrap;
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
         }
-        .violations-grid {
-            display: grid;
-            grid-template-columns: minmax(320px, 380px) minmax(0, 1fr);
-            gap: 1.25rem;
-            align-items: start;
+        .policy-tab-btn:hover {
+            border-color: var(--tenant);
+            color: var(--tenant);
+            transform: translateY(-1px);
         }
-        .form-card, .history-card {
-            min-width: 0;
+        .policy-tab-btn.active {
+            background-color: var(--tenant);
+            border-color: var(--tenant);
+            color: #ffffff;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+        }
+
+        /* ── Policy Presentation Card ── */
+        .policy-main-card {
             background-color: var(--bg-secondary);
             border: 1px solid var(--border-color);
             border-radius: var(--radius-lg);
-            padding: 1.35rem;
+            padding: 2rem;
             box-shadow: var(--shadow-sm);
         }
-        .history-card {
-            grid-column: 2;
-            grid-row: 1;
+        .policy-header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 1.25rem;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 1.5rem;
+            margin-bottom: 1.75rem;
+            flex-wrap: wrap;
         }
-        .form-card {
-            grid-column: 1;
-            grid-row: 1;
-            position: sticky;
-            top: 5.5rem;
-        }
-        .policy-card-heading {
-            margin-bottom: 1.25rem;
-        }
-        .policy-card-heading h2 {
-            font-size: 1rem;
-        }
-        .policy-history-table-wrap {
-            width: 100%;
-            overflow-x: auto;
-        }
-        .policy-history-table-wrap table {
-            width: 100%;
-            min-width: 720px;
-            border-collapse: collapse;
-            text-align: left;
-            font-size: 0.9rem;
-        }
-        .policy-history-table-wrap th {
-            font-weight: 700;
-            color: var(--text-secondary);
-            padding: 0.75rem 1rem;
-            border-bottom: 2px solid var(--border-color);
-            text-transform: uppercase;
+        .policy-category-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
             font-size: 0.75rem;
+            font-weight: 800;
+            color: var(--tenant);
+            background-color: color-mix(in srgb, var(--tenant) 12%, transparent);
+            padding: 0.3rem 0.85rem;
+            border-radius: var(--radius-full);
+            text-transform: uppercase;
             letter-spacing: 0.05em;
         }
-        .policy-history-table-wrap td {
-            padding: 1rem;
-            border-bottom: 1px solid var(--border-color);
+        .policy-active-title {
+            margin: 0.6rem 0 0 0;
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: var(--text-primary);
+            letter-spacing: -0.01em;
+        }
+        .policy-meta-box {
+            text-align: right;
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            padding: 0.65rem 1rem;
+            border-radius: var(--radius-md);
+        }
+        .policy-version-text {
+            font-size: 0.82rem;
+            font-weight: 800;
             color: var(--text-primary);
         }
-        @media (max-width: 1080px) {
-            .violations-grid {
-                grid-template-columns: 1fr;
-            }
-            .history-card,
-            .form-card {
-                grid-column: 1;
-                position: static;
-            }
-            .form-card { grid-row: 1; }
-            .history-card { grid-row: 2; }
+        .policy-date-text {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: 2px;
         }
+
+        /* ── Executive Summary ── */
+        .policy-summary-callout {
+            background-color: color-mix(in srgb, var(--tenant) 8%, var(--bg-primary));
+            border-left: 4px solid var(--tenant);
+            border-radius: 0 var(--radius-md) var(--radius-md) 0;
+            padding: 1.25rem 1.5rem;
+            margin-bottom: 2rem;
+        }
+        .policy-summary-callout h4 {
+            margin: 0 0 0.4rem 0;
+            font-size: 0.82rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--tenant);
+            font-weight: 800;
+        }
+        .policy-summary-callout p {
+            margin: 0;
+            font-size: 0.92rem;
+            color: var(--text-primary);
+            line-height: 1.6;
+            font-weight: 500;
+        }
+
+        /* ── Search Bar ── */
+        .policy-search-wrap {
+            margin-bottom: 1.5rem;
+            position: relative;
+        }
+        .policy-search-input {
+            width: 100%;
+            padding: 0.75rem 1rem 0.75rem 2.6rem;
+            background-color: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            color: var(--text-primary);
+            font-size: 0.9rem;
+            font-weight: 500;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .policy-search-input:focus {
+            border-color: var(--tenant);
+            box-shadow: 0 0 0 3px color-mix(in srgb, var(--tenant) 20%, transparent);
+        }
+        .policy-search-icon {
+            position: absolute;
+            top: 50%;
+            left: 0.9rem;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            pointer-events: none;
+        }
+
+        /* ── Section Clause Boxes ── */
+        .policy-section-box {
+            background-color: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 1.35rem 1.5rem;
+            margin-bottom: 1rem;
+            transition: all 0.2s ease;
+        }
+        .policy-section-box:hover {
+            border-color: color-mix(in srgb, var(--tenant) 40%, var(--border-color));
+            box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+        }
+        .policy-clause-num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 24px;
+            height: 24px;
+            background-color: color-mix(in srgb, var(--tenant) 15%, transparent);
+            color: var(--tenant);
+            border-radius: 50%;
+            font-size: 0.75rem;
+            font-weight: 800;
+            margin-right: 0.5rem;
+        }
+        .policy-section-title {
+            margin: 0 0 0.6rem 0;
+            font-size: 1.05rem;
+            font-weight: 800;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+        }
+        .policy-section-body {
+            margin: 0;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            line-height: 1.65;
+        }
+
         @media (max-width: 640px) {
-            .policy-overview-card {
-                align-items: stretch;
+            .policy-hero-card {
+                padding: 1.5rem;
+            }
+            .policy-main-card {
+                padding: 1.25rem;
+            }
+            .policy-header-row {
                 flex-direction: column;
-                padding: 1rem;
             }
-            .policy-rules-button {
+            .policy-meta-box {
+                text-align: left;
                 width: 100%;
-                justify-content: center;
-            }
-            .form-card,
-            .history-card {
-                padding: 1rem;
             }
         }
     </style>
     <link href="../../css/design-system.css" rel="stylesheet">
     <script src="../../js/ui.js" defer></script>
 </head>
-<body>
-    <!-- Navbar -->
+<body class="app-loading" data-role="tenant" data-page-title="Platform Terms & Community Rules">
+    <!-- Navbar (fallback) -->
     <nav class="navbar navbar-tenant">
         <div class="navbar-container">
             <div class="navbar-brand-group">
@@ -157,382 +273,195 @@
                 <span class="navbar-badge navbar-badge-tenant">Tenant</span>
             </div>
             <div class="navbar-menu" style="flex-wrap: wrap; gap: 0.5rem 1rem;">
-                <a href="dashboard.html" class="navbar-menu-link">Dashboard</a>
                 <a href="properties.html" class="navbar-menu-link">Discovery</a>
                 <a href="applications.html" class="navbar-menu-link">My Applications</a>
                 <a href="leases.html" class="navbar-menu-link">My Lease</a>
                 <a href="billings.html" class="navbar-menu-link">My Billings</a>
                 <a href="maintenance.html" class="navbar-menu-link">Maintenance</a>
                 <a href="reports.html" class="navbar-menu-link">Reports</a>
-                <a href="tenant-reports.html" class="navbar-menu-link">Reports Against Me</a>
-                <a href="disputes.html" class="navbar-menu-link">Disputes</a>
-                <a href="policy-violations.html" class="navbar-menu-link active">Violations</a>
-                <a href="feedback.html" class="navbar-menu-link">Feedback</a>
-            </div>
-            <div class="navbar-right">
-                <span class="navbar-user-welcome">Welcome, <span class="user-name">User</span></span>
-                <button id="logoutBtn" class="navbar-btn">Logout</button>
+                <a href="policy-violations.html" class="navbar-menu-link active">Rules &amp; Policies</a>
             </div>
         </div>
     </nav>
 
-    <main class="dashboard-container">
-        <section class="policy-overview-card" aria-labelledby="policyOverviewTitle">
-            <div class="policy-overview-copy">
-                <span class="policy-overview-icon" aria-hidden="true">
-                    <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.25" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-                </span>
-                <div>
-                    <h2 id="policyOverviewTitle">Platform terms and community rules</h2>
-                    <p>Review housing standards, quiet-hour rules, and disciplinary guidelines before filing a report.</p>
-                </div>
+    <main class="dashboard-container" style="max-width: 1100px; margin: 0 auto; padding: 1.5rem;">
+        <!-- Hero Header -->
+        <section class="policy-hero-card" aria-labelledby="policyHeroTitle">
+            <div class="policy-hero-badge">
+                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                Platform Governance &amp; Community Standards
             </div>
-            <button type="button" id="openPlatformPolicyModalBtn" class="btn-secondary policy-rules-button">
-                View terms and rules
-            </button>
+            <h1 id="policyHeroTitle" class="policy-hero-title">Platform Terms &amp; Community Rules</h1>
+            <p class="policy-hero-desc">
+                Review official terms of service, tenant conduct guidelines, residential community standards, and disciplinary sanction policies.
+            </p>
         </section>
 
-        <div class="violations-grid">
-            <!-- Submit Form -->
-            <div class="form-card">
-                <div class="policy-card-heading">
-                    <h2>Report a policy violation</h2>
-                    <p class="policy-section-description">Connect the report to a lease and describe only what you directly observed.</p>
-                </div>
-                <div id="errorMessage" class="status-badge status-rejected hidden" style="width:100%; margin-bottom: 1rem; padding: 0.75rem;"></div>
-                <div id="successMessage" class="status-badge status-active hidden" style="width:100%; margin-bottom: 1rem; padding: 0.75rem;"></div>
-
-                <form id="violationForm">
-                    <div class="form-group">
-                        <label class="form-label" for="leaseSelector">Select Lease context</label>
-                        <select id="leaseSelector" name="lease_id" class="form-input" required>
-                            <option value="">-- Select Active Lease --</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label class="form-label" for="violationType">Violation Type</label>
-                        <select id="violationType" name="violation_type" class="form-input" required>
-                            <option value="">-- Select Type --</option>
-                            <option value="property_rule_violation">House Rule Violation</option>
-                            <option value="late_payment">Late Payment</option>
-                            <option value="unauthorized_occupant">Unauthorized Occupant / Subletting</option>
-                            <option value="property_damage">Property Damage</option>
-                            <option value="noise_complaint">Noise Complaint / Disturbance</option>
-                            <option value="misconduct">General Misconduct / Harassment</option>
-                            <option value="other">Other Violation</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label class="form-label" for="violationDescription">Factual Evidence Description</label>
-                        <textarea id="violationDescription" name="violation_description" class="form-input" placeholder="Give details about what occurred, dates, times, and rules broken..." style="height: 120px;" required></textarea>
-                    </div>
-
-                    <div class="form-group">
-                        <label class="form-label" for="evidenceFile">Upload Evidence Document / Image (Optional)</label>
-                        <input type="file" id="evidenceFile" accept="image/*,application/pdf" class="form-input">
-                        <p class="form-help">Accepted formats: images or PDF. Attach only evidence relevant to this report.</p>
-                    </div>
-
-                    <button type="submit" id="submitBtn" class="btn-primary" style="background-color: var(--tenant); border-color: var(--tenant); width: 100%;">
-                        Submit Violation Report
-                    </button>
-                </form>
-            </div>
-
-            <!-- History List -->
-            <div class="history-card">
-                <div class="policy-card-heading">
-                    <h2>Policy violation history</h2>
-                    <p class="policy-section-description">Track review status, administrative action, and the date each report was filed.</p>
-                </div>
-                <div class="policy-history-table-wrap">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Violation Details</th>
-                            <th>Category & Description</th>
-                            <th>Status & Action Taken</th>
-                            <th>Date Filed</th>
-                        </tr>
-                    </thead>
-                    <tbody id="violationsTableBody">
-                        <tr>
-                            <td colspan="4" style="text-align: center; color: var(--text-muted);">Loading history...</td>
-                        </tr>
-                    </tbody>
-                </table>
-                </div>
-            </div>
+        <!-- Category Tabs Bar -->
+        <div class="policy-tabs-bar" role="tablist" aria-label="Platform policy categories">
+            <button type="button" class="policy-tab-btn active" role="tab" aria-selected="true" data-policy-key="tos">
+                <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/></svg>
+                Terms of Service (TOS)
+            </button>
+            <button type="button" class="policy-tab-btn" role="tab" aria-selected="false" data-policy-key="tenant_code">
+                <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z"/></svg>
+                Tenant Code of Conduct
+            </button>
+            <button type="button" class="policy-tab-btn" role="tab" aria-selected="false" data-policy-key="listing_standards">
+                <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25"/></svg>
+                Landlord Listing Standards
+            </button>
+            <button type="button" class="policy-tab-btn" role="tab" aria-selected="false" data-policy-key="disciplinary_guidelines">
+                <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                Disciplinary Sanctions Policy
+            </button>
         </div>
+
+        <!-- Policy Content Display Card -->
+        <article class="policy-main-card">
+            <div class="policy-header-row">
+                <div>
+                    <span id="policyCategoryTag" class="policy-category-tag">Legal &amp; Governance</span>
+                    <h2 id="policyTitleDisplay" class="policy-active-title">Platform Terms of Service (TOS)</h2>
+                </div>
+                <div class="policy-meta-box">
+                    <div id="policyVersionDisplay" class="policy-version-text">Version: v2.4 (2026)</div>
+                    <div id="policyLastUpdatedDisplay" class="policy-date-text">Last Updated: August 2026</div>
+                </div>
+            </div>
+
+            <!-- Executive Summary -->
+            <div class="policy-summary-callout">
+                <h4>Executive Summary</h4>
+                <p id="policySummaryDisplay">
+                    Official rules and operational terms governing tenant rights, lease contracts, online transactions, and dispute resolutions on DomiKnow.
+                </p>
+            </div>
+
+            <!-- Real-time Filter Search -->
+            <div class="policy-search-wrap">
+                <svg class="policy-search-icon" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                <input type="text" id="policySearchInput" class="policy-search-input" placeholder="Search within this policy (e.g. noise, payments, termination, safety)..." aria-label="Search policy clauses">
+            </div>
+
+            <!-- Policy Sections List Container -->
+            <div id="policySectionsContainer" aria-live="polite">
+                <div style="text-align:center; padding: 2.5rem; color: var(--text-muted);">
+                    Loading platform policy clauses...
+                </div>
+            </div>
+        </article>
     </main>
 
     <script src="../../js/auth.js"></script>
     <script src="../../js/dashboard.js"></script>
     <script>
-        const token = localStorage.getItem('domiknow_token');
-        let activeLeasesMap = new Map();
+        let allPoliciesData = {};
+        let currentPolicyKey = 'tos';
+        let currentSearchQuery = '';
 
         document.addEventListener('DOMContentLoaded', () => {
-            if (!token) return;
-            fetchActiveLeases();
-            fetchMyViolations();
+            fetchPlatformPolicies();
 
-            document.getElementById('violationForm').addEventListener('submit', handleSubmitViolation);
+            // Tab button clicks
+            document.querySelectorAll('.policy-tab-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const key = btn.dataset.policyKey;
+                    if (key) switchPolicyCategory(key);
+                });
+            });
+
+            // Live search filter input
+            const searchInput = document.getElementById('policySearchInput');
+            if (searchInput) {
+                searchInput.addEventListener('input', (e) => {
+                    currentSearchQuery = (e.target.value || '').trim().toLowerCase();
+                    renderActivePolicyClauses();
+                });
+            }
         });
 
-        async function fetchActiveLeases() {
-            const selectEl = document.getElementById('leaseSelector');
+        async function fetchPlatformPolicies() {
+            const container = document.getElementById('policySectionsContainer');
             try {
-                const response = await fetch('/api/tenant/leases/my', {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
-                if (!response.ok) return;
-
-                const result = await response.json();
-                const leases = result.data || [];
-                const activeLeases = leases.filter(l => l.lease_status === 'active');
-
-                activeLeases.forEach(lease => {
-                    activeLeasesMap.set(lease.id, lease);
-                    const option = document.createElement('option');
-                    option.value = lease.id;
-                    option.textContent = `${lease.property_name} (Landlord: ${lease.landlord_name || 'N/A'})`;
-                    selectEl.appendChild(option);
-                });
+                const response = await fetch('/api/policies');
+                if (response.ok) {
+                    const result = await response.json();
+                    const list = result.data || [];
+                    list.forEach(p => {
+                        allPoliciesData[p.key] = p;
+                    });
+                    renderActivePolicyClauses();
+                } else {
+                    container.innerHTML = '<div style="text-align:center; padding:2rem; color:var(--error);">Failed to load platform policies.</div>';
+                }
             } catch (err) {
                 console.error(err);
+                container.innerHTML = '<div style="text-align:center; padding:2rem; color:var(--error);">Network error loading policies. Please try again.</div>';
             }
         }
 
-        async function fetchMyViolations() {
-            const tableBody = document.getElementById('violationsTableBody');
-            try {
-                const response = await fetch('/api/policy-violations/my', {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
-                if (!response.ok) {
-                    tableBody.innerHTML = `<tr><td colspan="4" style="text-align: center; color: var(--error);">Failed to load history.</td></tr>`;
-                    return;
-                }
+        function switchPolicyCategory(key) {
+            currentPolicyKey = key;
+            document.querySelectorAll('.policy-tab-btn').forEach(btn => {
+                const isActive = btn.dataset.policyKey === key;
+                btn.classList.toggle('active', isActive);
+                btn.setAttribute('aria-selected', isActive ? 'true' : 'false');
+            });
 
-                const result = await response.json();
-                const violations = result.data || [];
-
-                if (violations.length === 0) {
-                    tableBody.innerHTML = `<tr><td colspan="4" style="text-align: center; padding: 2rem; color: var(--text-muted);">No violation records logged.</td></tr>`;
-                    return;
-                }
-
-                tableBody.innerHTML = '';
-                violations.forEach(viol => {
-                    let statusBadgeClass = 'status-pending';
-                    if (viol.status === 'resolved') statusBadgeClass = 'status-active';
-                    if (viol.status === 'dismissed') statusBadgeClass = 'status-rejected';
-                    if (viol.status === 'under_review') statusBadgeClass = 'status-pending';
-
-                    const createdDate = new Date(viol.created_at).toLocaleDateString();
-
-                    const row = document.createElement('tr');
-                    row.innerHTML = `
-                        <td>
-                            <div style="font-weight:700; color:var(--text-primary);">${domiknowEscapeHtml(viol.properties?.property_name || 'Property')}</div>
-                            <div style="font-size:0.75rem; color:var(--text-muted);">
-                                Reporter: ${domiknowEscapeHtml(viol.reporter?.full_name || 'You')}<br>
-                                Violator: ${domiknowEscapeHtml(viol.violator?.full_name || 'Landlord')}
-                            </div>
-                        </td>
-                        <td>
-                            <div style="text-transform:capitalize; font-size:0.8rem;"><strong>${domiknowEscapeHtml(String(viol.violation_type || 'other').replace(/_/g, ' '))}</strong></div>
-                            <div style="font-size:0.75rem; color:var(--text-muted);">${domiknowEscapeHtml(String(viol.violation_description || '').substring(0, 50))}${String(viol.violation_description || '').length > 50 ? '…' : ''}</div>
-                        </td>
-                        <td>
-                            <span class="status-badge ${statusBadgeClass}" style="text-transform:capitalize;">${domiknowEscapeHtml(String(viol.status || 'pending').replace(/_/g, ' '))}</span>
-                            <div style="font-size:0.75rem; color:var(--text-muted); margin-top:0.25rem;">
-                                Action: ${domiknowEscapeHtml(viol.action_taken || 'Under official review')}
-                            </div>
-                        </td>
-                        <td>${createdDate}</td>
-                    `;
-                    tableBody.appendChild(row);
-                });
-            } catch (err) {
-                console.error(err);
-                tableBody.innerHTML = `<tr><td colspan="4" style="text-align: center; color: var(--error);">Error reaching API.</td></tr>`;
+            // Reset search input
+            const searchInput = document.getElementById('policySearchInput');
+            if (searchInput) {
+                searchInput.value = '';
+                currentSearchQuery = '';
             }
+
+            renderActivePolicyClauses();
         }
 
-        async function handleSubmitViolation(e) {
-            e.preventDefault();
-            const submitBtn = document.getElementById('submitBtn');
-            const errorDiv = document.getElementById('errorMessage');
-            const successDiv = document.getElementById('successMessage');
+        function renderActivePolicyClauses() {
+            const policy = allPoliciesData[currentPolicyKey];
+            const container = document.getElementById('policySectionsContainer');
+            if (!policy) return;
 
-            submitBtn.disabled = true;
-            submitBtn.textContent = 'Submitting...';
-            errorDiv.classList.add('hidden');
-            successDiv.classList.add('hidden');
+            document.getElementById('policyCategoryTag').textContent = policy.category || 'Platform Policy';
+            document.getElementById('policyTitleDisplay').textContent = policy.title || 'Platform Terms';
+            document.getElementById('policyVersionDisplay').textContent = `Version: ${policy.version || 'v2.4'}`;
+            document.getElementById('policyLastUpdatedDisplay').textContent = `Last Updated: ${policy.last_updated || 'August 2026'}`;
+            document.getElementById('policySummaryDisplay').textContent = policy.summary || 'Official rules and guidelines.';
 
-            const formData = new FormData(e.target);
-            const leaseId = formData.get('lease_id');
-            const lease = activeLeasesMap.get(leaseId);
+            container.innerHTML = '';
 
-            if (!lease) {
-                errorDiv.textContent = 'Invalid Lease Selected.';
-                errorDiv.classList.remove('hidden');
-                submitBtn.disabled = false;
-                submitBtn.textContent = 'Submit Violation Report';
+            const allSections = policy.sections || [];
+            const filteredSections = allSections.filter(sec => {
+                if (!currentSearchQuery) return true;
+                const h = (sec.heading || '').toLowerCase();
+                const c = (sec.content || '').toLowerCase();
+                return h.includes(currentSearchQuery) || c.includes(currentSearchQuery);
+            });
+
+            if (filteredSections.length === 0) {
+                container.innerHTML = `
+                    <div style="text-align:center; padding: 2.5rem; color: var(--text-muted); background: var(--bg-primary); border: 1px dashed var(--border-color); border-radius: var(--radius-md);">
+                        <svg width="32" height="32" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" style="margin-bottom:0.5rem; opacity:0.6;"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                        <p style="margin:0; font-weight:600;">No clauses found matching "${domiknowEscapeHtml(currentSearchQuery)}".</p>
+                        <small style="color:var(--text-muted);">Try a different search keyword or switch policy tabs above.</small>
+                    </div>
+                `;
                 return;
             }
 
-            const fileInput = document.getElementById('evidenceFile');
-            const file = fileInput.files[0];
-
-            const bodyData = {
-                lease_id: leaseId,
-                property_id: lease.property_id,
-                violator_id: lease.landlord_id, // Landlord is the violator for tenant-filed violations
-                violation_type: formData.get('violation_type'),
-                violation_description: formData.get('violation_description')
-            };
-
-            const submitPayload = async (base64String, fileName, mimeType, fileSize) => {
-                if (base64String) {
-                    bodyData.base64_content = base64String;
-                    bodyData.file_name = fileName;
-                    bodyData.mime_type = mimeType;
-                    bodyData.file_size = fileSize;
-                }
-
-                try {
-                    const response = await fetch('/api/policy-violations', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Authorization': `Bearer ${token}`
-                        },
-                        body: JSON.stringify(bodyData)
-                    });
-
-                    const result = await response.json();
-                    if (response.ok) {
-                        successDiv.textContent = result.message || 'Violation report submitted!';
-                        successDiv.classList.remove('hidden');
-                        e.target.reset();
-                        fetchMyViolations();
-                    } else {
-                        errorDiv.textContent = result.message || 'Submission failed.';
-                        errorDiv.classList.remove('hidden');
-                    }
-                } catch (err) {
-                    console.error(err);
-                    errorDiv.textContent = 'An error occurred during submission.';
-                    errorDiv.classList.remove('hidden');
-                } finally {
-                    submitBtn.disabled = false;
-                    submitBtn.textContent = 'Submit Violation Report';
-                }
-            };
-
-            if (file) {
-                const reader = new FileReader();
-                reader.readAsDataURL(file);
-                reader.onload = () => {
-                    submitPayload(reader.result, file.name, file.type, file.size);
-                };
-                reader.onerror = () => {
-                    errorDiv.textContent = 'Failed to read file.';
-                    errorDiv.classList.remove('hidden');
-                    submitBtn.disabled = false;
-                    submitBtn.textContent = 'Submit Violation Report';
-                };
-            } else {
-                submitPayload(null);
-            }
-        }
-
-        // Platform Policy Viewer Modal Logic
-        const modalHtml = `
-            <div id="userPolicyModal" role="dialog" aria-modal="true" aria-labelledby="userPolicyModalTitle" aria-hidden="true" tabindex="-1" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(15, 23, 42, 0.65); backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; z-index: 9999; opacity: 0; pointer-events: none; transition: opacity 0.25s ease;">
-                <div tabindex="-1" style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-lg); width: min(calc(100% - 32px), 760px); max-height: 85vh; display: flex; flex-direction: column; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); overflow: hidden;">
-                    <div style="padding: 1.25rem 1.75rem; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; background: var(--bg-secondary);">
-                        <h3 id="userPolicyModalTitle" style="margin: 0; font-size: 1.2rem; font-weight: 800; color: var(--text-primary); display: flex; align-items: center; gap: 8px;">
-                            <svg width="20" height="20" fill="none" stroke="#4f46e5" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-                            Platform Terms of Service &amp; Rules
-                        </h3>
-                        <button id="closeUserPolicyModalBtn" type="button" aria-label="Close platform policies" style="background: none; border: none; cursor: pointer; color: var(--text-secondary); font-size: 1.5rem; font-weight: 700;">&times;</button>
-                    </div>
-                    <div id="userPolicyModalBody" style="padding: 1.5rem; overflow-y: auto; flex-grow: 1;">
-                        <div style="text-align: center; color: var(--text-muted); font-style: italic;">Loading published platform policies...</div>
-                    </div>
-                    <div style="padding: 1rem 1.75rem; border-top: 1px solid var(--border-color); text-align: right; background: var(--bg-primary);">
-                        <button type="button" id="closeUserPolicyModalFooterBtn" class="navbar-btn" style="padding: 0.5rem 1.25rem;">Close Rules</button>
-                    </div>
-                </div>
-            </div>
-        `;
-        document.body.insertAdjacentHTML('beforeend', modalHtml);
-
-        const openBtn = document.getElementById('openPlatformPolicyModalBtn');
-        const modal = document.getElementById('userPolicyModal');
-        const closeBtn = document.getElementById('closeUserPolicyModalBtn');
-        const closeFooterBtn = document.getElementById('closeUserPolicyModalFooterBtn');
-        let policyModalReturnFocus = null;
-
-        const closePolicyModal = () => {
-            modal.style.opacity = '0';
-            modal.style.pointerEvents = 'none';
-            modal.setAttribute('aria-hidden', 'true');
-            document.body.classList.remove('tenant-modal-open');
-            policyModalReturnFocus?.focus?.();
-        };
-
-        if (openBtn && modal) {
-            openBtn.addEventListener('click', async () => {
-                policyModalReturnFocus = document.activeElement;
-                modal.style.opacity = '1';
-                modal.style.pointerEvents = 'auto';
-                modal.setAttribute('aria-hidden', 'false');
-                document.body.classList.add('tenant-modal-open');
-                requestAnimationFrame(() => modal.querySelector('[tabindex="-1"]')?.focus());
-                
-                try {
-                    const res = await fetch('/api/policies');
-                    if (res.ok) {
-                        const result = await res.json();
-                        const policies = result.data || [];
-                        const body = document.getElementById('userPolicyModalBody');
-                        body.innerHTML = policies.map(p => `
-                            <div style="background: var(--bg-primary); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 1.25rem; margin-bottom: 1.25rem;">
-                                <div style="font-size: 0.75rem; font-weight: 800; color: #4f46e5; text-transform: uppercase;">${domiknowEscapeHtml(p.category || 'Policy Section')} &middot; ${domiknowEscapeHtml(p.version || 'v1.0')}</div>
-                                <h4 style="margin: 0.25rem 0 0.5rem 0; font-size: 1.15rem; font-weight: 800; color: var(--text-primary);">${domiknowEscapeHtml(p.title || 'Untitled policy')}</h4>
-                                <p style="margin: 0 0 1rem 0; font-size: 0.88rem; color: var(--text-secondary); line-height: 1.5; font-weight: 500;">${domiknowEscapeHtml(p.summary || '')}</p>
-                                <div>
-                                    ${(p.sections || []).map(s => `
-                                        <div style="margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px dashed var(--border-color);">
-                                            <div style="font-weight: 800; font-size: 0.9rem; color: var(--text-primary); margin-bottom: 0.25rem;">${domiknowEscapeHtml(s.heading || '')}</div>
-                                            <div style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.5;">${domiknowEscapeHtml(s.content || '')}</div>
-                                        </div>
-                                    `).join('')}
-                                </div>
-                            </div>
-                        `).join('');
-                    }
-                } catch (err) {
-                    console.error(err);
-                }
-            });
-
-            if (closeBtn) {
-                closeBtn.addEventListener('click', closePolicyModal);
-            }
-            closeFooterBtn?.addEventListener('click', closePolicyModal);
-            modal.addEventListener('click', event => {
-                if (event.target === modal) closePolicyModal();
-            });
-            document.addEventListener('keydown', event => {
-                if (event.key === 'Escape' && modal.getAttribute('aria-hidden') === 'false') closePolicyModal();
+            filteredSections.forEach((sec, idx) => {
+                const box = document.createElement('div');
+                box.className = 'policy-section-box';
+                box.innerHTML = `
+                    <h3 class="policy-section-title">
+                        <span class="policy-clause-num">${idx + 1}</span>
+                        ${domiknowEscapeHtml(sec.heading || `Clause ${idx + 1}`)}
+                    </h3>
+                    <p class="policy-section-body">${domiknowEscapeHtml(sec.content || '')}</p>
+                `;
+                container.appendChild(box);
             });
         }
     </script>

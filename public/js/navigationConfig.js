@@ -102,7 +102,6 @@ const NAVIGATION_CONFIG = {
     {
       section: 'Platform Monitoring',
       items: [
-        { label: 'Reservations', href: 'reservations.html' },
         { label: 'Payment Verification', href: 'payments.html' }
       ]
     },

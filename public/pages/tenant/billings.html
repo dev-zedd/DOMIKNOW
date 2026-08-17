@@ -461,6 +461,8 @@
                 </div>
             </form>
         </div>
+    </div>
+
     <!-- Payment details modal -->
     <div id="paymentDetailModal" class="modal-overlay hidden">
         <div class="modal-container">
@@ -540,11 +542,30 @@
             document.getElementById('btnTabPayments').addEventListener('click', () => switchTab('payments'));
 
             // paymentDetailModal close listeners
-            document.getElementById('closePaymentDetailModalBtn').addEventListener('click', closePaymentDetailModal);
-            document.getElementById('closePaymentModalFooterBtn').addEventListener('click', closePaymentDetailModal);
+            document.getElementById('closePaymentDetailModalBtn')?.addEventListener('click', closePaymentDetailModal);
+            document.getElementById('closePaymentModalFooterBtn')?.addEventListener('click', closePaymentDetailModal);
+
+            // Overlay click dismiss listeners
+            document.getElementById('paymentDetailModal')?.addEventListener('click', (e) => {
+                if (e.target.id === 'paymentDetailModal') closePaymentDetailModal();
+            });
+            document.getElementById('billDetailModal')?.addEventListener('click', (e) => {
+                if (e.target.id === 'billDetailModal') closeDetailModal();
+            });
+            document.getElementById('submitPaymentModal')?.addEventListener('click', (e) => {
+                if (e.target.id === 'submitPaymentModal') closePaymentModal();
+            });
+
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    closeDetailModal();
+                    closePaymentModal();
+                    closePaymentDetailModal();
+                }
+            });
 
             // Event delegation on payments table body
-            document.getElementById('paymentsTableBody').addEventListener('click', (e) => {
+            document.getElementById('paymentsTableBody')?.addEventListener('click', (e) => {
                 const btn = e.target.closest('[data-payment-id]');
                 if (btn) openPaymentDetailModal(btn.dataset.paymentId);
             });

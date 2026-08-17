@@ -39,6 +39,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         window.location.href = '/pages/landlord/properties.html';
         return;
     }
+    if (path.includes('/admin/reservations.html')) {
+        window.location.href = '/pages/admin/overview.html';
+        return;
+    }
 
     let expectedRole = null;
     if (path.includes('/tenant/')) expectedRole = 'tenant';
@@ -384,7 +388,6 @@ function renderNewDashboardLayout(user) {
             {
                 section: 'Platform Monitoring',
                 items: [
-                    { label: 'Reservations', href: 'reservations.html' },
                     { label: 'Payment Verification', href: 'payments.html' }
                 ]
             },
@@ -778,7 +781,7 @@ function renderNewDashboardLayout(user) {
                             <span>Disputes</span>
                         </a>
                         <a href="/pages/tenant/feedback.html" class="nav-sheet-item" ${activeNavigationFilename === 'feedback.html' ? 'aria-current="page"' : ''}>
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21a9 9 0 1 0-9-9c0 1.48.36 2.88 1 4.11L3 21l4.89-1c1.23.64 2.63 1 4.11 1z"/><circle cx="8" cy="12" r="1" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1" fill="currentColor" stroke-none"/><circle cx="16" cy="12" r="1" fill="currentColor" stroke-none"/></svg>
                             <span>Ratings &amp; feedback</span>
                         </a>
                         <a href="/pages/tenant/policy-violations.html" class="nav-sheet-item" ${activeNavigationFilename === 'policy-violations.html' ? 'aria-current="page"' : ''}>
@@ -931,8 +934,8 @@ function renderNewDashboardLayout(user) {
         });
     }
 
-    // 4. Attach Sidebar Scroll Persistence (remembers scroll position across page transitions)
-    initSidebarScrollPersistence(sidebar);
+    // 4. Attach Seamless SPA Dashboard Navigation
+    initSeamlessDashboardNavigation(role, sidebar);
 
     // Logout button behavior
     const logoutBtn = document.getElementById('newLogoutBtn');
@@ -1037,10 +1040,320 @@ function renderNewDashboardLayout(user) {
     document.dispatchEvent(new CustomEvent('domiknow:shell-ready', { detail: { role } }));
 }
 
-function initSidebarScrollPersistence(sidebar) {
+// ── 4. Persistent Sidebar Navigation & Active Indicator ──
+
+const parentNavigationPages = {
+    admin: {
+        'property-review-details.html': 'property-review.html',
+        'report-detail.html': 'reports.html'
+    },
+    maintenance: {
+        'task-details.html': 'tasks.html'
+    },
+    tenant: {
+        'property-details.html': 'properties.html',
+        'apply.html': 'properties.html',
+        'application-details.html': 'applications.html',
+        'landlord-report-form.html': 'reports.html',
+        'tenant-reports.html': 'reports.html'
+    },
+    landlord: {
+        'property-details.html': 'properties.html',
+        'units.html': 'properties.html',
+        'application-details.html': 'applications.html',
+        'lease-create.html': 'leases.html',
+        'maintenance-details.html': 'maintenance.html',
+        'tenant-report-form.html': 'reports.html',
+        'landlord-reports.html': 'reports.html'
+    }
+};
+
+function updateActiveNavigationIndicators(pathname, role) {
+    const filename = (pathname || window.location.pathname).split('/').pop().split('?')[0].split('#')[0] || 'properties.html';
+    const activeNavFilename = parentNavigationPages[role]?.[filename] || filename;
+
+    // 1. Sidebar links
+    document.querySelectorAll('.sidebar-link, .sidebar-sub-link').forEach(link => {
+        if (!link.href || link.id === 'newLogoutBtn') return;
+        const linkHref = link.getAttribute('href') || '';
+        const linkFile = linkHref.split('/').pop().split('?')[0].split('#')[0];
+        const isActive = linkFile === activeNavFilename;
+        if (isActive) {
+            link.classList.add('active');
+            link.setAttribute('aria-current', 'page');
+        } else {
+            link.classList.remove('active');
+            link.removeAttribute('aria-current');
+        }
+    });
+
+    // 2. Bottom nav items
+    document.querySelectorAll('.bottom-nav-item').forEach(item => {
+        if (item.tagName === 'BUTTON') return;
+        const linkHref = item.getAttribute('href') || '';
+        const linkFile = linkHref.split('/').pop().split('?')[0].split('#')[0];
+        const isActive = linkFile === activeNavFilename;
+        if (isActive) {
+            item.classList.add('active');
+            item.setAttribute('aria-current', 'page');
+        } else {
+            item.classList.remove('active');
+            item.removeAttribute('aria-current');
+        }
+    });
+
+    // 3. Nav sheet items
+    document.querySelectorAll('.nav-sheet-item').forEach(item => {
+        if (item.tagName === 'BUTTON') return;
+        const linkHref = item.getAttribute('href') || '';
+        const linkFile = linkHref.split('/').pop().split('?')[0].split('#')[0];
+        const isActive = linkFile === activeNavFilename;
+        if (isActive) {
+            item.classList.add('active');
+            item.setAttribute('aria-current', 'page');
+        } else {
+            item.classList.remove('active');
+            item.removeAttribute('aria-current');
+        }
+    });
+}
+
+function showNavigationProgress() {
+    let bar = document.getElementById('domiknowNavProgressBar');
+    if (!bar) {
+        bar = document.createElement('div');
+        bar.id = 'domiknowNavProgressBar';
+        bar.style.cssText = 'position:fixed;top:0;left:0;height:3px;background:linear-gradient(90deg,#0f766e,#14b8a6,#06b6d4);z-index:99999;transition:width 0.2s ease,opacity 0.25s ease;width:0%;pointer-events:none;box-shadow:0 0 8px rgba(20,184,166,0.6);';
+        document.body.appendChild(bar);
+    }
+    bar.style.opacity = '1';
+    bar.style.width = '45%';
+    setTimeout(() => {
+        if (bar && bar.style.width === '45%') bar.style.width = '85%';
+    }, 100);
+}
+
+function hideNavigationProgress() {
+    const bar = document.getElementById('domiknowNavProgressBar');
+    if (!bar) return;
+    bar.style.width = '100%';
+    setTimeout(() => {
+        bar.style.opacity = '0';
+        setTimeout(() => { bar.style.width = '0%'; }, 250);
+    }, 150);
+}
+
+function loadExternalScript(src) {
+    return new Promise((resolve) => {
+        if (document.querySelector(`script[src="${src}"]`)) {
+            resolve();
+            return;
+        }
+        const script = document.createElement('script');
+        script.src = src;
+        script.onload = () => resolve();
+        script.onerror = () => resolve();
+        document.head.appendChild(script);
+    });
+}
+
+function isModalElement(el) {
+    if (!el || el.nodeType !== 1) return false;
+    const id = el.id || '';
+    const cls = el.className || '';
+    return (
+        cls.includes('modal') ||
+        cls.includes('overlay') ||
+        id.toLowerCase().includes('modal') ||
+        el.getAttribute('role') === 'dialog'
+    );
+}
+
+let isSeamlessNavigating = false;
+async function seamlessNavigateTo(targetUrlString, role, pushState = true) {
+    if (isSeamlessNavigating) return;
+    isSeamlessNavigating = true;
+
+    showNavigationProgress();
+
+    const mainContent = document.querySelector('.main-content-inner');
+    if (mainContent) {
+        mainContent.style.transition = 'opacity 0.1s ease-out';
+        mainContent.style.opacity = '0.35';
+    }
+
+    try {
+        const res = await fetch(targetUrlString, {
+            headers: { 'X-Requested-With': 'DOMIKNOW-SPA' }
+        });
+
+        if (!res.ok) {
+            window.location.href = targetUrlString;
+            return;
+        }
+
+        const html = await res.text();
+        const parser = new DOMParser();
+        const newDoc = parser.parseFromString(html, 'text/html');
+
+        // Update URL and Title
+        if (pushState) {
+            history.pushState({ spa: true, url: targetUrlString }, newDoc.title, targetUrlString);
+        }
+        document.title = newDoc.title;
+
+        // Update topbar title
+        const topbarTitle = document.getElementById('appPageTitle');
+        let newTitle = (newDoc.body.getAttribute('data-page-title') || '').trim();
+        if (!newTitle && newDoc.title) {
+            newTitle = newDoc.title.split(' - ')[0];
+        }
+        if (topbarTitle && newTitle) {
+            topbarTitle.textContent = newTitle;
+        }
+
+        // Close mobile sidebar or bottom sheet if open
+        const sidebar = document.getElementById('domiknowSidebar');
+        const overlay = document.getElementById('sidebarOverlay');
+        const navSheetOverlay = document.getElementById('navSheetOverlay');
+        if (sidebar && overlay && sidebar.classList.contains('open')) {
+            sidebar.classList.remove('open');
+            overlay.classList.remove('open');
+        }
+        if (navSheetOverlay && navSheetOverlay.classList.contains('open')) {
+            navSheetOverlay.classList.remove('open');
+        }
+
+        // Sync stylesheets and inline styles from new document
+        newDoc.querySelectorAll('link[rel="stylesheet"], style').forEach(el => {
+            if (el.tagName === 'LINK') {
+                const href = el.getAttribute('href');
+                if (href && !document.querySelector(`link[href="${href}"]`)) {
+                    const newLink = document.createElement('link');
+                    newLink.rel = 'stylesheet';
+                    newLink.href = href;
+                    document.head.appendChild(newLink);
+                }
+            } else if (el.tagName === 'STYLE') {
+                const newStyle = document.createElement('style');
+                newStyle.textContent = el.textContent;
+                document.head.appendChild(newStyle);
+            }
+        });
+
+        // 1. Remove previous page-specific modals from body (keep shell and persistent chat)
+        Array.from(document.body.children).forEach(child => {
+            if (
+                child.classList.contains('dashboard-layout') ||
+                child.id === 'floatingChatHeadFab' ||
+                child.id === 'chatHeadModal' ||
+                child.tagName === 'SCRIPT' ||
+                child.id === 'domiknowNavProgressBar'
+            ) {
+                return;
+            }
+            if (isModalElement(child)) {
+                child.remove();
+            }
+        });
+
+        // 2. Separate modals from main content elements
+        const bodyChildren = Array.from(newDoc.body.children);
+        const newMainElements = [];
+        const newModalElements = [];
+        const scriptsToRun = [];
+
+        bodyChildren.forEach(child => {
+            if (child.tagName === 'SCRIPT') {
+                scriptsToRun.push(child);
+            } else if (child.tagName === 'STYLE') {
+                // Handled in head sync
+            } else if (child.classList.contains('dashboard-layout') || child.tagName === 'NAV') {
+                // Ignore layout shell and legacy navbar
+            } else if (isModalElement(child)) {
+                newModalElements.push(child);
+            } else {
+                newMainElements.push(child);
+            }
+        });
+
+        // 3. Attach new modals directly to document.body so they stay top-level and unconstrained
+        newModalElements.forEach(el => {
+            document.body.appendChild(document.importNode(el, true));
+        });
+
+        // 4. Place main content inside .main-content-inner
+        if (mainContent) {
+            mainContent.innerHTML = '';
+            newMainElements.forEach(el => {
+                mainContent.appendChild(document.importNode(el, true));
+            });
+        }
+
+        // 5. Load external scripts from head if not present (e.g. Leaflet)
+        const headScripts = Array.from(newDoc.head.querySelectorAll('script'));
+        for (const script of headScripts) {
+            const src = script.getAttribute('src');
+            if (src && !document.querySelector(`script[src="${src}"]`)) {
+                await loadExternalScript(src);
+            }
+        }
+
+        // 6. Update active navigation indicators on sidebar
+        updateActiveNavigationIndicators(window.location.pathname, role);
+
+        // 7. Trigger module enhancers for newly mounted content
+        document.dispatchEvent(new CustomEvent('domiknow:page-content-updated', { detail: { role, path: window.location.pathname } }));
+
+        // 8. Execute page scripts in isolated scope
+        for (const script of scriptsToRun) {
+            const src = script.getAttribute('src');
+            if (src) {
+                if (!src.includes('dashboard.js') && !src.includes('auth.js') && !src.includes('ui.js')) {
+                    await loadExternalScript(src);
+                }
+            } else if (script.textContent.trim()) {
+                const text = script.textContent.trim();
+                const fnNames = [];
+                const fnRegex = /(?:async\s+)?function\s+([a-zA-Z0-9_$]+)\s*\(/g;
+                let match;
+                while ((match = fnRegex.exec(text)) !== null) {
+                    fnNames.push(match[1]);
+                }
+                const exportLines = fnNames.map(name => `try { if (typeof ${name} !== 'undefined') window.${name} = ${name}; } catch(e) {}`).join(';\n');
+
+                const s = document.createElement('script');
+                s.type = 'text/javascript';
+                s.textContent = `(function(window, document) { try { ${text}\n${exportLines} } catch(err) { console.error("Page script error:", err); } })(window, document);`;
+                document.body.appendChild(s);
+                s.remove();
+            }
+        }
+
+        // 9. Dispatch DOMContentLoaded event
+        document.dispatchEvent(new Event('DOMContentLoaded'));
+
+        // Reset scroll position
+        window.scrollTo({ top: 0, behavior: 'instant' });
+        if (mainContent) {
+            mainContent.scrollTop = 0;
+            requestAnimationFrame(() => {
+                mainContent.style.opacity = '1';
+            });
+        }
+    } catch (err) {
+        console.error('Seamless navigation error, falling back to standard load:', err);
+        window.location.href = targetUrlString;
+    } finally {
+        isSeamlessNavigating = false;
+        hideNavigationProgress();
+    }
+}
+
+function initSeamlessDashboardNavigation(role, sidebar) {
     if (!sidebar) return;
 
-    // Restore scroll position from sessionStorage
+    // 1. Restore scroll position from sessionStorage
     const savedScroll = sessionStorage.getItem('domiknow_sidebar_scroll');
     if (savedScroll !== null) {
         sidebar.scrollTop = parseInt(savedScroll, 10);
@@ -1056,16 +1369,56 @@ function initSidebarScrollPersistence(sidebar) {
         sessionStorage.setItem('domiknow_sidebar_scroll', sidebar.scrollTop);
     }, { passive: true });
 
-    // Save scroll position and smoothly fade out ONLY main content panel on link click (sidebar stays rock solid)
-    sidebar.addEventListener('click', (e) => {
-        const link = e.target.closest('.sidebar-link, .sidebar-sub-link');
-        if (link && link.href) {
-            sessionStorage.setItem('domiknow_sidebar_scroll', sidebar.scrollTop);
-            const mainContent = document.querySelector('.main-content-inner');
-            if (mainContent) {
-                mainContent.style.opacity = '0';
-            }
+    // 2. Attach global internal link interceptor once
+    if (window.__domiknowNavInitialized) return;
+    window.__domiknowNavInitialized = true;
+
+    document.addEventListener('click', async (e) => {
+        if (e.defaultPrevented || e.button !== 0 || e.ctrlKey || e.metaKey || e.shiftKey || e.altKey) return;
+
+        const link = e.target.closest('a[href]');
+        if (!link) return;
+
+        const href = link.getAttribute('href');
+        if (!href || href.startsWith('#') || href.startsWith('javascript:') || href.startsWith('mailto:') || href.startsWith('tel:')) return;
+        if (link.hasAttribute('download') || link.target === '_blank') return;
+        if (link.id === 'newLogoutBtn' || link.id === 'sheetLogoutBtn') return;
+
+        let targetUrl;
+        try {
+            targetUrl = new URL(link.href, window.location.origin);
+        } catch(err) {
+            return;
         }
+
+        if (targetUrl.origin !== window.location.origin) return;
+
+        // Check if internal dashboard page in the same portal
+        const validPathPrefixes = ['/pages/tenant/', '/pages/landlord/', '/pages/admin/', '/pages/maintenance/'];
+        const isDashboardPath = validPathPrefixes.some(prefix => targetUrl.pathname.startsWith(prefix));
+        if (!isDashboardPath) return;
+        if (targetUrl.pathname.includes('/auth/') || targetUrl.pathname.includes('/login') || targetUrl.pathname.includes('/register')) return;
+
+        // If clicking current page without params change, just scroll top
+        if (targetUrl.pathname === window.location.pathname && targetUrl.search === window.location.search) {
+            e.preventDefault();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            return;
+        }
+
+        e.preventDefault();
+
+        // ⚡ INSTANT ACTIVE INDICATOR UPDATE: highlight clicked nav immediately!
+        updateActiveNavigationIndicators(targetUrl.pathname, role);
+
+        // Perform seamless navigation without page reload
+        await seamlessNavigateTo(targetUrl.href, role, true);
+    });
+
+    // Handle browser Back / Forward buttons
+    window.addEventListener('popstate', () => {
+        updateActiveNavigationIndicators(window.location.pathname, role);
+        seamlessNavigateTo(window.location.href, role, false);
     });
 }
 
@@ -1146,7 +1499,7 @@ function getTenantIcon(label) {
         'Applications': `<svg class="nav-icon" viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>`,
         'Leases': `<svg class="nav-icon" viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>`,
         'Payments': `<svg class="nav-icon" viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>`,
-        'Support': `<svg class="nav-icon" viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>`,
+        'Support': `<svg class="nav-icon" viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21a9 9 0 1 0-9-9c0 1.48.36 2.88 1 4.11L3 21l4.89-1c1.23.64 2.63 1 4.11 1z"></path><circle cx="8" cy="12" r="1" fill="currentColor" stroke="none"></circle><circle cx="12" cy="12" r="1" fill="currentColor" stroke-none"></circle><circle cx="16" cy="12" r="1" fill="currentColor" stroke-none"></circle></svg>`,
         'Reports': `<svg class="nav-icon" viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9"></rect><rect x="14" y="3" width="7" height="5"></rect><rect x="14" y="12" width="7" height="9"></rect><rect x="3" y="16" width="7" height="5"></rect></svg>`,
         'Help': `<svg class="nav-icon" viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>`,
         'Setting': `<svg class="nav-icon" viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>`

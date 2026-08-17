@@ -464,4 +464,6 @@
     } else {
         initialize();
     }
+    document.addEventListener('domiknow:page-content-updated', initialize);
+    window.initializeLandlordModule = initialize;
 }());
