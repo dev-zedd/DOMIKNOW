@@ -957,7 +957,6 @@ body[data-tenant-page="application-details"] ::-webkit-scrollbar-thumb {
 }
 
 @media (min-width: 901px) {
-  body[data-tenant-page="property-details"] .main-content-inner,
   body[data-tenant-page="application-details"] .main-content-inner {
     display: flex;
     height: calc(100dvh - 76px) !important;
@@ -966,12 +965,10 @@ body[data-tenant-page="application-details"] ::-webkit-scrollbar-thumb {
     overflow: hidden !important;
   }
 
-  body[data-tenant-page="property-details"] .tenant-module-intro,
   body[data-tenant-page="application-details"] .tenant-module-intro {
     flex: 0 0 auto;
   }
 
-  body[data-tenant-page="property-details"] .dashboard-container,
   body[data-tenant-page="application-details"] .dashboard-container {
     height: auto !important;
     min-height: 0 !important;

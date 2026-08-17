@@ -21,10 +21,12 @@
             transition: opacity 0.15s ease-in;
         }
 
-        /* Viewport lock override */
+        /* Use one document scroll so every property, room, and review remains reachable. */
         body, html {
-            overflow: hidden !important;
-            height: 100vh !important;
+            min-height: 100%;
+            height: auto !important;
+            overflow-x: hidden !important;
+            overflow-y: auto !important;
             margin: 0;
             background-color: #f8fafc;
             color: #1e293b;
@@ -32,19 +34,20 @@
         }
         
         .main-content-inner {
-            height: calc(100vh - 72px) !important;
+            height: auto !important;
             min-height: calc(100vh - 72px) !important;
             padding: 0.5rem 1.5rem 0.5rem 1.5rem !important;
-            overflow: hidden !important;
+            overflow: visible !important;
             box-sizing: border-box !important;
             display: flex;
             flex-direction: column;
         }
 
         .dashboard-container {
-            height: 100% !important;
-            max-height: 100% !important;
-            overflow: hidden !important;
+            height: auto !important;
+            min-height: 0 !important;
+            max-height: none !important;
+            overflow: visible !important;
             padding: 0 !important;
             display: flex;
             flex-direction: column;
@@ -91,10 +94,11 @@
 
         #propertyDetailsContent {
             flex-grow: 1;
-            height: 0;
+            min-width: 0;
+            height: auto;
             display: flex;
             flex-direction: column;
-            overflow: hidden;
+            overflow: visible;
         }
 
         .detail-grid {
@@ -102,26 +106,28 @@
             grid-template-columns: 1.7fr 1.3fr;
             gap: 0.75rem;
             flex-grow: 1;
-            height: 0;
-            overflow: hidden;
+            height: auto;
+            align-items: start;
+            overflow: visible;
         }
 
         @media (max-width: 900px) {
+            .main-content-inner {
+                padding: 1rem 1rem calc(92px + env(safe-area-inset-bottom)) !important;
+            }
+
             .detail-grid {
                 grid-template-columns: 1fr;
                 height: auto;
-                overflow-y: auto;
-            }
-            body, html {
-                overflow: auto;
+                overflow: visible;
             }
             .dashboard-container {
                 height: auto;
-                overflow: auto;
+                overflow: visible;
             }
             #propertyDetailsContent {
                 height: auto;
-                overflow: auto;
+                overflow: visible;
             }
         }
 
@@ -129,16 +135,18 @@
             display: flex;
             flex-direction: column;
             gap: 0.6rem;
-            height: 100%;
-            overflow: hidden;
+            min-width: 0;
+            height: auto;
+            overflow: visible;
         }
 
         .detail-sidebar {
             display: flex;
             flex-direction: column;
             gap: 0.6rem;
-            height: 100%;
-            overflow: hidden;
+            min-width: 0;
+            height: auto;
+            overflow: visible;
         }
 
         .detail-header-compact {
@@ -259,18 +267,16 @@
         .rooms-card {
             display: flex;
             flex-direction: column;
-            flex-grow: 1;
-            height: 0;
+            height: auto;
             background: #ffffff;
             border: 1px solid #e2e8f0;
             border-radius: 10px;
             padding: 1rem;
-            overflow: hidden;
+            overflow: visible;
         }
 
         .rooms-scrollable-container {
-            flex-grow: 1;
-            overflow-y: auto;
+            overflow: visible;
             margin-top: 0.5rem;
             padding-right: 2px;
         }
@@ -435,16 +441,14 @@
             border: 1px solid #e2e8f0;
             border-radius: 10px;
             padding: 1rem;
-            flex-grow: 1;
-            height: 0;
+            height: auto;
             display: flex;
             flex-direction: column;
-            overflow: hidden;
+            overflow: visible;
         }
 
         .feedback-scrollable-content {
-            flex-grow: 1;
-            overflow-y: auto;
+            overflow: visible;
             margin-top: 0.5rem;
             padding-right: 2px;
         }
