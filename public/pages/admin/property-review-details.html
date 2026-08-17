@@ -269,11 +269,11 @@
                                 <div id="viewTotalFloors" class="detail-value" style="font-size: 1.1rem;">-</div>
                             </div>
                             <div>
-                                <div class="detail-label">Total Rental Units / Rooms</div>
+                                <div class="detail-label">Default Maximum Occupants per Unit</div>
                                 <div id="viewTotalUnits" class="detail-value" style="font-size: 1.1rem;">-</div>
                             </div>
                             <div>
-                                <div class="detail-label">Total Capacity (Optional)</div>
+                                <div class="detail-label">Total Building Capacity</div>
                                 <div id="viewTotalCapacity" class="detail-value" style="font-size: 1.1rem;">-</div>
                             </div>
                         </div>
@@ -466,9 +466,15 @@
             document.getElementById('viewContactPhone').textContent = prop.landlord_phone || 'N/A';
             document.getElementById('viewContactEmail').textContent = prop.landlord_email || 'N/A';
 
-            document.getElementById('viewTotalFloors').textContent = `${prop.total_floors || 2} Floors`;
-            document.getElementById('viewTotalUnits').textContent = `${prop.max_occupants || 1} Rooms / Units`;
-            document.getElementById('viewTotalCapacity').textContent = prop.total_capacity ? `${prop.total_capacity} persons` : 'Optional';
+            document.getElementById('viewTotalFloors').textContent = Number(prop.total_floors) > 0
+                ? `${Number(prop.total_floors)} floor${Number(prop.total_floors) === 1 ? '' : 's'}`
+                : 'Not provided';
+            document.getElementById('viewTotalUnits').textContent = Number(prop.max_occupants) > 0
+                ? `${Number(prop.max_occupants)} person${Number(prop.max_occupants) === 1 ? '' : 's'} per unit`
+                : 'Not provided';
+            document.getElementById('viewTotalCapacity').textContent = Number(prop.total_capacity) > 0
+                ? `${Number(prop.total_capacity)} persons`
+                : 'Not provided';
 
             // Amenities Tags
             const amenitiesContainer = document.getElementById('viewAmenities');

@@ -294,6 +294,7 @@
                     <div class="form-group">
                         <label for="propertyType" class="form-label">Property Type *</label>
                         <select id="propertyType" required class="form-select">
+                            <option value="" selected disabled>Select property type</option>
                             <option value="apartment">Apartment</option>
                             <option value="boarding_house">Boarding House</option>
                             <option value="bedspace">Bedspace</option>
@@ -317,30 +318,31 @@
                     <div class="form-group">
                         <label for="barangay" class="form-label">Barangay (Siniloan) *</label>
                         <select id="barangay" required class="form-select" style="transition: all 0.3s ease;">
-                            <option value="">-- Select Barangay (Siniloan) --</option>
+                            <option value="" selected disabled>Select barangay</option>
                             <option value="Acevida">Acevida</option>
-                            <option value="Bagong Pag-asa">Bagong Pag-asa (Poblacion)</option>
-                            <option value="Bagumayan">Bagumayan (Poblacion)</option>
+                            <option value="Bagong Pag-Asa">Bagong Pag-Asa</option>
+                            <option value="Bagumbarangay">Bagumbarangay</option>
                             <option value="Buhay">Buhay</option>
-                            <option value="Gen. Luna">Gen. Luna (Poblacion)</option>
-                            <option value="G. Redor" selected>G. Redor (Poblacion)</option>
+                            <option value="Gen. Luna">Gen. Luna</option>
+                            <option value="G. Redor">G. Redor</option>
                             <option value="Halayhayin">Halayhayin</option>
-                            <option value="I. Mendiola">I. Mendiola (Poblacion)</option>
-                            <option value="Kalaiya">Kalaiya</option>
+                            <option value="Mendiola">Mendiola</option>
                             <option value="Kapatalan">Kapatalan</option>
                             <option value="Laguio">Laguio</option>
                             <option value="Liyang">Liyang</option>
                             <option value="Llavac">Llavac</option>
                             <option value="Macatad">Macatad</option>
                             <option value="Magsaysay">Magsaysay</option>
-                            <option value="Maybo">Maybo</option>
-                            <option value="Pandeño">Pandeño</option>
+                            <option value="Mayatba">Mayatba</option>
+                            <option value="Pandeno">Pandeno</option>
+                            <option value="P. Burgos">P. Burgos</option>
+                            <option value="J. Rizal">J. Rizal</option>
                             <option value="Salubungan">Salubungan</option>
-                            <option value="Valderrama">Valderrama (Poblacion)</option>
+                            <option value="Valderrama">Valderrama</option>
                             <option value="Wawa">Wawa</option>
                         </select>
-                        <span id="bgyDetectStatus" style="display: block; font-size: 0.725rem; margin-top: 0.25rem; min-height: 1rem;"></span>
-                        <span id="locationAccuracyStatus" role="status" aria-live="polite" style="display: block; font-size: 0.725rem; margin-top: 0.2rem; min-height: 1rem; color: var(--text-muted);"></span>
+                        <span id="bgyDetectStatus" role="status" aria-live="polite" style="display: block; font-size: 0.725rem; margin-top: 0.25rem; min-height: 1rem;"></span>
+                        <span id="locationAccuracyStatus" role="status" aria-live="polite" style="display: block; font-size: 0.725rem; margin-top: 0.2rem; min-height: 1rem; color: var(--text-muted);">No exact property location selected yet.</span>
                     </div>
 
                     <div class="form-group">
@@ -400,12 +402,12 @@
 
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
                     <div class="form-group">
-                        <label for="latitude" class="form-label">Latitude</label>
-                        <input type="number" id="latitude" required step="any" value="14.425" class="form-input">
+                        <label for="latitude" class="form-label">Latitude *</label>
+                        <input type="number" id="latitude" required step="any" min="14" max="15" placeholder="Set using the map or enter latitude" class="form-input">
                     </div>
                     <div class="form-group">
-                        <label for="longitude" class="form-label">Longitude</label>
-                        <input type="number" id="longitude" required step="any" value="121.440" class="form-input">
+                        <label for="longitude" class="form-label">Longitude *</label>
+                        <input type="number" id="longitude" required step="any" min="121" max="122" placeholder="Set using the map or enter longitude" class="form-input">
                     </div>
                 </div>
 
@@ -429,22 +431,24 @@
                 <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem;">
                     <div class="form-group">
                         <label for="totalFloors" class="form-label">Total Floors *</label>
-                        <input type="number" id="totalFloors" required min="1" value="2" class="form-input">
+                        <input type="number" id="totalFloors" required min="1" max="100" step="1" placeholder="Enter the actual floor count" class="form-input">
                     </div>
                     <div class="form-group">
-                        <label for="maxOccupants" class="form-label">Total Rental Units / Rooms *</label>
-                        <input type="number" id="maxOccupants" required min="1" value="5" class="form-input">
+                        <label for="maxOccupants" class="form-label">Default Maximum Occupants per Unit *</label>
+                        <input type="number" id="maxOccupants" required min="1" max="100" step="1" placeholder="e.g. 4 persons" class="form-input">
+                        <span style="display:block;font-size:0.725rem;margin-top:0.25rem;color:var(--text-muted);">You can set a different capacity for each room or unit in Inventory.</span>
                     </div>
                     <div class="form-group">
-                        <label for="totalCapacity" class="form-label">Total Capacity (Optional)</label>
-                        <input type="number" id="totalCapacity" min="1" placeholder="e.g. 20 persons" class="form-input">
+                        <label for="totalCapacity" class="form-label">Total Building Capacity (Optional)</label>
+                        <input type="number" id="totalCapacity" min="1" max="10000" step="1" placeholder="e.g. 20 persons" class="form-input">
                     </div>
                 </div>
 
                 <div class="form-group">
-                    <label for="prefTenantType" class="form-label">Tenant Suitability *</label>
-                    <select id="prefTenantType" required class="form-select">
-                        <option value="student">Student</option>
+                        <label for="prefTenantType" class="form-label">Tenant Suitability *</label>
+                        <select id="prefTenantType" required class="form-select">
+                            <option value="" selected disabled>Select tenant suitability</option>
+                            <option value="student">Student</option>
                         <option value="worker">Employee / Worker</option>
                         <option value="family">Family</option>
                         <option value="general">Mixed / General</option>
@@ -486,15 +490,15 @@
                 <div style="margin-top:0.5rem;margin-bottom:1rem;padding:0.85rem;background:var(--bg-primary);border:1px solid var(--border-color);border-radius:var(--radius-md);">
                     <div style="font-size:0.8rem;font-weight:700;color:var(--text-secondary);margin-bottom:0.5rem;">Select Predefined Policy Choices (Click chip to add):</div>
                     <div style="display:flex;flex-wrap:wrap;gap:0.4rem;">
-                        <button type="button" class="btn-chip" onclick="addCustomPolicyCard('Smoking Policy', 'Not Allowed')" style="background:var(--bg-secondary);border:1px solid var(--border-color);padding:0.35rem 0.75rem;border-radius:var(--radius-sm);font-size:0.8rem;cursor:pointer;color:var(--text-primary);font-weight:600;transition:all 0.2s;" onmouseover="this.style.borderColor='var(--landlord)';this.style.color='var(--landlord)';" onmouseout="this.style.borderColor='var(--border-color)';this.style.color='var(--text-primary)';">+ Smoking Policy</button>
-                        <button type="button" class="btn-chip" onclick="addCustomPolicyCard('Pet Policy', 'Not Allowed')" style="background:var(--bg-secondary);border:1px solid var(--border-color);padding:0.35rem 0.75rem;border-radius:var(--radius-sm);font-size:0.8rem;cursor:pointer;color:var(--text-primary);font-weight:600;transition:all 0.2s;" onmouseover="this.style.borderColor='var(--landlord)';this.style.color='var(--landlord)';" onmouseout="this.style.borderColor='var(--border-color)';this.style.color='var(--text-primary)';">+ Pet Policy</button>
-                        <button type="button" class="btn-chip" onclick="addCustomPolicyCard('Overnight Guests', 'Allowed')" style="background:var(--bg-secondary);border:1px solid var(--border-color);padding:0.35rem 0.75rem;border-radius:var(--radius-sm);font-size:0.8rem;cursor:pointer;color:var(--text-primary);font-weight:600;transition:all 0.2s;" onmouseover="this.style.borderColor='var(--landlord)';this.style.color='var(--landlord)';" onmouseout="this.style.borderColor='var(--border-color)';this.style.color='var(--text-primary)';">+ Overnight Guests</button>
-                        <button type="button" class="btn-chip" onclick="addCustomPolicyCard('Subleasing & Sharing', 'Not Allowed')" style="background:var(--bg-secondary);border:1px solid var(--border-color);padding:0.35rem 0.75rem;border-radius:var(--radius-sm);font-size:0.8rem;cursor:pointer;color:var(--text-primary);font-weight:600;transition:all 0.2s;" onmouseover="this.style.borderColor='var(--landlord)';this.style.color='var(--landlord)';" onmouseout="this.style.borderColor='var(--border-color)';this.style.color='var(--text-primary)';">+ Subleasing & Sharing</button>
-                        <button type="button" class="btn-chip" onclick="addCustomPolicyCard('Unit Alterations & Painting', 'Not Allowed')" style="background:var(--bg-secondary);border:1px solid var(--border-color);padding:0.35rem 0.75rem;border-radius:var(--radius-sm);font-size:0.8rem;cursor:pointer;color:var(--text-primary);font-weight:600;transition:all 0.2s;" onmouseover="this.style.borderColor='var(--landlord)';this.style.color='var(--landlord)';" onmouseout="this.style.borderColor='var(--border-color)';this.style.color='var(--text-primary)';">+ Unit Alterations & Painting</button>
-                        <button type="button" class="btn-chip" onclick="addCustomPolicyCard('Day Visitors', 'Allowed')" style="background:var(--bg-secondary);border:1px solid var(--border-color);padding:0.35rem 0.75rem;border-radius:var(--radius-sm);font-size:0.8rem;cursor:pointer;color:var(--text-primary);font-weight:600;transition:all 0.2s;" onmouseover="this.style.borderColor='var(--landlord)';this.style.color='var(--landlord)';" onmouseout="this.style.borderColor='var(--border-color)';this.style.color='var(--text-primary)';">+ Day Visitors</button>
-                        <button type="button" class="btn-chip" onclick="addCustomPolicyCard('Loud Music & Parties', 'Not Allowed')" style="background:var(--bg-secondary);border:1px solid var(--border-color);padding:0.35rem 0.75rem;border-radius:var(--radius-sm);font-size:0.8rem;cursor:pointer;color:var(--text-primary);font-weight:600;transition:all 0.2s;" onmouseover="this.style.borderColor='var(--landlord)';this.style.color='var(--landlord)';" onmouseout="this.style.borderColor='var(--border-color)';this.style.color='var(--text-primary)';">+ Loud Music & Parties</button>
-                        <button type="button" class="btn-chip" onclick="addCustomPolicyCard('Commercial Business Use', 'Not Allowed')" style="background:var(--bg-secondary);border:1px solid var(--border-color);padding:0.35rem 0.75rem;border-radius:var(--radius-sm);font-size:0.8rem;cursor:pointer;color:var(--text-primary);font-weight:600;transition:all 0.2s;" onmouseover="this.style.borderColor='var(--landlord)';this.style.color='var(--landlord)';" onmouseout="this.style.borderColor='var(--border-color)';this.style.color='var(--text-primary)';">+ Commercial Business Use</button>
-                        <button type="button" class="btn-chip" onclick="addCustomPolicyCard('Outdoor Laundry Drying', 'Not Allowed')" style="background:var(--bg-secondary);border:1px solid var(--border-color);padding:0.35rem 0.75rem;border-radius:var(--radius-sm);font-size:0.8rem;cursor:pointer;color:var(--text-primary);font-weight:600;transition:all 0.2s;" onmouseover="this.style.borderColor='var(--landlord)';this.style.color='var(--landlord)';" onmouseout="this.style.borderColor='var(--border-color)';this.style.color='var(--text-primary)';">+ Outdoor Laundry Drying</button>
+                        <button type="button" class="btn-chip" onclick="addCustomPolicyCard('Smoking Policy')" style="background:var(--bg-secondary);border:1px solid var(--border-color);padding:0.35rem 0.75rem;border-radius:var(--radius-sm);font-size:0.8rem;cursor:pointer;color:var(--text-primary);font-weight:600;transition:all 0.2s;" onmouseover="this.style.borderColor='var(--landlord)';this.style.color='var(--landlord)';" onmouseout="this.style.borderColor='var(--border-color)';this.style.color='var(--text-primary)';">+ Smoking Policy</button>
+                        <button type="button" class="btn-chip" onclick="addCustomPolicyCard('Pet Policy')" style="background:var(--bg-secondary);border:1px solid var(--border-color);padding:0.35rem 0.75rem;border-radius:var(--radius-sm);font-size:0.8rem;cursor:pointer;color:var(--text-primary);font-weight:600;transition:all 0.2s;" onmouseover="this.style.borderColor='var(--landlord)';this.style.color='var(--landlord)';" onmouseout="this.style.borderColor='var(--border-color)';this.style.color='var(--text-primary)';">+ Pet Policy</button>
+                        <button type="button" class="btn-chip" onclick="addCustomPolicyCard('Overnight Guests')" style="background:var(--bg-secondary);border:1px solid var(--border-color);padding:0.35rem 0.75rem;border-radius:var(--radius-sm);font-size:0.8rem;cursor:pointer;color:var(--text-primary);font-weight:600;transition:all 0.2s;" onmouseover="this.style.borderColor='var(--landlord)';this.style.color='var(--landlord)';" onmouseout="this.style.borderColor='var(--border-color)';this.style.color='var(--text-primary)';">+ Overnight Guests</button>
+                        <button type="button" class="btn-chip" onclick="addCustomPolicyCard('Subleasing & Sharing')" style="background:var(--bg-secondary);border:1px solid var(--border-color);padding:0.35rem 0.75rem;border-radius:var(--radius-sm);font-size:0.8rem;cursor:pointer;color:var(--text-primary);font-weight:600;transition:all 0.2s;" onmouseover="this.style.borderColor='var(--landlord)';this.style.color='var(--landlord)';" onmouseout="this.style.borderColor='var(--border-color)';this.style.color='var(--text-primary)';">+ Subleasing & Sharing</button>
+                        <button type="button" class="btn-chip" onclick="addCustomPolicyCard('Unit Alterations & Painting')" style="background:var(--bg-secondary);border:1px solid var(--border-color);padding:0.35rem 0.75rem;border-radius:var(--radius-sm);font-size:0.8rem;cursor:pointer;color:var(--text-primary);font-weight:600;transition:all 0.2s;" onmouseover="this.style.borderColor='var(--landlord)';this.style.color='var(--landlord)';" onmouseout="this.style.borderColor='var(--border-color)';this.style.color='var(--text-primary)';">+ Unit Alterations & Painting</button>
+                        <button type="button" class="btn-chip" onclick="addCustomPolicyCard('Day Visitors')" style="background:var(--bg-secondary);border:1px solid var(--border-color);padding:0.35rem 0.75rem;border-radius:var(--radius-sm);font-size:0.8rem;cursor:pointer;color:var(--text-primary);font-weight:600;transition:all 0.2s;" onmouseover="this.style.borderColor='var(--landlord)';this.style.color='var(--landlord)';" onmouseout="this.style.borderColor='var(--border-color)';this.style.color='var(--text-primary)';">+ Day Visitors</button>
+                        <button type="button" class="btn-chip" onclick="addCustomPolicyCard('Loud Music & Parties')" style="background:var(--bg-secondary);border:1px solid var(--border-color);padding:0.35rem 0.75rem;border-radius:var(--radius-sm);font-size:0.8rem;cursor:pointer;color:var(--text-primary);font-weight:600;transition:all 0.2s;" onmouseover="this.style.borderColor='var(--landlord)';this.style.color='var(--landlord)';" onmouseout="this.style.borderColor='var(--border-color)';this.style.color='var(--text-primary)';">+ Loud Music & Parties</button>
+                        <button type="button" class="btn-chip" onclick="addCustomPolicyCard('Commercial Business Use')" style="background:var(--bg-secondary);border:1px solid var(--border-color);padding:0.35rem 0.75rem;border-radius:var(--radius-sm);font-size:0.8rem;cursor:pointer;color:var(--text-primary);font-weight:600;transition:all 0.2s;" onmouseover="this.style.borderColor='var(--landlord)';this.style.color='var(--landlord)';" onmouseout="this.style.borderColor='var(--border-color)';this.style.color='var(--text-primary)';">+ Commercial Business Use</button>
+                        <button type="button" class="btn-chip" onclick="addCustomPolicyCard('Outdoor Laundry Drying')" style="background:var(--bg-secondary);border:1px solid var(--border-color);padding:0.35rem 0.75rem;border-radius:var(--radius-sm);font-size:0.8rem;cursor:pointer;color:var(--text-primary);font-weight:600;transition:all 0.2s;" onmouseover="this.style.borderColor='var(--landlord)';this.style.color='var(--landlord)';" onmouseout="this.style.borderColor='var(--border-color)';this.style.color='var(--text-primary)';">+ Outdoor Laundry Drying</button>
                     </div>
                 </div>
 
@@ -680,6 +684,7 @@
         let map, marker, accuracyCircle;
         const defaultLat = 14.4172;
         const defaultLng = 121.4475;
+        let locationConfirmed = false;
         let createdPropertyId = null;
         const customPolicies = [];
 
@@ -757,11 +762,11 @@
                 alert('Please enter a custom policy name.');
                 return;
             }
-            addCustomPolicyCard(name, 'Not Allowed');
+            addCustomPolicyCard(name);
             input.value = '';
         }
 
-        function addCustomPolicyCard(name, defaultValue = 'Not Allowed') {
+        function addCustomPolicyCard(name, defaultValue = '') {
             const container = document.getElementById('customPoliciesContainer');
             if (!container) return;
 
@@ -786,7 +791,7 @@
                 </div>
                 <div class="radio-card-group">
                     <label class="radio-card ${defaultValue === 'Allowed' ? 'selected' : ''}" style="padding:0.45rem;">
-                        <input type="radio" name="custom_policy_${index}" value="Allowed" ${defaultValue === 'Allowed' ? 'checked' : ''}> Allowed
+                        <input type="radio" name="custom_policy_${index}" value="Allowed" required ${defaultValue === 'Allowed' ? 'checked' : ''}> Allowed
                     </label>
                     <label class="radio-card ${defaultValue === 'Not Allowed' ? 'selected-not' : ''}" style="padding:0.45rem;">
                         <input type="radio" name="custom_policy_${index}" value="Not Allowed" ${defaultValue === 'Not Allowed' ? 'checked' : ''}> Not Allowed
@@ -982,49 +987,29 @@
             }
         }
 
+        // Official PSA Philippine Standard Geographic Code list for Siniloan.
         const SINILOAN_BARANGAYS = [
-            { name: "Acevida", lat: 14.4170, lng: 121.4490 },
-            { name: "Bagong Pag-asa", lat: 14.4172, lng: 121.4475 },
-            { name: "Bagumayan", lat: 14.4168, lng: 121.4480 },
-            { name: "Buhay", lat: 14.4220, lng: 121.4520 },
-            { name: "Gen. Luna", lat: 14.4180, lng: 121.4460 },
-            { name: "G. Redor", lat: 14.4175, lng: 121.4470 },
-            { name: "Halayhayin", lat: 14.4250, lng: 121.4400 },
-            { name: "I. Mendiola", lat: 14.4180, lng: 121.4465 },
-            { name: "Kalaiya", lat: 14.4600, lng: 121.4880 },
-            { name: "Kapatalan", lat: 14.4550, lng: 121.4820 },
-            { name: "Laguio", lat: 14.4330, lng: 121.4600 },
-            { name: "Liyang", lat: 14.4380, lng: 121.4650 },
-            { name: "Llavac", lat: 14.4480, lng: 121.4750 },
-            { name: "Macatad", lat: 14.4280, lng: 121.4550 },
-            { name: "Magsaysay", lat: 14.4190, lng: 121.4485 },
-            { name: "Maybo", lat: 14.4350, lng: 121.4500 },
-            { name: "Pandeño", lat: 14.4400, lng: 121.4680 },
-            { name: "Salubungan", lat: 14.4300, lng: 121.4580 },
-            { name: "Valderrama", lat: 14.4170, lng: 121.4470 },
-            { name: "Wawa", lat: 14.4110, lng: 121.4450 }
+            'Acevida', 'Bagong Pag-Asa', 'Bagumbarangay', 'Buhay', 'Gen. Luna',
+            'Halayhayin', 'Mendiola', 'Kapatalan', 'Laguio', 'Liyang', 'Llavac',
+            'Pandeno', 'Magsaysay', 'Macatad', 'Mayatba', 'P. Burgos', 'G. Redor',
+            'Salubungan', 'Wawa', 'J. Rizal'
         ];
 
-        function getClosestSiniloanBarangay(lat, lng) {
-            let minDistance = Infinity;
-            let closestName = "G. Redor";
+        function getDistanceFromSiniloanKm(lat, lng) {
+            const toRadians = (value) => value * Math.PI / 180;
+            const latDelta = toRadians(lat - defaultLat);
+            const lngDelta = toRadians(lng - defaultLng);
+            const distanceFactor = Math.sin(latDelta / 2) ** 2
+                + Math.cos(toRadians(defaultLat)) * Math.cos(toRadians(lat)) * Math.sin(lngDelta / 2) ** 2;
+            return 6371 * 2 * Math.atan2(Math.sqrt(distanceFactor), Math.sqrt(1 - distanceFactor));
+        }
 
-            for (const bgy of SINILOAN_BARANGAYS) {
-                const R = 6371; // Earth radius in km
-                const dLat = (bgy.lat - lat) * Math.PI / 180;
-                const dLng = (bgy.lng - lng) * Math.PI / 180;
-                const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-                          Math.cos(lat * Math.PI / 180) * Math.cos(bgy.lat * Math.PI / 180) *
-                          Math.sin(dLng / 2) * Math.sin(dLng / 2);
-                const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-                const dist = R * c;
-
-                if (dist < minDistance) {
-                    minDistance = dist;
-                    closestName = bgy.name;
-                }
-            }
-            return closestName;
+        function isWithinSiniloanServiceArea(lat, lng) {
+            return Number.isFinite(lat)
+                && Number.isFinite(lng)
+                && Math.abs(lat) <= 90
+                && Math.abs(lng) <= 180
+                && getDistanceFromSiniloanKm(lat, lng) <= 25;
         }
 
         function onBarangayDropdownChange() {
@@ -1032,23 +1017,24 @@
             if (!selectedVal) return;
 
             const normSelect = selectedVal.trim().toLowerCase();
-            const bgyObj = SINILOAN_BARANGAYS.find(b => 
-                b.name.toLowerCase() === normSelect || 
-                normSelect.includes(b.name.toLowerCase()) || 
-                b.name.toLowerCase().includes(normSelect)
-            );
+            const barangayName = SINILOAN_BARANGAYS.find(name => name.toLowerCase() === normSelect);
 
-            if (bgyObj && map && marker) {
-                map.flyTo([bgyObj.lat, bgyObj.lng], 17, { animate: true, duration: 1.2 });
-                marker.setLatLng([bgyObj.lat, bgyObj.lng]);
-                updateCoordinates(bgyObj.lat, bgyObj.lng);
+            if (barangayName) {
+                locationConfirmed = false;
+                document.getElementById('latitude').value = '';
+                document.getElementById('longitude').value = '';
 
                 const statusLabel = document.getElementById('bgyDetectStatus');
                 if (statusLabel) {
-                    statusLabel.style.color = 'var(--color-success-text)';
-                    statusLabel.textContent = `✓ Pin aligned to Barangay ${bgyObj.name}`;
+                    statusLabel.style.color = 'var(--color-warning-text)';
+                    statusLabel.textContent = `Barangay ${barangayName} selected. Place the pin on the exact property.`;
                 }
-                if (marker && marker.unbindPopup) {
+                const accuracyStatus = document.getElementById('locationAccuracyStatus');
+                if (accuracyStatus) {
+                    accuracyStatus.style.color = 'var(--color-warning-text)';
+                    accuracyStatus.textContent = 'Barangay centers are only navigation guides and are not saved as property coordinates.';
+                }
+                if (marker?.unbindPopup) {
                     marker.unbindPopup();
                 }
             }
@@ -1077,8 +1063,8 @@
                     ...(propertyPin ? { icon: propertyPin } : {})
                 }).addTo(map);
                 marker.bindPopup(window.DomiknowMap
-                    ? DomiknowMap.popupContent({ eyebrow: 'Property pin', title: 'Drag or click to adjust', meta: 'Siniloan, Laguna' })
-                    : 'Drag or click to adjust the property pin');
+                    ? DomiknowMap.popupContent({ eyebrow: 'Map starting point', title: 'Place this pin on the property', meta: 'The starting point is not saved automatically.' })
+                    : 'Place this pin on the exact property. The starting point is not saved automatically.');
 
                 const loadingIndicator = document.getElementById('mapLoadingIndicator');
                 if (loadingIndicator) loadingIndicator.style.display = 'none';
@@ -1115,19 +1101,19 @@
                     if (accuracyStatus) accuracyStatus.textContent = 'Pin placed manually.';
                 });
 
-                updateCoordinates(defaultLat, defaultLng);
-                reverseGeocode(defaultLat, defaultLng, false);
             } catch (err) {
                 console.error('Error in initializeMap:', err);
             }
         }
 
         function centerSiniloanMap() {
-            if (map && marker) {
+            if (map) {
                 map.setView([defaultLat, defaultLng], 17);
-                marker.setLatLng([defaultLat, defaultLng]);
-                updateCoordinates(defaultLat, defaultLng);
-                reverseGeocode(defaultLat, defaultLng, false);
+                const accuracyStatus = document.getElementById('locationAccuracyStatus');
+                if (accuracyStatus && !locationConfirmed) {
+                    accuracyStatus.style.color = 'var(--text-muted)';
+                    accuracyStatus.textContent = 'Map centered on Siniloan for navigation. Select the exact property location before saving.';
+                }
             }
         }
         window.centerSiniloanMap = centerSiniloanMap;
@@ -1135,15 +1121,21 @@
         function updateCoordinates(lat, lng) {
             document.getElementById('latitude').value = lat.toFixed(6);
             document.getElementById('longitude').value = lng.toFixed(6);
+            document.getElementById('latitude').setCustomValidity('');
+            document.getElementById('longitude').setCustomValidity('');
+            locationConfirmed = true;
         }
 
         function updateMapFromInputs() {
             const lat = parseFloat(document.getElementById('latitude').value);
             const lng = parseFloat(document.getElementById('longitude').value);
-            if (!isNaN(lat) && !isNaN(lng) && marker && map) {
+            if (Number.isFinite(lat) && Number.isFinite(lng) && isWithinSiniloanServiceArea(lat, lng) && marker && map) {
                 marker.setLatLng([lat, lng]);
                 map.panTo([lat, lng]);
+                locationConfirmed = true;
                 reverseGeocode(lat, lng, true);
+            } else {
+                locationConfirmed = false;
             }
         }
 
@@ -1176,12 +1168,7 @@
                     const lat = position.coords.latitude;
                     const lng = position.coords.longitude;
                     const accuracy = Math.max(0, Number(position.coords.accuracy) || 0);
-                    const toRadians = (value) => value * Math.PI / 180;
-                    const latDelta = toRadians(lat - defaultLat);
-                    const lngDelta = toRadians(lng - defaultLng);
-                    const distanceFactor = Math.sin(latDelta / 2) ** 2
-                        + Math.cos(toRadians(defaultLat)) * Math.cos(toRadians(lat)) * Math.sin(lngDelta / 2) ** 2;
-                    const distanceFromSiniloanKm = 6371 * 2 * Math.atan2(Math.sqrt(distanceFactor), Math.sqrt(1 - distanceFactor));
+                    const distanceFromSiniloanKm = getDistanceFromSiniloanKm(lat, lng);
                     if (distanceFromSiniloanKm > 25) {
                         if (accuracyStatus) {
                             accuracyStatus.style.color = 'var(--color-warning-text)';
@@ -1281,22 +1268,18 @@
                 }
             }
 
-            // 3. Match Barangay from OpenStreetMap or Siniloan Distance Engine
+            // 3. Only accept a barangay explicitly returned by a geocoding provider.
             let matchedBarangay = '';
             if (detectedBgyName) {
                 const normDetectedBgy = detectedBgyName.trim().toLowerCase();
-                const matchedObj = SINILOAN_BARANGAYS.find(b => 
-                    b.name.toLowerCase() === normDetectedBgy || 
-                    normDetectedBgy.includes(b.name.toLowerCase()) || 
-                    b.name.toLowerCase().includes(normDetectedBgy)
+                const matchedName = SINILOAN_BARANGAYS.find(name =>
+                    name.toLowerCase() === normDetectedBgy ||
+                    normDetectedBgy.includes(name.toLowerCase()) ||
+                    name.toLowerCase().includes(normDetectedBgy)
                 );
-                if (matchedObj) {
-                    matchedBarangay = matchedObj.name;
+                if (matchedName) {
+                    matchedBarangay = matchedName;
                 }
-            }
-
-            if (!matchedBarangay) {
-                matchedBarangay = getClosestSiniloanBarangay(lat, lng);
             }
 
             // Helper to verify if string is a barangay name
@@ -1304,8 +1287,8 @@
                 if (!str) return false;
                 const clean = str.toLowerCase().replace(/^(brgy\.?|barangay)\s*/i, '').trim();
                 if (!clean) return false;
-                return SINILOAN_BARANGAYS.some(b => {
-                    const bName = b.name.toLowerCase();
+                return SINILOAN_BARANGAYS.some(name => {
+                    const bName = name.toLowerCase();
                     return clean === bName || clean.includes(bName) || bName.includes(clean);
                 });
             };
@@ -1348,8 +1331,13 @@
             }
 
             if (statusLabel) {
-                statusLabel.style.color = 'var(--color-success-text)';
-                statusLabel.textContent = `✓ Detected Barangay: ${matchedBarangay}`;
+                if (matchedBarangay) {
+                    statusLabel.style.color = 'var(--color-success-text)';
+                    statusLabel.textContent = `✓ Detected Barangay: ${matchedBarangay}`;
+                } else {
+                    statusLabel.style.color = 'var(--color-warning-text)';
+                    statusLabel.textContent = 'Barangay could not be verified automatically. Select the correct barangay manually.';
+                }
             }
 
             if (marker && marker.unbindPopup) {
@@ -1401,8 +1389,47 @@
         // ==========================================
         // SUBMIT STEP 1
         // ==========================================
+        function showPropertyDetailsError(message, field) {
+            const feedback = document.getElementById('createFeedback');
+            if (feedback) {
+                feedback.className = 'alert alert-error';
+                feedback.textContent = message;
+                feedback.classList.remove('hidden');
+                feedback.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+            if (field) {
+                field.setCustomValidity(message);
+                field.reportValidity();
+                field.addEventListener('input', () => field.setCustomValidity(''), { once: true });
+            }
+        }
+
         async function handleStep1Submit(e) {
             e.preventDefault();
+            const latitudeInput = document.getElementById('latitude');
+            const longitudeInput = document.getElementById('longitude');
+            const latitude = Number(latitudeInput.value);
+            const longitude = Number(longitudeInput.value);
+            const maxOccupants = Number(document.getElementById('maxOccupants').value);
+            const totalCapacityInput = document.getElementById('totalCapacity');
+            const totalCapacity = totalCapacityInput.value ? Number(totalCapacityInput.value) : null;
+
+            if (!locationConfirmed || !isWithinSiniloanServiceArea(latitude, longitude)) {
+                showPropertyDetailsError(
+                    'Select and verify the exact property location using the map, address search, device location, or valid coordinates within Siniloan.',
+                    latitudeInput
+                );
+                return;
+            }
+
+            if (totalCapacity !== null && totalCapacity < maxOccupants) {
+                showPropertyDetailsError(
+                    'Total building capacity cannot be lower than the default maximum occupants for one unit.',
+                    totalCapacityInput
+                );
+                return;
+            }
+
             const btn = document.getElementById('btnRegisterSubmit');
             if (btn) {
                 btn.disabled = true;
@@ -1426,21 +1453,21 @@
             });
 
             const payload = {
-                property_name: document.getElementById('propertyName').value,
+                property_name: document.getElementById('propertyName').value.trim(),
                 property_type: document.getElementById('propertyType').value,
-                description: document.getElementById('description').value,
+                description: document.getElementById('description').value.trim(),
                 address: fullAddr,
                 barangay: document.getElementById('barangay').value,
                 municipality: 'Siniloan',
                 province: 'Laguna',
-                latitude: document.getElementById('latitude').value,
-                longitude: document.getElementById('longitude').value,
+                latitude,
+                longitude,
                 monthly_rent: 0,
-                max_occupants: document.getElementById('maxOccupants').value,
+                max_occupants: maxOccupants,
                 tenant_type_suitability: document.getElementById('prefTenantType').value,
                 house_rules: houseRulesPayload,
-                total_floors: document.getElementById('totalFloors').value || 1,
-                total_capacity: document.getElementById('totalCapacity').value || null,
+                total_floors: Number(document.getElementById('totalFloors').value),
+                total_capacity: totalCapacity,
                 amenities
             };
 
@@ -1472,6 +1499,7 @@
                     createdPropertyId = result.data.id;
                     const feedback = document.getElementById('createFeedback');
                     if (feedback) {
+                        feedback.className = 'alert alert-success';
                         feedback.textContent = 'Step 1 Complete: Property details saved! Please upload legal documents.';
                         feedback.classList.remove('hidden');
                         setTimeout(() => feedback.classList.add('hidden'), 3000);

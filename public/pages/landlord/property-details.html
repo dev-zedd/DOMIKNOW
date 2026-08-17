@@ -265,11 +265,11 @@
                                 <div id="viewTotalFloors" class="detail-value" style="font-size: 1.1rem;">-</div>
                             </div>
                             <div>
-                                <div class="detail-label">Total Rental Units / Rooms</div>
+                                <div class="detail-label">Default Maximum Occupants per Unit</div>
                                 <div id="viewTotalUnits" class="detail-value" style="font-size: 1.1rem;">-</div>
                             </div>
                             <div>
-                                <div class="detail-label">Total Capacity (Optional)</div>
+                                <div class="detail-label">Total Building Capacity</div>
                                 <div id="viewTotalCapacity" class="detail-value" style="font-size: 1.1rem;">-</div>
                             </div>
                         </div>
@@ -315,6 +315,7 @@
                             <div class="form-group">
                                 <label for="propertyType" class="form-label">Property Type *</label>
                                 <select id="propertyType" required class="form-select">
+                                    <option value="" disabled>Select property type</option>
                                     <option value="apartment">Apartment</option>
                                     <option value="boarding_house">Boarding House</option>
                                     <option value="bedspace">Bedspace</option>
@@ -337,26 +338,27 @@
                             <div class="form-group">
                                 <label for="barangay" class="form-label">Barangay (Siniloan) *</label>
                                 <select id="barangay" required class="form-select">
-                                    <option value="G. Redor">G. Redor (Poblacion)</option>
-                                    <option value="Halayhayin">Halayhayin</option>
-                                    <option value="Pandeño">Pandeño</option>
-                                    <option value="Macasipac">Macasipac</option>
+                                    <option value="" disabled>Select barangay</option>
                                     <option value="Acevida">Acevida</option>
-                                    <option value="Mendiola">Mendiola (Poblacion)</option>
+                                    <option value="Bagong Pag-Asa">Bagong Pag-Asa</option>
+                                    <option value="Bagumbarangay">Bagumbarangay</option>
+                                    <option value="Buhay">Buhay</option>
+                                    <option value="Gen. Luna">Gen. Luna</option>
+                                    <option value="Halayhayin">Halayhayin</option>
+                                    <option value="Mendiola">Mendiola</option>
+                                    <option value="Kapatalan">Kapatalan</option>
+                                    <option value="Laguio">Laguio</option>
+                                    <option value="Liyang">Liyang</option>
+                                    <option value="Llavac">Llavac</option>
+                                    <option value="Pandeno">Pandeno</option>
+                                    <option value="Magsaysay">Magsaysay</option>
+                                    <option value="Macatad">Macatad</option>
+                                    <option value="Mayatba">Mayatba</option>
+                                    <option value="P. Burgos">P. Burgos</option>
+                                    <option value="G. Redor">G. Redor</option>
                                     <option value="Salubungan">Salubungan</option>
                                     <option value="Wawa">Wawa</option>
-                                    <option value="Liyang">Liyang</option>
-                                    <option value="Kapatalan">Kapatalan</option>
-                                    <option value="Bagong Pag-asa">Bagong Pag-asa (Poblacion)</option>
-                                    <option value="Bagumbarangay">Bagumbarangay (Poblacion)</option>
-                                    <option value="Castro">Castro (Poblacion)</option>
-                                    <option value="Jose Rizal">Jose Rizal (Poblacion)</option>
-                                    <option value="Laguio">Laguio</option>
-                                    <option value="Llavac">Llavac</option>
-                                    <option value="Valderrama">Valderrama (Poblacion)</option>
-                                    <option value="P. Burgos">P. Burgos</option>
-                                    <option value="San Jose">San Jose</option>
-                                    <option value="San Antonio">San Antonio</option>
+                                    <option value="J. Rizal">J. Rizal</option>
                                 </select>
                             </div>
                             <div class="form-group">
@@ -381,21 +383,22 @@
                         <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem;">
                             <div class="form-group">
                                 <label for="totalFloors" class="form-label">Total Floors *</label>
-                                <input type="number" id="totalFloors" min="1" value="2" class="form-input">
+                                <input type="number" id="totalFloors" required min="1" max="100" step="1" class="form-input">
                             </div>
                             <div class="form-group">
-                                <label for="maxOccupants" class="form-label">Total Rental Units / Rooms *</label>
-                                <input type="number" id="maxOccupants" required min="1" class="form-input">
+                                <label for="maxOccupants" class="form-label">Default Maximum Occupants per Unit *</label>
+                                <input type="number" id="maxOccupants" required min="1" max="100" step="1" class="form-input">
                             </div>
                             <div class="form-group">
-                                <label for="totalCapacity" class="form-label">Total Capacity (Optional)</label>
-                                <input type="number" id="totalCapacity" min="1" class="form-input">
+                                <label for="totalCapacity" class="form-label">Total Building Capacity (Optional)</label>
+                                <input type="number" id="totalCapacity" min="1" max="10000" step="1" class="form-input">
                             </div>
                         </div>
 
                         <div class="form-group">
                             <label for="prefTenantType" class="form-label">Tenant Suitability *</label>
                             <select id="prefTenantType" required class="form-select">
+                                <option value="" disabled>Select tenant suitability</option>
                                 <option value="student">Student</option>
                                 <option value="worker">Employee / Worker</option>
                                 <option value="family">Family</option>
@@ -676,13 +679,19 @@
 
             // SECTION 4: Property Info (Building Specs)
             const floorsEl = document.getElementById('viewTotalFloors');
-            if (floorsEl) floorsEl.textContent = `${prop.total_floors || 2} Floors`;
+            if (floorsEl) floorsEl.textContent = Number(prop.total_floors) > 0
+                ? `${Number(prop.total_floors)} floor${Number(prop.total_floors) === 1 ? '' : 's'}`
+                : 'Not provided';
 
             const unitsEl = document.getElementById('viewTotalUnits');
-            if (unitsEl) unitsEl.textContent = `${prop.max_occupants || 1} Rooms / Units`;
+            if (unitsEl) unitsEl.textContent = Number(prop.max_occupants) > 0
+                ? `${Number(prop.max_occupants)} person${Number(prop.max_occupants) === 1 ? '' : 's'} per unit`
+                : 'Not provided';
 
             const capEl = document.getElementById('viewTotalCapacity');
-            if (capEl) capEl.textContent = prop.total_capacity ? `${prop.total_capacity} persons` : 'Optional';
+            if (capEl) capEl.textContent = Number(prop.total_capacity) > 0
+                ? `${Number(prop.total_capacity)} persons`
+                : 'Not provided';
 
             // SECTION 5: Shared Amenities
             const amenitiesContainer = document.getElementById('viewAmenities');
@@ -729,16 +738,16 @@
             if (formName) formName.value = prop.property_name || '';
 
             const formType = document.getElementById('propertyType');
-            if (formType) formType.value = prop.property_type || 'apartment';
+            if (formType) formType.value = prop.property_type || '';
 
             const formSuit = document.getElementById('prefTenantType');
-            if (formSuit) formSuit.value = prop.tenant_type_suitability || 'general';
+            if (formSuit) formSuit.value = prop.tenant_type_suitability || '';
 
             const formFloors = document.getElementById('totalFloors');
-            if (formFloors) formFloors.value = prop.total_floors || 2;
+            if (formFloors) formFloors.value = Number(prop.total_floors) > 0 ? prop.total_floors : '';
 
             const formOcc = document.getElementById('maxOccupants');
-            if (formOcc) formOcc.value = prop.max_occupants || 1;
+            if (formOcc) formOcc.value = Number(prop.max_occupants) > 0 ? prop.max_occupants : '';
 
             const formCap = document.getElementById('totalCapacity');
             if (formCap) formCap.value = prop.total_capacity || '';
@@ -753,13 +762,20 @@
             if (formLmark) formLmark.value = landmarkVal !== '-' ? landmarkVal : '';
 
             const formBgy = document.getElementById('barangay');
-            if (formBgy) formBgy.value = prop.barangay || 'G. Redor';
+            if (formBgy) {
+                const barangayAliases = {
+                    'Bagong Pag-asa': 'Bagong Pag-Asa',
+                    'I. Mendiola': 'Mendiola',
+                    'Pandeño': 'Pandeno'
+                };
+                formBgy.value = barangayAliases[prop.barangay] || prop.barangay || '';
+            }
 
             const formLat = document.getElementById('latitude');
-            if (formLat) formLat.value = prop.latitude || 14.425;
+            if (formLat) formLat.value = prop.latitude !== null && prop.latitude !== undefined ? prop.latitude : '';
 
             const formLng = document.getElementById('longitude');
-            if (formLng) formLng.value = prop.longitude || 121.44;
+            if (formLng) formLng.value = prop.longitude !== null && prop.longitude !== undefined ? prop.longitude : '';
 
             const formRules = document.getElementById('houseRules');
             if (formRules) formRules.value = parseHouseRulesText(prop.house_rules) || '';

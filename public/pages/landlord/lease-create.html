@@ -957,8 +957,8 @@
 
                 // Auto-fill right panel form fields
                 if (app.properties) {
-                    let rentVal = app.properties.monthly_rent;
-                    let maxOcc = app.properties.max_occupants || 1;
+                    let rentVal = null;
+                    let maxOcc = null;
 
                     // Resolve room or bed space level monthly rent/occupancy limits
                     const targetUnit = app.unit || app.property_units;
@@ -980,11 +980,11 @@
                         maxOcc = 1; // A bed space is always exactly 1 occupant limit
                     }
 
-                    document.getElementById('monthlyRent').value = rentVal || 0;
-                    document.getElementById('securityDeposit').value = parseFloat(rentVal || 0) * 2;
-                    document.getElementById('advancePayment').value = rentVal || 0;
-                    document.getElementById('maxOccupants').value = maxOcc || 1;
-                    document.getElementById('dueDay').value = 5; // Standard default due day
+                    document.getElementById('monthlyRent').value = Number(rentVal) > 0 ? Number(rentVal) : '';
+                    document.getElementById('securityDeposit').value = '';
+                    document.getElementById('advancePayment').value = '';
+                    document.getElementById('maxOccupants').value = Number(maxOcc) > 0 ? Number(maxOcc) : '';
+                    document.getElementById('dueDay').value = '';
                     
                     // Clear existing dynamic custom policy cards container
                     const customContainer = document.getElementById('customPoliciesContainer');

@@ -2,6 +2,21 @@ const propertyModel = require('../models/propertyModel');
 const auditLogModel = require('../models/auditLogModel');
 const responseHelper = require('../utils/responseHelper');
 
+const normalizeBarangay = value => {
+    const normalized = String(value || '')
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .toLowerCase()
+        .replace(/\(poblacion\)/g, '')
+        .replace(/^brgy\.?\s*/, '')
+        .replace(/[^a-z0-9]+/g, ' ')
+        .trim();
+    return ({
+        bagumayan: 'bagumbarangay',
+        'i mendiola': 'mendiola'
+    })[normalized] || normalized;
+};
+
 const propertyController = {
     async getAllProperties(req, res) {
         try {
@@ -59,8 +74,21 @@ const propertyController = {
         try {
             // 5 Input Criteria from query params
             const preferred_location = req.query.preferred_location || req.query.preferred_barangay || '';
-            const min_price = parseFloat(req.query.min_price || 0);
-            const max_price = parseFloat(req.query.max_price || req.query.max_budget || 100000);
+            const rawMinPrice = req.query.min_price;
+            const rawMaxPrice = req.query.max_price ?? req.query.max_budget;
+            const min_price = rawMinPrice !== undefined && rawMinPrice !== '' && Number.isFinite(Number(rawMinPrice)) && Number(rawMinPrice) >= 0
+                ? Number(rawMinPrice)
+                : null;
+            const max_price = rawMaxPrice !== undefined && rawMaxPrice !== '' && Number.isFinite(Number(rawMaxPrice)) && Number(rawMaxPrice) >= 0
+                ? Number(rawMaxPrice)
+                : null;
+            if ((rawMinPrice !== undefined && rawMinPrice !== '' && min_price === null)
+                || (rawMaxPrice !== undefined && rawMaxPrice !== '' && max_price === null)) {
+                return responseHelper.error(res, 'Budget values must be valid non-negative numbers.', null, 400);
+            }
+            if (min_price !== null && max_price !== null && min_price > max_price) {
+                return responseHelper.error(res, 'Minimum budget cannot be greater than maximum budget.', null, 400);
+            }
             const preferred_property_type = req.query.preferred_property_type || req.query.property_type || '';
             const tenant_preference = req.query.tenant_preference || req.query.tenant_type || '';
             
@@ -71,6 +99,14 @@ const propertyController = {
                     : req.query.amenities.split(',').map(a => a.trim());
             }
 
+            const activeCriteriaCount = [
+                Boolean(preferred_location),
+                min_price !== null || max_price !== null,
+                Boolean(preferred_property_type),
+                Boolean(tenant_preference),
+                preferred_amenities.length > 0
+            ].filter(Boolean).length;
+
             const candidates = await propertyModel.getRecommendationCandidates();
             if (candidates.length === 0) {
                 return responseHelper.success(res, 'No properties available for recommendation', []);
@@ -79,24 +115,35 @@ const propertyController = {
             // ── STAGE 1: STRICT ALL-INPUT CONSTRAINT FILTERING (AND LOGIC) ──
             // A property MUST possess 100% of all user-selected filter criteria to be included in results.
             const qualifiedCandidates = candidates.filter(prop => {
+                const availableRents = Array.isArray(prop.available_rents)
+                    ? prop.available_rents.filter(rent => Number.isFinite(Number(rent)) && Number(rent) > 0).map(Number)
+                    : [];
+                if (availableRents.length === 0) return false;
+
                 // 1. Location Constraint Match
                 if (preferred_location) {
-                    const normPref = preferred_location.trim().toLowerCase();
-                    const normPropBrgy = (prop.barangay || '').trim().toLowerCase();
-                    const normAddress = (prop.address || '').trim().toLowerCase();
+                    const normPref = normalizeBarangay(preferred_location);
+                    const normPropBrgy = normalizeBarangay(prop.barangay);
+                    const normAddress = normalizeBarangay(prop.address);
                     const matchLocation = (normPropBrgy === normPref || normAddress.includes(normPref));
                     if (!matchLocation) return false;
                 }
 
                 // 2. Budget / Rental Price Range Constraint Match
-                const rent = parseFloat(prop.monthly_rent || 0);
-                if (min_price > 0 && rent < min_price) return false;
-                if (max_price > 0 && rent > max_price) return false;
+                if (min_price !== null || max_price !== null) {
+                    const hasRentInBudget = availableRents.some(rent =>
+                        (min_price === null || rent >= min_price)
+                        && (max_price === null || rent <= max_price)
+                    );
+                    if (!hasRentInBudget) return false;
+                }
 
                 // 3. Property Type Constraint Match
                 if (preferred_property_type) {
                     if (prop.property_type !== preferred_property_type) return false;
                 }
+
+                if (tenant_preference && prop.tenant_type_suitability !== tenant_preference) return false;
 
                 // 4. Amenities Constraint Match (MUST HAVE ALL SELECTED AMENITIES)
                 if (preferred_amenities.length > 0) {
@@ -114,63 +161,104 @@ const propertyController = {
                 return responseHelper.success(res, 'No properties match 100% of your active filter criteria', []);
             }
 
-            // ── STAGE 2: QUALITY, TRUST & RELIABILITY RANKING ──
-            // Rank qualified properties strictly by Property Rating, Trust Score, Rental Reliability & Landlord Rating
+            // Stage 2: rank only from metrics that have supporting records.
             const recommended = qualifiedCandidates.map(prop => {
                 let score = 0;
+                let evidenceWeight = 0;
+                let evidenceCount = 0;
                 const reasons = [];
 
-                const trustScore = prop.landlord?.landlord_trust_score ?? 100;
-                const propertyRating = parseFloat(prop.average_rating || 4.8);
-                const landlordRating = parseFloat(prop.landlord_rating || 4.7);
-                const rentalReliability = Math.min(99, Math.max(85, Math.round(trustScore * 0.5 + propertyRating * 10)));
+                const propertyRatingCount = Math.max(0, Number(prop.rating_count) || 0);
+                const propertyRatingValue = Number(prop.average_rating);
+                const propertyRating = propertyRatingCount > 0 && Number.isFinite(propertyRatingValue)
+                    && propertyRatingValue >= 1 && propertyRatingValue <= 5 ? propertyRatingValue : null;
+
+                const landlordRatingCount = Math.max(0, Number(prop.landlord?.landlord_rating_count) || 0);
+                const landlordRatingValue = Number(prop.landlord?.landlord_average_rating);
+                const landlordRating = landlordRatingCount > 0 && Number.isFinite(landlordRatingValue)
+                    && landlordRatingValue >= 1 && landlordRatingValue <= 5 ? landlordRatingValue : null;
+
+                const reliabilityCount = Math.max(0, Number(prop.recommendation_evidence?.landlord_reliability_count) || 0);
+                const reliabilityValue = Number(prop.recommendation_evidence?.landlord_reliability);
+                const rentalReliability = reliabilityCount > 0 && Number.isFinite(reliabilityValue)
+                    && reliabilityValue >= 1 && reliabilityValue <= 5 ? reliabilityValue : null;
+
+                const reviewedTrustCaseCount = Math.max(0, Number(prop.recommendation_evidence?.reviewed_trust_case_count) || 0);
+                const trustScoreValue = Number(prop.landlord?.landlord_trust_score);
+                const trustScore = reviewedTrustCaseCount > 0 && Number.isFinite(trustScoreValue)
+                    && trustScoreValue >= 0 && trustScoreValue <= 100 ? trustScoreValue : null;
 
                 // 1. Property Rating Score (30% Weight / Max 30 Pts)
-                const ratingPoints = Math.round((propertyRating / 5.0) * 30);
-                score += ratingPoints;
-                reasons.push(`Property Rating (${propertyRating.toFixed(1)}/5.0 ★) (+${ratingPoints} pts)`);
+                if (propertyRating !== null) {
+                    score += (propertyRating / 5) * 30;
+                    evidenceWeight += 30;
+                    evidenceCount += propertyRatingCount;
+                    reasons.push(`Property rating: ${propertyRating.toFixed(1)}/5 from ${propertyRatingCount} verified review${propertyRatingCount === 1 ? '' : 's'}`);
+                }
 
                 // 2. Landlord Trust Score (30% Weight / Max 30 Pts)
-                const trustPoints = Math.round((trustScore / 100) * 30);
-                score += trustPoints;
-                reasons.push(`Landlord Trust Score (${trustScore}/100 🛡️) (+${trustPoints} pts)`);
+                if (trustScore !== null) {
+                    score += (trustScore / 100) * 30;
+                    evidenceWeight += 30;
+                    evidenceCount += reviewedTrustCaseCount;
+                    reasons.push(`Administrative trust score: ${trustScore}/100 after ${reviewedTrustCaseCount} reviewed case${reviewedTrustCaseCount === 1 ? '' : 's'}`);
+                }
 
                 // 3. Rental Reliability Index (20% Weight / Max 20 Pts)
-                const reliabilityPoints = Math.round((rentalReliability / 100) * 20);
-                score += reliabilityPoints;
-                reasons.push(`Rental Reliability Index (${rentalReliability}% ⚡) (+${reliabilityPoints} pts)`);
+                if (rentalReliability !== null) {
+                    score += (rentalReliability / 5) * 20;
+                    evidenceWeight += 20;
+                    evidenceCount += reliabilityCount;
+                    reasons.push(`Landlord reliability: ${rentalReliability.toFixed(1)}/5 from ${reliabilityCount} verified review${reliabilityCount === 1 ? '' : 's'}`);
+                }
 
                 // 4. Landlord Rating Score (20% Weight / Max 20 Pts)
-                const landlordRatingPoints = Math.round((landlordRating / 5.0) * 20);
-                score += landlordRatingPoints;
-                reasons.push(`Landlord Reputation Rating (${landlordRating.toFixed(1)}/5.0 👨‍💼) (+${landlordRatingPoints} pts)`);
+                if (landlordRating !== null) {
+                    score += (landlordRating / 5) * 20;
+                    evidenceWeight += 20;
+                    evidenceCount += landlordRatingCount;
+                    reasons.push(`Landlord rating: ${landlordRating.toFixed(1)}/5 from ${landlordRatingCount} verified review${landlordRatingCount === 1 ? '' : 's'}`);
+                }
 
-                // Total match percentage equals combined score (Max = 100%)
-                const matchPercentage = Math.min(100, Math.max(50, Math.round(score)));
+                const qualityScore = Math.round(score * 10) / 10;
 
                 return {
                     property: prop,
-                    score,
-                    match_percentage: matchPercentage,
+                    score: qualityScore,
+                    match_percentage: activeCriteriaCount > 0 ? 100 : null,
+                    active_criteria_count: activeCriteriaCount,
+                    evidence_weight: evidenceWeight,
+                    evidence_count: evidenceCount,
                     reasons,
                     output_criteria: {
                         property_location: `Brgy. ${prop.barangay}, Siniloan, Laguna`,
                         property_rating: propertyRating,
+                        property_rating_count: propertyRatingCount,
                         trust_score: trustScore,
-                        rental_reliability: `${rentalReliability}% High Reliability`,
-                        landlord_rating: landlordRating
+                        reviewed_trust_case_count: reviewedTrustCaseCount,
+                        rental_reliability: rentalReliability,
+                        reliability_count: reliabilityCount,
+                        landlord_rating: landlordRating,
+                        landlord_rating_count: landlordRatingCount
                     }
                 };
             });
 
-            // Sort by highest quality match score descending
-            recommended.sort((a, b) => b.score - a.score);
+            recommended.sort((a, b) =>
+                b.score - a.score
+                || b.evidence_weight - a.evidence_weight
+                || b.evidence_count - a.evidence_count
+                || String(a.property.property_name || '').localeCompare(String(b.property.property_name || ''))
+            );
 
-            // Assign rank number (#1, #2, #3, etc.)
-            const rankedList = recommended.map((item, idx) => ({
-                rank: idx + 1,
-                ...item
-            }));
+            let previousScore = null;
+            let currentRank = 0;
+            const rankedList = recommended.map((item, index) => {
+                if (item.evidence_weight === 0) return { rank: null, ...item };
+                if (previousScore === null || item.score !== previousScore) currentRank = index + 1;
+                previousScore = item.score;
+                return { rank: currentRank, ...item };
+            });
 
             return responseHelper.success(res, 'Ranked recommendations calculated successfully', rankedList);
         } catch (error) {

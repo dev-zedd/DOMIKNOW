@@ -107,47 +107,12 @@ const screeningController = {
                 return responseHelper.error(res, 'Screening record not found or access denied.', null, 404);
             }
 
-            const monthlyRent = parseFloat(details.properties.monthly_rent);
-            const monthlyIncome = parseFloat(details.monthly_income);
-            const empStatus = details.employment_status;
-            const rentalHistory = details.previous_rental_history;
-            const rentalConduct = details.rental_conduct_notes;
-
-            // Calculate Score
-            let score = 0;
-
-            // 1. Previous Rental History Check (Max 50 points)
-            if (rentalHistory === 'positive' || rentalHistory === 'neutral') {
-                score += 50;
-            }
-
-            // 2. Rental Conduct Check (Max 50 points)
-            if (rentalConduct === 'positive' || rentalConduct === 'neutral') {
-                score += 50;
-            }
-
-            // Determine Risk Label
-            let label = 'high_risk';
-            if (score >= 100) {
-                label = 'low_risk';
-            } else if (score >= 50) {
-                label = 'moderate_risk';
-            }
-
-            const remarks = `Generated score assessment: Total match rating of ${score}/100 points. Risk category falls under ${label.replace('_', ' ')}.`;
-
-            const updated = await screeningModel.updateScreeningScore(id, landlordId, {
-                screening_score: score,
-                screening_result_label: label,
-                screening_remarks: remarks
-            });
-
-            await auditLogModel.log(landlordId, 'GENERATE_SCREENING_SCORE', `Landlord generated screening score for screening record ${id}`);
-
-            return responseHelper.success(res, 'Screening score assessment generated successfully.', {
-                record: updated,
-                explanation: remarks
-            });
+            return responseHelper.error(
+                res,
+                'Automated risk scoring is unavailable because this screening contains applicant-declared information, not verified rental-history evidence. Review the submitted documents manually.',
+                null,
+                422
+            );
 
         } catch (error) {
             console.error('Calculate score error:', error);

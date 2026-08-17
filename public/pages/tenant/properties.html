@@ -103,25 +103,25 @@
                     <select id="filterBarangay" class="form-select">
                         <option value="">All Barangays in Siniloan</option>
                         <option value="Acevida">Acevida</option>
-                        <option value="Bagong Pag-asa">Bagong Pag-asa (Poblacion)</option>
-                        <option value="Bagumayan">Bagumayan</option>
+                        <option value="Bagong Pag-Asa">Bagong Pag-Asa</option>
+                        <option value="Bagumbarangay">Bagumbarangay</option>
                         <option value="Buhay">Buhay</option>
                         <option value="Gen. Luna">Gen. Luna</option>
-                        <option value="G. Redor">G. Redor (Poblacion)</option>
                         <option value="Halayhayin">Halayhayin</option>
-                        <option value="I. Mendiola">I. Mendiola (Poblacion)</option>
-                        <option value="Kalaiya">Kalaiya</option>
+                        <option value="Mendiola">Mendiola</option>
                         <option value="Kapatalan">Kapatalan</option>
                         <option value="Laguio">Laguio</option>
                         <option value="Liyang">Liyang</option>
                         <option value="Llavac">Llavac</option>
                         <option value="Macatad">Macatad</option>
                         <option value="Magsaysay">Magsaysay</option>
-                        <option value="Maybo">Maybo</option>
-                        <option value="Pandeño">Pandeño</option>
+                        <option value="Mayatba">Mayatba</option>
+                        <option value="Pandeno">Pandeno</option>
+                        <option value="P. Burgos">P. Burgos</option>
+                        <option value="G. Redor">G. Redor</option>
                         <option value="Salubungan">Salubungan</option>
-                        <option value="Valderrama">Valderrama</option>
                         <option value="Wawa">Wawa</option>
+                        <option value="J. Rizal">J. Rizal</option>
                     </select>
                 </div>
 
@@ -129,9 +129,9 @@
                 <div class="filter-section">
                     <label class="form-label">Budget or rental price range</label>
                     <div style="display: flex; gap: 0.5rem; align-items: center;">
-                        <input type="number" id="filterMinPrice" placeholder="Min ₱" class="form-input" style="padding: 0.5rem;">
+                        <input type="number" id="filterMinPrice" min="0" step="100" placeholder="No minimum" class="form-input" style="padding: 0.5rem;">
                         <span style="color: var(--text-muted); font-size: 0.8125rem;">to</span>
-                        <input type="number" id="filterMaxPrice" placeholder="Max ₱" class="form-input" style="padding: 0.5rem;">
+                        <input type="number" id="filterMaxPrice" min="0" step="100" placeholder="No maximum" class="form-input" style="padding: 0.5rem;">
                     </div>
                 </div>
 
@@ -307,11 +307,18 @@
 
             const markers = [];
             const markerMap = {};
+            const readMetric = (value, min, max) => {
+                if (value === null || value === undefined || value === '') return null;
+                const parsed = Number(value);
+                return Number.isFinite(parsed) && parsed >= min && parsed <= max ? parsed : null;
+            };
 
             items.forEach(item => {
                 const prop = item.property || item;
-                const rank = Number(item.rank) || 1;
-                const matchPct = Math.max(0, Math.min(100, Number(item.match_percentage) || 100));
+                const parsedRank = Number(item.rank);
+                const rank = Number.isInteger(parsedRank) && parsedRank > 0 ? parsedRank : null;
+                const parsedMatch = readMetric(item.match_percentage, 0, 100);
+                const matchPct = parsedMatch === null ? null : Math.round(parsedMatch);
                 const out = item.output_criteria || {};
                 const propertyId = String(prop.id || '');
                 const safePropertyId = encodeURIComponent(propertyId);
@@ -319,10 +326,43 @@
                 const propertyType = domiknowEscapeHtml(String(prop.property_type || 'Property').replace(/_/g, ' '));
                 const barangayName = domiknowEscapeHtml(prop.barangay || 'Location not specified');
                 const imageUrl = domiknowSafeExternalUrl(prop.main_image_url || 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&w=400&q=80');
-                const propertyRating = Number(out.property_rating ?? prop.average_rating ?? 0);
-                const landlordRating = Number(out.landlord_rating ?? 0);
-                const trustScore = Math.max(0, Math.min(100, Number(out.trust_score) || 0));
-                const reliability = domiknowEscapeHtml(out.rental_reliability || 'Not yet rated');
+                const propertyRating = readMetric(out.property_rating, 1, 5);
+                const propertyRatingCount = Math.max(0, Number(out.property_rating_count) || 0);
+                const landlordRating = readMetric(out.landlord_rating, 1, 5);
+                const landlordRatingCount = Math.max(0, Number(out.landlord_rating_count) || 0);
+                const trustScore = readMetric(out.trust_score, 0, 100);
+                const reviewedTrustCaseCount = Math.max(0, Number(out.reviewed_trust_case_count) || 0);
+                const reliability = readMetric(out.rental_reliability, 1, 5);
+                const reliabilityCount = Math.max(0, Number(out.reliability_count) || 0);
+                const unitStats = prop.unit_stats || {};
+                const availableCount = Math.max(0, Number(unitStats.available_listing_count) || 0);
+                const minimumRent = readMetric(unitStats.min_available_monthly_rent, 0.01, Number.MAX_SAFE_INTEGER);
+                const rankLabel = rank === null
+                    ? 'Not enough data to rank'
+                    : rank === 1 && hasActiveFilter
+                        ? 'Rank #1 &middot; Top criteria match'
+                        : rank === 1
+                            ? 'Rank #1 &middot; Most verified'
+                            : `Rank #${rank}`;
+                const reviewLabel = (count) => `${count} verified review${count === 1 ? '' : 's'}`;
+                const missingMetricHtml = '<span style="color: var(--text-muted); font-weight: 600;">Not enough data</span>';
+                const propertyRatingHtml = propertyRating !== null && propertyRatingCount > 0
+                    ? `<span style="color: #b45309; font-weight: 800;">&#9733; ${propertyRating.toFixed(1)} / 5</span><span style="color: var(--text-muted);">${reviewLabel(propertyRatingCount)}</span>`
+                    : missingMetricHtml;
+                const landlordRatingHtml = landlordRating !== null && landlordRatingCount > 0
+                    ? `<span style="color: #7c3aed; font-weight: 800;">${landlordRating.toFixed(1)} / 5</span><span style="color: var(--text-muted);">${reviewLabel(landlordRatingCount)}</span>`
+                    : missingMetricHtml;
+                const reliabilityHtml = reliability !== null && reliabilityCount > 0
+                    ? `<span style="color: #0369a1; font-weight: 800;">${reliability.toFixed(1)} / 5</span><span style="color: var(--text-muted);">${reviewLabel(reliabilityCount)}</span>`
+                    : missingMetricHtml;
+                const trustScoreHtml = trustScore !== null && reviewedTrustCaseCount > 0
+                    ? `<span style="color: var(--color-success-text); font-weight: 800;">${Math.round(trustScore)} / 100</span><span style="color: var(--text-muted);">${reviewedTrustCaseCount} reviewed case${reviewedTrustCaseCount === 1 ? '' : 's'}</span>`
+                    : missingMetricHtml;
+                const availabilityHtml = availableCount > 0 && minimumRent !== null
+                    ? `${availableCount} available &middot; From &#8369;${minimumRent.toLocaleString('en-PH', { maximumFractionDigits: 0 })}/month`
+                    : 'No currently rentable units';
+                const rankBadgeBackground = rank === null ? 'var(--bg-primary)' : rank === 1 ? 'var(--color-action-primary)' : 'var(--brand-navy)';
+                const rankBadgeColor = rank === null ? 'var(--text-secondary)' : 'white';
                 
                 // Amenities HTML preview
                 let amenHtml = '';
@@ -336,9 +376,9 @@
                 }
 
                 // Render Match % badge ONLY when user has active filter options
-                const matchBadgeHtml = hasActiveFilter ? `
+                const matchBadgeHtml = hasActiveFilter && matchPct !== null ? `
                     <span class="reco-score-badge" style="background: var(--color-action-primary);">
-                        ${matchPct}% Match
+                        ${matchPct}% criteria match
                     </span>
                 ` : '';
 
@@ -349,8 +389,8 @@
                 card.innerHTML = `
                     <div class="prop-img-wrapper" style="position: relative;">
                         <img src="${imageUrl}" alt="${propertyName}" class="prop-img" loading="lazy" decoding="async">
-                        <span style="position: absolute; top: 10px; left: 10px; background: ${rank === 1 ? 'var(--color-action-primary)' : 'var(--brand-navy)'}; color: white; padding: 0.2rem 0.65rem; border-radius: var(--radius-sm); font-weight: 800; font-size: 0.72rem; box-shadow: var(--shadow-card); display: inline-flex; align-items: center; gap: 0.25rem;">
-                            ${rank === 1 ? `<svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"/></svg> Rank #1 Top Match` : `Rank #${rank}`}
+                        <span style="position: absolute; top: 10px; left: 10px; background: ${rankBadgeBackground}; color: ${rankBadgeColor}; border: 1px solid var(--border-color); padding: 0.2rem 0.65rem; border-radius: var(--radius-sm); font-weight: 800; font-size: 0.72rem; box-shadow: var(--shadow-card); display: inline-flex; align-items: center; gap: 0.25rem;">
+                            ${rank === 1 ? `<svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"/></svg>` : ''} ${rankLabel}
                         </span>
                         ${matchBadgeHtml}
                     </div>
@@ -363,8 +403,9 @@
                         </div>
 
                         <h4 class="prop-title" style="margin: 0.25rem 0;">${propertyName}</h4>
+                        <p style="margin: 0.15rem 0 0; color: var(--text-secondary); font-size: 0.78rem; font-weight: 700;">${availabilityHtml}</p>
                         
-                        <!-- 5 Output Criteria Badges Display Grid -->
+                        <!-- Only verified evidence is displayed; missing metrics are never synthesized. -->
                         <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.4rem; margin: 0.65rem 0; background: var(--bg-primary); padding: 0.6rem 0.75rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color);">
                             <div>
                                 <span style="font-size: 0.65rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">1. Location</span>
@@ -372,30 +413,26 @@
                             </div>
                             <div>
                                 <span style="font-size: 0.65rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">2. Property Rating</span>
-                                <div style="font-size: 0.78rem; font-weight: 700; color: #f59e0b; display: inline-flex; align-items: center; gap: 0.2rem;">
-                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"/></svg>
-                                    ${Number.isFinite(propertyRating) ? propertyRating.toFixed(1) : '0.0'} / 5.0
+                                <div style="font-size: 0.75rem; display: flex; flex-direction: column; gap: 0.1rem;">
+                                    ${propertyRatingHtml}
                                 </div>
                             </div>
                             <div>
                                 <span style="font-size: 0.65rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">3. Trust Score</span>
-                                    <div style="font-size: 0.78rem; font-weight: 700; color: var(--color-success-text); display: inline-flex; align-items: center; gap: 0.2rem;">
-                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-                                    ${trustScore} / 100
+                                <div style="font-size: 0.75rem; display: flex; flex-direction: column; gap: 0.1rem;">
+                                    ${trustScoreHtml}
                                 </div>
                             </div>
                             <div>
                                 <span style="font-size: 0.65rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">4. Reliability</span>
-                                <div style="font-size: 0.78rem; font-weight: 700; color: #0284c7; display: inline-flex; align-items: center; gap: 0.2rem;">
-                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-                                    ${reliability}
+                                <div style="font-size: 0.75rem; display: flex; flex-direction: column; gap: 0.1rem;">
+                                    ${reliabilityHtml}
                                 </div>
                             </div>
                             <div style="grid-column: span 2;">
                                 <span style="font-size: 0.65rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">5. Landlord Rating</span>
-                                <div style="font-size: 0.78rem; font-weight: 700; color: #8b5cf6; display: inline-flex; align-items: center; gap: 0.2rem;">
-                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                                    ${Number.isFinite(landlordRating) ? landlordRating.toFixed(1) : '0.0'} / 5.0
+                                <div style="font-size: 0.75rem; display: flex; flex-direction: column; gap: 0.1rem;">
+                                    ${landlordRatingHtml}
                                 </div>
                             </div>
                         </div>
@@ -418,7 +455,7 @@
                         className: '',
                         html: rank === 1
                             ? `<div class="map-top1-pulse" style="background: var(--color-action-primary); color: white; border: 2.5px solid white; border-radius: 50%; width: 38px; height: 38px; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 0.85rem; box-shadow: var(--shadow-dropdown);">#1</div>`
-                            : `<div class="marker-inner" style="background: var(--brand-navy); color: white; border: 2px solid white; border-radius: 50%; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.75rem; box-shadow: var(--shadow-card);">#${rank}</div>`,
+                            : `<div class="marker-inner" style="background: ${rank === null ? 'var(--bg-primary)' : 'var(--brand-navy)'}; color: ${rank === null ? 'var(--text-primary)' : 'white'}; border: 2px solid ${rank === null ? 'var(--border-color)' : 'white'}; border-radius: 50%; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.75rem; box-shadow: var(--shadow-card);">${rank === null ? '&bull;' : `#${rank}`}</div>`,
                         iconSize: rank === 1 ? [38, 38] : [30, 30],
                         iconAnchor: rank === 1 ? [19, 19] : [15, 15]
                     });
@@ -426,11 +463,11 @@
                     const marker = L.marker([lat, lng], { icon: markerIcon })
                         .bindPopup(`
                             <div style="font-family: var(--font-family); padding: 0.35rem 0.25rem;">
-                                <span style="background: ${rank === 1 ? 'var(--color-action-primary)' : 'var(--brand-navy)'}; color: white; padding: 0.2rem 0.6rem; border-radius: var(--radius-sm); font-weight: 800; font-size: 0.72rem;">${rank === 1 ? 'Top Match' : `Rank #${rank}`} (${matchPct}% Match)</span>
+                                <span style="background: ${rankBadgeBackground}; color: ${rankBadgeColor}; border: 1px solid var(--border-color); padding: 0.2rem 0.6rem; border-radius: var(--radius-sm); font-weight: 800; font-size: 0.72rem;">${rankLabel}${hasActiveFilter && matchPct !== null ? ` (${matchPct}% criteria match)` : ''}</span>
                                 <h4 style="margin: 0.4rem 0 0.25rem 0; font-weight: 800; color: var(--primary); font-size: 0.95rem;">${propertyName}</h4>
-                                <p style="margin: 0.2rem 0 0.5rem 0; font-size: 0.78rem; color: #059669; font-weight: 700; display: flex; align-items: center; gap: 0.25rem;">
-                                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-                                    Trust Score: ${trustScore}/100
+                                <p style="margin: 0.2rem 0; font-size: 0.78rem; color: var(--text-secondary); font-weight: 700;">${availabilityHtml}</p>
+                                <p style="margin: 0.2rem 0 0.5rem 0; font-size: 0.78rem; color: var(--text-secondary); font-weight: 700;">
+                                    Trust score: ${trustScore !== null && reviewedTrustCaseCount > 0 ? `${Math.round(trustScore)}/100 (${reviewedTrustCaseCount} reviewed case${reviewedTrustCaseCount === 1 ? '' : 's'})` : 'Not enough data'}
                                 </p>
                                 <a href="property-details.html?id=${safePropertyId}" style="font-size: 0.78rem; font-weight: 800; text-decoration: none; color: white; background: var(--color-action-primary); padding: 0.35rem 0.75rem; border-radius: var(--radius-sm); display: inline-block;">Open Details</a>
                             </div>

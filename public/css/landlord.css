@@ -367,6 +367,16 @@
 }
 
 /* Keep landlord iconography on one outlined, currentColor-based language. */
+.dashboard-layout-landlord .landlord-inline-icon {
+  display: inline-flex;
+  width: 1em;
+  height: 1em;
+  flex: 0 0 1em;
+  align-items: center;
+  justify-content: center;
+  vertical-align: -0.125em;
+}
+
 .dashboard-layout-landlord :where(button, a, .badge, .chip, .status-badge) > .landlord-inline-icon,
 .dashboard-layout-landlord .landlord-summary-action > .ui-icon {
   display: inline-flex;

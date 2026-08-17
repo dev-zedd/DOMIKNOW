@@ -82,37 +82,7 @@ const unitModel = {
             .eq('id', unitId)
             .maybeSingle();
 
-        if (error || !unit) {
-            // Check if unitId corresponds to a property id (fallback virtual unit)
-            const { data: prop } = await supabase.from('properties').select('*').eq('id', unitId).maybeSingle();
-            if (prop) {
-                const { data: propAmenities } = await supabase
-                    .from('property_amenities')
-                    .select('amenity_name')
-                    .eq('property_id', prop.id);
-
-                return {
-                    id: prop.id,
-                    property_id: prop.id,
-                    unit_number: 'Unit 101',
-                    unit_type: prop.property_type === 'boarding_house' ? 'bedspace' : 'room',
-                    monthly_rent: parseFloat(prop.monthly_rent || 0),
-                    security_deposit: parseFloat(prop.monthly_rent || 0),
-                    capacity: parseInt(prop.max_occupants || 1, 10),
-                    bedrooms: 1,
-                    bathrooms: 1,
-                    floor_area_sqm: 20,
-                    status: prop.status === 'approved' ? 'available' : 'unavailable',
-                    main_image_url: prop.main_image_url || null,
-                    description: prop.description || '',
-                    amenities: (propAmenities || []).map(a => a.amenity_name),
-                    images: prop.main_image_url ? [{ image_url: prop.main_image_url, is_main: true }] : [],
-                    beds: [],
-                    property: prop
-                };
-            }
-            return null;
-        }
+        if (error || !unit) return null;
 
         // Fetch beds, amenities & images
         const { data: beds } = await supabase

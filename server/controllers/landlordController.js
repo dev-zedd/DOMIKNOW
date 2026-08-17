@@ -4,6 +4,97 @@ const responseHelper = require('../utils/responseHelper');
 const supabase = require('../config/supabaseClient');
 const { uploadFile, getSignedUrl } = require('../utils/storageHelper');
 
+const VALID_PROPERTY_TYPES = new Set(['apartment', 'boarding_house', 'bedspace']);
+const VALID_TENANT_TYPES = new Set(['student', 'worker', 'family', 'general']);
+const VALID_SINILOAN_BARANGAYS = new Set([
+    'Acevida', 'Bagong Pag-Asa', 'Bagumbarangay', 'Buhay', 'Gen. Luna',
+    'Halayhayin', 'Mendiola', 'Kapatalan', 'Laguio', 'Liyang', 'Llavac',
+    'Pandeno', 'Magsaysay', 'Macatad', 'Mayatba', 'P. Burgos', 'G. Redor',
+    'Salubungan', 'Wawa', 'J. Rizal'
+]);
+const BARANGAY_ALIASES = new Map([
+    ['bagong pag-asa', 'Bagong Pag-Asa'],
+    ['i. mendiola', 'Mendiola'],
+    ['pandeño', 'Pandeno']
+]);
+const SINILOAN_CENTER = { latitude: 14.4172, longitude: 121.4475 };
+
+function distanceFromSiniloanKm(latitude, longitude) {
+    const toRadians = (value) => value * Math.PI / 180;
+    const latitudeDelta = toRadians(latitude - SINILOAN_CENTER.latitude);
+    const longitudeDelta = toRadians(longitude - SINILOAN_CENTER.longitude);
+    const factor = Math.sin(latitudeDelta / 2) ** 2
+        + Math.cos(toRadians(SINILOAN_CENTER.latitude))
+        * Math.cos(toRadians(latitude))
+        * Math.sin(longitudeDelta / 2) ** 2;
+    return 6371 * 2 * Math.atan2(Math.sqrt(factor), Math.sqrt(1 - factor));
+}
+
+function validatePropertyDetails(body) {
+    const propertyName = String(body.property_name || '').trim();
+    const propertyType = String(body.property_type || '').trim();
+    const description = String(body.description || '').trim();
+    const address = String(body.address || '').trim();
+    const rawBarangay = String(body.barangay || '').trim();
+    const barangay = BARANGAY_ALIASES.get(rawBarangay.toLowerCase())
+        || Array.from(VALID_SINILOAN_BARANGAYS).find(name => name.toLowerCase() === rawBarangay.toLowerCase())
+        || '';
+    const tenantType = String(body.tenant_type_suitability || '').trim();
+    const latitude = Number(body.latitude);
+    const longitude = Number(body.longitude);
+    const maxOccupants = Number(body.max_occupants);
+    const totalFloors = Number(body.total_floors);
+    const totalCapacity = body.total_capacity === '' || body.total_capacity === null || body.total_capacity === undefined
+        ? null
+        : Number(body.total_capacity);
+
+    if (!propertyName || !description || !address) {
+        return { error: 'Property name, description, and street address are required.' };
+    }
+    if (!VALID_PROPERTY_TYPES.has(propertyType)) {
+        return { error: 'Select a valid property type.' };
+    }
+    if (!VALID_SINILOAN_BARANGAYS.has(barangay)) {
+        return { error: 'Select a valid barangay in Siniloan.' };
+    }
+    if (!VALID_TENANT_TYPES.has(tenantType)) {
+        return { error: 'Select a valid tenant suitability.' };
+    }
+    if (!Number.isFinite(latitude) || !Number.isFinite(longitude)
+        || Math.abs(latitude) > 90 || Math.abs(longitude) > 180
+        || distanceFromSiniloanKm(latitude, longitude) > 25) {
+        return { error: 'Set a valid property location within the Siniloan service area.' };
+    }
+    if (!Number.isInteger(totalFloors) || totalFloors < 1 || totalFloors > 100) {
+        return { error: 'Total floors must be a whole number from 1 to 100.' };
+    }
+    if (!Number.isInteger(maxOccupants) || maxOccupants < 1 || maxOccupants > 100) {
+        return { error: 'Default maximum occupants per unit must be a whole number from 1 to 100.' };
+    }
+    if (totalCapacity !== null
+        && (!Number.isInteger(totalCapacity) || totalCapacity < maxOccupants || totalCapacity > 10000)) {
+        return { error: 'Total building capacity must be a whole number, at least the per-unit maximum, and no more than 10,000.' };
+    }
+
+    return {
+        data: {
+            property_name: propertyName,
+            property_type: propertyType,
+            description,
+            address,
+            barangay,
+            municipality: 'Siniloan',
+            province: 'Laguna',
+            latitude,
+            longitude,
+            max_occupants: maxOccupants,
+            tenant_type_suitability: tenantType,
+            total_floors: totalFloors,
+            total_capacity: totalCapacity
+        }
+    };
+}
+
 const landlordController = {
     async createProperty(req, res) {
         try {
@@ -16,36 +107,16 @@ const landlordController = {
 
             const landlordId = req.user.id;
 
-            // 1. Validate required fields & scope
-            const validTypes = ['apartment', 'boarding_house', 'bedspace'];
-            if (!validTypes.includes(property_type)) {
-                return responseHelper.error(res, 'Invalid property type. Scope is limited to Apartment, Boarding House, and Bedspace.');
-            }
-
-            if (!property_name || !property_type || !address || !barangay || 
-                !municipality || !province || !latitude || !longitude || 
-                !max_occupants || !tenant_type_suitability) {
-                return responseHelper.error(res, 'All essential property details are required.');
-            }
+            // 1. Validate factual property criteria before persisting them.
+            const validation = validatePropertyDetails(req.body);
+            if (validation.error) return responseHelper.error(res, validation.error);
 
             // 2. Insert property
             const prop = await landlordModel.createProperty({
                 landlord_id: landlordId,
-                property_name,
-                property_type,
-                description,
-                address,
-                barangay,
-                municipality,
-                province,
-                latitude: parseFloat(latitude),
-                longitude: parseFloat(longitude),
-                monthly_rent: Math.max(1, parseFloat(monthly_rent || 1)),
-                max_occupants: parseInt(max_occupants),
-                tenant_type_suitability,
+                ...validation.data,
+                monthly_rent: 0,
                 house_rules,
-                total_floors: total_floors ? parseInt(total_floors, 10) : 1,
-                total_capacity: total_capacity ? parseInt(total_capacity, 10) : null,
                 status: 'pending_review'
             });
 
@@ -68,7 +139,7 @@ const landlordController = {
             }
 
             // 4. Log audit
-            await auditLogModel.log(landlordId, 'SUBMIT_PROPERTY_REGISTRATION', `Landlord submitted property for review: ${property_name}`);
+            await auditLogModel.log(landlordId, 'SUBMIT_PROPERTY_REGISTRATION', `Landlord submitted property for review: ${validation.data.property_name}`);
 
             return responseHelper.success(res, 'Property submitted successfully for admin review.', prop, 201);
 
@@ -135,23 +206,16 @@ const landlordController = {
                 total_floors, total_capacity
             } = req.body;
 
+            const validation = validatePropertyDetails(req.body);
+            if (validation.error) return responseHelper.error(res, validation.error);
+
             // Update details
             const updated = await landlordModel.updateProperty(id, landlordId, {
-                property_name,
-                property_type,
-                description,
-                address,
-                barangay,
-                municipality,
-                province,
-                latitude: parseFloat(latitude),
-                longitude: parseFloat(longitude),
-                monthly_rent: parseFloat(monthly_rent),
-                max_occupants: parseInt(max_occupants),
-                tenant_type_suitability,
+                ...validation.data,
+                monthly_rent: Number.isFinite(Number(monthly_rent)) && Number(monthly_rent) >= 0
+                    ? Number(monthly_rent)
+                    : 0,
                 house_rules,
-                total_floors: total_floors ? parseInt(total_floors, 10) : 1,
-                total_capacity: total_capacity ? parseInt(total_capacity, 10) : null,
                 status: 'pending_review' // Re-submission resets status to pending_review
             });
 
@@ -165,7 +229,7 @@ const landlordController = {
                 await landlordModel.saveAmenities(id, amenities);
             }
 
-            await auditLogModel.log(landlordId, 'UPDATE_PROPERTY_SUBMISSION', `Landlord updated property submission: ${property_name}`);
+            await auditLogModel.log(landlordId, 'UPDATE_PROPERTY_SUBMISSION', `Landlord updated property submission: ${validation.data.property_name}`);
 
             return responseHelper.success(res, 'Property updated successfully and returned to review queue', updated);
 

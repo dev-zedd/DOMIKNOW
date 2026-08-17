@@ -563,22 +563,24 @@
                 thumbImg.src = domiknowSafeExternalUrl(prop?.main_image_url || 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&w=150&q=80');
             }
             
-            let rentVal = prop.monthly_rent;
-            let spaceLabel = 'Whole Property';
+            let rentVal = null;
+            let spaceLabel = 'No unit selected';
             
             const targetUnit = app.unit || app.property_units;
             const targetBed = app.bed || app.unit_beds;
             
             if (targetUnit) {
-                rentVal = targetUnit.monthly_rent || prop.monthly_rent;
+                rentVal = Number(targetUnit.monthly_rent) > 0 ? Number(targetUnit.monthly_rent) : null;
                 spaceLabel = `Room ${targetUnit.unit_number}`;
                 if (targetBed) {
-                    rentVal = targetBed.monthly_rent;
+                    rentVal = Number(targetBed.monthly_rent) > 0 ? Number(targetBed.monthly_rent) : null;
                     spaceLabel += ` (Bed Space: ${targetBed.bed_label})`;
                 }
             }
 
-            document.getElementById('propRent').textContent = `₱${parseInt(rentVal).toLocaleString()}/month`;
+            document.getElementById('propRent').textContent = Number.isFinite(rentVal)
+                ? `₱${rentVal.toLocaleString('en-PH')}/month`
+                : 'Rent not available';
             document.getElementById('targetSpace').textContent = spaceLabel;
             document.getElementById('propType').textContent = String(prop?.property_type || 'Property').replace(/_/g, ' ').toUpperCase();
             document.getElementById('propAddress').textContent = `${prop?.address || 'Address not specified'}, Barangay ${prop?.barangay || 'Not specified'}, Siniloan`;

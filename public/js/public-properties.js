@@ -123,9 +123,9 @@
                 .filter(Boolean).join(' ').toLowerCase();
             const matchesQuery = !query || searchable.includes(query);
             const matchesType = !type || String(property.property_type || '').toLowerCase() === type;
-            const matchesBarangay = !barangay || String(property.barangay || '').toLowerCase() === barangay;
-            const rent = Number(property.min_monthly_rent ?? property.monthly_rent);
-            const matchesRent = !maximumRent || (Number.isFinite(rent) && rent <= maximumRent);
+            const matchesBarangay = !barangay || normalizeBarangay(property.barangay) === normalizeBarangay(barangay);
+            const rent = Number(property.min_available_monthly_rent ?? property.min_monthly_rent);
+            const matchesRent = !maximumRent || (Number.isFinite(rent) && rent > 0 && rent <= maximumRent);
             const matchesLocation = !searchOrigin || (validCoordinates(property) && distanceKm(searchOrigin.lat, searchOrigin.lng, Number(property.latitude), Number(property.longitude)) <= SEARCH_RADIUS_KM);
             return matchesQuery && matchesType && matchesBarangay && matchesRent && matchesLocation;
         });
@@ -318,7 +318,7 @@
             if (!validCoordinates(property)) return;
             const selected = String(property.id) === String(selectedPropertyId);
             const marker = L.marker([Number(property.latitude), Number(property.longitude)], {
-                icon: DomiknowMap.priceIcon(`${formatCurrency(property.min_monthly_rent ?? property.monthly_rent)}/mo`, {
+                icon: DomiknowMap.priceIcon(`${formatCurrency(property.min_available_monthly_rent ?? property.min_monthly_rent)}/mo`, {
                     selected,
                     unavailable: !isAvailable(property)
                 }),
@@ -594,8 +594,8 @@
 
     function sortProperties(items) {
         const sort = document.getElementById('propertySort')?.value;
-        if (sort === 'price_asc') return items.sort((a, b) => safeNumber(a.min_monthly_rent ?? a.monthly_rent) - safeNumber(b.min_monthly_rent ?? b.monthly_rent));
-        if (sort === 'price_desc') return items.sort((a, b) => safeNumber(b.min_monthly_rent ?? b.monthly_rent) - safeNumber(a.min_monthly_rent ?? a.monthly_rent));
+        if (sort === 'price_asc') return items.sort((a, b) => safeNumber(a.min_available_monthly_rent ?? a.min_monthly_rent, Number.POSITIVE_INFINITY) - safeNumber(b.min_available_monthly_rent ?? b.min_monthly_rent, Number.POSITIVE_INFINITY));
+        if (sort === 'price_desc') return items.sort((a, b) => safeNumber(b.min_available_monthly_rent ?? b.min_monthly_rent, Number.NEGATIVE_INFINITY) - safeNumber(a.min_available_monthly_rent ?? a.min_monthly_rent, Number.NEGATIVE_INFINITY));
         if (sort === 'distance' && searchOrigin) {
             return items.sort((a, b) => distanceTo(a) - distanceTo(b));
         }
@@ -636,6 +636,18 @@
         return String(document.getElementById(id)?.value || '').trim().toLowerCase();
     }
 
+    function normalizeBarangay(value) {
+        const normalized = String(value || '')
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .toLowerCase()
+            .replace(/\(poblacion\)/g, '')
+            .replace(/^brgy\.?\s*/, '')
+            .replace(/[^a-z0-9]+/g, ' ')
+            .trim();
+        return ({ bagumayan: 'bagumbarangay', 'i mendiola': 'mendiola' })[normalized] || normalized;
+    }
+
     function updateFilterState() {
         const filterIds = ['propertySearch', 'propertyTypeFilter', 'propertyPriceFilter', 'propertyBarangayFilter'];
         const activeCount = filterIds.reduce((count, id) => count + Number(Boolean(document.getElementById(id)?.value)), 0)
@@ -668,7 +680,8 @@
     function isAvailable(property) {
         const totalSpaces = Number(property?.total_space_count);
         const availableSpaces = Number(property?.available_space_count);
-        if (Number.isFinite(totalSpaces) && totalSpaces > 0) {
+        if (Number.isFinite(totalSpaces)) {
+            if (totalSpaces <= 0) return false;
             return Number.isFinite(availableSpaces) && availableSpaces > 0;
         }
         const value = String(property?.availability_status || property?.status || 'available').toLowerCase();
@@ -678,6 +691,7 @@
     function availabilityLabel(property) {
         const totalSpaces = Number(property?.total_space_count);
         const availableSpaces = Number(property?.available_space_count);
+        if (Number.isFinite(totalSpaces) && totalSpaces <= 0) return 'Rooms not configured';
         if (Number.isFinite(totalSpaces) && totalSpaces > 0 && Number.isFinite(availableSpaces)) {
             return availableSpaces > 0
                 ? `${availableSpaces} ${availableSpaces === 1 ? 'vacancy' : 'vacancies'}`
@@ -697,8 +711,12 @@
     }
 
     function formatRentRange(property) {
-        const minimum = Number(property?.min_monthly_rent ?? property?.monthly_rent);
-        const maximum = Number(property?.max_monthly_rent ?? property?.monthly_rent);
+        const hasAvailableRate = property?.min_available_monthly_rent !== null && property?.min_available_monthly_rent !== undefined;
+        const rawMinimum = hasAvailableRate ? property.min_available_monthly_rent : property?.min_monthly_rent;
+        const rawMaximum = hasAvailableRate ? property.max_available_monthly_rent : property?.max_monthly_rent;
+        if (rawMinimum === null || rawMinimum === undefined || rawMaximum === null || rawMaximum === undefined) return 'Price on request';
+        const minimum = Number(rawMinimum);
+        const maximum = Number(rawMaximum);
         if (!Number.isFinite(minimum) || !Number.isFinite(maximum)) return 'Price on request';
         if (minimum === maximum) return formatCurrency(minimum);
         return `${formatCurrency(minimum)}–${formatCurrency(maximum)}`;

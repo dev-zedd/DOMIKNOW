@@ -1083,7 +1083,7 @@
                                                 ${bed.bed_label}
                                             </span>
                                             <div style="display: flex; align-items: center; gap: 10px;">
-                                                <span style="color: var(--landlord); font-weight: 800; font-size: 0.825rem;">₱${parseFloat(bed.monthly_rent).toLocaleString()}/mo</span>
+                                                <span style="color: var(--landlord); font-weight: 800; font-size: 0.825rem;">${Number(bed.monthly_rent) > 0 ? `₱${Number(bed.monthly_rent).toLocaleString('en-PH')}/mo` : 'Price not set'}</span>
                                                 <span class="status-pill status-${bed.status}">${statusDotSvg} ${bed.status}</span>
                                             </div>
                                         </div>
@@ -1093,7 +1093,7 @@
                         </div>
                     `;
                 } else {
-                    const rent = parseFloat(room.monthly_rent || 0).toLocaleString();
+                    const rent = Number(room.monthly_rent) > 0 ? `₱${Number(room.monthly_rent).toLocaleString('en-PH')}` : 'Price not set';
                     const status = room.status || 'available';
                     let statusDotSvg = `<svg width="8" height="8" fill="currentColor" viewBox="0 0 8 8"><circle cx="4" cy="4" r="4"/></svg>`;
 
@@ -1101,7 +1101,7 @@
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; background-color: var(--bg-primary); padding: 0.85rem 1rem; radius: var(--radius-md); border: 1px solid var(--border-color); margin-top: 0.25rem;">
                             <div>
                                 <span style="font-size: 0.7rem; font-weight: 700; color: var(--text-muted); display: block; text-transform: uppercase; letter-spacing: 0.04em;">Monthly Rent</span>
-                                <span style="font-size: 1.15rem; font-weight: 800; color: var(--landlord);">₱${rent}</span>
+                                <span style="font-size: 1.15rem; font-weight: 800; color: var(--landlord);">${rent}</span>
                             </div>
                             <div>
                                 <span style="font-size: 0.7rem; font-weight: 700; color: var(--text-muted); display: block; text-transform: uppercase; letter-spacing: 0.04em;">Room Status</span>
@@ -1420,8 +1420,8 @@
                 document.getElementById('numBeds').value = room.beds ? room.beds.length : 0;
                 document.getElementById('rentPerBed').value = room.beds && room.beds.length > 0 ? room.beds[0].monthly_rent : room.monthly_rent;
             } else {
-                document.getElementById('roomCapacity').value = room.capacity || 1;
-                document.getElementById('monthlyRent').value = room.monthly_rent || 0;
+                document.getElementById('roomCapacity').value = Number(room.capacity) > 0 ? room.capacity : '';
+                document.getElementById('monthlyRent').value = Number(room.monthly_rent) > 0 ? room.monthly_rent : '';
             }
 
             document.querySelectorAll('.room-amenity-cb').forEach(cb => {

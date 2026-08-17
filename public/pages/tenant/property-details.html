@@ -625,6 +625,12 @@
             const propertyAddress = domiknowEscapeHtml(prop.address || 'Address not specified');
             const propertyDescription = domiknowEscapeHtml(prop.description || 'No description provided.');
             const mainImageUrl = domiknowSafeExternalUrl(prop.main_image_url || 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&w=800&q=80');
+            const formatRent = value => {
+                const amount = Number(value);
+                return Number.isFinite(amount) && amount > 0
+                    ? `₱${amount.toLocaleString('en-PH', { maximumFractionDigits: 0 })}`
+                    : 'Price not listed';
+            };
 
             // Format amenities items (no emojis!)
             let amenityItemsHtml = '';
@@ -636,30 +642,30 @@
                 amenityItemsHtml = '<p style="color: var(--text-muted); font-size: 0.85rem; margin: 0;">No specific amenities listed.</p>';
             }
 
-            // Format feedback reviews summary (no emojis!)
-            let feedbackSummaryHtml = '';
-            if (prop.feedback_summary) {
-                feedbackSummaryHtml = `
-                    <div style="font-size: 1.1rem; font-weight: 700; margin-bottom: 0.75rem; color: #0f172a; display: flex; align-items: center; gap: 4px;">
-                        ★ ${parseFloat(prop.feedback_summary.rating_average).toFixed(1)} 
-                        <span style="color: var(--text-muted); font-weight: 500; font-size: 0.8rem;">(${Number(prop.feedback_summary.total_feedback) || 0} ratings)</span>
-                    </div>
+            // Property rating is canonical only when backed by lease-linked rating records.
+            const propertyRatingValue = Number(prop.average_rating);
+            const propertyRatingCount = Math.max(0, Number(prop.rating_count) || 0);
+            const hasPropertyRating = propertyRatingCount > 0
+                && Number.isFinite(propertyRatingValue)
+                && propertyRatingValue >= 1
+                && propertyRatingValue <= 5;
+            let feedbackSummaryHtml = `
+                <div style="font-size: 1.1rem; font-weight: 700; margin-bottom: 0.5rem; color: var(--text-primary); display: flex; align-items: center; gap: 4px;">
+                    ${hasPropertyRating ? `★ ${propertyRatingValue.toFixed(1)} / 5` : 'Not enough rating data'}
+                    <span style="color: var(--text-muted); font-weight: 500; font-size: 0.8rem;">${hasPropertyRating ? `(${propertyRatingCount} verified ${propertyRatingCount === 1 ? 'rating' : 'ratings'})` : '(No verified ratings yet)'}</span>
+                </div>
+            `;
+            const summarizedFeedbackCount = Math.max(0, Number(prop.feedback_summary?.total_feedback) || 0);
+            if (summarizedFeedbackCount > 0) {
+                feedbackSummaryHtml += `
                     <div class="feedback-bullets">
                         <div class="feedback-bullet feedback-bullet-pos">
-                            <strong>Positive Highlights:</strong><br>${domiknowEscapeHtml(prop.feedback_summary.positive_summary || 'N/A')}
+                            <strong>Positive highlights:</strong><br>${domiknowEscapeHtml(prop.feedback_summary.positive_summary || 'No summary available')}
                         </div>
                         <div class="feedback-bullet feedback-bullet-neg">
-                            <strong>Minor Drawbacks:</strong><br>${domiknowEscapeHtml(prop.feedback_summary.negative_summary || 'N/A')}
+                            <strong>Reported drawbacks:</strong><br>${domiknowEscapeHtml(prop.feedback_summary.negative_summary || 'No summary available')}
                         </div>
                     </div>
-                `;
-            } else {
-                feedbackSummaryHtml = `
-                    <div style="font-size: 1.1rem; font-weight: 700; margin-bottom: 0.5rem; color: #0f172a; display: flex; align-items: center; gap: 4px;">
-                        ★ ${parseFloat(prop.average_rating).toFixed(1)} 
-                        <span style="color: var(--text-muted); font-weight: 500; font-size: 0.8rem;">(No detailed reviews yet)</span>
-                    </div>
-                    <p style="color: var(--text-muted); font-size: 0.8rem; font-style: italic; margin-top: 0.5rem;">Detailed feedback reports will populate as active ratings are processed.</p>
                 `;
             }
 
@@ -721,7 +727,7 @@
                             <div class="bed-list-container">
                                 <div class="bed-list-title">Bed Spaces:</div>
                                 ${beds.map(bed => {
-                                    const isAvailable = bed.status === 'available';
+                                    const isAvailable = unitStatus === 'available' && String(bed.status || '').toLowerCase() === 'available';
                                     let actionBtnHtml = '';
                                     
                                     if (token) {
@@ -739,7 +745,7 @@
                                         <div class="bed-list-item">
                                             <span>${domiknowEscapeHtml(bed.bed_label || 'Bed')}</span>
                                             <div style="display: flex; align-items: center; gap: 8px;">
-                                                <span class="bed-rent">₱${parseFloat(bed.monthly_rent).toLocaleString()}</span>
+                                                <span class="bed-rent">${formatRent(bed.monthly_rent)}</span>
                                                 ${actionBtnHtml}
                                             </div>
                                         </div>
@@ -771,14 +777,14 @@
                             <div class="room-card-header">
                                 <div>
                                     <h4 class="room-card-title">${unitNumber}</h4>
-                                    <span class="room-card-subtitle">${domiknowEscapeHtml(String(u.unit_type || 'unit').replace(/_/g, ' ').toUpperCase())} &bull; ${Number(u.floor_area_sqm) || 0} sqm</span>
+                                    <span class="room-card-subtitle">${domiknowEscapeHtml(String(u.unit_type || 'unit').replace(/_/g, ' ').toUpperCase())}${Number(u.floor_area_sqm) > 0 ? ` &bull; ${Number(u.floor_area_sqm)} sqm` : ''}</span>
                                 </div>
                                 <span class="status-badge ${statusClass}">${domiknowEscapeHtml(unitStatus)}</span>
                             </div>
                             
                             <div class="room-card-specs">
-                                <p style="margin: 0 0 0.25rem 0;"><strong>Rent:</strong> <span style="color: var(--landlord); font-weight: 700;">₱${parseInt(u.monthly_rent).toLocaleString()}</span> / mo</p>
-                                <p style="margin: 0 0 0.25rem 0;"><strong>Capacity:</strong> ${Number(u.capacity) || 0} persons</p>
+                                <p style="margin: 0 0 0.25rem 0;"><strong>Rent:</strong> <span style="color: var(--landlord); font-weight: 700;">${formatRent(u.monthly_rent)}</span>${Number(u.monthly_rent) > 0 ? ' / mo' : ''}</p>
+                                <p style="margin: 0 0 0.25rem 0;"><strong>Capacity:</strong> ${Number(u.capacity) > 0 ? `${Number(u.capacity)} people` : 'Not listed'}</p>
                             </div>
  
                             ${unitAmenities ? `<div class="room-card-amenities">${unitAmenities}</div>` : ''}
@@ -793,14 +799,15 @@
             }
 
             const rentRange = (() => {
-                let rentRangeDisplay = `₱${parseFloat(prop.monthly_rent).toLocaleString()}/mo`;
-                if (prop.unit_stats && prop.unit_stats.min_monthly_rent > 0) {
-                    const minRent = parseFloat(prop.unit_stats.min_monthly_rent);
-                    const maxRent = parseFloat(prop.unit_stats.max_monthly_rent);
+                let rentRangeDisplay = 'Price on request';
+                const hasAvailableRate = Number(prop.unit_stats?.min_available_monthly_rent) > 0;
+                const minRent = Number(hasAvailableRate ? prop.unit_stats.min_available_monthly_rent : prop.unit_stats?.min_monthly_rent);
+                const maxRent = Number(hasAvailableRate ? prop.unit_stats.max_available_monthly_rent : prop.unit_stats?.max_monthly_rent);
+                if (minRent > 0 && maxRent > 0) {
                     if (minRent === maxRent) {
-                        rentRangeDisplay = `₱${minRent.toLocaleString()}/mo`;
+                        rentRangeDisplay = `${formatRent(minRent)}/mo`;
                     } else {
-                        rentRangeDisplay = `₱${minRent.toLocaleString()} - ₱${maxRent.toLocaleString()}/mo`;
+                        rentRangeDisplay = `${formatRent(minRent)} - ${formatRent(maxRent)}/mo`;
                     }
                 }
                 return rentRangeDisplay;
@@ -921,19 +928,7 @@
                         new ResizeObserver(() => detailsMap.invalidateSize(false)).observe(detailsMapElement);
                     }
 
-                    const markerRent = (() => {
-                        let rentRangeDisplay = `₱${parseFloat(prop.monthly_rent).toLocaleString()}/mo`;
-                        if (prop.unit_stats && prop.unit_stats.min_monthly_rent > 0) {
-                            const minRent = parseFloat(prop.unit_stats.min_monthly_rent);
-                            const maxRent = parseFloat(prop.unit_stats.max_monthly_rent);
-                            if (minRent === maxRent) {
-                                rentRangeDisplay = `₱${minRent.toLocaleString()}/mo`;
-                            } else {
-                                rentRangeDisplay = `₱${minRent.toLocaleString()} - ₱${maxRent.toLocaleString()}/mo`;
-                            }
-                        }
-                        return rentRangeDisplay;
-                    })();
+                    const markerRent = rentRange;
 
                     L.marker([propertyLatitude, propertyLongitude])
                         .addTo(detailsMap)

@@ -639,13 +639,13 @@
             const rentalOptions = getRentalOptions(units);
             const availableOptions = rentalOptions.filter(option => option.available);
             const hasManagedInventory = units.length > 0;
-            const unitRents = units
-                .map(unit => Number(unit.monthly_rent))
+            const optionRents = rentalOptions
+                .map(option => Number(option.rent))
                 .filter(value => Number.isFinite(value) && value > 0);
-            const propertyRent = Number(property.monthly_rent);
-            const displayedRents = unitRents.length
-                ? unitRents
-                : Number.isFinite(propertyRent) && propertyRent > 0 ? [propertyRent] : [];
+            const availableOptionRents = availableOptions
+                .map(option => Number(option.rent))
+                .filter(value => Number.isFinite(value) && value > 0);
+            const displayedRents = availableOptionRents.length ? availableOptionRents : optionRents;
             const minimumRent = displayedRents.length ? Math.min(...displayedRents) : Number.NaN;
             const maximumRent = displayedRents.length ? Math.max(...displayedRents) : Number.NaN;
             const addressParts = [
@@ -656,7 +656,7 @@
             ].filter(Boolean);
             const availability = String(property.availability_status || property.status || 'available').toLowerCase();
             const listingIsActive = !['unavailable', 'occupied', 'inactive', 'rejected'].includes(availability);
-            const available = listingIsActive && (!hasManagedInventory || availableOptions.length > 0);
+            const available = listingIsActive && hasManagedInventory && availableOptions.length > 0;
 
             document.title = `${propertyName} — DOMIKNOW`;
             document.getElementById('propertyName').textContent = propertyName;
@@ -665,7 +665,7 @@
             document.getElementById('propertyType').textContent = formatLabel(property.property_type || 'Rental');
             document.getElementById('availableSpaces').textContent = hasManagedInventory
                 ? `${availableOptions.length} of ${rentalOptions.length}`
-                : available ? 'Contact to confirm' : 'None listed';
+                : 'Rooms not configured';
             const capacity = Number(property.total_capacity || property.max_occupants);
             document.getElementById('maxOccupants').textContent = Number.isFinite(capacity) && capacity > 0
                 ? `${capacity} people`
@@ -689,7 +689,7 @@
             const status = document.getElementById('propertyStatus');
             status.textContent = hasManagedInventory
                 ? available ? `${availableOptions.length} ${availableOptions.length === 1 ? 'VACANCY' : 'VACANCIES'}` : 'NO VACANCIES'
-                : available ? 'AVAILABLE' : formatLabel(availability).toUpperCase();
+                : 'ROOMS NOT CONFIGURED';
             status.classList.toggle('status-active', available);
             status.classList.toggle('status-inactive', !available);
             if (!available) {
@@ -698,10 +698,12 @@
                     applyButton.removeAttribute('href');
                     applyButton.setAttribute('aria-disabled', 'true');
                     applyButton.style.pointerEvents = 'none';
-                    applyButton.textContent = hasManagedInventory ? 'No spaces available' : 'Currently unavailable';
+                    applyButton.textContent = hasManagedInventory ? 'No spaces available' : 'Rooms not configured';
                 }
                 const helperText = document.getElementById('applicationHelperText');
-                if (helperText) helperText.textContent = 'Applications reopen when the landlord marks a room or bedspace as available.';
+                if (helperText) helperText.textContent = hasManagedInventory
+                    ? 'Applications reopen when the landlord marks a room or bedspace as available.'
+                    : 'Applications open after the landlord configures at least one rentable room or bedspace.';
                 const accountGuidance = document.querySelector('.property-account-guidance');
                 if (accountGuidance) {
                     accountGuidance.replaceChildren();
@@ -772,17 +774,20 @@
             return units.flatMap(unit => {
                 const beds = Array.isArray(unit.beds) ? unit.beds : [];
                 const rentsByBed = unit.rental_style === 'per_bed' || unit.unit_type === 'bedspace';
+                const unitAvailable = String(unit.status || '').toLowerCase() === 'available';
                 if (rentsByBed && beds.length) {
                     return beds.map(bed => ({
                         unit,
                         bed,
-                        available: String(bed.status || '').toLowerCase() === 'available'
+                        rent: bed.monthly_rent,
+                        available: unitAvailable && String(bed.status || '').toLowerCase() === 'available'
                     }));
                 }
                 return [{
                     unit,
                     bed: null,
-                    available: String(unit.status || '').toLowerCase() === 'available'
+                    rent: unit.monthly_rent,
+                    available: unitAvailable
                 }];
             });
         }
@@ -804,13 +809,13 @@
             const hasManagedInventory = units.length > 0;
             const availabilityText = hasManagedInventory
                 ? `${availableOptions.length} of ${rentalOptions.length} ${rentalOptions.length === 1 ? 'space' : 'spaces'}`
-                : 'Confirm with landlord';
+                : 'Rooms not configured';
             document.getElementById('sidebarAvailability').textContent = availabilityText;
             document.getElementById('unitSectionSummary').textContent = hasManagedInventory
                 ? availableOptions.length
                     ? `${availableOptions.length} currently open`
                     : 'No current vacancies'
-                : 'Availability confirmed during inquiry';
+                : 'No rentable rooms configured';
 
             const deposits = units
                 .map(unit => Number(unit.security_deposit))
@@ -829,9 +834,7 @@
                     ? availableOptions.length
                         ? 'Price range is based on the rooms and bedspaces listed below.'
                         : 'These are listed room rates; there are currently no vacancies.'
-                    : Number.isFinite(minimumRent) && Number.isFinite(maximumRent)
-                        ? 'Property-level rate; confirm the exact space and move-in terms.'
-                        : 'Ask the landlord for the complete rate and move-in terms.';
+                    : 'This property cannot accept applications until its rooms or bedspaces are configured.';
             }
         }
 
