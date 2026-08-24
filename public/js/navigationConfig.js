@@ -51,6 +51,13 @@ const NAVIGATION_CONFIG = {
           ]
         }
       ]
+    },
+    {
+      section: 'Account',
+      items: [
+        { label: 'Notifications', href: 'notifications.html' },
+        { label: 'My Profile', href: 'profile.html' }
+      ]
     }
   ],
   landlord: [
@@ -83,13 +90,22 @@ const NAVIGATION_CONFIG = {
         { label: 'Disputes', href: 'disputes.html' },
         { label: 'Ratings and Feedback', href: 'feedback.html' }
       ]
+    },
+    {
+      section: 'Account',
+      items: [
+        { label: 'Notifications', href: 'notifications.html' },
+        { label: 'My Profile', href: 'profile.html' }
+      ]
     }
   ],
   admin: [
     {
       section: 'Command Center',
       items: [
-        { label: 'Overview', href: 'overview.html' }
+        { label: 'Overview', href: 'overview.html' },
+        { label: 'Notifications', href: 'notifications.html' },
+        { label: 'My Profile', href: 'profile.html' }
       ]
     },
     {
@@ -119,7 +135,9 @@ const NAVIGATION_CONFIG = {
       section: 'Main',
       items: [
         { label: 'Dashboard', href: 'dashboard.html' },
-        { label: 'Assigned Tasks', href: 'tasks.html' }
+        { label: 'Assigned Tasks', href: 'tasks.html' },
+        { label: 'Notifications', href: 'notifications.html' },
+        { label: 'My Profile', href: 'profile.html' }
       ]
     }
   ]

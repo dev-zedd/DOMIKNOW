@@ -21,9 +21,57 @@
   font-family: var(--font-family);
 }
 
+[data-theme="dark"] .leaflet-container.domiknow-map {
+  background: #0b1220;
+}
+
+.leaflet-container.domiknow-map.is-map-loading::before {
+  content: "Loading map…";
+  position: absolute;
+  z-index: 451;
+  top: 50%;
+  left: 50%;
+  padding: 8px 11px;
+  border: 1px solid var(--color-border-default);
+  border-radius: 9px;
+  background: var(--color-bg-surface);
+  color: var(--color-text-secondary);
+  box-shadow: var(--shadow-card);
+  font-size: 0.75rem;
+  font-weight: 750;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+.leaflet-container.domiknow-map.is-map-loading::after {
+  content: "";
+  position: absolute;
+  z-index: 450;
+  inset: 0;
+  background:
+    linear-gradient(100deg, transparent 18%, color-mix(in srgb, var(--color-bg-surface) 72%, transparent) 48%, transparent 78%),
+    var(--color-bg-subtle);
+  background-size: 220% 100%, auto;
+  animation: domiknow-map-loading 1.35s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes domiknow-map-loading {
+  from { background-position: 120% 0, 0 0; }
+  to { background-position: -120% 0, 0 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .leaflet-container.domiknow-map.is-map-loading::after { animation: none; }
+}
+
 .domiknow-map .leaflet-tile-pane {
   filter: saturate(0.76) contrast(0.96) brightness(1.025);
   transition: filter var(--motion-page);
+}
+
+[data-theme="dark"] .domiknow-map .leaflet-tile-pane {
+  filter: saturate(0.66) contrast(1.04) brightness(0.82);
 }
 
 .domiknow-map .leaflet-control-container {
@@ -219,6 +267,7 @@
 }
 
 .domiknow-map .map-property-popup-shell .leaflet-popup-content-wrapper {
+  max-width: calc(100vw - 32px);
   overflow: hidden;
   padding: 0;
   border-color: var(--map-card-border);
@@ -252,6 +301,7 @@
   overflow: hidden;
   background: var(--map-card-bg);
   color: var(--map-card-text);
+  overflow-wrap: anywhere;
 }
 
 .map-property-card__header { display: flex; gap: 12px; align-items: center; padding-right: 24px; }
@@ -268,7 +318,7 @@
   color: var(--map-card-accent);
 }
 
-.map-property-card__icon .ui-icon { width: 22px; height: 22px; }
+.map-property-card__icon :where(.ui-icon, svg) { width: 22px; height: 22px; }
 .map-property-card__heading { display: grid; min-width: 0; gap: 3px; }
 
 .map-property-card__eyebrow {
@@ -357,10 +407,10 @@
   .map-property-card { gap: 12px; padding: 14px; }
   .map-property-card__header { padding-right: 20px; }
   .map-property-card__icon { width: 42px; height: 42px; flex-basis: 42px; }
-  .map-property-card__footer { gap: 8px; }
-  .map-property-card__price-row { gap: 7px; }
+  .map-property-card__footer { flex-wrap: wrap; gap: 10px; }
+  .map-property-card__price-row { width: 100%; gap: 7px; }
   .map-property-card__price { white-space: normal; }
-  .map-property-card__action { min-height: 34px; padding-inline: 9px; }
+  .map-property-card__action { width: 100%; min-height: 38px; padding-inline: 9px; }
 }
 
 .domiknow-map-legend {

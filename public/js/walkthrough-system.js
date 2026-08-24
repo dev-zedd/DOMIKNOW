@@ -272,8 +272,8 @@
         if (document.querySelector('[data-walkthrough-replay]') || !getContext()) return;
         const button = document.createElement('button');
         button.type = 'button'; button.className = 'dk-tour-replay'; button.dataset.walkthroughReplay = '';
-        button.setAttribute('aria-label', 'Open the DOMIKNOW walkthrough'); button.title = 'Guide';
-        button.innerHTML = window.domiknowIcon ? window.domiknowIcon('sparkle') : '?';
+        button.setAttribute('aria-label', 'Play the DOMIKNOW walkthrough'); button.title = 'Play walkthrough';
+        button.innerHTML = window.domiknowIcon ? window.domiknowIcon('play') : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="m10 8 6 4-6 4Z"/></svg>';
         button.addEventListener('click', () => start({ force: true }));
         const host = document.querySelector('.topbar-right, .public-workspace-actions, .landing-header .auth-buttons, .public-header .login-prompt');
         if (host) host.insertBefore(button, host.querySelector('[data-theme-toggle]') || host.firstChild);

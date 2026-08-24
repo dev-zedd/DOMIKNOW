@@ -153,6 +153,13 @@ const tenantReportController = {
                 `Landlord filed tenant report ${report.id} (Category: ${report_category}, Severity: ${severity}) against tenant ${lease.tenant_id}`
             );
 
+            await notificationModel.createForRole('admin', {
+                type: 'report_submitted',
+                title: 'Tenant report awaiting review',
+                message: `A ${severity} severity tenant report was submitted and added to the review queue.`,
+                reference_id: report.id
+            });
+
             return responseHelper.success(res, 'Tenant report submitted successfully. It is now pending admin review.', report, 201);
 
         } catch (error) {

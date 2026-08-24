@@ -31,6 +31,16 @@ const userModel = {
         return data || null;
     },
 
+    async findCredentialsById(id) {
+        const { data, error } = await supabase
+            .from('users')
+            .select('id, email, password_hash')
+            .eq('id', id)
+            .single();
+        if (error && error.code !== 'PGRST116') throw error;
+        return data || null;
+    },
+
     async updateProfile(id, profileData) {
         // Only allow updating these fields
         const { full_name, contact_number, address, profile_image_url } = profileData;

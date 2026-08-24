@@ -9,7 +9,7 @@ router.use(requireAuth);
 router.post('/', requireRole('landlord'), leaseController.createLease);
 router.get('/', requireRole('landlord'), leaseController.getLandlordLeases);
 router.get('/my', requireRole('tenant'), leaseController.getTenantLeases);
-router.get('/:id', leaseController.getLeaseById);
+router.get('/:id', requireRole('tenant', 'landlord', 'admin'), leaseController.getLeaseById);
 router.put('/:id', requireRole('landlord'), leaseController.updateLeaseDetails);
 router.put('/:id/status', requireRole('landlord'), leaseController.updateLeaseStatus);
 router.put('/:id/accept', requireRole('tenant'), leaseController.acceptLease);

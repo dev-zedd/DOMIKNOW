@@ -923,17 +923,29 @@
                     const detailsMap = L.map(detailsMapElement).setView([propertyLatitude, propertyLongitude], 15);
                     if (window.DomiknowMap) DomiknowMap.addBasemap(detailsMap);
                     else L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '&copy; OpenStreetMap contributors' }).addTo(detailsMap);
-                    requestAnimationFrame(() => requestAnimationFrame(() => detailsMap.invalidateSize(false)));
-                    if ('ResizeObserver' in window && detailsMapElement) {
-                        new ResizeObserver(() => detailsMap.invalidateSize(false)).observe(detailsMapElement);
-                    }
+                    if (window.DomiknowMap) DomiknowMap.observeContainer(detailsMap, detailsMapElement);
+                    else requestAnimationFrame(() => requestAnimationFrame(() => detailsMap.invalidateSize(false)));
 
                     const markerRent = rentRange;
+                    const rawPropertyName = prop.property_name || 'Unnamed property';
 
-                    L.marker([propertyLatitude, propertyLongitude])
-                        .addTo(detailsMap)
-                        .bindPopup(`<strong>${propertyName}</strong><br>${domiknowEscapeHtml(markerRent)}`)
-                        .openPopup();
+                    const marker = L.marker([propertyLatitude, propertyLongitude], window.DomiknowMap ? {
+                        icon: DomiknowMap.pinIcon({ selected: true }),
+                        keyboard: true,
+                        title: `${rawPropertyName} location`,
+                        alt: `${rawPropertyName} location marker`
+                    } : {}).addTo(detailsMap);
+                    if (window.DomiknowMap) {
+                        DomiknowMap.bindPopup(marker, DomiknowMap.propertyPopupContent({
+                            eyebrow: 'Property location',
+                            title: rawPropertyName,
+                            facts: [markerRent],
+                            actionHref: '#availableUnitsSection',
+                            actionLabel: 'View available units'
+                        })).openPopup();
+                    } else {
+                        marker.bindPopup(`<strong>${propertyName}</strong><br>${domiknowEscapeHtml(markerRent)}`).openPopup();
+                    }
                 }, 100);
             }
         }

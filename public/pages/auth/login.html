@@ -3,160 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - DomiKnow</title>
+    <title>Sign in — DOMIKNOW</title>
     <link href="../../css/input.css" rel="stylesheet">
-    <link href="../../css/design-system.css" rel="stylesheet">
-    <style>
-        :root {
-            --primary: #0355F3;
-            --primary-hover: #0247D1;
-            --primary-light: #EAF0FF;
-            --border-focus: #7EA2FF;
-            --bg-primary: #F8FAFC;
-            --accent: #0355F3;
-            --card-shadow: 0 20px 40px rgba(15, 73, 83, 0.08);
-        }
-
-        body {
-            font-family: Inter, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: var(--bg-primary);
-            color: var(--primary);
-        }
-
-        .auth-page {
-            background-color: var(--bg-primary);
-            background-image: 
-                radial-gradient(at 0% 0%, rgba(255, 207, 210, 0.4) 0px, transparent 50%), 
-                radial-gradient(at 100% 100%, rgba(249, 142, 110, 0.15) 0px, transparent 50%);
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            padding: 3rem 1.5rem;
-        }
-
-        .back-to-home-container {
-            width: 100%;
-            max-width: 440px;
-            margin-bottom: 1.5rem;
-            text-align: left;
-        }
-
-        .back-to-home-link {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            color: var(--primary);
-            font-weight: 700;
-            text-decoration: none;
-            font-size: 0.875rem;
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-            background: white;
-            padding: 0.5rem 1rem;
-            border-radius: 10px;
-            border: 1px solid rgba(15, 73, 83, 0.08);
-            box-shadow: 0 2px 8px rgba(15, 73, 83, 0.02);
-        }
-
-        .back-to-home-link:hover {
-            transform: translateX(-4px);
-            color: var(--accent);
-            border-color: var(--accent);
-        }
-
-        .back-to-home-link svg {
-            stroke-width: 2.5px;
-        }
-
-        .auth-header {
-            text-align: center;
-            margin-bottom: 2rem;
-        }
-
-        .auth-logo {
-            font-family: inherit;
-            color: var(--primary);
-            font-weight: 800;
-            font-size: 2.5rem;
-            letter-spacing: -0.03em;
-            margin-bottom: 0.5rem;
-        }
-
-        .auth-subtitle {
-            font-size: 0.9375rem;
-            color: var(--text-secondary);
-        }
-
-        .auth-link {
-            color: var(--accent);
-            font-weight: 700;
-            text-decoration: none;
-            transition: color 0.2s;
-        }
-
-        .auth-link:hover {
-            color: var(--primary);
-        }
-
-        .auth-card {
-            background: white;
-            border-radius: 24px;
-            padding: 2.5rem;
-            width: 100%;
-            max-width: 440px;
-            box-shadow: var(--card-shadow);
-            border: 1px solid rgba(15, 73, 83, 0.06);
-        }
-
-        .form-label {
-            font-weight: 700;
-            font-size: 0.8125rem;
-            color: var(--primary);
-            margin-bottom: 0.5rem;
-            display: block;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-
-        .form-input {
-            border-radius: 12px;
-            border: 1.5px solid var(--border-color);
-            padding: 0.75rem 1rem;
-            font-size: 0.9375rem;
-            transition: all 0.2s;
-            width: 100%;
-            box-sizing: border-box;
-        }
-
-        .form-input:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 4px rgba(15, 73, 83, 0.1);
-        }
-
-        .btn-primary {
-            background-color: var(--primary);
-            color: white;
-            font-weight: 700;
-            font-size: 0.9375rem;
-            padding: 0.875rem;
-            border-radius: 12px;
-            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-            width: 100%;
-            border: none;
-            cursor: pointer;
-        }
-
-        .btn-primary:hover {
-            background-color: var(--primary-hover);
-            transform: translateY(-1px);
-            box-shadow: 0 8px 20px rgba(15, 73, 83, 0.15);
-        }
-    </style>
     <link href="../../css/design-system.css" rel="stylesheet">
     <link href="../../css/auth-module.css" rel="stylesheet">
     <link href="../../css/mobile-first.css?v=20260817-1" rel="stylesheet">
+    <link href="../../css/loading-system.css?v=20260823-1" rel="stylesheet" data-domiknow-loading-system>
+    <script src="../../js/loading-system.js?v=20260823-1" defer data-domiknow-loading-system></script>
     <script src="../../js/ui.js" defer></script>
 </head>
 <body class="auth-page auth-login-page">
@@ -194,25 +47,26 @@
     </div>
 
     <div class="auth-card">
-        <div id="errorMessage" class="alert alert-danger hidden" style="border-radius: 12px; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.75rem; background: #fef2f2; border: 1px solid #fecaca; padding: 1rem; color: #b91c1c;">
-            <span class="alert-icon" style="color: #ef4444; display: inline-flex; align-items: center; flex-shrink: 0;">
+        <div class="auth-card-heading">
+            <p class="auth-eyebrow">Secure account access</p>
+            <h2>Sign in to your workspace</h2>
+            <p>Use the email address and password connected to your DOMIKNOW account.</p>
+        </div>
+
+        <div id="errorMessage" class="alert alert-danger hidden" role="alert" aria-live="assertive">
+            <span class="alert-icon">
                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
             </span>
-            <span class="alert-text" style="font-size: 0.875rem; font-weight: 600;">Error message</span>
+            <span class="alert-text">Error message</span>
         </div>
 
-        <div class="issued-account-note">
-            <strong>Maintenance personnel</strong>
-            <span>Sign in using the email and temporary password provided by your landlord. Maintenance accounts are not created through public signup.</span>
-        </div>
-
-        <form id="loginForm" novalidate style="display: flex; flex-direction: column; gap: 1.25rem;">
+        <form id="loginForm" novalidate class="auth-form">
             <div class="form-group">
                 <label for="email" class="form-label">Email Address *</label>
                 <input id="email" name="email" type="email" required 
                        placeholder="name@example.com" class="form-input"
                        autocomplete="email">
-                <small class="form-error" id="email_error" style="color: #ef4444; font-size: 0.75rem; font-weight: 600; margin-top: 0.25rem; display: block;"></small>
+                <small class="form-error" id="email_error"></small>
             </div>
 
             <div class="form-group">
@@ -225,20 +79,25 @@
                         Show
                     </button>
                 </div>
-                <small class="form-error" id="password_error" style="color: #ef4444; font-size: 0.75rem; font-weight: 600; margin-top: 0.25rem; display: block;"></small>
+                <small class="form-error" id="password_error"></small>
             </div>
 
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: -0.5rem;">
-                <a href="verify-code.html" class="auth-link" style="font-size: 0.8125rem;">Verify Email Code</a>
-                <a href="forgot-password.html" class="auth-link" style="font-size: 0.8125rem;">Forgot Password?</a>
+            <div class="auth-inline-actions">
+                <a href="verify-code.html" class="auth-link">Verify email code</a>
+                <a href="forgot-password.html" class="auth-link">Forgot password?</a>
             </div>
 
-            <div class="form-group" style="margin-top: 0.5rem;">
+            <div class="form-group auth-primary-action">
                 <button type="submit" id="submitBtn" class="btn-primary">
                     Sign in
                 </button>
             </div>
         </form>
+
+        <div class="issued-account-note auth-login-issued-note">
+            <strong>Maintenance personnel</strong>
+            <span>Use the email and temporary password provided by your landlord. Maintenance accounts are not created through public signup.</span>
+        </div>
     </div>
 
     <script src="../../js/auth.js"></script>
@@ -247,7 +106,7 @@
         const passwordInput = document.getElementById('password');
         const togglePasswordBtn = document.getElementById('togglePassword');
 
-        const redirectParam = new URLSearchParams(window.location.search).get('redirect');
+        const redirectParam = window.domiknowSafeAuthRedirect(new URLSearchParams(window.location.search).get('redirect'));
         if (redirectParam) {
             document.querySelectorAll('[data-preserve-redirect]').forEach(link => {
                 const target = new URL(link.href, window.location.href);
@@ -271,7 +130,8 @@
             // Clear previous errors
             document.querySelectorAll('.form-error').forEach(el => el.textContent = '');
             document.querySelectorAll('.form-input').forEach(el => {
-                el.style.borderColor = '';
+                el.classList.remove('is-invalid');
+                el.removeAttribute('aria-invalid');
             });
             
             // Email validation
@@ -299,7 +159,11 @@
             const errorEl = document.getElementById(`${fieldId}_error`);
             const inputEl = document.getElementById(fieldId);
             if (errorEl) errorEl.textContent = message;
-            if (inputEl) inputEl.style.borderColor = '#ef4444';
+            if (inputEl) {
+                inputEl.classList.add('is-invalid');
+                inputEl.setAttribute('aria-invalid', 'true');
+                inputEl.setAttribute('aria-describedby', `${fieldId}_error`);
+            }
         }
         
         form.addEventListener('submit', async function(e) {

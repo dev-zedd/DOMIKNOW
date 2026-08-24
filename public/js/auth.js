@@ -1,10 +1,59 @@
 // Base API URL
 const API_BASE_URL = '/api';
 
+function domiknowSafeAuthRedirect(rawRedirect, role = null) {
+    if (!rawRedirect) return null;
+    try {
+        const target = new URL(String(rawRedirect), window.location.origin);
+        if (target.origin !== window.location.origin || target.username || target.password) return null;
+        if (!target.pathname.startsWith('/pages/')) return null;
+        if (role) {
+            const rolePrefix = {
+                tenant: '/pages/tenant/',
+                landlord: '/pages/landlord/',
+                maintenance: '/pages/maintenance/',
+                admin: '/pages/admin/'
+            }[role];
+            if (!rolePrefix || !target.pathname.startsWith(rolePrefix)) return null;
+        }
+        return `${target.pathname}${target.search}${target.hash}`;
+    } catch (error) {
+        return null;
+    }
+}
+window.domiknowSafeAuthRedirect = domiknowSafeAuthRedirect;
+
+function setAuthButtonLoading(button, loading, label) {
+    if (!button) return;
+    if (window.DomiKnowLoading) {
+        window.DomiKnowLoading.setButton(button, loading, label);
+        return;
+    }
+    if (loading) {
+        button.dataset.authDefaultHtml ||= button.innerHTML;
+        button.disabled = true;
+        button.setAttribute('aria-busy', 'true');
+        button.textContent = label || 'Working…';
+    } else {
+        button.disabled = false;
+        button.removeAttribute('aria-busy');
+        if (button.dataset.authDefaultHtml) button.innerHTML = button.dataset.authDefaultHtml;
+    }
+}
+
+function prepareAuthMessage(element, variant) {
+    if (!element) return;
+    element.classList.toggle('alert-danger', variant === 'error');
+    element.classList.toggle('alert-success', variant === 'success');
+    element.setAttribute('role', variant === 'error' ? 'alert' : 'status');
+    element.setAttribute('aria-live', variant === 'error' ? 'assertive' : 'polite');
+}
+
 // Helper to show error
 function showError(message) {
     const errorDiv = document.getElementById('errorMessage');
     if (errorDiv) {
+        prepareAuthMessage(errorDiv, 'error');
         errorDiv.textContent = message;
         errorDiv.classList.remove('hidden');
         setTimeout(() => errorDiv.classList.add('hidden'), 5000);
@@ -17,6 +66,7 @@ function showError(message) {
 function showSuccess(message) {
     const successDiv = document.getElementById('successMessage');
     if (successDiv) {
+        prepareAuthMessage(successDiv, 'success');
         successDiv.textContent = message;
         successDiv.classList.remove('hidden');
         setTimeout(() => successDiv.classList.add('hidden'), 5000);
@@ -29,17 +79,14 @@ function showSuccess(message) {
 async function handleRegister(e) {
     e.preventDefault();
     const submitBtn = document.getElementById('submitBtn');
-    const defaultLabel = submitBtn.dataset.defaultLabel || submitBtn.textContent.trim() || 'Create account';
-    submitBtn.disabled = true;
-    submitBtn.textContent = 'Creating account...';
+    setAuthButtonLoading(submitBtn, true, 'Creating account…');
 
     const formData = new FormData(e.target);
     const data = Object.fromEntries(formData.entries());
 
     if (data.password !== data.confirm_password) {
         showError('Passwords do not match');
-        submitBtn.disabled = false;
-        submitBtn.textContent = defaultLabel;
+        setAuthButtonLoading(submitBtn, false);
         return;
     }
 
@@ -55,7 +102,7 @@ async function handleRegister(e) {
         if (response.ok) {
             // Redirect to verify page with email
             const verifyParams = new URLSearchParams({ email: data.email });
-            const redirectUrl = new URLSearchParams(window.location.search).get('redirect');
+            const redirectUrl = domiknowSafeAuthRedirect(new URLSearchParams(window.location.search).get('redirect'));
             if (redirectUrl) verifyParams.set('redirect', redirectUrl);
             window.location.href = `verify-code.html?${verifyParams.toString()}`;
         } else {
@@ -64,8 +111,7 @@ async function handleRegister(e) {
     } catch (error) {
         showError('An error occurred during registration');
     } finally {
-        submitBtn.disabled = false;
-        submitBtn.textContent = defaultLabel;
+        setAuthButtonLoading(submitBtn, false);
     }
 }
 
@@ -73,8 +119,7 @@ async function handleRegister(e) {
 async function handleVerify(e) {
     e.preventDefault();
     const submitBtn = document.getElementById('submitBtn');
-    submitBtn.disabled = true;
-    submitBtn.textContent = 'Verifying...';
+    setAuthButtonLoading(submitBtn, true, 'Verifying email…');
 
     const formData = new FormData(e.target);
     const data = {
@@ -111,8 +156,7 @@ async function handleVerify(e) {
     } catch (error) {
         showError('An error occurred during verification');
     } finally {
-        submitBtn.disabled = false;
-        submitBtn.textContent = 'Verify';
+        setAuthButtonLoading(submitBtn, false);
     }
 }
 
@@ -125,8 +169,7 @@ async function handleResendCode() {
     }
 
     const resendBtn = document.getElementById('resendBtn');
-    resendBtn.disabled = true;
-    resendBtn.textContent = 'Sending...';
+    setAuthButtonLoading(resendBtn, true, 'Sending code…');
 
     try {
         const response = await fetch(`${API_BASE_URL}/auth/resend-code`, {
@@ -145,8 +188,7 @@ async function handleResendCode() {
     } catch (error) {
         showError('An error occurred while resending code');
     } finally {
-        resendBtn.disabled = false;
-        resendBtn.textContent = "Didn't receive the code? Resend";
+        setAuthButtonLoading(resendBtn, false);
     }
 }
 
@@ -157,19 +199,18 @@ function showVerifyNotice(message, email) {
     const verifyUrl = `verify-code.html${emailParam}`;
     
     if (errorDiv) {
-        errorDiv.innerHTML = `
-            <div style="display: flex; flex-direction: column; gap: 0.5rem; width: 100%;">
-                <div style="display: flex; align-items: center; gap: 0.5rem;">
-                    <span style="color: #ef4444; display: inline-flex; align-items: center; flex-shrink: 0;">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
-                    </span>
-                    <span style="font-size: 0.875rem; font-weight: 600;">${message}</span>
-                </div>
-                <a href="${verifyUrl}" class="btn-primary" style="display: inline-block; text-align: center; font-size: 0.8125rem; padding: 0.625rem 1rem; text-decoration: none; margin-top: 0.25rem; border-radius: 8px;">
-                    Click here to enter your Verification Code &rarr;
-                </a>
-            </div>
-        `;
+        prepareAuthMessage(errorDiv, 'error');
+        errorDiv.replaceChildren();
+        const content = document.createElement('div');
+        content.className = 'auth-alert-action';
+        const text = document.createElement('span');
+        text.textContent = message;
+        const link = document.createElement('a');
+        link.href = verifyUrl;
+        link.className = 'btn-primary auth-alert-action__button';
+        link.textContent = 'Enter verification code';
+        content.append(text, link);
+        errorDiv.appendChild(content);
         errorDiv.classList.remove('hidden');
     } else {
         if (confirm(`${message}\n\nDo you want to go to the verification page now?`)) {
@@ -182,8 +223,7 @@ function showVerifyNotice(message, email) {
 async function handleLogin(e) {
     e.preventDefault();
     const submitBtn = document.getElementById('submitBtn');
-    submitBtn.disabled = true;
-    submitBtn.textContent = 'Signing in...';
+    setAuthButtonLoading(submitBtn, true, 'Signing in…');
 
     const formData = new FormData(e.target);
     const data = Object.fromEntries(formData.entries());
@@ -204,9 +244,9 @@ async function handleLogin(e) {
             
             // Check for redirect parameter
             const urlParams = new URLSearchParams(window.location.search);
-            const redirectUrl = urlParams.get('redirect');
+            const redirectUrl = domiknowSafeAuthRedirect(urlParams.get('redirect'), result.data.user.role);
             if (redirectUrl) {
-                window.location.href = decodeURIComponent(redirectUrl);
+                window.location.href = redirectUrl;
             } else {
                 // Redirect based on role
                 const role = result.data.user.role;
@@ -226,8 +266,7 @@ async function handleLogin(e) {
     } catch (error) {
         showError('An error occurred during login');
     } finally {
-        submitBtn.disabled = false;
-        submitBtn.textContent = 'Sign in';
+        setAuthButtonLoading(submitBtn, false);
     }
 }
 
@@ -239,7 +278,7 @@ async function logout() {
 
     try {
         const shouldLogout = await window.domiknowConfirm({
-            variant: 'warning',
+            variant: 'danger',
             eyebrow: 'End your session',
             title: 'Log out of DOMIKNOW?',
             message: 'You will need to sign in again to access your account and continue your current work.',

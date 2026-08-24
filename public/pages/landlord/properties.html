@@ -343,7 +343,7 @@
                         <div class="prop-header">
                             <img src="${prop.main_image_url || 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&w=600&q=80'}" alt="${prop.property_name}" class="prop-img">
                             <span class="status-badge status-badge-absolute ${statusClass}">${statusLabel.toUpperCase()}</span>
-                            <span class="type-badge-absolute">${prop.property_type.replace('_', ' ')}</span>
+                            <span class="type-badge-absolute">${prop.property_type.replace(/_/g, ' ')}</span>
                         </div>
                         <div class="prop-body">
                             <div class="prop-name">${prop.property_name}</div>

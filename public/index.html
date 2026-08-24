@@ -8,6 +8,10 @@
     <link href="css/input.css" rel="stylesheet">
     <link href="css/design-system.css" rel="stylesheet">
     <link href="css/public-refinement.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+    <link href="css/map-system.css?v=20260823-1" rel="stylesheet">
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="js/map-system.js?v=20260823-1" defer></script>
     <link rel="preload" as="image" href="images/domiknow-public-hero-v2.jpg">
     <style>
         :root {
@@ -1475,14 +1479,15 @@
             line-height: 1.6;
         }
     </style>
-    <link href="css/public-module.css?v=20260817-11" rel="stylesheet">
+    <link href="css/public-module.css?v=20260823-5" rel="stylesheet">
     <link href="css/mobile-first.css?v=20260817-1" rel="stylesheet">
     <script src="js/ui.js" defer></script>
+    <script src="js/public-navigation.js?v=20260823-1" defer></script>
     <script src="js/public-home.js?v=20260817-1" defer></script>
     <script src="js/location-permission.js?v=20260817-9" defer></script>
 </head>
 
-<body class="public-landing-page">
+<body class="public-landing-page" id="top">
     <!-- Noise Grain Overlay -->
     <svg class="noise-overlay" xmlns="http://www.w3.org/2000/svg">
         <filter id="noiseFilter">
@@ -1495,7 +1500,7 @@
     <div class="aurora-hero-wrapper">
 
         <!-- Navbar -->
-        <header class="landing-header" id="mainHeader">
+        <header class="landing-header public-workspace-header" id="mainHeader">
             <!-- Logo -->
             <a href="index.html" class="logo brand-lockup" aria-label="DOMIKNOW home">
                 <span class="brand-mark" aria-hidden="true">
@@ -1507,7 +1512,8 @@
             </a>
 
             <!-- Centered Nav -->
-            <nav class="nav-links" aria-label="Primary navigation">
+            <nav class="nav-links public-workspace-nav" aria-label="Primary navigation">
+                <a href="#top" class="nav-link" aria-current="page">Home</a>
                 <a href="pages/public/properties.html" class="nav-link">Browse rentals</a>
                 <a href="#howItWorks" class="nav-link">How It Works</a>
                 <a href="#communityFeedback" class="nav-link">Experience</a>
@@ -1515,8 +1521,8 @@
             </nav>
 
             <!-- Auth / CTA Button -->
-            <div class="auth-buttons">
-                <a href="/pages/auth/login.html" class="btn btn-secondary">Log in</a>
+            <div class="auth-buttons public-workspace-actions">
+                <a href="/pages/auth/login.html" class="btn btn-secondary public-auth-login">Log in</a>
                 <a href="/pages/auth/register.html" class="btn btn-primary btn-hero-cta">Create account</a>
                 <button type="button" class="theme-toggle" data-theme-toggle aria-label="Switch color theme"></button>
             </div>
@@ -1689,43 +1695,12 @@
             <a href="pages/public/properties.html" class="btn btn-primary">Open rental discovery</a>
         </div>
         <div class="public-discovery-bridge__preview" aria-hidden="true">
-            <svg class="bridge-map-scene" viewBox="0 0 720 430" preserveAspectRatio="xMidYMid slice" focusable="false">
-                <rect width="720" height="430" fill="#dfe9e7"/>
-                <path d="M570 -20C534 66 558 118 620 163C683 209 687 294 628 450H760V-20Z" fill="#b8dce9"/>
-                <path d="M45 42C128 5 206 22 242 87C264 128 236 166 164 175C85 184 24 131 45 42Z" fill="#c7dfca"/>
-                <path d="M444 280C514 247 578 269 590 327C603 390 524 426 439 401C392 387 391 305 444 280Z" fill="#c7dfca"/>
-                <g fill="none" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M-20 342C111 304 161 239 271 222C391 204 470 126 744 96" stroke="#ffffff" stroke-width="22"/>
-                    <path d="M-20 342C111 304 161 239 271 222C391 204 470 126 744 96" stroke="#f1c86e" stroke-width="10"/>
-                    <path d="M95 -20C119 79 157 132 223 192C294 256 339 329 360 458" stroke="#ffffff" stroke-width="15"/>
-                    <path d="M95 -20C119 79 157 132 223 192C294 256 339 329 360 458" stroke="#d4d9d8" stroke-width="6"/>
-                    <path d="M-10 124C85 142 129 193 179 286M245 -10C243 82 290 124 379 151M414 -20C407 67 446 113 528 142M410 166C451 206 481 238 487 301M70 385C141 354 196 349 264 371M341 291C396 305 423 346 428 432M525 215C583 234 625 273 672 333" stroke="#ffffff" stroke-width="7"/>
-                    <path d="M-10 124C85 142 129 193 179 286M245 -10C243 82 290 124 379 151M414 -20C407 67 446 113 528 142M410 166C451 206 481 238 487 301M70 385C141 354 196 349 264 371M341 291C396 305 423 346 428 432M525 215C583 234 625 273 672 333" stroke="#cbd4d3" stroke-width="2"/>
-                    <circle cx="340" cy="215" r="118" stroke="#0355f3" stroke-width="3" stroke-dasharray="8 9" opacity="0.55"/>
-                </g>
-                <g fill="#64748b" font-family="Arial, sans-serif" font-size="13" font-weight="700" letter-spacing="0.6">
-                    <text x="270" y="188">SINILOAN</text>
-                    <text x="90" y="105" font-size="11">MAGSAYSAY</text>
-                    <text x="475" y="348" font-size="11">SAN ANTONIO</text>
-                </g>
-                <text x="594" y="205" fill="#4f8297" font-family="Arial, sans-serif" font-size="11" font-weight="700" transform="rotate(67 594 205)">LAGUNA DE BAY</text>
-            </svg>
+            <img class="bridge-map-scene" src="images/siniloan-noir-map.svg" alt="" loading="lazy" decoding="async">
             <div class="bridge-map-search"><span data-icon="search"></span><span>Search this area</span></div>
             <span class="bridge-marker bridge-marker--one">&#8369;3,500</span>
             <span class="bridge-marker bridge-marker--two">&#8369;4,200</span>
             <span class="bridge-marker bridge-marker--three">&#8369;2,800</span>
             <div class="bridge-map-controls"><span>+</span><span>&minus;</span></div>
-            <div class="bridge-list-card">
-                <div class="bridge-list-card__heading">
-                    <span class="bridge-list-card__icon"><span data-icon="building"></span></span>
-                    <span>
-                        <small>Selected rental</small>
-                        <strong>Listing details stay connected</strong>
-                    </span>
-                </div>
-                <div class="bridge-list-card__meta"><span>2 rooms available</span><span>1.2 km away</span></div>
-                <div class="bridge-list-card__footer"><span>Starting at</span><strong>&#8369;3,500 <small>/ month</small></strong></div>
-            </div>
         </div>
     </section>
 
@@ -2091,6 +2066,7 @@
             }).setView([defaultLat, defaultLng], 14);
 
             DomiknowMap.addBasemap(map);
+            DomiknowMap.observeContainer(map, document.getElementById('searchMap'));
 
             drawSiniloanZone();
 
@@ -2409,7 +2385,7 @@
         }
 
         function selectEstatesProperty(propId) {
-            const found = propertiesData.find(p => p.id === propId);
+            const found = propertiesData.find(p => String(p.id) === String(propId));
             if (found) {
                 selectedProperty = found;
                 renderFeaturedCard(selectedProperty);
@@ -2423,6 +2399,7 @@
                 if (found.latitude && found.longitude) {
                     map.panTo([found.latitude, found.longitude]);
                 }
+                propertyMarkers.find(marker => String(marker.domiknowPropertyId) === String(found.id))?.openPopup();
             }
         }
 
@@ -2452,6 +2429,22 @@
                     title: `${prop.property_name || 'Rental property'}, ${priceText}`,
                     alt: `${prop.property_name || 'Rental property'} map marker`
                 }).addTo(map);
+
+                marker.domiknowPropertyId = String(prop.id);
+                const availableCount = Number(prop.available_space_count);
+                const totalCount = Number(prop.total_space_count);
+                const availability = Number.isFinite(totalCount) && totalCount > 0 && Number.isFinite(availableCount)
+                    ? availableCount > 0 ? `${availableCount} available` : 'No vacancies'
+                    : 'Availability not listed';
+                DomiknowMap.bindPopup(marker, DomiknowMap.propertyPopupContent({
+                    eyebrow: 'Selected rental',
+                    title: prop.property_name || 'Rental property',
+                    facts: [availability, `Brgy. ${prop.barangay || 'Siniloan'}`],
+                    price: Number.isFinite(rentValue) && rentValue > 0 ? `₱${rentValue.toLocaleString('en-PH')}` : 'Price on request',
+                    priceSuffix: Number.isFinite(rentValue) && rentValue > 0 ? '/ month' : false,
+                    actionHref: `pages/public/property-details.html?id=${encodeURIComponent(prop.id)}`,
+                    actionLabel: 'View details'
+                }));
 
                 marker.on('click', () => {
                     selectEstatesProperty(prop.id);

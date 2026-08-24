@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notifications - DOMIKNOW</title>
+    <meta name="description" content="Review rental, lease, payment, maintenance, case, and account notifications in DOMIKNOW.">
+    <link href="../../css/input.css" rel="stylesheet">
+    <link href="../../css/design-system.css" rel="stylesheet">
+    <link href="../../css/notification-system.css?v=20260824-2" rel="stylesheet" data-notification-system>
+    <script src="../../js/ui.js" defer></script>
+</head>
+<body class="app-loading" data-role="tenant" data-page-title="Notifications">
+    <main class="notification-center-page" data-notification-center aria-labelledby="appPageTitle">
+        <section class="notification-center__hero" aria-labelledby="notificationCenterHeading">
+            <div>
+                <p class="notification-center__eyebrow">Notification center</p>
+                <h2 id="notificationCenterHeading">Stay current without losing your place</h2>
+                <p>Rental activity, lease changes, account notices, maintenance updates, and case decisions are collected here.</p>
+            </div>
+            <div class="notification-center__summary" aria-label="Notification summary">
+                <div class="notification-summary-card"><span>Total</span><strong data-notification-total>0</strong></div>
+                <div class="notification-summary-card"><span>Unread</span><strong data-notification-unread>0</strong></div>
+                <div class="notification-summary-card"><span>Today</span><strong data-notification-today>0</strong></div>
+            </div>
+        </section>
+
+        <section class="notification-center__panel" aria-labelledby="notificationListHeading">
+            <div class="notification-center__toolbar">
+                <div>
+                    <p class="notification-center__eyebrow">Inbox</p>
+                    <h2 id="notificationListHeading" class="sr-only">Your notifications</h2>
+                    <div class="notification-filters" role="group" aria-label="Filter notification center">
+                        <button type="button" class="notification-filter is-active" data-notification-filter="all">All notifications</button>
+                        <button type="button" class="notification-filter" data-notification-filter="unread">Unread only</button>
+                    </div>
+                </div>
+                <div>
+                    <button type="button" class="notification-mark-all" data-notification-mark-all>Mark all read</button>
+                    <button type="button" class="notification-icon-button" data-notification-refresh aria-label="Refresh notifications" title="Refresh notifications">
+                        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11a8 8 0 1 0 2 5.3M20 4v7h-7"/></svg>
+                    </button>
+                </div>
+            </div>
+            <div class="notification-center__list" data-notification-center-list aria-live="polite">
+                <div class="notification-state" role="status">Preparing your notifications…</div>
+            </div>
+        </section>
+    </main>
+
+    <script src="../../js/auth.js"></script>
+    <script src="../../js/dashboard.js"></script>
+</body>
+</html>

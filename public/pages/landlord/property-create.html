@@ -298,6 +298,9 @@
                             <option value="apartment">Apartment</option>
                             <option value="boarding_house">Boarding House</option>
                             <option value="bedspace">Bedspace</option>
+                            <option value="studio_unit">Studio Unit</option>
+                            <option value="room_for_rent">Room for Rent</option>
+                            <option value="house">House</option>
                         </select>
                     </div>
                 </div>
@@ -1069,11 +1072,9 @@
                 const loadingIndicator = document.getElementById('mapLoadingIndicator');
                 if (loadingIndicator) loadingIndicator.style.display = 'none';
 
-                requestAnimationFrame(() => requestAnimationFrame(() => map.invalidateSize(false)));
                 const mapElement = document.getElementById('locationMap');
-                if ('ResizeObserver' in window && mapElement) {
-                    new ResizeObserver(() => map.invalidateSize(false)).observe(mapElement);
-                }
+                if (window.DomiknowMap) DomiknowMap.observeContainer(map, mapElement);
+                else requestAnimationFrame(() => requestAnimationFrame(() => map.invalidateSize(false)));
 
                 marker.on('dragend', function() {
                     const pos = marker.getLatLng();

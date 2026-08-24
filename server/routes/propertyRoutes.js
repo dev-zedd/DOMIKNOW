@@ -10,7 +10,9 @@ const handleValidationErrors = require('../middleware/validationMiddleware');
 const searchValidation = [
     query('search').optional().trim().isLength({ max: 255 }).withMessage('Search term too long'),
     query('barangay').optional().trim().isLength({ max: 100 }).withMessage('Barangay name too long'),
-    query('property_type').optional().isIn(['apartment', 'boarding_house', 'bedspace']).withMessage('Invalid property type'),
+    query('property_type').optional().isIn([
+        'apartment', 'boarding_house', 'bedspace', 'studio_unit', 'room_for_rent', 'house'
+    ]).withMessage('Invalid property type'),
 
     query('tenant_type').optional().isIn(['student', 'worker', 'family', 'general']).withMessage('Invalid tenant type'),
     query('min_price').optional().isFloat({ min: 0 }).withMessage('Minimum price must be a positive number'),
@@ -37,9 +39,10 @@ router.get('/', searchValidation, handleValidationErrors, propertyController.get
 // Property Details API (PUBLIC - anyone can view details)
 router.get('/:id', propertyIdValidation, handleValidationErrors, propertyController.getPropertyById);
 
-// Property Recommendations API (Multi-Criteria Ranked)
-router.get('/recommendations/ranked', propertyController.getRecommended);
-router.get('/recommendations/personalized', propertyController.getRecommended);
+// Tenant-only Multi-Criteria Property Recommendation (MC-REC-v1.0).
+// Public GIS discovery remains available through GET /api/properties.
+router.get('/recommendations/ranked', requireAuth, requireRole('tenant'), propertyController.getRecommended);
+router.get('/recommendations/personalized', requireAuth, requireRole('tenant'), propertyController.getRecommended);
 
 // Property Comparison API (Authenticated users)
 router.post('/compare', requireAuth, compareValidation, handleValidationErrors, propertyController.compareProperties);

@@ -491,7 +491,7 @@ body[data-maintenance-page="task-details"] .timeline {
     z-index: 120;
     display: grid;
     min-height: calc(66px + env(safe-area-inset-bottom));
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 6px;
     padding: 5px max(12px, env(safe-area-inset-right)) calc(5px + env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));
   }
@@ -499,10 +499,11 @@ body[data-maintenance-page="task-details"] .timeline {
   .dashboard-layout-maintenance .bottom-nav-item {
     display: inline-grid;
     min-height: 54px !important;
-    grid-template-columns: 22px auto;
+    grid-template-columns: 1fr;
     place-content: center;
+    justify-items: center;
     align-items: center;
-    gap: 7px;
+    gap: 3px;
     border: 0 !important;
     border-radius: 10px !important;
     background: transparent !important;

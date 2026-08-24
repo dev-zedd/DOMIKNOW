@@ -2,9 +2,15 @@ const bcrypt = require('bcrypt');
 const userModel = require('../models/userModel');
 const maintenanceModel = require('../models/maintenanceModel');
 const auditLogModel = require('../models/auditLogModel');
+const notificationModel = require('../models/notificationModel');
 const responseHelper = require('../utils/responseHelper');
 const supabase = require('../config/supabaseClient');
 const { uploadFile, getSignedUrl } = require('../utils/storageHelper');
+
+const MAINTENANCE_CATEGORIES = new Set([
+    'plumbing', 'electrical', 'aircon', 'door', 'roof', 'internet', 'appliance', 'others'
+]);
+const MAINTENANCE_PRIORITIES = new Set(['low', 'medium', 'high', 'emergency']);
 
 const maintenanceController = {
     // ── Tenant: Create request ──────────────────────────────────────────
@@ -21,6 +27,12 @@ const maintenanceController = {
 
             if (!property_id || !lease_id || !issue_title || !issue_description || !issue_category || !priority_level) {
                 return responseHelper.error(res, 'Property, lease, title, description, category, and priority level are required.');
+            }
+            if (!MAINTENANCE_CATEGORIES.has(issue_category)) {
+                return responseHelper.error(res, 'Select a valid maintenance issue category.');
+            }
+            if (!MAINTENANCE_PRIORITIES.has(priority_level)) {
+                return responseHelper.error(res, 'Select a valid maintenance priority level.');
             }
 
             // Verify active lease
@@ -72,6 +84,13 @@ const maintenanceController = {
             });
 
             await auditLogModel.log(tenantId, 'SUBMIT_MAINTENANCE_REQUEST', `Tenant submitted maintenance request ${request.id}`);
+            await notificationModel.create({
+                user_id: lease.landlord_id,
+                type: 'maintenance_submitted',
+                title: 'New maintenance request',
+                message: `${issue_title} was reported${unit_number ? ` for unit ${unit_number}` : ''}. Review its priority and assign the next action.`,
+                reference_id: request.id
+            });
             return responseHelper.success(res, 'Maintenance request successfully submitted.', request, 201);
 
         } catch (error) {
@@ -98,8 +117,11 @@ const maintenanceController = {
             const { decision, remarks } = req.body; // decision: 'confirm' or 'rework'
             const tenantId = req.user.id;
 
-            if (!decision) {
-                return responseHelper.error(res, 'Decision parameter is required.');
+            if (!['confirm', 'rework'].includes(decision)) {
+                return responseHelper.error(res, 'Decision must be either confirm or rework.');
+            }
+            if (decision === 'rework' && (!remarks || remarks.trim().length < 5)) {
+                return responseHelper.error(res, 'Explain what still needs work before requesting rework.');
             }
 
             const request = await maintenanceModel.findRequestDetails(id);
@@ -127,6 +149,26 @@ const maintenanceController = {
             });
 
             await auditLogModel.log(tenantId, 'TENANT_RESPOND_MAINTENANCE', `Tenant responded with ${decision} for task ${id}`);
+
+            const recipients = [{
+                user_id: request.landlord_id,
+                type: decision === 'rework' ? 'maintenance_rework_requested' : 'maintenance_closed',
+                title: decision === 'rework' ? 'Tenant requested maintenance rework' : 'Tenant confirmed the repair',
+                message: decision === 'rework'
+                    ? `${request.issue_title}: the tenant requested additional work${remarks ? ` — ${remarks}` : '.'}`
+                    : `${request.issue_title} was confirmed complete and has been closed.`,
+                reference_id: id
+            }];
+            if (decision === 'rework' && request.assigned_maintenance_id) {
+                recipients.push({
+                    user_id: request.assigned_maintenance_id,
+                    type: 'maintenance_rework_requested',
+                    title: 'Maintenance rework requested',
+                    message: `${request.issue_title} needs additional work${remarks ? ` — ${remarks}` : '.'}`,
+                    reference_id: id
+                });
+            }
+            await Promise.all(recipients.map(notification => notificationModel.create(notification)));
             return responseHelper.success(res, `Request successfully updated as ${newStatus}.`, updated);
 
         } catch (error) {
@@ -153,8 +195,8 @@ const maintenanceController = {
             const { decision, rejection_reason } = req.body; // decision: 'approve' or 'reject'
             const landlordId = req.user.id;
 
-            if (!decision) {
-                return responseHelper.error(res, 'Decision parameter is required.');
+            if (!['approve', 'reject'].includes(decision)) {
+                return responseHelper.error(res, 'Decision must be either approve or reject.');
             }
 
             const request = await maintenanceModel.findRequestDetails(id);
@@ -171,8 +213,8 @@ const maintenanceController = {
             let note = 'Landlord approved request.';
 
             if (decision === 'reject') {
-                if (!rejection_reason) {
-                    return responseHelper.error(res, 'Rejection reason is required.');
+                if (!rejection_reason || rejection_reason.trim().length < 5) {
+                    return responseHelper.error(res, 'A clear rejection reason is required.');
                 }
                 newStatus = 'rejected';
                 updatePayload = { status: 'rejected', rejection_reason };
@@ -188,6 +230,15 @@ const maintenanceController = {
             });
 
             await auditLogModel.log(landlordId, 'LANDLORD_RESPOND_MAINTENANCE', `Landlord responded ${decision} to request ${id}`);
+            await notificationModel.create({
+                user_id: request.tenant_id,
+                type: decision === 'reject' ? 'maintenance_rejected' : 'maintenance_approved',
+                title: decision === 'reject' ? 'Maintenance request was not approved' : 'Maintenance request approved',
+                message: decision === 'reject'
+                    ? `${request.issue_title} was not approved. ${rejection_reason}`
+                    : `${request.issue_title} was approved and is ready for technician assignment.`,
+                reference_id: id
+            });
             return responseHelper.success(res, `Request successfully marked as ${newStatus}.`, updated);
 
         } catch (error) {
@@ -210,6 +261,9 @@ const maintenanceController = {
             const request = await maintenanceModel.findRequestDetails(id);
             if (!request || request.landlord_id !== landlordId) {
                 return responseHelper.error(res, 'Request not found or access denied.', null, 404);
+            }
+            if (request.status !== 'approved') {
+                return responseHelper.error(res, 'Only approved requests can be assigned to a technician.');
             }
 
             // Verify technician role
@@ -247,6 +301,22 @@ const maintenanceController = {
             });
 
             await auditLogModel.log(landlordId, 'ASSIGN_MAINTENANCE', `Assigned technician ${assigned_maintenance_id} to request ${id}`);
+            await Promise.all([
+                notificationModel.create({
+                    user_id: assigned_maintenance_id,
+                    type: 'maintenance_assigned',
+                    title: 'New maintenance task assigned',
+                    message: `${request.issue_title} is due on ${new Date(due_date).toLocaleDateString('en-PH')}. Open the task to accept or decline it.`,
+                    reference_id: id
+                }),
+                notificationModel.create({
+                    user_id: request.tenant_id,
+                    type: 'maintenance_assigned',
+                    title: 'A technician was assigned',
+                    message: `${request.issue_title} has been assigned to maintenance personnel. You can follow its progress from your request.`,
+                    reference_id: id
+                })
+            ]);
             return responseHelper.success(res, 'Technician assigned successfully.', updated);
 
         } catch (error) {
@@ -262,8 +332,11 @@ const maintenanceController = {
             const { decision, remarks } = req.body; // decision: 'accept' or 'rework'
             const landlordId = req.user.id;
 
-            if (!decision) {
-                return responseHelper.error(res, 'Decision parameter is required.');
+            if (!['accept', 'rework'].includes(decision)) {
+                return responseHelper.error(res, 'Decision must be either accept or rework.');
+            }
+            if (decision === 'rework' && (!remarks || remarks.trim().length < 5)) {
+                return responseHelper.error(res, 'Explain what still needs work before requesting rework.');
             }
 
             const request = await maintenanceModel.findRequestDetails(id);
@@ -291,6 +364,27 @@ const maintenanceController = {
             });
 
             await auditLogModel.log(landlordId, 'LANDLORD_VERIFY_MAINTENANCE', `Landlord assessed completion as ${decision} for request ${id}`);
+            const verificationNotifications = [{
+                user_id: request.tenant_id,
+                type: decision === 'rework' ? 'maintenance_rework_requested' : 'maintenance_verified',
+                title: decision === 'rework' ? 'Maintenance rework requested' : 'Maintenance work verified',
+                message: decision === 'rework'
+                    ? `${request.issue_title} was returned to the technician for additional work.`
+                    : `${request.issue_title} was verified by the landlord. Please confirm the repair from your request.`,
+                reference_id: id
+            }];
+            if (request.assigned_maintenance_id) {
+                verificationNotifications.push({
+                    user_id: request.assigned_maintenance_id,
+                    type: decision === 'rework' ? 'maintenance_rework_requested' : 'maintenance_verified',
+                    title: decision === 'rework' ? 'Landlord requested rework' : 'Maintenance work accepted',
+                    message: decision === 'rework'
+                        ? `${request.issue_title} needs additional work${remarks ? ` — ${remarks}` : '.'}`
+                        : `${request.issue_title} was reviewed and accepted by the landlord.`,
+                    reference_id: id
+                });
+            }
+            await Promise.all(verificationNotifications.map(notification => notificationModel.create(notification)));
             return responseHelper.success(res, `Request successfully updated as ${newStatus}.`, updated);
 
         } catch (error) {
@@ -317,8 +411,8 @@ const maintenanceController = {
             const { response } = req.body; // response: 'accept' or 'decline'
             const workerId = req.user.id;
 
-            if (!response) {
-                return responseHelper.error(res, 'Response is required.');
+            if (!['accept', 'decline'].includes(response)) {
+                return responseHelper.error(res, 'Response must be either accept or decline.');
             }
 
             const request = await maintenanceModel.findRequestDetails(id);
@@ -350,6 +444,24 @@ const maintenanceController = {
             });
 
             await auditLogModel.log(workerId, 'WORKER_RESPOND_JOB', `Technician ${workerId} responded ${response} to task ${id}`);
+            await Promise.all([
+                notificationModel.create({
+                    user_id: request.landlord_id,
+                    type: response === 'decline' ? 'maintenance_assignment_declined' : 'maintenance_assignment_accepted',
+                    title: response === 'decline' ? 'Technician declined the task' : 'Technician accepted the task',
+                    message: response === 'decline'
+                        ? `${request.issue_title} needs to be assigned to another technician.`
+                        : `${request.issue_title} was accepted and is ready to begin.`,
+                    reference_id: id
+                }),
+                ...(response === 'accept' ? [notificationModel.create({
+                    user_id: request.tenant_id,
+                    type: 'maintenance_assignment_accepted',
+                    title: 'Technician accepted your request',
+                    message: `Maintenance personnel accepted ${request.issue_title}. Progress updates will appear here.`,
+                    reference_id: id
+                })] : [])
+            ]);
             return responseHelper.success(res, `Task marked as ${newStatus}.`, updated);
 
         } catch (error) {
@@ -379,6 +491,20 @@ const maintenanceController = {
                 return responseHelper.error(res, 'Request not found or access denied.', null, 404);
             }
 
+            const allowedNextStatus = {
+                accepted: 'travelling',
+                travelling: 'arrived',
+                arrived: 'repairing'
+            }[request.status];
+            if (status !== allowedNextStatus) {
+                return responseHelper.error(
+                    res,
+                    allowedNextStatus
+                        ? `The next valid task status is ${allowedNextStatus}.`
+                        : 'This task cannot receive another progress update in its current state.'
+                );
+            }
+
             let updatePayload = { status };
             let note = `Technician updated progress status to: ${status}`;
 
@@ -402,6 +528,18 @@ const maintenanceController = {
             });
 
             await auditLogModel.log(workerId, 'WORKER_UPDATE_STATUS', `Technician updated status to ${status} for task ${id}`);
+            const statusLabels = {
+                travelling: 'is on the way to the property',
+                arrived: 'has arrived at the property',
+                repairing: 'has started the repair'
+            };
+            await Promise.all([request.tenant_id, request.landlord_id].map(userId => notificationModel.create({
+                user_id: userId,
+                type: `maintenance_${status}`,
+                title: 'Maintenance progress updated',
+                message: `The technician ${statusLabels[status]} for ${request.issue_title}.`,
+                reference_id: id
+            })));
             return responseHelper.success(res, `Task updated as ${status}.`, updated);
 
         } catch (error) {
@@ -430,6 +568,9 @@ const maintenanceController = {
             const request = await maintenanceModel.findRequestDetails(id);
             if (!request || request.assigned_maintenance_id !== workerId) {
                 return responseHelper.error(res, 'Request not found or access denied.', null, 404);
+            }
+            if (request.status !== 'repairing') {
+                return responseHelper.error(res, 'A completion report can only be submitted while the task is in repair.');
             }
 
             // Upload photos if provided
@@ -509,6 +650,13 @@ const maintenanceController = {
             });
 
             await auditLogModel.log(workerId, 'WORKER_SUBMIT_REPORT', `Technician submitted completion report for request ${id}`);
+            await Promise.all([request.tenant_id, request.landlord_id].map(userId => notificationModel.create({
+                user_id: userId,
+                type: 'maintenance_completed',
+                title: 'Maintenance work completed',
+                message: `${request.issue_title} was marked complete. Review the repair report and confirm the result.`,
+                reference_id: id
+            })));
             return responseHelper.success(res, 'Maintenance completion report submitted successfully.', { report, updated });
 
         } catch (error) {

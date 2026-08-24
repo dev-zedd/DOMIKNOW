@@ -1125,7 +1125,7 @@
             // Render property details
             document.getElementById('propName').textContent = prop.property_name;
             document.getElementById('propAddress').textContent = `${prop.address}, Barangay ${prop.barangay}, Siniloan`;
-            document.getElementById('propType').textContent = prop.property_type.replace('_', ' ').toUpperCase();
+            document.getElementById('propType').textContent = prop.property_type.replace(/_/g, ' ').toUpperCase();
             
             let rentVal = null;
             let targetRoomText = '';

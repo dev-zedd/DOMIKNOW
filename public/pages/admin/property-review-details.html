@@ -6,7 +6,9 @@
     <title>Verify Property - DomiKnow</title>
     <link href="../../css/input.css" rel="stylesheet">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link href="../../css/map-system.css?v=20260823-1" rel="stylesheet">
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="../../js/map-system.js?v=20260823-1" defer></script>
     <style>
         .details-grid {
             display: grid;
@@ -371,33 +373,14 @@
                 return;
             }
 
-            // Set up Leaflet Map with CARTO HD Vector & Esri Satellite HD layers
-            const cartoVoyagerHD = L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-                maxZoom: 21,
-                maxNativeZoom: 20,
-                subdomains: 'abcd',
-                detectRetina: true
-            });
-            const satelliteBase = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { maxZoom: 19, detectRetina: true });
-            const labelsOverlay = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}', { maxZoom: 19, detectRetina: true });
-            const esriSatelliteHD = L.layerGroup([satelliteBase, labelsOverlay]);
-
             adminMap = L.map('landlordMap', {
-                zoomControl: true,
-                layers: [cartoVoyagerHD]
+                zoomControl: true
             }).setView([14.425, 121.440], 15);
+            const domiknowBasemap = DomiknowMap.addBasemap(adminMap, { maxZoom: 20, maxNativeZoom: 20 });
+            DomiknowMap.addLayerControl(adminMap, domiknowBasemap, { satellite: true });
 
             const mapContainer = document.getElementById('landlordMap');
-            requestAnimationFrame(() => requestAnimationFrame(() => adminMap.invalidateSize(false)));
-            if ('ResizeObserver' in window && mapContainer) {
-                const mapResizeObserver = new ResizeObserver(() => adminMap.invalidateSize(false));
-                mapResizeObserver.observe(mapContainer);
-            }
-
-            L.control.layers({
-                "🗺️ CARTO HD Street Vector": cartoVoyagerHD,
-                "🛰️ Esri HD Satellite": esriSatelliteHD
-            }, null, { position: 'topright' }).addTo(adminMap);
+            DomiknowMap.observeContainer(adminMap, mapContainer);
 
             fetchPropertyReviewDetails();
             
@@ -448,7 +431,7 @@
 
             // Specs
             document.getElementById('viewPropName').textContent = prop.property_name || '-';
-            document.getElementById('viewPropType').textContent = (prop.property_type || '-').replace('_', ' ').toUpperCase();
+            document.getElementById('viewPropType').textContent = (prop.property_type || '-').replace(/_/g, ' ').toUpperCase();
             document.getElementById('viewDescription').textContent = prop.description || 'No description provided.';
             
             document.getElementById('viewBarangay').textContent = prop.barangay || '-';
@@ -664,10 +647,20 @@
             if (Number.isFinite(latitude) && Number.isFinite(longitude) && Math.abs(latitude) <= 90 && Math.abs(longitude) <= 180) {
                 adminMap.invalidateSize(false);
                 adminMap.setView([latitude, longitude], 16);
-                L.marker([latitude, longitude])
-                    .addTo(adminMap)
-                    .bindPopup(`<strong>${domiknowEscapeHtml(prop.property_name)}</strong><br>Brgy. ${domiknowEscapeHtml(prop.barangay)}`)
-                    .openPopup();
+                const marker = L.marker([latitude, longitude], {
+                    icon: DomiknowMap.pinIcon({ selected: true }),
+                    keyboard: true,
+                    title: `${prop.property_name || 'Property'} review location`,
+                    alt: `${prop.property_name || 'Property'} review location marker`
+                }).addTo(adminMap);
+                DomiknowMap.bindPopup(marker, DomiknowMap.propertyPopupContent({
+                    eyebrow: 'Property under review',
+                    title: prop.property_name || 'Property',
+                    facts: [
+                        `Brgy. ${prop.barangay || 'Location not specified'}`,
+                        prop.property_type ? String(prop.property_type).replace(/_/g, ' ') : 'Property type not specified'
+                    ]
+                })).openPopup();
             }
         }
 

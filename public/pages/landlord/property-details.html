@@ -319,6 +319,9 @@
                                     <option value="apartment">Apartment</option>
                                     <option value="boarding_house">Boarding House</option>
                                     <option value="bedspace">Bedspace</option>
+                                    <option value="studio_unit">Studio Unit</option>
+                                    <option value="room_for_rent">Room for Rent</option>
+                                    <option value="house">House</option>
                                 </select>
                             </div>
                         </div>
@@ -522,11 +525,9 @@
                 : L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(detailsMap);
             if (window.DomiknowMap) DomiknowMap.addLayerControl(detailsMap, domiknowBasemap, { satellite: true });
 
-            requestAnimationFrame(() => requestAnimationFrame(() => detailsMap.invalidateSize(false)));
             const mapElement = document.getElementById('landlordMap');
-            if ('ResizeObserver' in window && mapElement) {
-                new ResizeObserver(() => detailsMap.invalidateSize(false)).observe(mapElement);
-            }
+            if (window.DomiknowMap) DomiknowMap.observeContainer(detailsMap, mapElement);
+            else requestAnimationFrame(() => requestAnimationFrame(() => detailsMap.invalidateSize(false)));
 
             if (urlParams.get('edit') === 'true') {
                 toggleMode(true);
@@ -588,7 +589,7 @@
             if (titleEl) titleEl.textContent = prop.property_name;
 
             const subEl = document.getElementById('pageSubtitle');
-            if (subEl) subEl.textContent = `Registered ${prop.property_type.replace('_', ' ')} in Barangay ${prop.barangay || 'Siniloan'}.`;
+            if (subEl) subEl.textContent = `Registered ${prop.property_type.replace(/_/g, ' ')} in Barangay ${prop.barangay || 'Siniloan'}.`;
 
             // Status badge
             const statusBadge = document.getElementById('propertyStatusBadge');
@@ -646,7 +647,7 @@
             if (nameEl) nameEl.textContent = prop.property_name || '-';
 
             const typeEl = document.getElementById('viewPropType');
-            if (typeEl) typeEl.textContent = (prop.property_type || '-').replace('_', ' ').toUpperCase();
+            if (typeEl) typeEl.textContent = (prop.property_type || '-').replace(/_/g, ' ').toUpperCase();
 
             const descEl = document.getElementById('viewDescription');
             if (descEl) descEl.textContent = prop.description || 'No description provided.';
@@ -983,15 +984,19 @@
             if (detailsMarker) detailsMarker.remove();
             const propertyPin = window.DomiknowMap ? DomiknowMap.pinIcon({ selected: true }) : undefined;
             detailsMarker = L.marker([latitude, longitude], propertyPin ? { icon: propertyPin } : {})
-                .addTo(detailsMap)
-                .bindPopup(window.DomiknowMap
-                    ? DomiknowMap.popupContent({
-                        eyebrow: 'Registered property',
-                        title: prop.property_name || 'Property',
-                        meta: `Brgy. ${prop.barangay || 'Location not specified'}`
-                    })
-                    : `${prop.property_name || 'Property'} — Brgy. ${prop.barangay || 'Location not specified'}`)
-                .openPopup();
+                .addTo(detailsMap);
+            if (window.DomiknowMap) {
+                DomiknowMap.bindPopup(detailsMarker, DomiknowMap.propertyPopupContent({
+                    eyebrow: 'Registered property',
+                    title: prop.property_name || 'Property',
+                    facts: [
+                        `Brgy. ${prop.barangay || 'Location not specified'}`,
+                        prop.property_type ? String(prop.property_type).replace(/_/g, ' ') : 'Property type not specified'
+                    ]
+                })).openPopup();
+            } else {
+                detailsMarker.bindPopup(`${prop.property_name || 'Property'} — Brgy. ${prop.barangay || 'Location not specified'}`).openPopup();
+            }
             requestAnimationFrame(() => detailsMap.invalidateSize(false));
         }
 

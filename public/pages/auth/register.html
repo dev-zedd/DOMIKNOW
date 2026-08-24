@@ -162,9 +162,10 @@
             display: block;
         }
     </style>
-    <link href="../../css/design-system.css" rel="stylesheet">
     <link href="../../css/auth-module.css" rel="stylesheet">
     <link href="../../css/mobile-first.css?v=20260817-1" rel="stylesheet">
+    <link href="../../css/loading-system.css?v=20260823-1" rel="stylesheet" data-domiknow-loading-system>
+    <script src="../../js/loading-system.js?v=20260823-1" defer data-domiknow-loading-system></script>
     <script src="../../js/ui.js" defer></script>
 </head>
 <body class="auth-page auth-register-page">
@@ -202,14 +203,14 @@
     </div>
 
     <div class="auth-card">
-        <div id="errorMessage" class="alert alert-danger hidden" style="border-radius: 12px; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.75rem; background: #fef2f2; border: 1px solid #fecaca; padding: 1rem; color: #b91c1c;">
+        <div id="errorMessage" class="alert alert-danger hidden" role="alert" aria-live="assertive" style="border-radius: 12px; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.75rem; background: #fef2f2; border: 1px solid #fecaca; padding: 1rem; color: #b91c1c;">
             <span class="alert-icon" style="color: #ef4444; display: inline-flex; align-items: center; flex-shrink: 0;">
                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
             </span>
             <span class="alert-text" style="font-size: 0.875rem; font-weight: 600;">Error message</span>
         </div>
 
-        <div id="successMessage" class="alert alert-success hidden" style="border-radius: 12px; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.75rem; background: #ecfdf5; border: 1px solid #a7f3d0; padding: 1rem; color: #065f46;">
+        <div id="successMessage" class="alert alert-success hidden" role="status" aria-live="polite" style="border-radius: 12px; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.75rem; background: #ecfdf5; border: 1px solid #a7f3d0; padding: 1rem; color: #065f46;">
             <span class="alert-icon" style="color: #10b981; display: inline-flex; align-items: center; flex-shrink: 0;">
                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
             </span>

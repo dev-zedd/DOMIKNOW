@@ -297,14 +297,17 @@
         }
     </style>
     <link href="../../css/design-system.css" rel="stylesheet">
-    <link href="../../css/public-module.css" rel="stylesheet">
+    <link href="../../css/public-module.css?v=20260823-5" rel="stylesheet">
     <link href="../../css/map-system.css" rel="stylesheet">
     <link href="../../css/mobile-first.css?v=20260817-1" rel="stylesheet">
+    <link href="../../css/loading-system.css?v=20260823-1" rel="stylesheet" data-domiknow-loading-system>
+    <script src="../../js/loading-system.js?v=20260823-1" defer data-domiknow-loading-system></script>
     <script src="../../js/ui.js" defer></script>
+    <script src="../../js/public-navigation.js?v=20260823-1" defer></script>
     <script src="../../js/map-system.js" defer></script>
 </head>
 <body class="public-property-page">
-    <header class="public-header">
+    <header class="public-header public-workspace-header">
         <a href="../../index.html" class="logo brand-lockup" aria-label="DOMIKNOW home">
             <span class="brand-mark" aria-hidden="true">
                 <span class="brand-mark-dot brand-mark-dot-primary"></span>
@@ -313,27 +316,39 @@
             </span>
             <span class="brand-wordmark"><span class="brand-wordmark-domi">DOMI</span><span class="brand-wordmark-know">KNOW</span></span>
         </a>
-        <nav class="public-detail-nav" aria-label="Property navigation">
-            <a href="properties.html" class="back-btn">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
-                <span>Back to properties</span>
-            </a>
+        <nav class="public-workspace-nav" aria-label="Public navigation">
+            <a href="../../index.html">Home</a>
+            <a href="properties.html" aria-current="page">Browse rentals</a>
+            <a href="../../index.html#howItWorks">How it works</a>
+            <a href="../../index.html#communityFeedback">Experience</a>
+            <a href="../../index.html#faqSection">FAQ</a>
         </nav>
-        <div class="login-prompt">
-            <a href="../auth/login.html" class="btn-action btn-login">Log in</a>
-            <a href="../auth/register.html" class="btn-action btn-reserve">Create account</a>
+        <div class="login-prompt public-workspace-actions">
+            <a href="../auth/login.html" class="btn btn-secondary public-auth-login">Log in</a>
+            <a href="../auth/register.html" class="btn btn-primary">Create account</a>
             <button type="button" class="theme-toggle" data-theme-toggle aria-label="Switch color theme"></button>
         </div>
     </header>
 
     <main class="public-property-main">
         <!-- Loading Container -->
-        <div id="loadingMessage" class="property-loading-state">
+        <div id="loadingMessage" class="property-loading-state dk-property-detail-loading" role="status" aria-live="polite" aria-busy="true" aria-label="Loading property details">
             <div class="property-loading-state__icon">
                 <svg class="animate-spin" xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="animation: spin 1.5s linear infinite;"><line x1="12" y1="2" x2="12" y2="6"></line><line x1="12" y1="18" x2="12" y2="22"></line><line x1="4.93" y1="4.93" x2="7.76" y2="7.76"></line><line x1="16.24" y1="16.24" x2="19.07" y2="19.07"></line><line x1="2" y1="12" x2="6" y2="12"></line><line x1="18" y1="12" x2="22" y2="12"></line><line x1="4.93" y1="19.07" x2="7.76" y2="16.24"></line><line x1="16.24" y1="7.76" x2="19.07" y2="4.93"></svg>
             </div>
             <h3>Loading property details…</h3>
             <p>Checking the latest verified listing information.</p>
+            <div class="dk-skeleton-detail" aria-hidden="true">
+                <span class="dk-skeleton dk-skeleton-detail__media"></span>
+                <span class="dk-skeleton-detail__content">
+                    <span class="dk-skeleton dk-skeleton--line is-short"></span>
+                    <span class="dk-skeleton dk-skeleton--title"></span>
+                    <span class="dk-skeleton dk-skeleton--line is-medium"></span>
+                    <span class="dk-skeleton dk-skeleton--line"></span>
+                    <span class="dk-skeleton dk-skeleton--line is-medium"></span>
+                    <span class="dk-skeleton dk-skeleton--button"></span>
+                </span>
+            </div>
         </div>
 
         <div id="propertyError" class="property-error-state hidden" role="alert">
@@ -520,8 +535,6 @@
         const urlParams = new URLSearchParams(window.location.search);
         const propertyId = urlParams.get('id');
         let propertyMap;
-        let propertyMapResizeObserver;
-        let propertyMapResizeFrame;
 
         document.addEventListener('DOMContentLoaded', () => {
             if (!propertyId) {
@@ -1064,7 +1077,6 @@
                 return;
             }
 
-            propertyMapResizeObserver?.disconnect();
             if (propertyMap) {
                 propertyMap.remove();
             }
@@ -1075,38 +1087,19 @@
             }).setView([latitude, longitude], 16);
             DomiknowMap.addBasemap(propertyMap);
 
-            L.marker([latitude, longitude], {
+            const locationMarker = L.marker([latitude, longitude], {
                 icon: DomiknowMap.pinIcon({ selected: true }),
                 keyboard: true,
                 title: propertyName,
                 alt: `${propertyName} location marker`
-            })
-                .addTo(propertyMap)
-                .bindPopup(DomiknowMap.popupContent({
-                    eyebrow: 'Verified rental',
-                    title: propertyName,
-                    meta: address
-                }))
-                .openPopup();
+            }).addTo(propertyMap);
+            DomiknowMap.bindPopup(locationMarker, DomiknowMap.propertyPopupContent({
+                eyebrow: 'Verified rental',
+                title: propertyName,
+                facts: [address]
+            })).openPopup();
 
-            const refreshMapLayout = () => {
-                if (!propertyMap || !mapElement.isConnected) return;
-                propertyMap.invalidateSize({ animate: false, pan: false });
-                propertyMap.setView([latitude, longitude], propertyMap.getZoom(), { animate: false });
-            };
-
-            // Recalculate once after Leaflet creates its panes, then again after fonts,
-            // imagery, and the responsive details columns have had time to settle.
-            window.requestAnimationFrame(refreshMapLayout);
-            window.setTimeout(refreshMapLayout, 200);
-
-            if ('ResizeObserver' in window) {
-                propertyMapResizeObserver = new ResizeObserver(() => {
-                    window.cancelAnimationFrame(propertyMapResizeFrame);
-                    propertyMapResizeFrame = window.requestAnimationFrame(refreshMapLayout);
-                });
-                propertyMapResizeObserver.observe(mapElement);
-            }
+            DomiknowMap.observeContainer(propertyMap, mapElement);
         }
 
         function formatLabel(value) {

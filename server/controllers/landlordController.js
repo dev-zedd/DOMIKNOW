@@ -1,10 +1,18 @@
 const landlordModel = require('../models/landlordModel');
 const auditLogModel = require('../models/auditLogModel');
+const notificationModel = require('../models/notificationModel');
 const responseHelper = require('../utils/responseHelper');
 const supabase = require('../config/supabaseClient');
 const { uploadFile, getSignedUrl } = require('../utils/storageHelper');
 
-const VALID_PROPERTY_TYPES = new Set(['apartment', 'boarding_house', 'bedspace']);
+const VALID_PROPERTY_TYPES = new Set([
+    'apartment',
+    'boarding_house',
+    'bedspace',
+    'studio_unit',
+    'room_for_rent',
+    'house'
+]);
 const VALID_TENANT_TYPES = new Set(['student', 'worker', 'family', 'general']);
 const VALID_SINILOAN_BARANGAYS = new Set([
     'Acevida', 'Bagong Pag-Asa', 'Bagumbarangay', 'Buhay', 'Gen. Luna',
@@ -140,6 +148,12 @@ const landlordController = {
 
             // 4. Log audit
             await auditLogModel.log(landlordId, 'SUBMIT_PROPERTY_REGISTRATION', `Landlord submitted property for review: ${validation.data.property_name}`);
+            await notificationModel.createForRole('admin', {
+                type: 'property_submitted',
+                title: 'New property submission received',
+                message: `${validation.data.property_name} was added to the property review queue. Verify its listing details and required documents before deciding.`,
+                reference_id: prop.id
+            });
 
             return responseHelper.success(res, 'Property submitted successfully for admin review.', prop, 201);
 
@@ -230,6 +244,12 @@ const landlordController = {
             }
 
             await auditLogModel.log(landlordId, 'UPDATE_PROPERTY_SUBMISSION', `Landlord updated property submission: ${validation.data.property_name}`);
+            await notificationModel.createForRole('admin', {
+                type: 'property_resubmitted',
+                title: 'Property submission updated',
+                message: `${validation.data.property_name} was updated and returned to the property review queue. Verify the revised details and documents before deciding.`,
+                reference_id: id
+            });
 
             return responseHelper.success(res, 'Property updated successfully and returned to review queue', updated);
 

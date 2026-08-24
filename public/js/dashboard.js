@@ -135,7 +135,12 @@ function populateDashboardUI(user) {
             .slice(0, 2)
             .map(part => part.charAt(0).toUpperCase())
             .join('');
-        avatar.textContent = initials || 'T';
+        const profileImageUrl = user.profile_image_url ? domiknowSafeExternalUrl(user.profile_image_url) : '';
+        const hasProfileImage = Boolean(profileImageUrl && profileImageUrl !== '#');
+        avatar.textContent = hasProfileImage ? '' : (initials || 'T');
+        avatar.style.backgroundImage = hasProfileImage ? `url("${profileImageUrl.replace(/"/g, '%22')}")` : '';
+        avatar.style.backgroundSize = hasProfileImage ? 'cover' : '';
+        avatar.style.backgroundPosition = hasProfileImage ? 'center' : '';
     }
 
     // Populate Account Status
@@ -252,13 +257,36 @@ function loadAdminModuleAssets() {
     }
 }
 
+function loadNotificationSystemAssets() {
+    if (!document.head.querySelector('link[data-notification-system]')) {
+        const stylesheet = document.createElement('link');
+        stylesheet.rel = 'stylesheet';
+        stylesheet.href = '/css/notification-system.css?v=20260824-2';
+        stylesheet.setAttribute('data-notification-system', '');
+        document.head.appendChild(stylesheet);
+    }
+
+    if (window.DomiKnowNotifications) {
+        window.DomiKnowNotifications.refreshSurface?.();
+        return;
+    }
+
+    if (!document.head.querySelector('script[data-notification-system]')) {
+        const script = document.createElement('script');
+        script.src = '/js/notification-system.js?v=20260823-2';
+        script.defer = true;
+        script.setAttribute('data-notification-system', '');
+        document.head.appendChild(script);
+    }
+}
+
 async function requestAuthenticatedLogout() {
     if (typeof window.logout === 'function') {
         return window.logout();
     }
 
     const modalOptions = {
-        variant: 'warning',
+        variant: 'danger',
         eyebrow: 'End your session',
         title: 'Log out of DOMIKNOW?',
         message: 'You will need to sign in again to access your account and continue your current work.',
@@ -375,7 +403,9 @@ function renderNewDashboardLayout(user) {
             {
                 section: 'Command Center',
                 items: [
-                    { label: 'Overview', href: 'overview.html' }
+                    { label: 'Overview', href: 'overview.html' },
+                    { label: 'Notifications', href: 'notifications.html' },
+                    { label: 'My Profile', href: 'profile.html' }
                 ]
             },
             {
@@ -494,7 +524,14 @@ function renderNewDashboardLayout(user) {
                 section: 'Safety & records',
                 items: [
                     { label: 'Reports center', href: 'reports.html', icon: 'Reports' },
-                    { label: 'Policy violations', href: 'policy-violations.html', icon: 'Policy Violations' }
+                    { label: 'Policy violations', href: 'policy-violations.html', icon: 'Policy Violations' },
+                    { label: 'Notifications', href: 'notifications.html', icon: 'Notifications' }
+                ]
+            },
+            {
+                section: 'Account',
+                items: [
+                    { label: 'My profile', href: 'profile.html', icon: 'Profile' }
                 ]
             }
         ];
@@ -567,7 +604,14 @@ function renderNewDashboardLayout(user) {
                     { label: 'Maintenance', href: 'maintenance.html', icon: 'Maintenance Management' },
                     { label: 'Reports center', href: 'reports.html', icon: 'Reports' },
                     { label: 'Complaints & disputes', href: 'disputes.html', icon: 'Disputes' },
-                    { label: 'Ratings & feedback', href: 'feedback.html', icon: 'Ratings and Feedback' }
+                    { label: 'Ratings & feedback', href: 'feedback.html', icon: 'Ratings and Feedback' },
+                    { label: 'Notifications', href: 'notifications.html', icon: 'Notifications' }
+                ]
+            },
+            {
+                section: 'Account',
+                items: [
+                    { label: 'My profile', href: 'profile.html', icon: 'Profile' }
                 ]
             }
         ];
@@ -610,7 +654,9 @@ function renderNewDashboardLayout(user) {
     } else if (role === 'maintenance') {
         const maintenanceItems = [
             { label: 'Work overview', href: 'dashboard.html', icon: 'Dashboard' },
-            { label: 'Assigned tasks', href: 'tasks.html', icon: 'Assigned Tasks' }
+            { label: 'Assigned tasks', href: 'tasks.html', icon: 'Assigned Tasks' },
+            { label: 'Notifications', href: 'notifications.html', icon: 'Notifications' },
+            { label: 'My profile', href: 'profile.html', icon: 'Profile' }
         ];
 
         sidebarHtml = `
@@ -710,16 +756,20 @@ function renderNewDashboardLayout(user) {
                     </div>
                 </div>
                 <div class="topbar-right">
+                    <button type="button" class="topbar-action notification-trigger" data-notification-trigger aria-label="Open notifications" aria-controls="domiknowNotificationOverlay" aria-expanded="false" title="Notifications">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+                        <span class="notification-trigger__badge" data-notification-badge hidden>0</span>
+                    </button>
                     <button type="button" class="topbar-action theme-toggle" data-theme-toggle aria-label="Toggle color theme" aria-pressed="false" title="Toggle color theme">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.66 6.34l1.41-1.41"/></svg>
                     </button>
-                    <div class="topbar-account" aria-label="Signed in user">
+                    <a class="topbar-account" href="/pages/${role}/profile.html" aria-label="Open your profile" title="Open profile" ${activeNavigationFilename === 'profile.html' ? 'aria-current="page"' : ''}>
                         <span class="topbar-avatar" aria-hidden="true">${shellUserName.trim().charAt(0).toUpperCase() || 'T'}</span>
                         <span class="topbar-account-copy">
                             <span class="topbar-account-role">${roleLabel}</span>
                             <span class="user-name">Checking account...</span>
                         </span>
-                    </div>
+                    </a>
                 </div>
             </header>
             <div class="main-content-inner">
@@ -735,7 +785,8 @@ function renderNewDashboardLayout(user) {
                           activeNavigationFilename === 'leases.html' ? 'leases' :
                           activeNavigationFilename === 'billings.html' ? 'payments' :
                           activeNavigationFilename === 'reports.html' ? 'reports' :
-                          ['maintenance.html', 'disputes.html', 'feedback.html'].includes(activeNavigationFilename) ? 'support' : '';
+                          ['maintenance.html', 'disputes.html', 'feedback.html'].includes(activeNavigationFilename) ? 'support' :
+                          ['policy-violations.html', 'notifications.html', 'profile.html'].includes(activeNavigationFilename) ? 'more' : '';
 
         topbarHtml += `
             <nav class="bottom-nav-bar" aria-label="Tenant quick navigation">
@@ -755,7 +806,7 @@ function renderNewDashboardLayout(user) {
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
                     <span>Payments</span>
                 </a>
-                <button type="button" id="btnOpenNavSheet" class="bottom-nav-item ${['support', 'reports'].includes(activeTab) ? 'active' : ''}" aria-label="Open more tenant tools" aria-controls="navSheetOverlay" aria-expanded="false">
+                <button type="button" id="btnOpenNavSheet" class="bottom-nav-item ${['support', 'reports', 'more'].includes(activeTab) ? 'active' : ''}" aria-label="Open more tenant tools" aria-controls="navSheetOverlay" aria-expanded="false">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/></svg>
                     <span>More</span>
                 </button>
@@ -787,6 +838,14 @@ function renderNewDashboardLayout(user) {
                         <a href="/pages/tenant/policy-violations.html" class="nav-sheet-item" ${activeNavigationFilename === 'policy-violations.html' ? 'aria-current="page"' : ''}>
                             ${getLinkIcon('Policy Violations')}
                             <span>Policy violations</span>
+                        </a>
+                        <a href="/pages/tenant/notifications.html" class="nav-sheet-item" ${activeNavigationFilename === 'notifications.html' ? 'aria-current="page"' : ''}>
+                            ${getLinkIcon('Notifications')}
+                            <span>Notifications</span>
+                        </a>
+                        <a href="/pages/tenant/profile.html" class="nav-sheet-item" ${activeNavigationFilename === 'profile.html' ? 'aria-current="page"' : ''}>
+                            ${getLinkIcon('Profile')}
+                            <span>My profile</span>
                         </a>
                         <button type="button" id="sheetLogoutBtn" class="nav-sheet-item logout" aria-label="Log out of DOMIKNOW">
                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
@@ -857,6 +916,14 @@ function renderNewDashboardLayout(user) {
                             ${getLinkIcon('Ratings and Feedback')}
                             <span>Ratings &amp; feedback</span>
                         </a>
+                        <a href="/pages/landlord/notifications.html" class="nav-sheet-item" ${activeNavigationFilename === 'notifications.html' ? 'aria-current="page"' : ''}>
+                            ${getLinkIcon('Notifications')}
+                            <span>Notifications</span>
+                        </a>
+                        <a href="/pages/landlord/profile.html" class="nav-sheet-item" ${activeNavigationFilename === 'profile.html' ? 'aria-current="page"' : ''}>
+                            ${getLinkIcon('Profile')}
+                            <span>My profile</span>
+                        </a>
                         <button type="button" id="sheetLogoutBtn" class="nav-sheet-item logout" aria-label="Log out of DOMIKNOW">
                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
                             <span>Log out</span>
@@ -866,16 +933,27 @@ function renderNewDashboardLayout(user) {
             </div>
         `;
     } else if (role === 'maintenance') {
-        const isTasksActive = activeNavigationFilename === 'tasks.html';
+        const isOverviewActive = activeNavigationFilename === 'dashboard.html';
+        const isTasksActive = ['tasks.html', 'task-details.html'].includes(activeNavigationFilename);
+        const isNotificationsActive = activeNavigationFilename === 'notifications.html';
+        const isProfileActive = activeNavigationFilename === 'profile.html';
         topbarHtml += `
             <nav class="bottom-nav-bar" aria-label="Maintenance quick navigation">
-                <a href="/pages/maintenance/dashboard.html" class="bottom-nav-item ${isTasksActive ? '' : 'active'}" ${isTasksActive ? '' : 'aria-current="page"'}>
+                <a href="/pages/maintenance/dashboard.html" class="bottom-nav-item ${isOverviewActive ? 'active' : ''}" ${isOverviewActive ? 'aria-current="page"' : ''}>
                     ${getLinkIcon('Dashboard')}
                     <span>Overview</span>
                 </a>
                 <a href="/pages/maintenance/tasks.html" class="bottom-nav-item ${isTasksActive ? 'active' : ''}" ${isTasksActive ? 'aria-current="page"' : ''}>
                     ${getLinkIcon('Assigned Tasks')}
                     <span>Tasks</span>
+                </a>
+                <a href="/pages/maintenance/notifications.html" class="bottom-nav-item ${isNotificationsActive ? 'active' : ''}" ${isNotificationsActive ? 'aria-current="page"' : ''}>
+                    ${getLinkIcon('Notifications')}
+                    <span>Alerts</span>
+                </a>
+                <a href="/pages/maintenance/profile.html" class="bottom-nav-item ${isProfileActive ? 'active' : ''}" ${isProfileActive ? 'aria-current="page"' : ''}>
+                    ${getLinkIcon('Profile')}
+                    <span>Profile</span>
                 </a>
             </nav>
         `;
@@ -1035,6 +1113,7 @@ function renderNewDashboardLayout(user) {
     });
 
     // ⚡ INSTANT FADE-IN: Reveal layout smooth & flicker-free once sidebar is constructed
+    loadNotificationSystemAssets();
     document.body.classList.remove('app-loading');
     document.body.classList.add('app-ready');
     document.dispatchEvent(new CustomEvent('domiknow:shell-ready', { detail: { role } }));
@@ -1476,7 +1555,9 @@ function getLinkIcon(label) {
         'Register Property': baseSvg('<polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>'),
         'User Management': baseSvg('<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path>'),
         'Utilities': baseSvg('<polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>'),
-        'Audit Logs': baseSvg('<line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line>')
+        'Audit Logs': baseSvg('<line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line>'),
+        'Notifications': baseSvg('<path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path>'),
+        'Profile': baseSvg('<path d="M20 21a8 8 0 0 0-16 0"></path><circle cx="12" cy="7" r="4"></circle>')
     };
 
     icons['Overview'] = icons['Dashboard'];
@@ -1487,6 +1568,7 @@ function getLinkIcon(label) {
     icons['Case Triage'] = icons['Reports Monitor'];
     icons['Policies'] = icons['Policy Violations'];
     icons['Audit Trail'] = icons['Audit Logs'];
+    icons['My Profile'] = icons['Profile'];
     
     return icons[label] || baseSvg('<circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="16"></line><line x1="8" y1="12" x2="16" y2="12"></line>');
 }

@@ -277,13 +277,25 @@ const leaseModel = {
         // Enforce landlord ownership check
         const { data: lease, error: checkError } = await supabase
             .from('lease_records')
-            .select('id')
+            .select('id, lease_status')
             .eq('id', id)
             .eq('landlord_id', landlordId)
             .maybeSingle();
 
         if (checkError) throw checkError;
         if (!lease) return null;
+
+        const allowedTransitions = {
+            pending_tenant_acceptance: ['cancelled'],
+            rejected: ['cancelled'],
+            accepted: ['active', 'cancelled'],
+            active: ['expired', 'terminated', 'ended']
+        };
+        if (!(allowedTransitions[lease.lease_status] || []).includes(status)) {
+            const error = new Error(`Lease cannot move from ${lease.lease_status} to ${status}.`);
+            error.statusCode = 400;
+            throw error;
+        }
 
         const { data, error } = await supabase
             .from('lease_records')
@@ -310,10 +322,10 @@ const leaseModel = {
                 monthly_rent,
                 security_deposit,
                 lease_status,
-                users!lease_records_tenant_id_fkey (
+                tenant:users!lease_records_tenant_id_fkey (
                     full_name
                 ),
-                users!lease_records_landlord_id_fkey (
+                landlord:users!lease_records_landlord_id_fkey (
                     full_name
                 ),
                 properties (

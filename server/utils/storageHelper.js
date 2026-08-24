@@ -119,6 +119,19 @@ const uploadFile = async (bucketName, filePath, fileInput, mimeType) => {
 };
 
 /**
+ * Remove one stored file. The explicit path keeps deletion scoped to the
+ * authenticated user's known object rather than accepting arbitrary paths.
+ */
+const deleteFile = async (bucketName, filePath) => {
+    const { error } = await supabase.storage
+        .from(bucketName)
+        .remove([filePath]);
+
+    if (error) throw error;
+    return true;
+};
+
+/**
  * Generate a fresh signed URL for a file stored in a private bucket.
  * Used when a previously stored signed URL has expired.
  */
@@ -140,6 +153,7 @@ const isPrivateBucket = (bucketName) => {
 
 module.exports = {
     uploadFile,
+    deleteFile,
     getSignedUrl,
     isPrivateBucket,
     PRIVATE_BUCKETS,

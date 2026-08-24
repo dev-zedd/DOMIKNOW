@@ -8,44 +8,16 @@
     <!-- Leaflet.js GIS map components -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link href="../../css/map-system.css" rel="stylesheet">
+    <link href="../../css/recommendation-system.css?v=20260824-1" rel="stylesheet">
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <style>
-        .compare-bar {
-            background-color: var(--bg-secondary);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-md);
-            padding: 1rem;
-            margin-bottom: 1.5rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: var(--shadow-md);
-        }
-        .compare-bar.hidden {
-            display: none !important;
-        }
-
-        /* ── Map Marker Animations ── */
-        .map-top1-pulse {
-            animation: pulseGlow 2s infinite ease-in-out;
-            z-index: 1000 !important;
-        }
-        @keyframes pulseGlow {
-            0% { transform: scale(1); filter: drop-shadow(0 0 4px rgba(16, 185, 129, 0.6)); }
-            50% { transform: scale(1.15); filter: drop-shadow(0 0 14px rgba(16, 185, 129, 0.9)); }
-            100% { transform: scale(1); filter: drop-shadow(0 0 4px rgba(16, 185, 129, 0.6)); }
-        }
+        /* Map marker response when a linked recommendation card is focused. */
         .map-marker-bounce {
             animation: markerBounce 0.5s ease-in-out 2;
         }
         @keyframes markerBounce {
             0%, 100% { transform: translateY(0) scale(1.1); }
             50% { transform: translateY(-10px) scale(1.2); }
-        }
-        .leaflet-popup-content-wrapper {
-            border-radius: 12px;
-            padding: 4px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
         }
         .prop-card {
             transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
@@ -61,8 +33,9 @@
     <link href="../../css/public-refinement.css" rel="stylesheet">
     <script src="../../js/ui.js" defer></script>
     <script src="../../js/map-system.js" defer></script>
+    <script src="../../js/location-permission.js?v=20260817-9" defer></script>
 </head>
-<body>
+<body data-tenant-page="recommendations">
     <!-- Navbar -->
     <nav class="navbar navbar-tenant">
         <div class="navbar-container">
@@ -94,61 +67,65 @@
 
         <div class="properties-layout">
             <!-- Left Column: Filters -->
-            <aside class="filter-card">
-                <h3 class="filter-title">Filter Options</h3>
-                
-                <!-- 1. Preferred location -->
-                <div class="filter-section">
-                    <label class="form-label" for="filterBarangay">Preferred location</label>
-                    <select id="filterBarangay" class="form-select">
-                        <option value="">All Barangays in Siniloan</option>
-                        <option value="Acevida">Acevida</option>
-                        <option value="Bagong Pag-Asa">Bagong Pag-Asa</option>
-                        <option value="Bagumbarangay">Bagumbarangay</option>
-                        <option value="Buhay">Buhay</option>
-                        <option value="Gen. Luna">Gen. Luna</option>
-                        <option value="Halayhayin">Halayhayin</option>
-                        <option value="Mendiola">Mendiola</option>
-                        <option value="Kapatalan">Kapatalan</option>
-                        <option value="Laguio">Laguio</option>
-                        <option value="Liyang">Liyang</option>
-                        <option value="Llavac">Llavac</option>
-                        <option value="Macatad">Macatad</option>
-                        <option value="Magsaysay">Magsaysay</option>
-                        <option value="Mayatba">Mayatba</option>
-                        <option value="Pandeno">Pandeno</option>
-                        <option value="P. Burgos">P. Burgos</option>
-                        <option value="G. Redor">G. Redor</option>
-                        <option value="Salubungan">Salubungan</option>
-                        <option value="Wawa">Wawa</option>
-                        <option value="J. Rizal">J. Rizal</option>
-                    </select>
+            <aside class="filter-card recommendation-controls" aria-labelledby="recommendationControlsTitle">
+                <div class="recommendation-controls__header">
+                    <p class="recommendation-eyebrow">MC-REC-v1.0</p>
+                    <h3 class="filter-title" id="recommendationControlsTitle">Your rental priorities</h3>
+                    <p>Set preferences and importance. Mandatory choices filter eligibility before any score is calculated.</p>
                 </div>
 
-                <!-- 2. Budget or rental price range -->
-                <div class="filter-section">
-                    <label class="form-label">Budget or rental price range</label>
-                    <div style="display: flex; gap: 0.5rem; align-items: center;">
-                        <input type="number" id="filterMinPrice" min="0" step="100" placeholder="No minimum" class="form-input" style="padding: 0.5rem;">
-                        <span style="color: var(--text-muted); font-size: 0.8125rem;">to</span>
-                        <input type="number" id="filterMaxPrice" min="0" step="100" placeholder="No maximum" class="form-input" style="padding: 0.5rem;">
+                <div class="filter-section recommendation-section">
+                    <div class="recommendation-section__heading">
+                        <span class="recommendation-step">1</span>
+                        <div><strong>Household and budget</strong><small>Price is scored from your comfortable budget to your hard limit.</small></div>
+                    </div>
+                    <label class="form-label" for="filterOccupants">Number of occupants</label>
+                    <input type="number" id="filterOccupants" min="1" max="50" step="1" value="1" class="form-input">
+                    <div class="recommendation-field-grid">
+                        <label><span>Comfortable monthly budget</span><input type="number" id="filterComfortableBudget" min="1" step="100" placeholder="e.g. 3500" class="form-input"></label>
+                        <label><span>Hard maximum budget</span><input type="number" id="filterHardMaxBudget" min="1" step="100" placeholder="e.g. 5000" class="form-input"></label>
                     </div>
                 </div>
 
-                <!-- 3. Preferred property type -->
-                <div class="filter-section">
+                <div class="filter-section recommendation-section">
+                    <div class="recommendation-section__heading">
+                        <span class="recommendation-step">2</span>
+                        <div><strong>Property type</strong><small>Keep this soft for scoring, or make it mandatory.</small></div>
+                    </div>
                     <label class="form-label" for="filterType">Preferred property type</label>
                     <select id="filterType" class="form-select">
-                        <option value="">All Types</option>
+                        <option value="">No preference</option>
                         <option value="apartment">Apartment</option>
-                        <option value="boarding_house">Boarding House</option>
+                        <option value="boarding_house">Boarding house</option>
                         <option value="bedspace">Bedspace</option>
+                        <option value="studio_unit">Studio unit</option>
+                        <option value="room_for_rent">Room for rent</option>
+                        <option value="house">House</option>
                     </select>
+                    <label class="recommendation-toggle"><input type="checkbox" id="filterTypeRequired"><span>Require this property type</span></label>
                 </div>
 
-                <!-- 4. Preferred amenities -->
-                <div class="filter-section">
-                    <label class="form-label">Preferred amenities</label>
+                <div class="filter-section recommendation-section">
+                    <div class="recommendation-section__heading">
+                        <span class="recommendation-step">3</span>
+                        <div><strong>Reference location</strong><small>Distance uses Haversine straight-line distance.</small></div>
+                    </div>
+                    <button type="button" id="useRecommendationLocation" class="recommendation-location-button">Use my accurate device location</button>
+                    <p id="recommendationLocationStatus" class="recommendation-inline-status" role="status">Location Suitability is inactive until a location is available.</p>
+                    <input type="hidden" id="recommendationLatitude">
+                    <input type="hidden" id="recommendationLongitude">
+                    <div class="recommendation-field-grid">
+                        <label><span>Ideal distance (km)</span><input type="number" id="filterIdealDistance" min="0" step="0.1" value="1" class="form-input"></label>
+                        <label><span>Maximum distance (km)</span><input type="number" id="filterMaximumDistance" min="0.1" step="0.1" value="5" class="form-input"></label>
+                    </div>
+                    <label class="recommendation-toggle"><input type="checkbox" id="filterDistanceRequired"><span>Exclude properties beyond the maximum distance</span></label>
+                </div>
+
+                <div class="filter-section recommendation-section">
+                    <div class="recommendation-section__heading">
+                        <span class="recommendation-step">4</span>
+                        <div><strong>Amenities</strong><small>Selected amenities are scored unless marked mandatory.</small></div>
+                    </div>
                     <div class="amenity-checkbox-grid">
                         <label class="checkbox-label"><input type="checkbox" class="amenity-filter" value="WiFi"> WiFi</label>
                         <label class="checkbox-label"><input type="checkbox" class="amenity-filter" value="CCTV"> CCTV</label>
@@ -162,13 +139,31 @@
                         <label class="checkbox-label"><input type="checkbox" class="amenity-filter" value="Near Market"> Near Market</label>
                         <label class="checkbox-label"><input type="checkbox" class="amenity-filter" value="Pet Friendly"> Pet Friendly</label>
                     </div>
+                    <label class="recommendation-toggle"><input type="checkbox" id="filterAmenitiesRequired"><span>Require every selected amenity</span></label>
                 </div>
 
-                <button id="btnClearFilters" class="navbar-btn" style="width: 100%; margin-top: 0.5rem; justify-content: center; font-weight: 700; color: var(--primary);">Clear All Filters</button>
+                <div class="filter-section recommendation-section">
+                    <div class="recommendation-section__heading">
+                        <span class="recommendation-step">5</span>
+                        <div><strong>Criterion importance</strong><small>0 means not considered; 5 means very high importance.</small></div>
+                    </div>
+                    <div class="recommendation-importance-list">
+                        <label data-criterion-control="C1"><span>Tenant Preference Match</span><select id="importanceC1" class="form-select recommendation-importance"><option value="0">0 — Not considered</option><option value="1">1 — Very low</option><option value="2">2 — Low</option><option value="3" selected>3 — Moderate</option><option value="4">4 — High</option><option value="5">5 — Very high</option></select><small data-criterion-help>C1 needs a budget, soft property type, or soft policy.</small></label>
+                        <label data-criterion-control="C2"><span>Location Suitability</span><select id="importanceC2" class="form-select recommendation-importance"><option value="0">0 — Not considered</option><option value="1">1 — Very low</option><option value="2">2 — Low</option><option value="3" selected>3 — Moderate</option><option value="4">4 — High</option><option value="5">5 — Very high</option></select><small data-criterion-help>C2 needs your location and a maximum distance.</small></label>
+                        <label data-criterion-control="C3"><span>Amenity Match</span><select id="importanceC3" class="form-select recommendation-importance"><option value="0">0 — Not considered</option><option value="1">1 — Very low</option><option value="2">2 — Low</option><option value="3" selected>3 — Moderate</option><option value="4">4 — High</option><option value="5">5 — Very high</option></select><small data-criterion-help>C3 needs at least one desired, non-mandatory amenity.</small></label>
+                        <label data-criterion-control="C4"><span>Authenticated Rating Score</span><select id="importanceC4" class="form-select recommendation-importance"><option value="0">0 — Not considered</option><option value="1">1 — Very low</option><option value="2">2 — Low</option><option value="3" selected>3 — Moderate</option><option value="4">4 — High</option><option value="5">5 — Very high</option></select></label>
+                        <label data-criterion-control="C5"><span>Rental Operations Reliability</span><select id="importanceC5" class="form-select recommendation-importance"><option value="0">0 — Not considered</option><option value="1">1 — Very low</option><option value="2">2 — Low</option><option value="3" selected>3 — Moderate</option><option value="4">4 — High</option><option value="5">5 — Very high</option></select></label>
+                    </div>
+                </div>
+
+                <button id="btnClearFilters" class="navbar-btn recommendation-reset">Reset recommendation preferences</button>
             </aside>
 
             <!-- Right Column: Map and Listings -->
             <div class="discovery-main">
+                <section id="recommendationSummary" class="recommendation-summary" aria-live="polite">
+                    <div><p class="recommendation-eyebrow">Multi-Criteria Property Recommendation</p><h2>Calculating suitable properties</h2><p>Scores are advisory comparisons, not probabilities or guarantees.</p></div>
+                </section>
                 <!-- GIS Map Card -->
                 <div class="map-card">
                     <div id="map" role="application" aria-label="Interactive map of recommended rental properties"></div>
@@ -191,12 +186,12 @@
         let mapInstance = null;
         let markersGroup = null;
         let userLocationMarker = null;
-        let selectedPropertyIds = [];
         let allProperties = [];
         let currentPage = 1;
         let totalPages = 1;
         let propertyRequestController = null;
         let filterRequestTimer = null;
+        let recommendationMetadata = null;
 
         document.addEventListener('DOMContentLoaded', () => {
             // Initialize Leaflet Map centered in Siniloan, Laguna
@@ -207,74 +202,170 @@
             markersGroup = L.layerGroup().addTo(mapInstance);
 
             const mapElement = document.getElementById('map');
-            requestAnimationFrame(() => requestAnimationFrame(() => mapInstance.invalidateSize(false)));
-            if ('ResizeObserver' in window && mapElement) {
-                new ResizeObserver(() => mapInstance.invalidateSize(false)).observe(mapElement);
-            }
+            if (window.DomiknowMap) DomiknowMap.observeContainer(mapInstance, mapElement);
+            else requestAnimationFrame(() => requestAnimationFrame(() => mapInstance.invalidateSize(false)));
 
-            // Bind Event Listeners for Filters
-            document.getElementById('filterBarangay').addEventListener('change', applyFilters);
-            document.getElementById('filterMinPrice').addEventListener('input', applyFilters);
-            document.getElementById('filterMaxPrice').addEventListener('input', applyFilters);
-            document.getElementById('filterType').addEventListener('change', applyFilters);
-            document.querySelectorAll('.amenity-filter').forEach(cb => cb.addEventListener('change', applyFilters));
+            // Bind canonical recommendation inputs.
+            document.querySelectorAll('.recommendation-controls input:not([type="hidden"]), .recommendation-controls select')
+                .forEach(control => control.addEventListener(control.type === 'number' ? 'input' : 'change', () => {
+                    updateCriterionAvailability();
+                    applyFilters();
+                }));
+            document.getElementById('useRecommendationLocation').addEventListener('click', requestRecommendationLocation);
+            document.addEventListener('domiknow:location-ready', event => applyRecommendationLocation(event.detail));
+            document.addEventListener('domiknow:location-error', event => {
+                const status = document.getElementById('recommendationLocationStatus');
+                status.textContent = event.detail?.message || 'Your device location is unavailable.';
+                status.dataset.state = 'error';
+                updateCriterionAvailability();
+            });
             
             document.getElementById('btnClearFilters').addEventListener('click', clearFilters);
             
-            if (document.getElementById('btnCompareGo')) {
-                document.getElementById('btnCompareGo').addEventListener('click', goCompare);
-            }
-
-            // Event delegation for compare checkboxes (bypasses CSP)
-            document.getElementById('propertiesGrid').addEventListener('change', (e) => {
-                const cb = e.target.closest('.compare-cb');
-                if (cb) {
-                    const id = cb.value;
-                    toggleCompare(cb, id);
-                }
-            });
-
-            // Initial Fetch
+            const storedLocation = window.DomiknowLocation?.read?.();
+            if (storedLocation) applyRecommendationLocation(storedLocation, { refresh: false });
+            updateCriterionAvailability();
             fetchProperties();
         });
 
-        // Fetch properties with 4 Input Criteria passed to the Ranked Recommendation Engine
+        function applyRecommendationLocation(location, options = {}) {
+            const lat = Number(location?.lat ?? location?.latitude);
+            const lng = Number(location?.lng ?? location?.longitude);
+            if (!Number.isFinite(lat) || !Number.isFinite(lng)) return;
+            document.getElementById('recommendationLatitude').value = String(lat);
+            document.getElementById('recommendationLongitude').value = String(lng);
+            const accuracy = Number(location?.accuracy);
+            const status = document.getElementById('recommendationLocationStatus');
+            status.textContent = Number.isFinite(accuracy)
+                ? `Accurate device location ready (about ${Math.round(accuracy)} m accuracy).`
+                : 'Device location ready for distance scoring.';
+            status.dataset.state = 'ready';
+            updateCriterionAvailability();
+            if (options.refresh !== false) applyFilters();
+        }
+
+        async function requestRecommendationLocation() {
+            const button = document.getElementById('useRecommendationLocation');
+            const status = document.getElementById('recommendationLocationStatus');
+            button.disabled = true;
+            button.textContent = 'Getting accurate location...';
+            status.textContent = 'Requesting a fresh high-accuracy device location.';
+            status.dataset.state = '';
+            try {
+                const location = await window.DomiknowLocation?.request?.({ userInitiated: true });
+                if (location) applyRecommendationLocation(location);
+            } finally {
+                button.disabled = false;
+                button.textContent = 'Use my accurate device location';
+            }
+        }
+
+        function updateCriterionAvailability() {
+            const hasBudget = Boolean(document.getElementById('filterHardMaxBudget').value);
+            const selectedPropertyType = document.getElementById('filterType').value;
+            const hasSoftType = Boolean(selectedPropertyType)
+                && !document.getElementById('filterTypeRequired').checked;
+            const hasLocation = Boolean(document.getElementById('recommendationLatitude').value)
+                && Boolean(document.getElementById('recommendationLongitude').value)
+                && Boolean(document.getElementById('filterMaximumDistance').value);
+            const hasDesiredAmenities = document.querySelectorAll('.amenity-filter:checked').length > 0
+                && !document.getElementById('filterAmenitiesRequired').checked;
+            const availability = { C1: hasBudget || hasSoftType, C2: hasLocation, C3: hasDesiredAmenities, C4: true, C5: true };
+            const typeRequired = document.getElementById('filterTypeRequired');
+            const distanceRequired = document.getElementById('filterDistanceRequired');
+            const amenitiesRequired = document.getElementById('filterAmenitiesRequired');
+            typeRequired.disabled = !selectedPropertyType;
+            distanceRequired.disabled = !hasLocation;
+            amenitiesRequired.disabled = document.querySelectorAll('.amenity-filter:checked').length === 0;
+            if (typeRequired.disabled) typeRequired.checked = false;
+            if (distanceRequired.disabled) distanceRequired.checked = false;
+            if (amenitiesRequired.disabled) amenitiesRequired.checked = false;
+            Object.entries(availability).forEach(([code, available]) => {
+                const wrapper = document.querySelector(`[data-criterion-control="${code}"]`);
+                const select = wrapper?.querySelector('select');
+                if (wrapper) wrapper.dataset.unavailable = String(!available);
+                if (select) select.disabled = !available;
+            });
+        }
+
+        function showRecommendationError(message) {
+            const summary = document.getElementById('recommendationSummary');
+            summary.innerHTML = `<div><p class="recommendation-eyebrow">Check your priorities</p><h2>Recommendation settings need attention</h2><p role="alert">${domiknowEscapeHtml(message)}</p></div>`;
+        }
+
+        // Fetch a reproducible MC-REC-v1.0 recommendation run.
         async function fetchProperties() {
             propertyRequestController?.abort();
             propertyRequestController = new AbortController();
             try {
-                const barangay = document.getElementById('filterBarangay')?.value || '';
-                const minPrice = document.getElementById('filterMinPrice')?.value || '';
-                const maxPrice = document.getElementById('filterMaxPrice')?.value || '';
+                const comfortableBudget = document.getElementById('filterComfortableBudget').value;
+                const hardMaximumBudget = document.getElementById('filterHardMaxBudget').value;
                 const type = document.getElementById('filterType')?.value || '';
+                const latitude = document.getElementById('recommendationLatitude').value;
+                const longitude = document.getElementById('recommendationLongitude').value;
+                const idealDistance = document.getElementById('filterIdealDistance').value;
+                const maximumDistance = document.getElementById('filterMaximumDistance').value;
+
+                if (comfortableBudget && !hardMaximumBudget) {
+                    showRecommendationError('Add a hard maximum budget when using a comfortable budget.');
+                    return;
+                }
+                if (comfortableBudget && hardMaximumBudget && Number(comfortableBudget) > Number(hardMaximumBudget)) {
+                    showRecommendationError('Your comfortable budget cannot exceed the hard maximum budget.');
+                    return;
+                }
+                if (latitude && longitude && Number(idealDistance || 0) >= Number(maximumDistance)) {
+                    showRecommendationError('Ideal distance must be smaller than maximum distance.');
+                    return;
+                }
 
                 const activeAmenities = [];
                 document.querySelectorAll('.amenity-filter:checked').forEach(cb => {
                     activeAmenities.push(cb.value);
                 });
 
-                let queryParams = `preferred_location=${encodeURIComponent(barangay)}&min_price=${encodeURIComponent(minPrice)}&max_price=${encodeURIComponent(maxPrice)}&preferred_property_type=${encodeURIComponent(type)}`;
-                activeAmenities.forEach(a => {
-                    queryParams += `&amenities=${encodeURIComponent(a)}`;
+                const queryParams = new URLSearchParams({
+                    occupant_count: document.getElementById('filterOccupants').value,
+                    comfortable_monthly_budget: comfortableBudget,
+                    hard_maximum_monthly_budget: hardMaximumBudget,
+                    preferred_property_type: type,
+                    property_type_required: String(document.getElementById('filterTypeRequired').checked),
+                    reference_latitude: latitude,
+                    reference_longitude: longitude,
+                    ideal_distance_km: latitude && longitude ? idealDistance : '',
+                    maximum_distance_km: latitude && longitude ? maximumDistance : '',
+                    maximum_distance_is_required: String(document.getElementById('filterDistanceRequired').checked),
+                    amenities_required: String(document.getElementById('filterAmenitiesRequired').checked),
+                    importance_c1: document.getElementById('importanceC1').value,
+                    importance_c2: document.getElementById('importanceC2').value,
+                    importance_c3: document.getElementById('importanceC3').value,
+                    importance_c4: document.getElementById('importanceC4').value,
+                    importance_c5: document.getElementById('importanceC5').value
                 });
+                activeAmenities.forEach(amenity => queryParams.append('amenities', amenity));
 
                 const headers = {};
                 if (token) {
                     headers['Authorization'] = `Bearer ${token}`;
                 }
 
-                const response = await fetch(`/api/properties/recommendations/ranked?${queryParams}`, {
+                const response = await fetch(`/api/properties/recommendations/ranked?${queryParams.toString()}`, {
                     headers,
                     signal: propertyRequestController.signal
                 });
 
+                const result = await response.json().catch(() => ({}));
                 if (!response.ok) {
-                    document.getElementById('propertiesGrid').innerHTML = `<p role="alert" style="grid-column: 1/-1; text-align: center; color: var(--error);">Failed to load recommended listings. Please try again.</p>`;
+                    showRecommendationError(result.message || 'Failed to calculate property recommendations.');
+                    document.getElementById('propertiesGrid').innerHTML = `<p role="alert" style="grid-column: 1/-1; text-align: center; color: var(--error);">${domiknowEscapeHtml(result.message || 'Failed to load recommendations. Please try again.')}</p>`;
                     return;
                 }
 
-                const result = await response.json();
-                allProperties = result.data || [];
+                recommendationMetadata = result.data || {};
+                allProperties = Array.isArray(recommendationMetadata)
+                    ? recommendationMetadata
+                    : recommendationMetadata.recommendations || [];
+                renderRecommendationSummary(recommendationMetadata);
                 renderUI(allProperties);
 
             } catch (err) {
@@ -282,6 +373,57 @@
                 console.error(err);
                 document.getElementById('propertiesGrid').innerHTML = `<p role="alert" style="grid-column: 1/-1; text-align: center; color: var(--error);">Property listings could not be loaded. Please check your connection and try again.</p>`;
             }
+        }
+
+        function renderRecommendationSummary(metadata) {
+            const summary = document.getElementById('recommendationSummary');
+            const recommendations = Array.isArray(metadata?.recommendations) ? metadata.recommendations : [];
+            const labels = {
+                C1: 'Preferences', C2: 'Location', C3: 'Amenities',
+                C4: 'Authenticated rating', C5: 'Operations reliability'
+            };
+            const weightHtml = Object.entries(metadata?.normalized_weights || {}).map(([code, weight]) =>
+                `<span class="recommendation-summary__chip">${labels[code] || code}<strong>${(Number(weight) * 100).toFixed(1)}%</strong></span>`
+            ).join('');
+            const exclusionLabels = {
+                PROPERTY_INACTIVE: 'Inactive listing',
+                PROPERTY_NOT_APPROVED: 'Not approved',
+                LANDLORD_NOT_VERIFIED: 'Landlord not verified',
+                PROPERTY_SUSPENDED: 'Suspended listing',
+                NOT_LONG_TERM_RESIDENTIAL_ELIGIBLE: 'Outside long-term rental scope',
+                REQUIRED_DOCUMENTS_INCOMPLETE: 'Required documents incomplete',
+                REQUIRED_DOCUMENTS_INVALID: 'Required documents not valid',
+                NO_AVAILABLE_UNITS: 'No available unit or bed',
+                OCCUPANCY_CAPACITY_NOT_MET: 'Insufficient occupant capacity',
+                REQUIRED_AMENITY_NOT_MET: 'Required amenity missing',
+                REQUIRED_PROPERTY_TYPE_NOT_MET: 'Required property type not met',
+                HARD_BUDGET_LIMIT_EXCEEDED: 'Above hard budget limit',
+                MAXIMUM_DISTANCE_EXCEEDED: 'Beyond required maximum distance',
+                REQUIRED_POLICY_NOT_MET: 'Required policy not met',
+                INCOMPLETE_RECOMMENDATION_DATA: 'Required listing data incomplete',
+                INVALID_RECOMMENDATION_DATA: 'Listing data needs review'
+            };
+            const exclusionEntries = Object.entries(metadata?.exclusion_summary || {})
+                .filter(([, count]) => Number(count) > 0)
+                .sort((a, b) => Number(b[1]) - Number(a[1]));
+            const exclusionHtml = exclusionEntries.length ? `
+                <details class="recommendation-exclusions">
+                    <summary>Why some properties were excluded</summary>
+                    <div>${exclusionEntries.map(([code, count]) => `<span>${domiknowEscapeHtml(exclusionLabels[code] || code.replace(/_/g, ' ').toLowerCase())}<strong>${Number(count)}</strong></span>`).join('')}</div>
+                </details>` : '';
+            summary.innerHTML = `
+                <div>
+                    <p class="recommendation-eyebrow">Multi-Criteria Property Recommendation · ${domiknowEscapeHtml(metadata?.formula_version || 'MC-REC-v1.0')}</p>
+                    <h2>${recommendations.length} eligible ${recommendations.length === 1 ? 'property' : 'properties'} ranked</h2>
+                    <p>${domiknowEscapeHtml(metadata?.advisory_notice || 'Suitability scores support comparison and are not probabilities or guarantees.')}</p>
+                </div>
+                <div class="recommendation-summary__meta">
+                    <span class="recommendation-summary__chip">Platform records checked<strong>${Number(metadata?.candidate_count || 0)}</strong></span>
+                    <span class="recommendation-summary__chip">Eligible<strong>${Number(metadata?.eligible_count || 0)}</strong></span>
+                    <span class="recommendation-summary__chip">Excluded by requirements<strong>${Number(metadata?.excluded_count || 0)}</strong></span>
+                </div>
+                <div class="recommendation-summary__weights" aria-label="Normalized tenant-defined criterion weights">${weightHtml}</div>
+                ${exclusionHtml}`;
         }
 
         function renderUI(items) {
@@ -292,18 +434,9 @@
             markersGroup.clearLayers();
 
             if (!items || items.length === 0) {
-                grid.innerHTML = `<p role="status" aria-live="polite" style="grid-column: 1/-1; text-align: center; color: var(--text-muted); padding: 3rem 0;">No approved properties match your active filter criteria. Try adjusting or clearing a filter.</p>`;
+                grid.innerHTML = `<p role="status" aria-live="polite" style="grid-column: 1/-1; text-align: center; color: var(--text-muted); padding: 3rem 0;">No properties passed the current eligibility requirements. Review your mandatory choices and the exclusion summary above; listings with incomplete verification, documents, inventory, or required data are not ranked.</p>`;
                 return;
             }
-
-            // Check if any filter option is actively set by the user
-            const barangay = document.getElementById('filterBarangay')?.value || '';
-            const minPrice = document.getElementById('filterMinPrice')?.value || '';
-            const maxPrice = document.getElementById('filterMaxPrice')?.value || '';
-            const type = document.getElementById('filterType')?.value || '';
-            const activeAmenitiesCount = document.querySelectorAll('.amenity-filter:checked').length;
-
-            const hasActiveFilter = Boolean(barangay || minPrice || maxPrice || type || activeAmenitiesCount > 0);
 
             const markers = [];
             const markerMap = {};
@@ -317,47 +450,29 @@
                 const prop = item.property || item;
                 const parsedRank = Number(item.rank);
                 const rank = Number.isInteger(parsedRank) && parsedRank > 0 ? parsedRank : null;
-                const parsedMatch = readMetric(item.match_percentage, 0, 100);
-                const matchPct = parsedMatch === null ? null : Math.round(parsedMatch);
-                const out = item.output_criteria || {};
+                const suitabilityScore = readMetric(item.property_suitability_score, 0, 100);
+                const breakdown = item.criterion_breakdown || {};
                 const propertyId = String(prop.id || '');
                 const safePropertyId = encodeURIComponent(propertyId);
                 const propertyName = domiknowEscapeHtml(prop.property_name || 'Unnamed property');
                 const propertyType = domiknowEscapeHtml(String(prop.property_type || 'Property').replace(/_/g, ' '));
                 const barangayName = domiknowEscapeHtml(prop.barangay || 'Location not specified');
                 const imageUrl = domiknowSafeExternalUrl(prop.main_image_url || 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&w=400&q=80');
-                const propertyRating = readMetric(out.property_rating, 1, 5);
-                const propertyRatingCount = Math.max(0, Number(out.property_rating_count) || 0);
-                const landlordRating = readMetric(out.landlord_rating, 1, 5);
-                const landlordRatingCount = Math.max(0, Number(out.landlord_rating_count) || 0);
-                const trustScore = readMetric(out.trust_score, 0, 100);
-                const reviewedTrustCaseCount = Math.max(0, Number(out.reviewed_trust_case_count) || 0);
-                const reliability = readMetric(out.rental_reliability, 1, 5);
-                const reliabilityCount = Math.max(0, Number(out.reliability_count) || 0);
                 const unitStats = prop.unit_stats || {};
                 const availableCount = Math.max(0, Number(unitStats.available_listing_count) || 0);
                 const minimumRent = readMetric(unitStats.min_available_monthly_rent, 0.01, Number.MAX_SAFE_INTEGER);
                 const rankLabel = rank === null
-                    ? 'Not enough data to rank'
-                    : rank === 1 && hasActiveFilter
-                        ? 'Rank #1 &middot; Top criteria match'
-                        : rank === 1
-                            ? 'Rank #1 &middot; Most verified'
-                            : `Rank #${rank}`;
-                const reviewLabel = (count) => `${count} verified review${count === 1 ? '' : 's'}`;
-                const missingMetricHtml = '<span style="color: var(--text-muted); font-weight: 600;">Not enough data</span>';
-                const propertyRatingHtml = propertyRating !== null && propertyRatingCount > 0
-                    ? `<span style="color: #b45309; font-weight: 800;">&#9733; ${propertyRating.toFixed(1)} / 5</span><span style="color: var(--text-muted);">${reviewLabel(propertyRatingCount)}</span>`
-                    : missingMetricHtml;
-                const landlordRatingHtml = landlordRating !== null && landlordRatingCount > 0
-                    ? `<span style="color: #7c3aed; font-weight: 800;">${landlordRating.toFixed(1)} / 5</span><span style="color: var(--text-muted);">${reviewLabel(landlordRatingCount)}</span>`
-                    : missingMetricHtml;
-                const reliabilityHtml = reliability !== null && reliabilityCount > 0
-                    ? `<span style="color: #0369a1; font-weight: 800;">${reliability.toFixed(1)} / 5</span><span style="color: var(--text-muted);">${reviewLabel(reliabilityCount)}</span>`
-                    : missingMetricHtml;
-                const trustScoreHtml = trustScore !== null && reviewedTrustCaseCount > 0
-                    ? `<span style="color: var(--color-success-text); font-weight: 800;">${Math.round(trustScore)} / 100</span><span style="color: var(--text-muted);">${reviewedTrustCaseCount} reviewed case${reviewedTrustCaseCount === 1 ? '' : 's'}</span>`
-                    : missingMetricHtml;
+                    ? 'Not ranked'
+                    : rank === 1 ? 'Rank #1 &middot; Highest suitability' : `Rank #${rank}`;
+                const criterionRows = Object.values(breakdown).map(criterion => `
+                    <div><dt title="${domiknowEscapeHtml(criterion.label || criterion.code)}">${domiknowEscapeHtml(criterion.label || criterion.code)}</dt><dd>${Number(criterion.display_score).toFixed(2)} / 100</dd></div>
+                `).join('');
+                const ratingCount = Math.max(0, Number(item.evidence?.rating?.review_count) || 0);
+                const limitedOperations = Object.values(item.evidence?.reliability?.fallback_flags || {}).some(Boolean);
+                const disclosure = [
+                    ratingCount > 0 ? `${ratingCount} authenticated rating${ratingCount === 1 ? '' : 's'}` : 'No authenticated rating history yet',
+                    limitedOperations ? 'Limited operational history' : 'Property-specific operational history'
+                ].join(' &middot; ');
                 const availabilityHtml = availableCount > 0 && minimumRent !== null
                     ? `${availableCount} available &middot; From &#8369;${minimumRent.toLocaleString('en-PH', { maximumFractionDigits: 0 })}/month`
                     : 'No currently rentable units';
@@ -375,10 +490,9 @@
                     amenHtml += `<span class="badge-amenity">+${amenitiesList.length - 3}</span>`;
                 }
 
-                // Render Match % badge ONLY when user has active filter options
-                const matchBadgeHtml = hasActiveFilter && matchPct !== null ? `
+                const suitabilityBadgeHtml = suitabilityScore !== null ? `
                     <span class="reco-score-badge" style="background: var(--color-action-primary);">
-                        ${matchPct}% criteria match
+                        ${suitabilityScore.toFixed(2)} / 100
                     </span>
                 ` : '';
 
@@ -392,7 +506,7 @@
                         <span style="position: absolute; top: 10px; left: 10px; background: ${rankBadgeBackground}; color: ${rankBadgeColor}; border: 1px solid var(--border-color); padding: 0.2rem 0.65rem; border-radius: var(--radius-sm); font-weight: 800; font-size: 0.72rem; box-shadow: var(--shadow-card); display: inline-flex; align-items: center; gap: 0.25rem;">
                             ${rank === 1 ? `<svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"/></svg>` : ''} ${rankLabel}
                         </span>
-                        ${matchBadgeHtml}
+                        ${suitabilityBadgeHtml}
                     </div>
 
                     <div class="prop-content">
@@ -405,37 +519,14 @@
                         <h4 class="prop-title" style="margin: 0.25rem 0;">${propertyName}</h4>
                         <p style="margin: 0.15rem 0 0; color: var(--text-secondary); font-size: 0.78rem; font-weight: 700;">${availabilityHtml}</p>
                         
-                        <!-- Only verified evidence is displayed; missing metrics are never synthesized. -->
-                        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.4rem; margin: 0.65rem 0; background: var(--bg-primary); padding: 0.6rem 0.75rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color);">
-                            <div>
-                                <span style="font-size: 0.65rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">1. Location</span>
-                                <div style="font-size: 0.78rem; font-weight: 700; color: var(--text-primary); text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">Brgy. ${barangayName}</div>
+                        <section class="recommendation-score-panel" aria-label="Property suitability score breakdown">
+                            <div class="recommendation-score-panel__header">
+                                <span>Property Suitability Score</span>
+                                <strong>${suitabilityScore !== null ? suitabilityScore.toFixed(2) : '—'} / 100</strong>
                             </div>
-                            <div>
-                                <span style="font-size: 0.65rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">2. Property Rating</span>
-                                <div style="font-size: 0.75rem; display: flex; flex-direction: column; gap: 0.1rem;">
-                                    ${propertyRatingHtml}
-                                </div>
-                            </div>
-                            <div>
-                                <span style="font-size: 0.65rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">3. Trust Score</span>
-                                <div style="font-size: 0.75rem; display: flex; flex-direction: column; gap: 0.1rem;">
-                                    ${trustScoreHtml}
-                                </div>
-                            </div>
-                            <div>
-                                <span style="font-size: 0.65rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">4. Reliability</span>
-                                <div style="font-size: 0.75rem; display: flex; flex-direction: column; gap: 0.1rem;">
-                                    ${reliabilityHtml}
-                                </div>
-                            </div>
-                            <div style="grid-column: span 2;">
-                                <span style="font-size: 0.65rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">5. Landlord Rating</span>
-                                <div style="font-size: 0.75rem; display: flex; flex-direction: column; gap: 0.1rem;">
-                                    ${landlordRatingHtml}
-                                </div>
-                            </div>
-                        </div>
+                            <dl class="recommendation-breakdown">${criterionRows}</dl>
+                            <p class="recommendation-disclosure">${disclosure}</p>
+                        </section>
 
                         <div class="prop-amenities-preview" style="margin-bottom: 0.75rem;">${amenHtml}</div>
 
@@ -451,27 +542,34 @@
                 const lng = Number(prop.longitude);
                 if (Number.isFinite(lat) && Number.isFinite(lng) && Math.abs(lat) <= 90 && Math.abs(lng) <= 180) {
 
-                    const markerIcon = L.divIcon({
-                        className: '',
-                        html: rank === 1
-                            ? `<div class="map-top1-pulse" style="background: var(--color-action-primary); color: white; border: 2.5px solid white; border-radius: 50%; width: 38px; height: 38px; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 0.85rem; box-shadow: var(--shadow-dropdown);">#1</div>`
-                            : `<div class="marker-inner" style="background: ${rank === null ? 'var(--bg-primary)' : 'var(--brand-navy)'}; color: ${rank === null ? 'var(--text-primary)' : 'white'}; border: 2px solid ${rank === null ? 'var(--border-color)' : 'white'}; border-radius: 50%; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.75rem; box-shadow: var(--shadow-card);">${rank === null ? '&bull;' : `#${rank}`}</div>`,
-                        iconSize: rank === 1 ? [38, 38] : [30, 30],
-                        iconAnchor: rank === 1 ? [19, 19] : [15, 15]
+                    const markerIcon = DomiknowMap.priceIcon(rank === null ? 'Unranked' : `#${rank}`, {
+                        selected: rank === 1,
+                        unavailable: rank === null
                     });
+                    const popupRank = rank === null
+                        ? 'Not ranked'
+                        : `Rank #${rank} · ${suitabilityScore !== null ? suitabilityScore.toFixed(2) : '—'} / 100 suitability`;
+                    const popupAvailability = availableCount > 0 && minimumRent !== null
+                        ? `${availableCount} available · From ₱${minimumRent.toLocaleString('en-PH', { maximumFractionDigits: 0 })}`
+                        : 'No currently rentable units';
+                    const popupDistance = Number.isFinite(Number(item.distance_km))
+                        ? `${Number(item.distance_km).toFixed(2)} km from your reference location`
+                        : 'Location criterion not active';
 
-                    const marker = L.marker([lat, lng], { icon: markerIcon })
-                        .bindPopup(`
-                            <div style="font-family: var(--font-family); padding: 0.35rem 0.25rem;">
-                                <span style="background: ${rankBadgeBackground}; color: ${rankBadgeColor}; border: 1px solid var(--border-color); padding: 0.2rem 0.6rem; border-radius: var(--radius-sm); font-weight: 800; font-size: 0.72rem;">${rankLabel}${hasActiveFilter && matchPct !== null ? ` (${matchPct}% criteria match)` : ''}</span>
-                                <h4 style="margin: 0.4rem 0 0.25rem 0; font-weight: 800; color: var(--primary); font-size: 0.95rem;">${propertyName}</h4>
-                                <p style="margin: 0.2rem 0; font-size: 0.78rem; color: var(--text-secondary); font-weight: 700;">${availabilityHtml}</p>
-                                <p style="margin: 0.2rem 0 0.5rem 0; font-size: 0.78rem; color: var(--text-secondary); font-weight: 700;">
-                                    Trust score: ${trustScore !== null && reviewedTrustCaseCount > 0 ? `${Math.round(trustScore)}/100 (${reviewedTrustCaseCount} reviewed case${reviewedTrustCaseCount === 1 ? '' : 's'})` : 'Not enough data'}
-                                </p>
-                                <a href="property-details.html?id=${safePropertyId}" style="font-size: 0.78rem; font-weight: 800; text-decoration: none; color: white; background: var(--color-action-primary); padding: 0.35rem 0.75rem; border-radius: var(--radius-sm); display: inline-block;">Open Details</a>
-                            </div>
-                        `);
+                    const marker = L.marker([lat, lng], {
+                        icon: markerIcon,
+                        keyboard: true,
+                        title: `${prop.property_name || 'Rental property'}, ${popupRank}`,
+                        alt: `${prop.property_name || 'Rental property'} recommendation marker`
+                    });
+                    DomiknowMap.bindPopup(marker, DomiknowMap.propertyPopupContent({
+                        eyebrow: popupRank,
+                        title: prop.property_name || 'Rental property',
+                        facts: [`Brgy. ${prop.barangay || 'Location not specified'}`, popupAvailability, popupDistance],
+                        price: minimumRent !== null ? `₱${minimumRent.toLocaleString('en-PH', { maximumFractionDigits: 0 })}` : '',
+                        actionHref: `property-details.html?id=${safePropertyId}`,
+                        actionLabel: 'Open details'
+                    }));
                     
                     markersGroup.addLayer(marker);
                     markers.push(marker);
@@ -484,8 +582,8 @@
                     if (data && data.marker) {
                         const iconElement = data.marker.getElement();
                         if (iconElement) {
-                            const innerDiv = iconElement.querySelector('div');
-                            if (innerDiv) innerDiv.classList.add('map-marker-bounce');
+                            const markerVisual = iconElement.querySelector('.domiknow-price-marker');
+                            if (markerVisual) markerVisual.classList.add('map-marker-bounce');
                         }
                     }
                 });
@@ -495,8 +593,8 @@
                     if (data && data.marker) {
                         const iconElement = data.marker.getElement();
                         if (iconElement) {
-                            const innerDiv = iconElement.querySelector('div');
-                            if (innerDiv) innerDiv.classList.remove('map-marker-bounce');
+                            const markerVisual = iconElement.querySelector('.domiknow-price-marker');
+                            if (markerVisual) markerVisual.classList.remove('map-marker-bounce');
                         }
                     }
                 });
@@ -527,7 +625,7 @@
             }
         }
 
-        // Apply filters dynamically by re-querying the recommendation API with active Filter Options
+        // Re-run the canonical recommendation when tenant priorities change.
         function applyFilters() {
             clearTimeout(filterRequestTimer);
             filterRequestTimer = setTimeout(fetchProperties, 350);
@@ -535,50 +633,25 @@
 
         function clearFilters() {
             clearTimeout(filterRequestTimer);
-            document.getElementById('filterBarangay').value = '';
-            document.getElementById('filterMinPrice').value = '';
-            document.getElementById('filterMaxPrice').value = '';
+            document.getElementById('filterOccupants').value = '1';
+            document.getElementById('filterComfortableBudget').value = '';
+            document.getElementById('filterHardMaxBudget').value = '';
             document.getElementById('filterType').value = '';
+            document.getElementById('filterTypeRequired').checked = false;
+            document.getElementById('filterIdealDistance').value = '1';
+            document.getElementById('filterMaximumDistance').value = '5';
+            document.getElementById('filterDistanceRequired').checked = false;
+            document.getElementById('filterAmenitiesRequired').checked = false;
+            document.getElementById('recommendationLatitude').value = '';
+            document.getElementById('recommendationLongitude').value = '';
+            document.getElementById('recommendationLocationStatus').textContent = 'Location Suitability is inactive until a location is available.';
+            document.getElementById('recommendationLocationStatus').dataset.state = '';
             document.querySelectorAll('.amenity-filter').forEach(cb => cb.checked = false);
-            
+            document.querySelectorAll('.recommendation-importance').forEach(select => { select.value = '3'; });
+            window.DomiknowLocation?.clear?.();
+            updateCriterionAvailability();
             fetchProperties();
         }
-
-        // Comparison Handler
-        function toggleCompare(cb, id) {
-            if (cb.checked) {
-                if (selectedPropertyIds.length >= 4) {
-                    cb.checked = false;
-                    alert('You can compare maximum 4 properties.');
-                    return;
-                }
-                selectedPropertyIds.push(id);
-            } else {
-                selectedPropertyIds = selectedPropertyIds.filter(pid => pid !== id);
-            }
-
-            updateCompareBar();
-        }
-
-        function updateCompareBar() {
-            const bar = document.getElementById('compareBar');
-            const count = document.getElementById('compareCount');
-            
-            count.textContent = selectedPropertyIds.length;
-
-            if (selectedPropertyIds.length >= 2) {
-                bar.classList.remove('hidden');
-            } else {
-                bar.classList.add('hidden');
-            }
-        }
-
-        function goCompare() {
-            if (selectedPropertyIds.length < 2) return;
-            const query = selectedPropertyIds.map(id => `id=${id}`).join('&');
-            window.location.href = `compare.html?${query}`;
-        }
-
 
     </script>
 </body>

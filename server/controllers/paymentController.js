@@ -1,5 +1,6 @@
 const paymentModel = require('../models/paymentModel');
 const auditLogModel = require('../models/auditLogModel');
+const notificationModel = require('../models/notificationModel');
 const responseHelper = require('../utils/responseHelper');
 const supabase = require('../config/supabaseClient');
 const { uploadFile, getSignedUrl } = require('../utils/storageHelper');
@@ -98,6 +99,14 @@ const paymentController = {
             // 7. Audit log
             await auditLogModel.log(tenantId, 'SUBMIT_PAYMENT_PROOF', `Tenant submitted payment reference ${payment_reference_number} for bill ${billing_id}`);
 
+            await notificationModel.create({
+                user_id: billing.landlord_id,
+                type: 'payment_submitted',
+                title: 'Payment proof needs verification',
+                message: `A tenant submitted a payment proof for PHP ${Number(payment_amount).toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}. Review the payment before updating the billing record.`,
+                reference_id: paymentRecord.id
+            });
+
             return responseHelper.success(res, 'Payment proof successfully submitted and logged for verification.', paymentRecord, 201);
 
         } catch (error) {
@@ -168,6 +177,16 @@ const paymentController = {
             // Audit logs
             const actionType = payment_status === 'verified' ? 'VERIFY_PAYMENT' : 'REJECT_PAYMENT';
             await auditLogModel.log(landlordId, actionType, `Landlord marked payment submission ${id} as ${payment_status}`);
+
+            await notificationModel.create({
+                user_id: updated.tenant_id,
+                type: payment_status === 'verified' ? 'payment_verified' : 'payment_rejected',
+                title: payment_status === 'verified' ? 'Payment verified' : 'Payment proof needs attention',
+                message: payment_status === 'verified'
+                    ? 'Your landlord verified your payment. Your billing record has been updated.'
+                    : `Your payment proof was not accepted. ${verification_remarks || 'Review the billing entry and submit a valid proof.'}`,
+                reference_id: updated.billing_id || id
+            });
 
             return responseHelper.success(res, `Payment submission successfully marked as ${payment_status}`, updated);
 

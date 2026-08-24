@@ -1,5 +1,6 @@
 const adminModel = require('../models/adminModel');
 const auditLogModel = require('../models/auditLogModel');
+const notificationModel = require('../models/notificationModel');
 const responseHelper = require('../utils/responseHelper');
 const { getSignedUrl } = require('../utils/storageHelper');
 
@@ -81,6 +82,13 @@ const adminReviewController = {
 
             // 4. Log audit
             await auditLogModel.log(adminId, 'APPROVE_PROPERTY_REGISTRATION', `Admin approved property registration: ${details.property_name}`);
+            await notificationModel.create({
+                user_id: details.landlord_id,
+                type: 'property_approved',
+                title: 'Property approved',
+                message: `${details.property_name} passed review and is now published in rental discovery.`,
+                reference_id: id
+            });
 
             return responseHelper.success(res, 'Property successfully approved and published to discovery catalog.', approved);
 
@@ -116,6 +124,13 @@ const adminReviewController = {
                 .eq('property_id', id);
 
             await auditLogModel.log(adminId, 'REJECT_PROPERTY_REGISTRATION', `Admin rejected property ${id}: ${rejection_reason}`);
+            await notificationModel.create({
+                user_id: details.landlord_id,
+                type: 'property_rejected',
+                title: 'Property submission needs changes',
+                message: `${details.property_name} was returned after review. Reason: ${rejection_reason}`,
+                reference_id: id
+            });
 
             return responseHelper.success(res, 'Property successfully rejected and returned to landlord', rejected);
 

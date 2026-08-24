@@ -57,6 +57,12 @@ const reportController = {
             });
 
             await auditLogModel.log(reporterId, 'SUBMIT_REPORT', `User submitted report ${report.id} regarding user ${reported_user_id}`);
+            await notificationModel.createForRole('admin', {
+                type: 'report_submitted',
+                title: 'New report awaiting review',
+                message: `${report_title} was submitted and added to the report queue.`,
+                reference_id: report.id
+            });
 
             return responseHelper.success(res, 'Report submitted successfully.', report, 201);
 
@@ -223,6 +229,12 @@ const reportController = {
             });
 
             await auditLogModel.log(complainantId, 'SUBMIT_DISPUTE', `User submitted dispute ${dispute.id} against ${respondent_id}`);
+            await notificationModel.createForRole('admin', {
+                type: 'report_submitted',
+                title: 'New dispute awaiting review',
+                message: `${dispute_title} was submitted and added to the case queue.`,
+                reference_id: dispute.id
+            });
 
             return responseHelper.success(res, 'Dispute submitted successfully.', dispute, 201);
 
@@ -353,6 +365,12 @@ const reportController = {
             });
 
             await auditLogModel.log(reporterId, 'SUBMIT_POLICY_VIOLATION', `User submitted policy violation ${violation.id} against ${violator_id}`);
+            await notificationModel.createForRole('admin', {
+                type: 'report_submitted',
+                title: 'Policy violation awaiting review',
+                message: `A ${violation_type.replace(/_/g, ' ')} case was submitted and added to the review queue.`,
+                reference_id: violation.id
+            });
 
             return responseHelper.success(res, 'Policy violation submitted successfully.', violation, 201);
 

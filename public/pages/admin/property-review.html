@@ -238,7 +238,7 @@
                         <div style="font-size: 0.75rem; color: var(--text-muted);">${domiknowEscapeHtml(prop.landlord_email)}${domiknowEscapeHtml(phoneText)}</div>
                     </td>
                     <td>
-                        <span class="detail-pill detail-pill-type" style="padding: 0.2rem 0.5rem; font-size: 0.7rem; text-transform: capitalize;">${domiknowEscapeHtml(String(prop.property_type || 'Unknown').replace('_', ' '))}</span>
+                        <span class="detail-pill detail-pill-type" style="padding: 0.2rem 0.5rem; font-size: 0.7rem; text-transform: capitalize;">${domiknowEscapeHtml(String(prop.property_type || 'Unknown').replace(/_/g, ' '))}</span>
                     </td>
                     <td style="font-size: 0.8125rem; color: var(--text-secondary); max-width: 200px;">${domiknowEscapeHtml(locationText)}</td>
                     <td style="text-align: center; font-weight: 700; color: var(--primary);">${docCount}</td>

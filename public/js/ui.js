@@ -44,6 +44,7 @@
         message: '<path d="M21 15a4 4 0 0 1-4 4H8l-5 3 1.5-4A7 7 0 0 1 3 14V8a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4v7Z"/>',
         flag: '<path d="M5 22V3M5 4h11l-2 4 2 4H5"/>',
         sparkle: '<path d="m12 3 1.3 3.7L17 8l-3.7 1.3L12 13l-1.3-3.7L7 8l3.7-1.3L12 3ZM19 14l.8 2.2L22 17l-2.2.8L19 20l-.8-2.2L16 17l2.2-.8L19 14ZM5 13l.8 2.2L8 16l-2.2.8L5 19l-.8-2.2L2 16l2.2-.8L5 13Z"/>',
+        play: '<circle cx="12" cy="12" r="9"/><path d="m10 8 6 4-6 4Z"/>',
         target: '<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/>',
         list: '<path d="M9 6h11M9 12h11M9 18h11"/><circle cx="4" cy="6" r="1"/><circle cx="4" cy="12" r="1"/><circle cx="4" cy="18" r="1"/>',
         map: '<path d="m3 6 6-3 6 3 6-3v15l-6 3-6-3-6 3V6Z"/><path d="M9 3v15M15 6v15"/>',
@@ -276,6 +277,26 @@
             script.setAttribute('data-domiknow-walkthrough', '');
             document.head.appendChild(script);
         }
+    }
+
+    function ensureDomiKnowLoadingSystem() {
+        let stylesheet = document.head.querySelector('link[href*="loading-system.css"]');
+        if (!stylesheet) {
+            stylesheet = document.createElement('link');
+            stylesheet.rel = 'stylesheet';
+            stylesheet.href = '/css/loading-system.css?v=20260823-1';
+            document.head.appendChild(stylesheet);
+        }
+        stylesheet.setAttribute('data-domiknow-loading-system', '');
+
+        let script = document.head.querySelector('script[src*="loading-system.js"]');
+        if (!window.DomiKnowLoading && !script) {
+            script = document.createElement('script');
+            script.src = '/js/loading-system.js?v=20260823-1';
+            script.defer = true;
+            document.head.appendChild(script);
+        }
+        script?.setAttribute('data-domiknow-loading-system', '');
     }
 
     function ensureFloatingThemeToggle() {
@@ -840,6 +861,7 @@
     ensureBrandFavicons();
     ensureDomiKnowModalSystem();
     ensureDomiKnowWalkthroughSystem();
+    ensureDomiKnowLoadingSystem();
     ensureNonAdminMobileExperience();
     applyTheme(readStoredTheme() || getSystemTheme(), false);
     document.addEventListener('click', handleDocumentClick);

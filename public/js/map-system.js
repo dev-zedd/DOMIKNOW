@@ -32,11 +32,25 @@
             updateWhenIdle: true
         });
         let layer = createThemeLayer(activeTheme);
-        const basemapGroup = L.layerGroup([layer]).addTo(map);
+        const basemapGroup = L.layerGroup([layer]);
 
         const container = map.getContainer();
         container.classList.add('domiknow-map');
         container.dataset.mapTheme = activeTheme;
+        let loadingTimeout;
+        const setMapLoading = (loading) => {
+            window.clearTimeout(loadingTimeout);
+            container.classList.toggle('is-map-loading', loading);
+            if (loading) {
+                container.setAttribute('aria-busy', 'true');
+                loadingTimeout = window.setTimeout(() => setMapLoading(false), 8000);
+            } else {
+                container.removeAttribute('aria-busy');
+            }
+        };
+        setMapLoading(true);
+        layer.once('load', () => setMapLoading(false));
+        basemapGroup.addTo(map);
 
         const observer = new MutationObserver(() => {
             const nextTheme = currentTheme();
@@ -44,9 +58,11 @@
 
             const nextLayer = createThemeLayer(nextTheme);
             if (map.hasLayer(basemapGroup)) {
+                setMapLoading(true);
                 nextLayer.once('load', () => {
                     basemapGroup.removeLayer(layer);
                     layer = nextLayer;
+                    setMapLoading(false);
                 });
                 basemapGroup.addLayer(nextLayer);
             } else {
@@ -63,7 +79,10 @@
             attributeFilter: ['data-theme']
         });
 
-        map.once('unload', () => observer.disconnect());
+        map.once('unload', () => {
+            observer.disconnect();
+            window.clearTimeout(loadingTimeout);
+        });
         return basemapGroup;
     }
 
@@ -101,11 +120,15 @@
                 ? 'selected'
                 : 'available';
 
+        const labelLength = String(priceLabel || '').length;
+        const markerWidth = Math.min(176, Math.max(76, 28 + (labelLength * 7.2)));
+
         return L.divIcon({
             className: 'domiknow-price-marker-wrapper',
             html: `<span class="domiknow-price-marker domiknow-price-marker--${state}">${escapeHtml(priceLabel)}</span>`,
-            iconSize: [104, 38],
-            iconAnchor: [52, 38]
+            iconSize: [markerWidth, 38],
+            iconAnchor: [markerWidth / 2, 38],
+            popupAnchor: [0, -38]
         });
     }
 
@@ -136,13 +159,78 @@
         return `${eyebrow}${title}${meta}`;
     }
 
+    function propertyPopupContent(options = {}) {
+        const facts = Array.isArray(options.facts)
+            ? options.facts.filter(value => value !== null && value !== undefined && String(value).trim()).slice(0, 4)
+            : [];
+        const action = options.actionHref
+            ? `<a class="map-property-card__action" href="${escapeHtml(options.actionHref)}">${escapeHtml(options.actionLabel || 'View details')}<span aria-hidden="true">&rarr;</span></a>`
+            : '';
+        const price = options.price
+            ? `<div class="map-property-card__price-row"><span>${escapeHtml(options.priceLabel || 'Starting at')}</span><span class="map-property-card__price"><strong>${escapeHtml(options.price)}</strong>${options.priceSuffix === false ? '' : `<span>${escapeHtml(options.priceSuffix || '/ month')}</span>`}</span></div>`
+            : '';
+
+        return `<article class="map-property-card">
+            <header class="map-property-card__header">
+                <span class="map-property-card__icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 21V5a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v16"/><path d="M17 9h2a2 2 0 0 1 2 2v10M8 7h2M8 11h2M8 15h2M13 7h1M13 11h1M13 15h1M3 21h19"/></svg></span>
+                <span class="map-property-card__heading"><span class="map-property-card__eyebrow">${escapeHtml(options.eyebrow || 'Property location')}</span><h3>${escapeHtml(options.title || 'Rental property')}</h3></span>
+            </header>
+            ${facts.length ? `<div class="map-property-card__facts">${facts.map(fact => `<span>${escapeHtml(fact)}</span>`).join('')}</div>` : ''}
+            ${(price || action) ? `<footer class="map-property-card__footer">${price}${action}</footer>` : ''}
+        </article>`;
+    }
+
+    function popupOptions(options = {}) {
+        const viewportWidth = Math.max(280, window.innerWidth || 320);
+        const width = Math.min(options.maxWidth || 410, Math.max(options.minWidth || 280, viewportWidth - 56));
+        return {
+            className: options.className || 'map-property-popup-shell',
+            minWidth: width,
+            maxWidth: width,
+            maxHeight: Math.max(220, (window.innerHeight || 640) - 80),
+            autoPan: options.autoPan !== false,
+            keepInView: true,
+            autoPanPadding: options.autoPanPadding || [24, 24]
+        };
+    }
+
+    function bindPopup(marker, content, options = {}) {
+        if (!marker?.bindPopup) return marker;
+        return marker.bindPopup(content, popupOptions(options));
+    }
+
+    function observeContainer(map, container) {
+        const element = typeof container === 'string' ? document.querySelector(container) : container;
+        if (!map || !element) return function () {};
+
+        let frame = 0;
+        const refresh = () => {
+            cancelAnimationFrame(frame);
+            frame = requestAnimationFrame(() => map.invalidateSize({ animate: false, pan: false }));
+        };
+        requestAnimationFrame(() => requestAnimationFrame(refresh));
+        const timers = [120, 360, 900].map(delay => window.setTimeout(refresh, delay));
+        const observer = 'ResizeObserver' in window ? new ResizeObserver(refresh) : null;
+        observer?.observe(element);
+        map.once('unload', () => {
+            cancelAnimationFrame(frame);
+            timers.forEach(window.clearTimeout);
+            observer?.disconnect();
+        });
+        return refresh;
+    }
+
     window.DomiknowMap = Object.freeze({
         addBasemap,
         addLayerControl,
+        bindPopup,
         escapeHtml,
+        observeContainer,
         pinIcon,
         popupContent,
+        popupOptions,
         priceIcon,
+        propertyPopupContent,
         satelliteLayer
     });
 })();

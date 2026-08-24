@@ -4,23 +4,12 @@ const responseHelper = require('../utils/responseHelper');
 const notificationController = {
     /**
      * GET /api/notifications/my
-     * Get all notifications for logged-in user (tenant or landlord)
+     * Get all notifications for the logged-in user.
      */
     async getMyNotifications(req, res) {
         try {
             const userId = req.user.id;
-            let notifications = await notificationModel.findByUserId(userId);
-            
-            if (!notifications || notifications.length === 0) {
-                const welcomeNotif = await notificationModel.create({
-                    user_id: userId,
-                    type: 'admin_warning',
-                    title: 'Platform TOS & Governance Notice',
-                    message: 'Official Notice: Please review DomiKnow Terms of Service and Housing Rules to ensure full platform compliance.',
-                    reference_id: null
-                });
-                notifications = [welcomeNotif];
-            }
+            const notifications = await notificationModel.findByUserId(userId);
 
             const unreadCount = notifications.filter(n => !n.read_status).length;
 

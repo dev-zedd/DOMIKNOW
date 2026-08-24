@@ -3,6 +3,21 @@
  * Marketing, rental discovery, and unauthenticated property-detail experience.
  */
 
+@view-transition {
+  navigation: auto;
+}
+
+::view-transition-old(root) { animation: 120ms ease-out both public-page-leave; }
+::view-transition-new(root) { animation: 180ms ease-out both public-page-enter; }
+
+@keyframes public-page-leave { to { opacity: 0.94; } }
+@keyframes public-page-enter { from { opacity: 0.94; } }
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(root),
+  ::view-transition-new(root) { animation: none; }
+}
+
 .public-landing-page,
 .public-property-page {
   background: var(--color-bg-canvas) !important;
@@ -16,14 +31,36 @@
 /* Public navigation */
 .public-landing-page .landing-header,
 .public-property-page .public-header {
-  width: min(100%, var(--content-max));
+  display: grid;
+  width: 100%;
   min-height: 72px;
+  grid-template-columns: auto 1fr auto;
+  gap: 28px;
+  align-items: center;
   margin-inline: auto;
-  padding: 14px var(--page-gutter) !important;
+  padding: 12px max(var(--page-gutter), calc((100vw - var(--content-max)) / 2)) !important;
   border: 0 !important;
   background: color-mix(in srgb, var(--color-bg-surface) 94%, transparent) !important;
   box-shadow: none !important;
   backdrop-filter: blur(16px);
+}
+
+/* Keep the public landing navigation available throughout the page, not only
+   while the hero wrapper remains in view. */
+.public-landing-page {
+  padding-top: 72px;
+}
+
+.public-landing-page .landing-header,
+.public-landing-page .landing-header.scrolled {
+  position: fixed !important;
+  top: 0;
+  right: 0;
+  left: 0;
+  z-index: 1200;
+  width: 100%;
+  max-width: none;
+  border-bottom: 1px solid var(--color-border-default) !important;
 }
 
 .public-landing-page .landing-header.scrolled {
@@ -35,24 +72,24 @@
 }
 
 .public-landing-page .nav-links {
-  gap: 8px !important;
-  padding: 4px;
-  border: 1px solid var(--color-border-default);
-  border-radius: 11px;
-  background: var(--color-bg-subtle);
+  justify-content: center;
+  gap: 4px !important;
+  padding: 0;
+  border: 0;
+  background: transparent;
 }
 
 .public-landing-page .nav-link {
-  min-height: 36px;
-  padding: 8px 13px;
-  border-radius: 8px;
+  padding: 9px 12px;
+  border-radius: var(--radius-md);
   color: var(--color-text-secondary) !important;
-  font-size: 0.8125rem !important;
+  font-size: var(--font-size-body-sm) !important;
   font-weight: 650 !important;
 }
 
-.public-landing-page .nav-link:hover {
-  background: var(--color-bg-surface);
+.public-landing-page .nav-link:hover,
+.public-landing-page .nav-link[aria-current="page"] {
+  background: var(--color-action-primary-subtle);
   color: var(--color-action-primary) !important;
 }
 
@@ -622,16 +659,23 @@
 
   .public-landing-page .landing-header,
   .public-property-page .public-header {
-    padding: 11px 14px !important;
+    min-height: 64px;
+    grid-template-columns: minmax(0, 1fr) auto;
+    padding: max(8px, env(safe-area-inset-top)) 14px 8px !important;
   }
 
   .public-landing-page .nav-links {
     display: none !important;
   }
 
-  .public-landing-page .auth-buttons .btn-secondary,
-  .public-property-page .login-prompt .btn-login {
+  .public-landing-page .auth-buttons .btn-primary,
+  .public-property-page .login-prompt .btn-primary {
     display: none !important;
+  }
+
+  .public-landing-page .auth-buttons .btn-secondary,
+  .public-property-page .login-prompt .btn-secondary {
+    display: inline-flex !important;
   }
 
   .public-landing-page .public-hero {
@@ -984,11 +1028,12 @@
 
 .public-discovery-bridge__preview {
   position: relative;
-  min-height: 370px;
+  min-height: 0;
+  aspect-ratio: 3367 / 2525;
   overflow: hidden;
-  border: 1px solid #b8c9c8;
+  border: 1px solid var(--color-border-default);
   border-radius: 18px;
-  background: #dfe9e7;
+  background: #05070b;
   box-shadow: 0 22px 46px rgba(4, 36, 88, 0.13);
 }
 
@@ -997,6 +1042,8 @@
   inset: 0;
   width: 100%;
   height: 100%;
+  object-fit: contain;
+  object-position: center;
 }
 
 .bridge-map-search {
@@ -1203,6 +1250,12 @@
   gap: 4px;
 }
 
+/* Navigation is never removed at responsive sizes. On compact screens it
+   becomes a horizontally scrollable second header row. */
+.public-workspace-header > .public-workspace-nav {
+  display: flex !important;
+}
+
 .public-workspace-nav a {
   padding: 9px 12px;
   border-radius: var(--radius-md);
@@ -1222,6 +1275,39 @@
   display: flex;
   gap: 8px;
   align-items: center;
+  justify-self: end;
+  width: max-content;
+}
+
+/* One login component across landing, discovery, and property details. */
+:where(.public-landing-page, .public-listings-page, .public-property-page) .public-auth-login {
+  display: inline-flex !important;
+  min-width: 82px;
+  min-height: 42px;
+  align-items: center;
+  justify-content: center;
+  padding: 9px 15px !important;
+  border: 1px solid var(--color-border-strong) !important;
+  border-radius: 9px !important;
+  background: var(--color-bg-surface) !important;
+  color: var(--color-text-brand) !important;
+  font-family: var(--font-family);
+  font-size: var(--font-size-body-sm) !important;
+  font-weight: 700 !important;
+  line-height: 1.2;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+:where(.public-landing-page, .public-listings-page, .public-property-page) .public-auth-login:hover {
+  border-color: var(--color-action-primary) !important;
+  background: var(--color-action-primary-subtle) !important;
+  color: var(--color-action-primary) !important;
+}
+
+:where(.public-landing-page, .public-listings-page, .public-property-page) .public-auth-login:focus-visible {
+  outline: none;
+  box-shadow: var(--shadow-focus) !important;
 }
 
 .public-discovery-main {
@@ -2282,7 +2368,6 @@
 
 @media (max-width: 820px) {
   .public-workspace-header { grid-template-columns: 1fr auto; padding-inline: 16px; }
-  .public-workspace-nav { display: none; }
   .public-workspace-actions .btn-secondary { display: none; }
   .public-discovery-main { padding: 28px 16px 40px; }
   .discovery-heading { grid-template-columns: minmax(0, 1fr); gap: 18px; }
@@ -2325,6 +2410,40 @@
   .public-property-page .grid-info-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 
+@media (max-width: 960px) {
+  .public-landing-page { padding-top: 124px; }
+
+  .public-workspace-header {
+    grid-template-columns: minmax(0, 1fr) auto !important;
+    grid-template-rows: auto auto;
+    gap: 6px 12px;
+  }
+
+  .public-workspace-header > .public-workspace-nav {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    width: 100%;
+    justify-content: flex-start;
+    overflow-x: auto;
+    overscroll-behavior-inline: contain;
+    padding: 2px 0 7px;
+    scrollbar-width: none;
+  }
+
+  .public-workspace-header > .public-workspace-nav::-webkit-scrollbar {
+    display: none;
+  }
+
+  .public-workspace-header > .public-workspace-nav a {
+    flex: 0 0 auto;
+    white-space: nowrap;
+  }
+
+  .public-landing-page .nav-links {
+    display: flex !important;
+  }
+}
+
 @media (max-width: 640px) {
   .public-landing-page .aurora-hero-wrapper { width: calc(100% - 16px) !important; }
   .public-landing-page .public-hero {
@@ -2339,7 +2458,7 @@
   .public-landing-page .public-hero-copy .hero-backdrop-title { font-size: clamp(2.65rem, 13vw, 3.8rem) !important; }
   .public-landing-page .hero-property-caption { display: none; }
   .public-landing-page .public-discovery-bridge { width: calc(100% - 16px); gap: 28px; padding: 42px 22px; }
-  .public-discovery-bridge__preview { min-height: 300px; }
+  .public-discovery-bridge__preview { min-height: 0; }
   .public-workspace-actions .btn { display: none; }
   .discovery-heading h1 { font-size: 2.5rem; }
   .discovery-heading__note { padding: 14px; }

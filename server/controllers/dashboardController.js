@@ -19,7 +19,8 @@ const dashboardController = {
                 email: user.email,
                 role: user.role,
                 account_status: user.account_status,
-                is_verified: user.is_verified
+                is_verified: user.is_verified,
+                profile_image_url: user.profile_image_url
             });
         } catch (error) {
             console.error('Dashboard error:', error);

@@ -381,6 +381,9 @@ const leaseController = {
     },
     async respondLease(req, res) {
         const { action } = req.body;
+        if (!['accept', 'reject'].includes(action)) {
+            return responseHelper.error(res, 'Action must be either accept or reject.');
+        }
         if (action === 'accept') {
             return leaseController.acceptLease(req, res);
         }
@@ -393,7 +396,10 @@ const leaseController = {
             const { lease_status } = req.body;
             const landlordId = req.user.id;
 
-            const allowedStatuses = ['pending_tenant_acceptance', 'accepted', 'rejected', 'active', 'expired', 'terminated', 'ended', 'cancelled'];
+            // Tenant acceptance/rejection is handled exclusively by the tenant
+            // endpoints. Landlords may only close a draft/active lease or
+            // finalize a legacy accepted record.
+            const allowedStatuses = ['active', 'expired', 'terminated', 'ended', 'cancelled'];
             if (!allowedStatuses.includes(lease_status)) {
                 return responseHelper.error(res, 'Invalid lease status.');
             }
@@ -434,7 +440,12 @@ const leaseController = {
 
         } catch (error) {
             console.error('Update lease status error:', error);
-            return responseHelper.error(res, 'Failed to update lease status', error, 500);
+            return responseHelper.error(
+                res,
+                error.message || 'Failed to update lease status',
+                error,
+                error.statusCode || 500
+            );
         }
     }
 };

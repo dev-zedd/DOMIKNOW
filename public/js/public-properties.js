@@ -35,7 +35,23 @@
         initializeMap();
         bindControls();
         applySharedDeviceLocation(window.DomiknowLocation?.read());
+        renderLoadingState();
         loadProperties();
+    }
+
+    function renderLoadingState() {
+        const container = document.getElementById('propertyResults');
+        const count = document.getElementById('propertyResultCount');
+        const mapCount = document.getElementById('mapResultCount');
+        if (count) count.textContent = 'Finding verified rentals…';
+        if (mapCount) mapCount.textContent = 'Preparing map results…';
+        if (window.DomiKnowLoading && container) {
+            window.DomiKnowLoading.mount(container, {
+                type: 'card',
+                count: 3,
+                label: 'Loading verified rental listings'
+            });
+        }
     }
 
     function applySharedDeviceLocation(location) {
@@ -71,6 +87,7 @@
             scrollWheelZoom: false
         }).setView([SINILOAN_CENTER.lat, SINILOAN_CENTER.lng], 14);
         DomiknowMap.addBasemap(map);
+        DomiknowMap.observeContainer(map, document.getElementById('publicPropertiesMap'));
         map.on('click', event => {
             if (!manualLocationMode) return;
             setManualLocation(event.latlng.lat, event.latlng.lng);
@@ -96,7 +113,7 @@
 
     async function loadProperties() {
         try {
-            const response = await fetch('/api/properties');
+            const response = await fetch('/api/properties?limit=100');
             const result = await response.json();
             if (!response.ok) throw new Error(result.message || 'Unable to load rentals');
             const source = result.data?.properties || result.data || [];
@@ -146,6 +163,7 @@
         const sorted = sortProperties([...filteredProperties]);
         count.textContent = `${sorted.length} ${sorted.length === 1 ? 'rental' : 'rentals'} found`;
         container.replaceChildren();
+        container.removeAttribute('aria-busy');
 
         if (!sorted.length) {
             renderMessage('No rentals match these filters.', 'Clear a filter or choose a different search location.');
@@ -174,13 +192,22 @@
         });
 
         const media = document.createElement('div');
-        media.className = 'public-listing-card__media';
+        media.className = 'public-listing-card__media is-loading';
         const image = document.createElement('img');
         image.className = 'public-listing-card__image';
         image.src = propertyImage(property);
         image.alt = property.property_name ? `${property.property_name} rental property` : 'Rental property';
         image.loading = 'lazy';
-        image.addEventListener('error', () => { image.src = FALLBACK_IMAGE; }, { once: true });
+        image.addEventListener('load', () => media.classList.remove('is-loading'));
+        let fallbackUsed = false;
+        image.addEventListener('error', () => {
+            if (fallbackUsed) {
+                media.classList.remove('is-loading');
+                return;
+            }
+            fallbackUsed = true;
+            image.src = FALLBACK_IMAGE;
+        });
         const status = document.createElement('span');
         status.className = `public-listing-card__status ${isAvailable(property) ? 'is-available' : 'is-unavailable'}`;
         status.textContent = availabilityLabel(property);
@@ -300,6 +327,7 @@
         const container = document.getElementById('propertyResults');
         if (!container) return;
         container.replaceChildren();
+        container.removeAttribute('aria-busy');
         const state = document.createElement('div');
         state.className = 'public-results-state';
         const heading = document.createElement('strong');
@@ -327,13 +355,7 @@
                 alt: `${property.property_name || 'Rental property'} map marker`
             }).addTo(map);
             marker.domiknowPropertyId = String(property.id);
-            const popupWidth = Math.min(410, Math.max(280, window.innerWidth - 56));
-            marker.bindPopup(createMapPropertyPopup(property), {
-                className: 'map-property-popup-shell',
-                minWidth: popupWidth,
-                maxWidth: popupWidth,
-                autoPanPadding: [24, 24]
-            });
+            DomiknowMap.bindPopup(marker, createMapPropertyPopup(property));
             marker.on('click', () => {
                 selectProperty(property.id, false);
             });

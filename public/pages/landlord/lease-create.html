@@ -1090,7 +1090,7 @@
             // Property
             const property = app.properties || {};
             document.getElementById('infoPropertyName').textContent = property.property_name || 'N/A';
-            document.getElementById('infoPropertyType').textContent = (property.property_type || 'N/A').replace('_', ' ').toUpperCase();
+            document.getElementById('infoPropertyType').textContent = (property.property_type || 'N/A').replace(/_/g, ' ').toUpperCase();
 
             // Resolve target unit/bed number
             const targetUnit = app.unit || app.property_units;
@@ -1214,7 +1214,7 @@
 
                 const property = lease.properties || {};
                 document.getElementById('infoPropertyName').textContent = property.property_name || 'N/A';
-                document.getElementById('infoPropertyType').textContent = (property.property_type || 'N/A').replace('_', ' ').toUpperCase();
+                document.getElementById('infoPropertyType').textContent = (property.property_type || 'N/A').replace(/_/g, ' ').toUpperCase();
                 document.getElementById('infoUnitNumber').textContent = property.unit_number || 'N/A';
                 document.getElementById('infoPropertyAddress').textContent = `${property.address || ''}, Barangay ${property.barangay || ''}, Siniloan, Laguna`;
 

@@ -229,10 +229,10 @@ const billingModel = {
                 total_amount,
                 due_date,
                 billing_status,
-                users!billing_records_tenant_id_fkey (
+                tenant:users!billing_records_tenant_id_fkey (
                     full_name
                 ),
-                users!billing_records_landlord_id_fkey (
+                landlord:users!billing_records_landlord_id_fkey (
                     full_name
                 ),
                 properties (
