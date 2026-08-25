@@ -1,0 +1,231 @@
+================================================================================
+                        DOMIKNOW DEMO ACCOUNTS
+                        Generated: August 18, 2026
+================================================================================
+
+NOTES:
+- Tenants are ACTIVE immediately (no email verification needed via seed script)
+- Landlords are set to PENDING — admin must approve them before they can log in
+- All accounts use role-based email format for easy identification
+- Profile images are seeded via fixDemoProfiles.js
+
+================================================================================
+                            TENANTS (15 ACCOUNTS)
+================================================================================
+
+#1
+  Full Name      : Juan dela Cruz
+  Email          : tenant01@domiknow.com
+  Password       : Tenant01#2026
+  Role           : tenant
+  Contact Number : +63 917 823 4561
+  Address        : 12 Mabini Street, Brgy. G. Redor, Siniloan, Laguna
+
+--------------------------------------------------------------------------------
+
+#2
+  Full Name      : Maria Santos
+  Email          : tenant02@domiknow.com
+  Password       : Tenant02#2026
+  Role           : tenant
+  Contact Number : +63 918 345 7892
+  Address        : 34 Rizal Avenue, Brgy. Halayhayin, Siniloan, Laguna
+
+--------------------------------------------------------------------------------
+
+#3
+  Full Name      : Carlo Reyes
+  Email          : tenant03@domiknow.com
+  Password       : Tenant03#2026
+  Role           : tenant
+  Contact Number : +63 927 561 2034
+  Address        : 7 Sampaguita Lane, Brgy. Pandeño, Siniloan, Laguna
+
+--------------------------------------------------------------------------------
+
+#4
+  Full Name      : Ana Flores
+  Email          : tenant04@domiknow.com
+  Password       : Tenant04#2026
+  Role           : tenant
+  Contact Number : +63 945 678 3012
+  Address        : 21 Aguinaldo Road, Brgy. Macasipac, Siniloan, Laguna
+
+--------------------------------------------------------------------------------
+
+#5
+  Full Name      : Kevin Bautista
+  Email          : tenant05@domiknow.com
+  Password       : Tenant05#2026
+  Role           : tenant
+  Contact Number : +63 956 234 8901
+  Address        : 5 Magsaysay Street, Brgy. Acevida, Siniloan, Laguna
+
+--------------------------------------------------------------------------------
+
+#6
+  Full Name      : Liza Gonzales
+  Email          : tenant06@domiknow.com
+  Password       : Tenant06#2026
+  Role           : tenant
+  Contact Number : +63 919 412 6703
+  Address        : 18 Luna Street, Brgy. Salubungan, Siniloan, Laguna
+
+--------------------------------------------------------------------------------
+
+#7
+  Full Name      : Mark Villanueva
+  Email          : tenant07@domiknow.com
+  Password       : Tenant07#2026
+  Role           : tenant
+  Contact Number : +63 932 789 1456
+  Address        : 9 Bonifacio Extension, Brgy. Mendiola, Siniloan, Laguna
+
+--------------------------------------------------------------------------------
+
+#8
+  Full Name      : Jenny Castillo
+  Email          : tenant08@domiknow.com
+  Password       : Tenant08#2026
+  Role           : tenant
+  Contact Number : +63 966 345 2178
+  Address        : 3 Del Pilar Street, Brgy. G. Redor, Siniloan, Laguna
+
+--------------------------------------------------------------------------------
+
+#9
+  Full Name      : Paolo Ramos
+  Email          : tenant09@domiknow.com
+  Password       : Tenant09#2026
+  Role           : tenant
+  Contact Number : +63 977 890 3245
+  Address        : 41 Burgos Street, Brgy. Halayhayin, Siniloan, Laguna
+
+--------------------------------------------------------------------------------
+
+#10
+  Full Name      : Claire Mendoza
+  Email          : tenant10@domiknow.com
+  Password       : Tenant10#2026
+  Role           : tenant
+  Contact Number : +63 939 567 4190
+  Address        : 16 Lapu-Lapu Street, Brgy. Pandeño, Siniloan, Laguna
+
+--------------------------------------------------------------------------------
+
+#11
+  Full Name      : Ryan Torres
+  Email          : tenant11@domiknow.com
+  Password       : Tenant11#2026
+  Role           : tenant
+  Contact Number : +63 920 123 8567
+  Address        : 28 Quezon Boulevard, Brgy. Macasipac, Siniloan, Laguna
+
+--------------------------------------------------------------------------------
+
+#12
+  Full Name      : Sheila Aquino
+  Email          : tenant12@domiknow.com
+  Password       : Tenant12#2026
+  Role           : tenant
+  Contact Number : +63 998 456 7823
+  Address        : 6 Kalayaan Street, Brgy. Acevida, Siniloan, Laguna
+
+--------------------------------------------------------------------------------
+
+#13
+  Full Name      : Ben Soriano
+  Email          : tenant13@domiknow.com
+  Password       : Tenant13#2026
+  Role           : tenant
+  Contact Number : +63 961 234 5679
+  Address        : 33 Malvar Road, Brgy. Salubungan, Siniloan, Laguna
+
+--------------------------------------------------------------------------------
+
+#14
+  Full Name      : Kristine Lim
+  Email          : tenant14@domiknow.com
+  Password       : Tenant14#2026
+  Role           : tenant
+  Contact Number : +63 926 789 0134
+  Address        : 11 Tandang Sora Street, Brgy. Mendiola, Siniloan, Laguna
+
+--------------------------------------------------------------------------------
+
+#15
+  Full Name      : Felix Navarro
+  Email          : tenant15@domiknow.com
+  Password       : Tenant15#2026
+  Role           : tenant
+  Contact Number : +63 995 312 6478
+  Address        : 55 General Luna Street, Brgy. G. Redor, Siniloan, Laguna
+
+================================================================================
+                           LANDLORDS (5 ACCOUNTS)
+                   *** Require Admin Approval Before Logging In ***
+================================================================================
+
+#1
+  Full Name      : Ricardo Dela Torre
+  Email          : landlord01@domiknow.com
+  Password       : Landlord01#2026
+  Role           : landlord
+  Contact Number : +63 917 456 2390
+  Address        : 24 G. Redor Street, Brgy. G. Redor, Siniloan, Laguna
+
+--------------------------------------------------------------------------------
+
+#2
+  Full Name      : Maricel Ocampo
+  Email          : landlord02@domiknow.com
+  Password       : Landlord02#2026
+  Role           : landlord
+  Contact Number : +63 918 234 5671
+  Address        : 8 Halayhayin Highway, Brgy. Halayhayin, Siniloan, Laguna
+
+--------------------------------------------------------------------------------
+
+#3
+  Full Name      : Eduardo Espiritu
+  Email          : landlord03@domiknow.com
+  Password       : Landlord03#2026
+  Role           : landlord
+  Contact Number : +63 927 890 1234
+  Address        : 15 Pandeño Street, Brgy. Pandeño, Siniloan, Laguna
+
+--------------------------------------------------------------------------------
+
+#4
+  Full Name      : Rosario Manalo
+  Email          : landlord04@domiknow.com
+  Password       : Landlord04#2026
+  Role           : landlord
+  Contact Number : +63 945 123 6780
+  Address        : 7 Macasipac Road, Brgy. Macasipac, Siniloan, Laguna
+
+--------------------------------------------------------------------------------
+
+#5
+  Full Name      : Dante Villareal
+  Email          : landlord05@domiknow.com
+  Password       : Landlord05#2026
+  Role           : landlord
+  Contact Number : +63 956 678 9012
+  Address        : 3 Acevida Street, Brgy. Acevida, Siniloan, Laguna
+
+================================================================================
+                            SETUP CHECKLIST
+================================================================================
+
+  [ ] 1. node database/seedDemoAccounts.js
+  [ ] 2. node database/seedDemoProperties.js
+  [ ] 3. node database/fixDemoDocuments.js
+  [ ] 4. node database/fixDemoImages.js
+  [ ] 5. node database/fixDemoProfiles.js
+  [ ] 6. node database/seedDemoActivity.js
+  [ ] 7. node database/seedDemoNotifications.js
+  [ ] 8. Approve all 5 landlord accounts via Admin panel
+  [ ] 9. Confirm all landlord account_status is 'active' before demo
+
+================================================================================
