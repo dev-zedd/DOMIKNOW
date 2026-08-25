@@ -4097,6 +4097,13 @@ body.auth-page {
 .dk-breadcrumbs a:hover,
 .dk-breadcrumbs--legacy a:hover { text-decoration: underline; }
 
+.dk-breadcrumbs a:focus-visible,
+.dk-breadcrumbs--legacy a:focus-visible {
+  border-radius: var(--radius-sm);
+  outline: 3px solid color-mix(in srgb, var(--color-action-primary) 28%, transparent);
+  outline-offset: 3px;
+}
+
 .dk-breadcrumbs [aria-current="page"],
 .dk-breadcrumbs .breadcrumb-current {
   overflow: hidden;
@@ -4112,6 +4119,11 @@ body.auth-page {
     overflow: hidden;
     font-size: 0.78rem;
   }
+
+  .dk-breadcrumbs ol,
+  .dk-breadcrumbs--legacy { gap: 6px; }
+
+  .dk-breadcrumbs li { gap: 6px; }
 }
 
 @media (max-width: 479px) {

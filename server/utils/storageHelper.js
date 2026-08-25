@@ -29,6 +29,60 @@ const SIGNED_URL_EXPIRY = 7 * 24 * 60 * 60;
 // In-memory set of verified buckets to prevent redundant API calls on every upload
 const verifiedBuckets = new Set();
 
+/**
+ * Supabase Storage methods expect an object path relative to the selected
+ * bucket. Older seed/import data sometimes includes the bucket name (or even
+ * a complete Supabase URL), which makes the SDK look for a duplicated path
+ * such as payment-proofs/payment-proofs/file.jpg.
+ */
+const normalizeStoragePath = (bucketName, filePath) => {
+    if (typeof bucketName !== 'string' || !bucketName.trim()) {
+        throw new TypeError('A storage bucket name is required.');
+    }
+    if (typeof filePath !== 'string' || !filePath.trim()) {
+        throw new TypeError('A storage object path is required.');
+    }
+
+    const cleanBucket = bucketName.trim().replace(/^\/+|\/+$/g, '');
+    let normalized = filePath.trim().replace(/\\/g, '/');
+
+    if (/^https?:\/\//i.test(normalized)) {
+        const parsed = new URL(normalized);
+        const decodedPath = decodeURIComponent(parsed.pathname);
+        const bucketMarker = `/${cleanBucket}/`;
+        const bucketIndex = decodedPath.indexOf(bucketMarker);
+        if (bucketIndex === -1) {
+            throw new Error(`Storage URL does not reference the ${cleanBucket} bucket.`);
+        }
+        normalized = decodedPath.slice(bucketIndex + bucketMarker.length);
+    } else {
+        normalized = normalized.split('?')[0].split('#')[0];
+        try {
+            normalized = decodeURIComponent(normalized);
+        } catch (error) {
+            // Keep a literal path when it contains a non-URI percent symbol.
+        }
+    }
+
+    normalized = normalized.replace(/^\/+/, '');
+    if (normalized.toLowerCase().startsWith(`${cleanBucket.toLowerCase()}/`)) {
+        normalized = normalized.slice(cleanBucket.length + 1);
+    }
+
+    const segments = normalized.split('/').filter(Boolean);
+    if (!segments.length || segments.some((segment) => segment === '..')) {
+        throw new Error('Invalid storage object path.');
+    }
+
+    return segments.join('/');
+};
+
+const isStorageObjectNotFound = (error) => {
+    return Number(error?.statusCode) === 404 ||
+        Number(error?.status) === 404 ||
+        /object not found/i.test(String(error?.message || ''));
+};
+
 const ensureBucket = async (bucketName) => {
     if (verifiedBuckets.has(bucketName)) return;
 
@@ -83,9 +137,10 @@ const uploadFile = async (bucketName, filePath, fileInput, mimeType) => {
         throw new Error('Invalid file input passed to storageHelper (expected Buffer or base64 String).');
     }
 
+    const normalizedPath = normalizeStoragePath(bucketName, filePath);
     const { data, error } = await supabase.storage
         .from(bucketName)
-        .upload(filePath, buffer, {
+        .upload(normalizedPath, buffer, {
             contentType: mimeType,
             upsert: true
         });
@@ -98,7 +153,7 @@ const uploadFile = async (bucketName, filePath, fileInput, mimeType) => {
         // Generate signed URL for private buckets
         const { data: signedData, error: signedErr } = await supabase.storage
             .from(bucketName)
-            .createSignedUrl(filePath, SIGNED_URL_EXPIRY);
+            .createSignedUrl(normalizedPath, SIGNED_URL_EXPIRY);
 
         if (signedErr) throw signedErr;
         fileUrl = signedData.signedUrl;
@@ -106,12 +161,12 @@ const uploadFile = async (bucketName, filePath, fileInput, mimeType) => {
         // Use public URL for public buckets (e.g. property-images)
         const { data: urlData } = supabase.storage
             .from(bucketName)
-            .getPublicUrl(filePath);
+            .getPublicUrl(normalizedPath);
         fileUrl = urlData.publicUrl;
     }
 
     return {
-        path: filePath,
+        path: normalizedPath,
         url: fileUrl,
         publicUrl: fileUrl,
         signedUrl: fileUrl
@@ -123,9 +178,10 @@ const uploadFile = async (bucketName, filePath, fileInput, mimeType) => {
  * authenticated user's known object rather than accepting arbitrary paths.
  */
 const deleteFile = async (bucketName, filePath) => {
+    const normalizedPath = normalizeStoragePath(bucketName, filePath);
     const { error } = await supabase.storage
         .from(bucketName)
-        .remove([filePath]);
+        .remove([normalizedPath]);
 
     if (error) throw error;
     return true;
@@ -136,9 +192,10 @@ const deleteFile = async (bucketName, filePath) => {
  * Used when a previously stored signed URL has expired.
  */
 const getSignedUrl = async (bucketName, filePath, expiresIn = SIGNED_URL_EXPIRY) => {
+    const normalizedPath = normalizeStoragePath(bucketName, filePath);
     const { data, error } = await supabase.storage
         .from(bucketName)
-        .createSignedUrl(filePath, expiresIn);
+        .createSignedUrl(normalizedPath, expiresIn);
 
     if (error) throw error;
     return data.signedUrl;
@@ -155,6 +212,8 @@ module.exports = {
     uploadFile,
     deleteFile,
     getSignedUrl,
+    normalizeStoragePath,
+    isStorageObjectNotFound,
     isPrivateBucket,
     PRIVATE_BUCKETS,
     SIGNED_URL_EXPIRY

@@ -938,11 +938,22 @@ body[data-admin-page="policy-management"] #toastBanner[data-state="error"] {
 
 .admin-bar-row__heading strong { color: var(--color-text-primary); }
 
+.admin-bar-row--unavailable .admin-bar-row__heading strong {
+  color: var(--color-text-muted);
+  font-size: 0.6875rem;
+  font-weight: 650;
+}
+
 .admin-bar-row__track {
   height: 7px;
   overflow: hidden;
   border-radius: 999px;
   background: var(--color-bg-subtle);
+}
+
+.admin-bar-row--unavailable .admin-bar-row__track {
+  border: 1px dashed var(--color-border-strong);
+  background: transparent;
 }
 
 .admin-bar-row__track > span {
@@ -1109,6 +1120,18 @@ body[data-admin-page="policy-management"] #toastBanner[data-state="error"] {
   color: var(--color-text-muted);
   font-size: 0.8125rem;
   text-align: center;
+}
+
+.admin-queue-empty[data-state="warning"] {
+  border-color: var(--color-warning-border);
+  background: var(--color-warning-bg);
+  color: var(--color-warning-text);
+}
+
+.admin-queue-empty[data-state="error"] {
+  border-color: var(--color-error-border);
+  background: var(--color-error-bg);
+  color: var(--color-error-text);
 }
 
 .admin-control-list {

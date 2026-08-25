@@ -454,7 +454,9 @@
         const flow = createOperatingFlow(meta.step);
         if (flow) intro.appendChild(flow);
 
-        content.insertBefore(intro, content.firstChild);
+        const breadcrumbs = content.querySelector(':scope > [data-domiknow-breadcrumbs]');
+        if (breadcrumbs) breadcrumbs.insertAdjacentElement('afterend', intro);
+        else content.insertBefore(intro, content.firstChild);
         enhanceOperationalContent();
         observeDynamicIconography();
     }

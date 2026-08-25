@@ -150,7 +150,9 @@
         intro.className = 'maintenance-module-intro';
         intro.appendChild(createSummary(meta));
         if (meta.showFlow) intro.appendChild(createWorkFlow());
-        content.insertBefore(intro, content.firstChild);
+        const breadcrumbs = content.querySelector(':scope > [data-domiknow-breadcrumbs]');
+        if (breadcrumbs) breadcrumbs.insertAdjacentElement('afterend', intro);
+        else content.insertBefore(intro, content.firstChild);
 
         enhanceTaskContent();
         if (meta.dynamicFlow) observeTaskStatus();

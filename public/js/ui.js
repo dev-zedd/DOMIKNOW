@@ -177,12 +177,12 @@
         const path = window.location.pathname.replace(/\\/g, '/').toLowerCase();
         return path.includes('/pages/auth/') ||
             path.includes('/pages/public/') ||
+            path.includes('/pages/404') ||
             !path.includes('/pages/');
     }
 
     function ensureNonAdminMobileExperience() {
         const path = window.location.pathname.replace(/\\/g, '/').toLowerCase();
-        if (path.includes('/pages/admin/')) return;
 
         const viewport = document.head.querySelector('meta[name="viewport"]');
         if (viewport) {
@@ -196,6 +196,10 @@
             }
         }
 
+        // Admin remains desktop-first, but still needs safe-area support on
+        // notched tablets and phones when a page is opened in a narrow window.
+        if (path.includes('/pages/admin/')) return;
+
         let stylesheet = document.head.querySelector('link[href*="mobile-first.css"]');
         if (!stylesheet) {
             stylesheet = document.createElement('link');
@@ -204,6 +208,15 @@
             document.head.appendChild(stylesheet);
         }
         stylesheet.setAttribute('data-mobile-first', '');
+    }
+
+    function ensureResponsivePolish() {
+        if (document.head.querySelector('link[data-domiknow-responsive-polish]')) return;
+        const stylesheet = document.createElement('link');
+        stylesheet.rel = 'stylesheet';
+        stylesheet.href = '/css/responsive-polish.css?v=20260826-1';
+        stylesheet.setAttribute('data-domiknow-responsive-polish', '');
+        document.head.appendChild(stylesheet);
     }
 
     function ensureDomiKnowModalSystem() {
@@ -859,6 +872,7 @@
     }
 
     ensureBrandFavicons();
+    ensureResponsivePolish();
     ensureDomiKnowModalSystem();
     ensureDomiKnowWalkthroughSystem();
     ensureDomiKnowLoadingSystem();

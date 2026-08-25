@@ -11,7 +11,9 @@ function domiknowEscapeHtml(value) {
 
 function domiknowSafeExternalUrl(value) {
     try {
-        const url = new URL(String(value || ''), window.location.origin);
+        const rawValue = String(value || '').trim();
+        if (!rawValue) return '#';
+        const url = new URL(rawValue, window.location.origin);
         return ['http:', 'https:'].includes(url.protocol) ? url.href : '#';
     } catch (error) {
         return '#';
@@ -1196,8 +1198,13 @@ function ensureContextBreadcrumbs(role, pathname = window.location.pathname) {
     const legacyBreadcrumb = content.querySelector('.breadcrumb-nav');
     if (legacyBreadcrumb) {
         legacyBreadcrumb.classList.add('dk-breadcrumbs', 'dk-breadcrumbs--legacy');
+        legacyBreadcrumb.dataset.domiknowBreadcrumbs = '';
         legacyBreadcrumb.setAttribute('role', 'navigation');
         legacyBreadcrumb.setAttribute('aria-label', 'Breadcrumb');
+        legacyBreadcrumb.removeAttribute('style');
+        legacyBreadcrumb.querySelectorAll('a, .breadcrumb-separator, .breadcrumb-current').forEach(element => {
+            element.removeAttribute('style');
+        });
         legacyBreadcrumb.querySelectorAll('.breadcrumb-separator').forEach(separator => {
             separator.textContent = '/';
         });
@@ -1320,6 +1327,15 @@ function isModalElement(el) {
 let isSeamlessNavigating = false;
 const seamlessPageCache = new Map();
 const SEAMLESS_CACHE_TTL = 30000;
+let pageStyleLifecyclePrepared = false;
+
+function preparePageStyleLifecycle() {
+    if (pageStyleLifecyclePrepared) return;
+    document.head.querySelectorAll('style').forEach(style => {
+        style.setAttribute('data-domiknow-page-style', '');
+    });
+    pageStyleLifecyclePrepared = true;
+}
 
 async function loadDashboardPageHtml(targetUrlString) {
     const url = new URL(targetUrlString, window.location.href);
@@ -1387,7 +1403,11 @@ async function seamlessNavigateTo(targetUrlString, role, pushState = true) {
             navSheetOverlay.classList.remove('open');
         }
 
-        // Sync stylesheets and inline styles from new document
+        // Sync stylesheets and replace page-scoped inline styles. Without this
+        // lifecycle, inline rules from every visited screen remain in the head
+        // and can visually override later pages.
+        preparePageStyleLifecycle();
+        document.head.querySelectorAll('style[data-domiknow-page-style]').forEach(style => style.remove());
         newDoc.querySelectorAll('link[rel="stylesheet"], style').forEach(el => {
             if (el.tagName === 'LINK') {
                 const href = el.getAttribute('href');
@@ -1400,6 +1420,7 @@ async function seamlessNavigateTo(targetUrlString, role, pushState = true) {
             } else if (el.tagName === 'STYLE') {
                 const newStyle = document.createElement('style');
                 newStyle.textContent = el.textContent;
+                newStyle.setAttribute('data-domiknow-page-style', '');
                 document.head.appendChild(newStyle);
             }
         });
