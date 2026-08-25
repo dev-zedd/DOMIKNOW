@@ -45,6 +45,7 @@
     async function request(path = '', options = {}) {
         const response = await fetch(`${API_URL}${path}`, {
             ...options,
+            cache: 'no-store',
             headers: {
                 'Authorization': `Bearer ${token()}`,
                 'Content-Type': 'application/json',
@@ -68,7 +69,7 @@
         if (value.includes('maintenance') || value.includes('task')) return 'maintenance';
         if (value.includes('property') || value.includes('listing')) return 'property';
         if (value.includes('report')) return 'report';
-        if (value.includes('security') || value.includes('profile')) return 'governance';
+        if (value.includes('security') || value.includes('profile') || value.includes('account')) return 'governance';
         if (value.includes('admin') || value.includes('suspension') || value.includes('policy')) return 'governance';
         return 'general';
     }
@@ -101,7 +102,7 @@
     function actionFor(notification) {
         const type = String(notification.type || '').toLowerCase();
         const prefix = `/pages/${role}`;
-        if (type.includes('security') || type.includes('profile')) {
+        if (type.includes('security') || type.includes('profile') || type.includes('account')) {
             return { href: `${prefix}/profile.html`, label: 'Review account security' };
         }
         if (type.includes('lease')) {
@@ -115,6 +116,16 @@
         if (type.includes('report')) {
             if (role === 'maintenance') return { href: `${prefix}/dashboard.html`, label: 'Open dashboard' };
             return { href: `${prefix}/reports.html`, label: 'Open reports' };
+        }
+        if (type.includes('complaint')) {
+            if (role === 'tenant' || role === 'landlord') {
+                return { href: `${prefix}/disputes.html`, label: 'Open complaints and disputes' };
+            }
+            return { href: role === 'admin' ? `${prefix}/reports.html` : `${prefix}/dashboard.html`, label: 'Open reports' };
+        }
+        if (type.includes('rating') || type.includes('feedback')) {
+            if (role === 'tenant' || role === 'landlord') return { href: `${prefix}/feedback.html`, label: 'Open ratings and feedback' };
+            return { href: role === 'admin' ? `${prefix}/overview.html` : `${prefix}/dashboard.html`, label: 'Open feedback' };
         }
         if (type.includes('payment') || type.includes('billing')) {
             if (role === 'tenant') return { href: `${prefix}/billings.html`, label: 'Open billings and payments' };
@@ -136,6 +147,9 @@
             if (role === 'landlord') return { href: `${prefix}/reports.html`, label: 'Review account notices' };
             if (role === 'admin') return { href: `${prefix}/policy-management.html`, label: 'Open policy management' };
             return { href: `${prefix}/dashboard.html`, label: 'Open dashboard' };
+        }
+        if (type.includes('welcome')) {
+            return { href: `${prefix}/profile.html`, label: 'Open your profile' };
         }
         return null;
     }
@@ -249,7 +263,7 @@
         document.body.classList.add('notification-panel-open');
         state.trigger?.setAttribute('aria-expanded', 'true');
         overlay.querySelector('.notification-panel')?.focus({ preventScroll: true });
-        if (!state.lastLoadedAt || Date.now() - state.lastLoadedAt > STALE_AFTER_MS) loadNotifications();
+        loadNotifications({ silent: state.notifications.length > 0 });
     }
 
     function closePanel() {
@@ -476,7 +490,10 @@
             renderCenter();
         }
         try {
-            const result = await request('/my');
+            const result = await request('/my', {
+                domiknowLoading: !options.silent,
+                headers: options.silent ? { 'X-DOMIKNOW-SILENT': '1' } : undefined
+            });
             const data = result.data || {};
             state.notifications = Array.isArray(data.notifications) ? data.notifications : [];
             const providedUnreadCount = Number(data.unreadCount);
@@ -591,6 +608,9 @@
         ensureSurface();
         renderPanel();
         renderCenter();
+        if (token() && (!state.lastLoadedAt || Date.now() - state.lastLoadedAt > STALE_AFTER_MS)) {
+            loadNotifications({ silent: state.notifications.length > 0 });
+        }
     }
 
     function initialize() {

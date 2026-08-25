@@ -2519,6 +2519,81 @@
   scroll-margin-top: 96px;
 }
 
+.public-final-cta {
+  display: grid;
+  grid-template-columns: minmax(0, 1.3fr) minmax(290px, .7fr);
+  width: min(calc(100% - 48px), 1240px);
+  margin: clamp(28px, 5vw, 72px) auto;
+  padding: clamp(28px, 5vw, 54px);
+  border: 1px solid color-mix(in srgb, var(--color-action-primary) 28%, transparent);
+  border-radius: var(--radius-2xl, 24px);
+  background:
+    radial-gradient(circle at 88% 18%, rgba(255, 255, 255, .18), transparent 20rem),
+    linear-gradient(135deg, var(--brand-navy), color-mix(in srgb, var(--color-action-primary) 62%, var(--brand-navy)));
+  color: #fff;
+  box-shadow: var(--shadow-lg);
+  gap: clamp(24px, 5vw, 64px);
+  align-items: center;
+}
+
+.public-final-cta .section-eyebrow { color: #a9c4ff; }
+
+.public-final-cta h2 {
+  max-width: 760px;
+  margin: 0;
+  color: #fff;
+  font-size: clamp(1.7rem, 3.8vw, 3rem);
+  letter-spacing: -.04em;
+  line-height: 1.08;
+}
+
+.public-final-cta__copy > p:last-child {
+  max-width: 700px;
+  margin: var(--space-5) 0 0;
+  color: rgba(255, 255, 255, .78);
+  line-height: 1.65;
+}
+
+.public-final-cta__actions {
+  display: grid;
+  gap: 11px;
+}
+
+.public-final-cta__actions .btn { width: 100%; min-height: 50px; }
+
+.public-final-cta__actions .btn-secondary {
+  border-color: rgba(255, 255, 255, .38);
+  background: rgba(255, 255, 255, .1);
+  color: #fff !important;
+}
+
+.public-final-cta__actions .btn-secondary:hover { background: rgba(255, 255, 255, .18); }
+
+.public-final-cta__actions > span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  color: rgba(255, 255, 255, .72);
+  font-size: 0.75rem;
+  text-align: center;
+}
+
+.public-final-cta__actions > span :where(svg, .ui-icon) { width: 16px; height: 16px; }
+
+@media (max-width: 800px) {
+  .public-final-cta { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 640px) {
+  .public-final-cta {
+    width: calc(100% - 16px);
+    margin-block: var(--space-8);
+    padding: 26px 18px;
+    border-radius: 18px;
+  }
+}
+
 .public-section-shell {
   padding: clamp(32px, 5vw, 64px);
   border: 1px solid var(--color-border-default);

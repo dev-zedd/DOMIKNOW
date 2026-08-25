@@ -132,12 +132,26 @@ app.use('/api', complaintRoutes);
 app.use('/api/storage', storageRoutes);
 
 
-// Favicon route
-app.get('/favicon.ico', (req, res) => res.status(204).end());
+// Favicon route - use the existing official DOMIKNOW mark.
+app.get('/favicon.ico', (req, res) => res.redirect(302, '/images/domiknow-mark.svg'));
 
 // Default Route
 app.get('/', (req, res) => {
     res.redirect('/pages/auth/login.html');
+});
+
+// Keep API failures machine-readable, then provide a branded recovery page for
+// unknown browser routes. These handlers must remain after every feature route.
+app.use('/api', (req, res) => {
+    res.status(404).json({
+        success: false,
+        message: 'API endpoint not found.',
+        data: null
+    });
+});
+
+app.use((req, res) => {
+    res.status(404).sendFile(path.join(__dirname, '../public/pages/404.html'));
 });
 
 // Start the server

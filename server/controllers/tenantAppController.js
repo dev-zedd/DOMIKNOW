@@ -1,6 +1,7 @@
 const tenantAppModel = require('../models/tenantAppModel');
 const propertyModel = require('../models/propertyModel');
 const auditLogModel = require('../models/auditLogModel');
+const notificationModel = require('../models/notificationModel');
 const responseHelper = require('../utils/responseHelper');
 const supabase = require('../config/supabaseClient');
 const { uploadFile, getSignedUrl } = require('../utils/storageHelper');
@@ -103,6 +104,23 @@ const tenantAppController = {
 
             // 5. Log audit
             await auditLogModel.log(tenantId, 'SUBMIT_RENTAL_APPLICATION', `Tenant submitted rental application for property ${property_id}`);
+
+            await Promise.all([
+                notificationModel.create({
+                    user_id: tenantId,
+                    type: 'application_submitted',
+                    title: 'Application submitted',
+                    message: `Your application for ${property.property_name || 'the selected property'} was submitted successfully.`,
+                    reference_id: newApp.id
+                }),
+                property.landlord_id ? notificationModel.create({
+                    user_id: property.landlord_id,
+                    type: 'new_application',
+                    title: 'New rental application',
+                    message: `A tenant submitted an application for ${property.property_name || 'one of your properties'}.`,
+                    reference_id: newApp.id
+                }) : Promise.resolve(null)
+            ]);
 
             return responseHelper.success(res, 'Rental application submitted successfully. Please upload required documents.', newApp, 201);
 

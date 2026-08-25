@@ -487,6 +487,16 @@ const landlordController = {
             const actionType = status === 'approved' ? 'APPROVE_TENANT_APPLICATION' : 'REJECT_TENANT_APPLICATION';
             await auditLogModel.log(landlordId, actionType, `Landlord updated tenant application ${id} status to ${status}`);
 
+            await notificationModel.create({
+                user_id: updated.tenant_id,
+                type: status === 'approved' ? 'application_approved' : 'application_rejected',
+                title: status === 'approved' ? 'Application approved' : 'Application not approved',
+                message: status === 'approved'
+                    ? 'Your rental application was approved. Review the application and lease area for the next step.'
+                    : `Your rental application was not approved.${landlord_remarks ? ` Landlord note: ${landlord_remarks}` : ''}`,
+                reference_id: updated.id
+            });
+
             return responseHelper.success(res, `Tenant application successfully marked as ${status}`, updated);
 
         } catch (error) {

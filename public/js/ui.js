@@ -265,14 +265,14 @@
         if (!document.head.querySelector('link[data-domiknow-walkthrough]')) {
             const stylesheet = document.createElement('link');
             stylesheet.rel = 'stylesheet';
-            stylesheet.href = '/css/walkthrough-system.css?v=20260817-1';
+            stylesheet.href = '/css/walkthrough-system.css?v=20260826-1';
             stylesheet.setAttribute('data-domiknow-walkthrough', '');
             document.head.appendChild(stylesheet);
         }
 
         if (!document.head.querySelector('script[data-domiknow-walkthrough]')) {
             const script = document.createElement('script');
-            script.src = '/js/walkthrough-system.js?v=20260817-1';
+            script.src = '/js/walkthrough-system.js?v=20260826-1';
             script.defer = true;
             script.setAttribute('data-domiknow-walkthrough', '');
             document.head.appendChild(script);
@@ -284,7 +284,7 @@
         if (!stylesheet) {
             stylesheet = document.createElement('link');
             stylesheet.rel = 'stylesheet';
-            stylesheet.href = '/css/loading-system.css?v=20260823-1';
+            stylesheet.href = '/css/loading-system.css?v=20260826-1';
             document.head.appendChild(stylesheet);
         }
         stylesheet.setAttribute('data-domiknow-loading-system', '');
@@ -292,7 +292,7 @@
         let script = document.head.querySelector('script[src*="loading-system.js"]');
         if (!window.DomiKnowLoading && !script) {
             script = document.createElement('script');
-            script.src = '/js/loading-system.js?v=20260823-1';
+            script.src = '/js/loading-system.js?v=20260826-1';
             script.defer = true;
             document.head.appendChild(script);
         }

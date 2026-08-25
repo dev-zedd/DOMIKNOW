@@ -3,6 +3,7 @@ const jwt = require('jsonwebtoken');
 const userModel = require('../models/userModel');
 const verificationModel = require('../models/verificationModel');
 const auditLogModel = require('../models/auditLogModel');
+const notificationModel = require('../models/notificationModel');
 const generateCode = require('../utils/generateCode');
 const { sendVerificationEmail, sendForgotPasswordEmail } = require('../config/mailer');
 const responseHelper = require('../utils/responseHelper');
@@ -95,6 +96,16 @@ const authController = {
 
             // 5. Audit log
             await auditLogModel.log(user.id, 'EMAIL_VERIFIED', 'User verified their email address.');
+
+            await notificationModel.create({
+                user_id: user.id,
+                type: 'welcome',
+                title: 'Welcome to DOMIKNOW',
+                message: user.role === 'tenant'
+                    ? 'Your tenant account is ready. Start browsing verified rentals and manage your rental journey from one place.'
+                    : 'Your landlord account email is verified. You will receive another update when your account is approved for property management.',
+                reference_id: null
+            });
 
             // 6. Return response based on role
             let message = 'Email verified successfully.';

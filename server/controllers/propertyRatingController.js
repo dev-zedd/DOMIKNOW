@@ -1,6 +1,7 @@
 const propertyRatingModel = require('../models/propertyRatingModel');
 const userModel = require('../models/userModel');
 const auditLogModel = require('../models/auditLogModel');
+const notificationModel = require('../models/notificationModel');
 const responseHelper = require('../utils/responseHelper');
 
 const EDIT_WINDOW_DAYS = 7;
@@ -117,6 +118,14 @@ const propertyRatingController = {
 
             // 6. Write Audit Log
             await auditLogModel.log(tenantId, 'SUBMIT_PROPERTY_RATING', `Tenant submitted property rating ${result.id} for lease ${lease_id}`);
+
+            await notificationModel.create({
+                user_id: lease.landlord_id,
+                type: 'property_rating_received',
+                title: 'New property rating',
+                message: 'A tenant submitted a verified rating for one of your properties.',
+                reference_id: result.id
+            });
 
             return responseHelper.success(res, 'Property rating submitted successfully. Thank you!', result, 201);
 

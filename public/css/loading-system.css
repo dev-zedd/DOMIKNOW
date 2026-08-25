@@ -194,6 +194,17 @@ td.dk-auto-skeleton { display: table-cell; width: auto; height: 52px; }
 
 [aria-busy="true"] { cursor: progress; }
 
+.main-content-inner.dk-route-loading {
+  opacity: 0.68;
+  pointer-events: none;
+  transition: opacity 140ms ease;
+}
+
+body[data-domiknow-loading="true"] a,
+body[data-domiknow-loading="true"] button {
+  cursor: progress;
+}
+
 @media (max-width: 720px) {
   .dk-skeleton-card { grid-template-columns: 104px minmax(0, 1fr); min-height: 132px; gap: 12px; padding: 10px; }
   .dk-skeleton-detail { grid-template-columns: 1fr; gap: 18px; }
@@ -205,6 +216,7 @@ td.dk-auto-skeleton { display: table-cell; width: auto; height: 52px; }
 @media (prefers-reduced-motion: reduce) {
   .dk-loading-bar,
   .dk-loading-bar::before,
+  .main-content-inner.dk-route-loading,
   .dk-skeleton::after,
   .dk-auto-skeleton::after,
   .dk-spinner { animation: none !important; transition: none !important; }

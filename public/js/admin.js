@@ -265,6 +265,86 @@
         if (element) element.textContent = Number.isFinite(value) ? String(value) : '—';
     }
 
+    function renderBarChart(containerId, items) {
+        const container = document.getElementById(containerId);
+        if (!container) return;
+        const maximum = Math.max(1, ...items.map(item => item.value));
+        container.replaceChildren();
+
+        items.forEach(item => {
+            const row = document.createElement('div');
+            row.className = `admin-bar-row admin-bar-row--${item.tone || 'primary'}`;
+            const heading = document.createElement('div');
+            heading.className = 'admin-bar-row__heading';
+            const label = document.createElement('span');
+            label.textContent = item.label;
+            const value = document.createElement('strong');
+            value.textContent = String(item.value);
+            heading.append(label, value);
+
+            const track = document.createElement('div');
+            track.className = 'admin-bar-row__track';
+            track.setAttribute('role', 'progressbar');
+            track.setAttribute('aria-label', item.label);
+            track.setAttribute('aria-valuemin', '0');
+            track.setAttribute('aria-valuemax', String(maximum));
+            track.setAttribute('aria-valuenow', String(item.value));
+            const bar = document.createElement('span');
+            bar.style.setProperty('--admin-bar-value', `${item.value ? Math.max(4, (item.value / maximum) * 100) : 0}%`);
+            track.appendChild(bar);
+            row.append(heading, track);
+            container.appendChild(row);
+        });
+    }
+
+    function queueAgeLabel(records) {
+        const timestamps = records
+            .map(record => record.created_at || record.submitted_at || record.updated_at)
+            .map(value => new Date(value).getTime())
+            .filter(Number.isFinite);
+        if (!timestamps.length) return 'No pending items';
+        const days = Math.max(0, Math.floor((Date.now() - Math.min(...timestamps)) / 86400000));
+        if (days === 0) return 'Less than 1 day';
+        return `${days} ${days === 1 ? 'day' : 'days'}`;
+    }
+
+    function renderOverviewAnalytics(data) {
+        const workload = [
+            { label: 'Account approvals', value: data.pendingUsers.length, tone: 'primary' },
+            { label: 'Property reviews', value: data.pendingProperties.length, tone: 'navy' },
+            { label: 'Reservation decisions', value: data.pendingReservations.length, tone: 'cyan' },
+            { label: 'Payment checks', value: data.pendingPayments.length, tone: 'violet' },
+            { label: 'Open cases', value: data.openReports.length, tone: 'amber' }
+        ];
+        const urgentSeverities = new Set(['critical', 'major', 'high', 'urgent']);
+        const lowSeverities = new Set(['low', 'minor']);
+        const urgentCases = data.openReports.filter(report => urgentSeverities.has(String(report.severity || '').toLowerCase()));
+        const lowCases = data.openReports.filter(report => lowSeverities.has(String(report.severity || '').toLowerCase()));
+        const standardCases = data.openReports.filter(report => !urgentCases.includes(report) && !lowCases.includes(report));
+
+        renderBarChart('adminWorkloadChart', workload);
+        renderBarChart('adminCaseChart', [
+            { label: 'Urgent', value: urgentCases.length, tone: 'amber' },
+            { label: 'Standard', value: standardCases.length, tone: 'primary' },
+            { label: 'Low', value: lowCases.length, tone: 'teal' }
+        ]);
+
+        setMetric('adminAnalyticsWorkloadTotal', workload.reduce((sum, item) => sum + item.value, 0));
+        setMetric('adminUrgentCases', urgentCases.length);
+        const oldest = document.getElementById('adminOldestQueueAge');
+        if (oldest) oldest.textContent = queueAgeLabel([
+            ...data.pendingUsers,
+            ...data.pendingProperties,
+            ...data.pendingReservations,
+            ...data.pendingPayments,
+            ...data.openReports
+        ]);
+        const coverage = document.getElementById('adminDataCoverage');
+        if (coverage) coverage.textContent = `${data.availableSources} of ${data.totalSources}`;
+        const updated = document.getElementById('adminAnalyticsUpdated');
+        if (updated) updated.textContent = `Updated ${new Intl.DateTimeFormat('en-PH', { hour: 'numeric', minute: '2-digit' }).format(new Date())}`;
+    }
+
     async function loadOverview() {
         const queue = document.getElementById('adminPriorityQueue');
         if (!queue) return;
@@ -296,6 +376,16 @@
         const pendingReservations = reservations.filter(reservation => reservation.status === 'pending');
         const pendingPayments = payments.filter(payment => ['pending', 'pending_verification'].includes(payment.payment_status));
         const openReports = reports.filter(report => openStatuses.has(report.status));
+
+        renderOverviewAnalytics({
+            pendingUsers,
+            pendingProperties,
+            pendingReservations,
+            pendingPayments,
+            openReports,
+            availableSources: requests.filter(result => result.status === 'fulfilled').length,
+            totalSources: requests.length
+        });
 
         setMetric('overviewPendingUsers', pendingUsers.length);
         setMetric('overviewPendingProperties', pendingProperties.length);
@@ -390,7 +480,21 @@
         if (flow) intro.appendChild(flow);
         content.insertBefore(intro, content.firstChild);
         enhanceAdminContent(content, page);
-        if (page === 'overview.html') loadOverview();
+        if (page === 'overview.html') {
+            const refreshAnalytics = document.getElementById('adminAnalyticsRefresh');
+            if (refreshAnalytics && !refreshAnalytics.dataset.bound) {
+                refreshAnalytics.dataset.bound = 'true';
+                refreshAnalytics.addEventListener('click', async () => {
+                    window.DomiKnowLoading?.setButton(refreshAnalytics, true, 'Refreshing...');
+                    try {
+                        await loadOverview();
+                    } finally {
+                        window.DomiKnowLoading?.setButton(refreshAnalytics, false);
+                    }
+                });
+            }
+            loadOverview();
+        }
     }
 
     if (document.readyState === 'loading') {

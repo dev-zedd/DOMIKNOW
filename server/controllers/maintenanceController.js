@@ -774,6 +774,23 @@ const maintenanceController = {
 
             await auditLogModel.log(landlordId, 'CREATE_MAINTENANCE_WORKER', `Created worker ${newWorker.email}`);
 
+            await Promise.all([
+                notificationModel.create({
+                    user_id: newWorker.id,
+                    type: 'welcome',
+                    title: 'Welcome to DOMIKNOW Field Operations',
+                    message: 'Your maintenance account is active. Assigned work orders and schedule changes will appear in this notification center.',
+                    reference_id: null
+                }),
+                notificationModel.create({
+                    user_id: landlordId,
+                    type: 'maintenance_account_created',
+                    title: 'Maintenance account created',
+                    message: `${newWorker.full_name} can now receive maintenance task assignments.`,
+                    reference_id: newWorker.id
+                })
+            ]);
+
             return responseHelper.success(res, 'Maintenance worker account created successfully.', {
                 id: newWorker.id,
                 full_name: newWorker.full_name,

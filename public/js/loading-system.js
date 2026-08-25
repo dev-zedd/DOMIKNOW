@@ -4,10 +4,15 @@
     if (window.DomiKnowLoading) return;
 
     const LEGACY_LOADING_PATTERN = /^(loading|fetching|checking|preparing|retrieving|sending|verifying|signing in|creating|resetting|processing)(?:\b|[.\u2026])/i;
+    const DEFAULT_REVEAL_DELAY = 160;
+    const MAX_OPERATION_DURATION = 30000;
     const trackedButtons = new WeakMap();
-    let activeRequests = 0;
+    const operations = new Map();
+    const pendingUpgradeRoots = new Set();
+    let operationId = 0;
     let revealTimer = null;
     let finishTimer = null;
+    let upgradeFrame = null;
 
     function getProgressBar() {
         let bar = document.querySelector('[data-domiknow-loading-bar]');
@@ -21,22 +26,47 @@
         return bar;
     }
 
-    function start(options = {}) {
-        activeRequests += 1;
-        window.clearTimeout(finishTimer);
-        if (activeRequests > 1) return;
-        const delay = Number.isFinite(options.delay) ? options.delay : 160;
-        window.clearTimeout(revealTimer);
-        revealTimer = window.setTimeout(() => {
-            const bar = getProgressBar();
-            bar.classList.remove('is-finishing');
-            bar.classList.add('is-visible');
-        }, Math.max(0, delay));
+    function setBusyState(isBusy) {
+        if (!document.body) return;
+        if (isBusy) document.body.setAttribute('data-domiknow-loading', 'true');
+        else document.body.removeAttribute('data-domiknow-loading');
     }
 
-    function finish() {
-        activeRequests = Math.max(0, activeRequests - 1);
-        if (activeRequests) return;
+    function start(options = {}) {
+        const token = `dk-loading-${++operationId}`;
+        const wasIdle = operations.size === 0;
+        const timeout = Number.isFinite(options.timeout) ? options.timeout : MAX_OPERATION_DURATION;
+        const timeoutId = timeout > 0 ? window.setTimeout(() => finish(token), timeout) : null;
+
+        operations.set(token, { timeoutId });
+        setBusyState(true);
+        window.clearTimeout(finishTimer);
+
+        if (wasIdle) {
+            const delay = Number.isFinite(options.delay) ? options.delay : DEFAULT_REVEAL_DELAY;
+            window.clearTimeout(revealTimer);
+            revealTimer = window.setTimeout(() => {
+                if (!operations.has(token) && operations.size === 0) return;
+                const bar = getProgressBar();
+                bar.classList.remove('is-finishing');
+                bar.classList.add('is-visible');
+            }, Math.max(0, delay));
+        }
+
+        return token;
+    }
+
+    function finish(token) {
+        let operationToken = token;
+        if (!operationToken) operationToken = operations.keys().next().value;
+        const operation = operations.get(operationToken);
+        if (!operation) return;
+
+        if (operation.timeoutId) window.clearTimeout(operation.timeoutId);
+        operations.delete(operationToken);
+        if (operations.size) return;
+
+        setBusyState(false);
         window.clearTimeout(revealTimer);
         const bar = document.querySelector('[data-domiknow-loading-bar]');
         if (!bar) return;
@@ -44,6 +74,18 @@
         finishTimer = window.setTimeout(() => {
             bar.classList.remove('is-visible', 'is-finishing');
         }, 170);
+    }
+
+    function reset() {
+        operations.forEach(operation => {
+            if (operation.timeoutId) window.clearTimeout(operation.timeoutId);
+        });
+        operations.clear();
+        window.clearTimeout(revealTimer);
+        window.clearTimeout(finishTimer);
+        setBusyState(false);
+        const bar = document.querySelector('[data-domiknow-loading-bar]');
+        bar?.classList.remove('is-visible', 'is-finishing');
     }
 
     function setButton(button, loading, label) {
@@ -66,7 +108,7 @@
             spinner.className = 'dk-spinner';
             spinner.setAttribute('aria-hidden', 'true');
             const text = document.createElement('span');
-            text.textContent = label || 'Working…';
+            text.textContent = label || 'Working\u2026';
             content.append(spinner, text);
             button.appendChild(content);
             return;
@@ -155,11 +197,12 @@
     }
 
     function upgradeLegacyLoading(root = document.body) {
-        if (!root) return;
+        if (!root || root.closest?.('[data-domiknow-loading-ignore]')) return;
         const candidates = [];
         if (root instanceof Element) candidates.push(root);
         root.querySelectorAll?.('div, span, p, td, dd, button').forEach(node => candidates.push(node));
         candidates.forEach(node => {
+            if (node.closest('[data-domiknow-loading-ignore]')) return;
             if (node instanceof HTMLButtonElement) {
                 const loadingButton = node.disabled && LEGACY_LOADING_PATTERN.test(node.textContent.trim());
                 node.classList.toggle('dk-auto-button-loading', loadingButton);
@@ -180,23 +223,70 @@
         });
     }
 
+    function scheduleLegacyUpgrade(root) {
+        if (!(root instanceof Element) || root.closest('[data-domiknow-loading-ignore]')) return;
+        for (const queuedRoot of pendingUpgradeRoots) {
+            if (queuedRoot.contains(root)) return;
+            if (root.contains(queuedRoot)) pendingUpgradeRoots.delete(queuedRoot);
+        }
+        pendingUpgradeRoots.add(root);
+        if (upgradeFrame !== null) return;
+        upgradeFrame = window.requestAnimationFrame(() => {
+            const roots = Array.from(pendingUpgradeRoots);
+            pendingUpgradeRoots.clear();
+            upgradeFrame = null;
+            roots.forEach(upgradeLegacyLoading);
+        });
+    }
+
     function track(promise, options = {}) {
-        start(options);
-        return Promise.resolve(promise).finally(finish);
+        const token = start(options);
+        return Promise.resolve(promise).finally(() => finish(token));
+    }
+
+    function getFetchOptions(input, init) {
+        const options = init && typeof init === 'object' ? init : {};
+        let headers;
+        try {
+            headers = new Headers(options.headers || (input instanceof Request ? input.headers : undefined));
+        } catch (_error) {
+            headers = new Headers();
+        }
+        return { options, headers };
+    }
+
+    function shouldTrackFetch(input, init) {
+        const { options, headers } = getFetchOptions(input, init);
+        if (options.domiknowLoading === false || headers.get('X-DOMIKNOW-SILENT') === '1') return false;
+        if (String(options.method || (input instanceof Request ? input.method : 'GET')).toUpperCase() === 'HEAD') return false;
+        try {
+            const requestUrl = new URL(input instanceof Request ? input.url : input, window.location.href);
+            return requestUrl.origin === window.location.origin;
+        } catch (_error) {
+            return true;
+        }
+    }
+
+    function stripFetchOptions(init) {
+        if (!init || typeof init !== 'object' || !Object.prototype.hasOwnProperty.call(init, 'domiknowLoading')) return init;
+        const nativeOptions = { ...init };
+        delete nativeOptions.domiknowLoading;
+        return nativeOptions;
     }
 
     const originalFetch = window.fetch?.bind(window);
     if (originalFetch) {
-        window.fetch = function (...args) {
-            start();
+        window.fetch = function (input, init) {
+            const trackRequest = shouldTrackFetch(input, init);
+            const token = trackRequest ? start() : null;
             let request;
             try {
-                request = originalFetch(...args);
+                request = originalFetch(input, stripFetchOptions(init));
             } catch (error) {
-                finish();
+                if (token) finish(token);
                 throw error;
             }
-            return Promise.resolve(request).finally(finish);
+            return token ? Promise.resolve(request).finally(() => finish(token)) : request;
         };
     }
 
@@ -205,9 +295,9 @@
         upgradeLegacyLoading();
         const observer = new MutationObserver(records => {
             records.forEach(record => {
-                if (record.type === 'characterData') upgradeLegacyLoading(record.target.parentElement);
+                if (record.type === 'characterData') scheduleLegacyUpgrade(record.target.parentElement);
                 record.addedNodes.forEach(node => {
-                    if (node instanceof Element) upgradeLegacyLoading(node);
+                    if (node instanceof Element) scheduleLegacyUpgrade(node);
                 });
             });
         });
@@ -216,14 +306,30 @@
         document.addEventListener('click', event => {
             const link = event.target instanceof Element ? event.target.closest('a[href]') : null;
             if (!link || event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
-            if (link.target && link.target !== '_self') return;
+            if ((link.target && link.target !== '_self') || link.hasAttribute('download')) return;
+            if (link.closest('.dashboard-layout')) return;
             const url = new URL(link.href, window.location.href);
-            if (url.origin !== window.location.origin || url.href === window.location.href || url.hash && url.pathname === window.location.pathname && url.search === window.location.search) return;
-            start({ delay: 0 });
-        }, true);
+            const sameDocumentHash = url.hash && url.pathname === window.location.pathname && url.search === window.location.search;
+            if (url.origin !== window.location.origin || url.href === window.location.href || sameDocumentHash) return;
+            window.queueMicrotask(() => {
+                if (!event.defaultPrevented) start({ delay: 0, timeout: 10000 });
+            });
+        });
+
+        window.addEventListener('pageshow', reset);
     }
 
-    window.DomiKnowLoading = { start, finish, track, setButton, mount, clear, upgradeLegacyLoading };
+    window.DomiKnowLoading = {
+        start,
+        finish,
+        reset,
+        track,
+        setButton,
+        mount,
+        clear,
+        upgradeLegacyLoading,
+        isBusy: () => operations.size > 0
+    };
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initialize, { once: true });
     else initialize();
 })();
