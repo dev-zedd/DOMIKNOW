@@ -4053,6 +4053,79 @@ body.auth-page {
   }
 }
 
+/* Contextual breadcrumbs are reserved for detail and task pages where the
+   sidebar alone does not communicate the parent record collection. */
+.dk-breadcrumbs {
+  width: 100%;
+  margin: 0 0 var(--space-4);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-body-sm);
+}
+
+.dk-breadcrumbs ol,
+.dk-breadcrumbs--legacy {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.dk-breadcrumbs li {
+  display: inline-flex;
+  min-width: 0;
+  align-items: center;
+  gap: 8px;
+}
+
+.dk-breadcrumbs li + li::before,
+.dk-breadcrumbs--legacy .breadcrumb-separator {
+  color: var(--color-text-placeholder);
+  content: "/";
+  font-weight: 500;
+}
+
+.dk-breadcrumbs a,
+.dk-breadcrumbs--legacy a {
+  color: var(--color-link) !important;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.dk-breadcrumbs a:hover,
+.dk-breadcrumbs--legacy a:hover { text-decoration: underline; }
+
+.dk-breadcrumbs a:focus-visible,
+.dk-breadcrumbs--legacy a:focus-visible {
+  border-radius: var(--radius-sm);
+  outline: 3px solid color-mix(in srgb, var(--color-action-primary) 28%, transparent);
+  outline-offset: 3px;
+}
+
+.dk-breadcrumbs [aria-current="page"],
+.dk-breadcrumbs .breadcrumb-current {
+  overflow: hidden;
+  color: var(--color-text-secondary) !important;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media (max-width: 640px) {
+  .dk-breadcrumbs {
+    margin-bottom: var(--space-3);
+    overflow: hidden;
+    font-size: 0.78rem;
+  }
+
+  .dk-breadcrumbs ol,
+  .dk-breadcrumbs--legacy { gap: 6px; }
+
+  .dk-breadcrumbs li { gap: 6px; }
+}
+
 @media (max-width: 479px) {
   .auth-page,
   body.auth-page {

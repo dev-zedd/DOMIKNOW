@@ -350,7 +350,9 @@
         const journey = createWorkflow(meta.step);
         if (journey) intro.appendChild(journey);
 
-        content.insertBefore(intro, content.firstChild);
+        const breadcrumbs = content.querySelector(':scope > [data-domiknow-breadcrumbs]');
+        if (breadcrumbs) breadcrumbs.insertAdjacentElement('afterend', intro);
+        else content.insertBefore(intro, content.firstChild);
         improveTables();
         improveForms();
         improveControls(document);

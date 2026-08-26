@@ -71,7 +71,7 @@
         return card;
     }
 
-    function showFeedbackState(grid, title, message, retry = false) {
+    function showFeedbackState(grid, title, message, retry = false, action = null) {
         grid.replaceChildren();
         const state = document.createElement('div');
         state.className = 'public-feedback-empty';
@@ -93,6 +93,13 @@
             button.textContent = 'Try again';
             button.addEventListener('click', loadPublicFeedback);
             state.append(button);
+        }
+        if (action?.href && action?.label) {
+            const link = document.createElement('a');
+            link.href = action.href;
+            link.className = 'btn btn-primary';
+            link.textContent = action.label;
+            state.append(link);
         }
         grid.appendChild(state);
     }
@@ -118,7 +125,9 @@
                 showFeedbackState(
                     grid,
                     'Verified feedback will appear here',
-                    'There are no lease-connected reviews approved for public display yet. DOMIKNOW does not use fabricated testimonials.'
+                    'There are no lease-connected reviews approved for public display yet. DOMIKNOW does not use fabricated testimonials.',
+                    false,
+                    { href: '/pages/public/properties.html', label: 'Browse rentals' }
                 );
                 return;
             }

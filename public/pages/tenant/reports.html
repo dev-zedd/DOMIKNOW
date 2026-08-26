@@ -1335,7 +1335,10 @@
             if (!activeChatReportId || !activeChatReportType) return;
             try {
                 // 1. Fetch messages
-                const res = await fetch(`/api/reports/messages/${activeChatReportType}/${activeChatReportId}`, { headers: { 'Authorization': `Bearer ${token}` } });
+                const res = await fetch(`/api/reports/messages/${activeChatReportType}/${activeChatReportId}`, {
+                    headers: { 'Authorization': `Bearer ${token}`, 'X-DOMIKNOW-SILENT': '1' },
+                    domiknowLoading: false
+                });
                 if (res.ok) {
                     const { data } = await res.json();
                     const messages = data || [];
@@ -1351,7 +1354,10 @@
                 }
 
                 // 2. Fetch active typers
-                const typingRes = await fetch(`/api/reports/messages/${activeChatReportType}/${activeChatReportId}/typing?thread=${activeChatThread}`, { headers: { 'Authorization': `Bearer ${token}` } });
+                const typingRes = await fetch(`/api/reports/messages/${activeChatReportType}/${activeChatReportId}/typing?thread=${activeChatThread}`, {
+                    headers: { 'Authorization': `Bearer ${token}`, 'X-DOMIKNOW-SILENT': '1' },
+                    domiknowLoading: false
+                });
                 if (typingRes.ok) {
                     const { data: typers } = await typingRes.json();
                     renderChatHeadTypingState(typers);
@@ -1466,7 +1472,8 @@
             try {
                 await fetch(`/api/reports/messages/${activeChatReportType}/${activeChatReportId}/typing`, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}`, 'X-DOMIKNOW-SILENT': '1' },
+                    domiknowLoading: false,
                     body: JSON.stringify({ is_typing: isTyping, thread: activeChatThread })
                 });
             } catch (e) {}

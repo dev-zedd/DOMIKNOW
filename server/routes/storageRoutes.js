@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const requireAuth = require('../middleware/authMiddleware');
 const responseHelper = require('../utils/responseHelper');
-const { getSignedUrl, isPrivateBucket } = require('../utils/storageHelper');
+const { getSignedUrl, isPrivateBucket, isStorageObjectNotFound } = require('../utils/storageHelper');
 
 /**
  * POST /api/storage/signed-url
@@ -37,6 +37,9 @@ router.post('/signed-url', requireAuth, async (req, res) => {
         return responseHelper.success(res, 'Signed URL generated successfully.', { signed_url: signedUrl });
 
     } catch (error) {
+        if (isStorageObjectNotFound(error)) {
+            return responseHelper.error(res, 'The requested stored file no longer exists.', null, 404);
+        }
         console.error('Generate signed URL error:', error);
         return responseHelper.error(res, 'Failed to generate signed URL.', error, 500);
     }

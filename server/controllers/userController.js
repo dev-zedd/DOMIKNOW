@@ -184,6 +184,33 @@ const userController = {
 
             await auditLogModel.log(req.user.id, `ADMIN_USER_STATUS_UPDATE`, `Admin changed user ${id} status to ${account_status}`);
 
+            const statusCopy = {
+                active: {
+                    title: 'Account activated',
+                    message: 'Your DOMIKNOW account is active. You can now use the features available to your role.'
+                },
+                disabled: {
+                    title: 'Account disabled',
+                    message: 'Your DOMIKNOW account was disabled by an administrator. Contact platform support if you need assistance.'
+                },
+                rejected: {
+                    title: 'Account application not approved',
+                    message: 'Your DOMIKNOW account application was not approved. Contact platform support for clarification.'
+                },
+                pending: {
+                    title: 'Account review pending',
+                    message: 'Your DOMIKNOW account is awaiting administrator review.'
+                }
+            }[account_status];
+
+            await notificationModel.create({
+                user_id: id,
+                type: `account_status_${account_status}`,
+                title: statusCopy.title,
+                message: statusCopy.message,
+                reference_id: id
+            });
+
             return responseHelper.success(res, `User status updated to ${account_status}`, updatedUser);
         } catch (error) {
             console.error('Update user status error:', error);

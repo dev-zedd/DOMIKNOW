@@ -1,5 +1,6 @@
 const complaintModel = require('../models/complaintModel');
 const auditLogModel = require('../models/auditLogModel');
+const notificationModel = require('../models/notificationModel');
 const responseHelper = require('../utils/responseHelper');
 const { uploadFile } = require('../utils/storageHelper');
 
@@ -79,6 +80,23 @@ const complaintController = {
             });
 
             await auditLogModel.log(tenantId, 'SUBMIT_COMPLAINT', `Tenant submitted complaint ${complaint.id} (${complaintNumber})`);
+
+            await Promise.all([
+                notificationModel.create({
+                    user_id: tenantId,
+                    type: 'complaint_submitted',
+                    title: 'Complaint submitted',
+                    message: `Complaint ${complaintNumber} was submitted and is ready for review.`,
+                    reference_id: complaint.id
+                }),
+                notificationModel.create({
+                    user_id: lease.landlord_id,
+                    type: 'complaint_received',
+                    title: 'New tenant complaint',
+                    message: `Complaint ${complaintNumber} requires your review: ${subject.trim()}`,
+                    reference_id: complaint.id
+                })
+            ]);
             return responseHelper.success(res, 'Complaint submitted successfully. The landlord will be notified.', complaint, 201);
 
         } catch (error) {
@@ -182,6 +200,14 @@ const complaintController = {
             });
 
             await auditLogModel.log(landlordId, 'UPDATE_COMPLAINT_STATUS', `Landlord updated complaint ${id} from ${previousStatus} to ${status}`);
+
+            await notificationModel.create({
+                user_id: complaint.tenant_id,
+                type: 'complaint_status_update',
+                title: 'Complaint status updated',
+                message: `Complaint ${complaint.complaint_number || id} is now ${status.replaceAll('_', ' ')}.`,
+                reference_id: id
+            });
             return responseHelper.success(res, `Complaint status updated to "${status}".`, updated);
 
         } catch (error) {

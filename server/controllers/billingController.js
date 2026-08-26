@@ -1,5 +1,6 @@
 const billingModel = require('../models/billingModel');
 const auditLogModel = require('../models/auditLogModel');
+const notificationModel = require('../models/notificationModel');
 const responseHelper = require('../utils/responseHelper');
 const supabase = require('../config/supabaseClient');
 
@@ -47,6 +48,14 @@ async function checkAndApplyOverduePenalties(userId, isLandlord = true) {
                             updated_at: new Date()
                         })
                         .eq('id', b.id);
+
+                    await notificationModel.create({
+                        user_id: b.tenant_id,
+                        type: 'billing_overdue',
+                        title: 'Billing is overdue',
+                        message: `Your billing statement due on ${b.due_date} is overdue. Review the updated balance and payment details.`,
+                        reference_id: b.id
+                    });
                 }
             }
         }
@@ -174,6 +183,14 @@ const billingController = {
             // 4. Audit log
             await auditLogModel.log(landlordId, 'GENERATE_BILLING', `Landlord generated billing record ${billing.id} for lease ${lease_id}`);
 
+            await notificationModel.create({
+                user_id: lease.tenant_id,
+                type: 'billing_issued',
+                title: 'New billing statement',
+                message: `A billing statement for ${billing_month} was issued. Total due: ₱${totalAmount.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}.`,
+                reference_id: billing.id
+            });
+
             return responseHelper.success(res, 'Billing statement generated successfully.', billing, 201);
 
         } catch (error) {
@@ -277,6 +294,16 @@ const billingController = {
             // Audit log
             await auditLogModel.log(landlordId, 'UPDATE_BILLING', `Landlord updated details of billing ${id}`);
 
+            await notificationModel.create({
+                user_id: existingBill.tenant_id,
+                type: billing_status === 'cancelled' ? 'billing_cancelled' : 'billing_updated',
+                title: billing_status === 'cancelled' ? 'Billing statement cancelled' : 'Billing statement updated',
+                message: billing_status === 'cancelled'
+                    ? 'A billing statement was cancelled by your landlord.'
+                    : 'A billing statement was updated. Review the latest amount, due date, and remarks.',
+                reference_id: updated.id
+            });
+
             return responseHelper.success(res, 'Billing details updated successfully.', updated);
 
         } catch (error) {
@@ -357,7 +384,7 @@ const billingController = {
                         const advPay  = parseFloat(lease.advance_payment || 0);
                         const totalAmt = rentAmt + secDep + advPay;
 
-                        await billingModel.createBilling({
+                        const initialBilling = await billingModel.createBilling({
                             lease_id: lease.id,
                             tenant_id: lease.tenant_id,
                             landlord_id: lease.landlord_id,
@@ -376,6 +403,14 @@ const billingController = {
                             due_date: lease.lease_start_date || new Date().toISOString().slice(0, 10),
                             billing_status: 'pending_payment',
                             remarks: `Initial Move-In Billing: Monthly Rent (₱${rentAmt.toLocaleString()}) + Security Deposit (₱${secDep.toLocaleString()}) + Advance Payment (₱${advPay.toLocaleString()})`
+                        });
+
+                        await notificationModel.create({
+                            user_id: tenantId,
+                            type: 'billing_issued',
+                            title: 'Move-in billing statement ready',
+                            message: `Your initial move-in statement is ready. Total due: ₱${totalAmt.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}.`,
+                            reference_id: initialBilling.id
                         });
                     }
                 }

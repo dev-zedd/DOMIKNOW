@@ -1,4 +1,18 @@
-node_modules/
+`node_modules/
 .env
 .DS_Store
 scratch/
+
+# Demo seed scripts — data already applied to Supabase, not for version control
+database/seedDemoAccounts.js
+database/seedDemoProperties.js
+database/seedDemoActivity.js
+database/seedDemoNotifications.js
+database/fixDemoDocuments.js
+database/fixDemoImages.js
+database/fixDemoProfiles.js
+database/uploadPaymentProofs.js
+DEMO_ACCOUNTS.txt
+demoProofOfPaymentImages/
+database/uploadPaymentProofs.js
+`

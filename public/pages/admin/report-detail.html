@@ -1856,7 +1856,10 @@
 
             try {
                 // 1. Fetch messages for activeThread
-                const res = await fetch(`/api/reports/messages/${reportType}/${reportId}?thread=${activeThread}`, { headers: { 'Authorization': `Bearer ${token}` } });
+                const res = await fetch(`/api/reports/messages/${reportType}/${reportId}?thread=${activeThread}`, {
+                    headers: { 'Authorization': `Bearer ${token}`, 'X-DOMIKNOW-SILENT': '1' },
+                    domiknowLoading: false
+                });
                 if (res.ok) {
                     const { data } = await res.json();
                     const messages = data || [];
@@ -1872,7 +1875,10 @@
                 }
 
                 // 2. Fetch active typers for activeThread
-                const typingRes = await fetch(`/api/reports/messages/${reportType}/${reportId}/typing?thread=${activeThread}`, { headers: { 'Authorization': `Bearer ${token}` } });
+                const typingRes = await fetch(`/api/reports/messages/${reportType}/${reportId}/typing?thread=${activeThread}`, {
+                    headers: { 'Authorization': `Bearer ${token}`, 'X-DOMIKNOW-SILENT': '1' },
+                    domiknowLoading: false
+                });
                 if (typingRes.ok) {
                     const { data: typers } = await typingRes.json();
                     renderTypingState(typers);

@@ -3,7 +3,8 @@ const auditLogModel = require('../models/auditLogModel');
 const notificationModel = require('../models/notificationModel');
 const responseHelper = require('../utils/responseHelper');
 const supabase = require('../config/supabaseClient');
-const { uploadFile, getSignedUrl } = require('../utils/storageHelper');
+const { uploadFile } = require('../utils/storageHelper');
+const { attachPaymentProofUrls } = require('../utils/paymentProofHelper');
 
 const paymentController = {
     async submitPayment(req, res) {
@@ -118,15 +119,7 @@ const paymentController = {
     async getTenantPayments(req, res) {
         try {
             const list = await paymentModel.findByTenantId(req.user.id);
-            for (const payment of list) {
-                if (payment.payment_proof_path) {
-                    try {
-                        payment.payment_proof_url = await getSignedUrl('payment-proofs', payment.payment_proof_path);
-                    } catch (err) {
-                        console.error('Error generating signed URL for payment proof:', err);
-                    }
-                }
-            }
+            await attachPaymentProofUrls(list, 'tenant-payments');
             return responseHelper.success(res, 'Your payment logs retrieved successfully', list);
         } catch (error) {
             console.error('Get tenant payments error:', error);
@@ -137,15 +130,7 @@ const paymentController = {
     async getLandlordPayments(req, res) {
         try {
             const list = await paymentModel.findByLandlordId(req.user.id);
-            for (const payment of list) {
-                if (payment.payment_proof_path) {
-                    try {
-                        payment.payment_proof_url = await getSignedUrl('payment-proofs', payment.payment_proof_path);
-                    } catch (err) {
-                        console.error('Error generating signed URL for payment proof:', err);
-                    }
-                }
-            }
+            await attachPaymentProofUrls(list, 'landlord-payments');
             return responseHelper.success(res, 'Landlord payments log retrieved successfully', list);
         } catch (error) {
             console.error('Get landlord payments error:', error);

@@ -265,6 +265,104 @@
         if (element) element.textContent = Number.isFinite(value) ? String(value) : '—';
     }
 
+    function renderBarChart(containerId, items) {
+        const container = document.getElementById(containerId);
+        if (!container) return;
+        const knownValues = items.map(item => item.value).filter(Number.isFinite);
+        const maximum = Math.max(1, ...knownValues);
+        container.replaceChildren();
+
+        items.forEach(item => {
+            const isAvailable = Number.isFinite(item.value);
+            const row = document.createElement('div');
+            row.className = `admin-bar-row admin-bar-row--${isAvailable ? item.tone || 'primary' : 'unavailable'}`;
+            const heading = document.createElement('div');
+            heading.className = 'admin-bar-row__heading';
+            const label = document.createElement('span');
+            label.textContent = item.label;
+            const value = document.createElement('strong');
+            value.textContent = isAvailable ? String(item.value) : 'Unavailable';
+            heading.append(label, value);
+
+            const track = document.createElement('div');
+            track.className = 'admin-bar-row__track';
+            if (isAvailable) {
+                track.setAttribute('role', 'progressbar');
+                track.setAttribute('aria-label', item.label);
+                track.setAttribute('aria-valuemin', '0');
+                track.setAttribute('aria-valuemax', String(maximum));
+                track.setAttribute('aria-valuenow', String(item.value));
+            } else {
+                track.setAttribute('role', 'status');
+                track.setAttribute('aria-label', `${item.label} data unavailable`);
+            }
+            const bar = document.createElement('span');
+            bar.style.setProperty('--admin-bar-value', `${isAvailable && item.value ? Math.max(4, (item.value / maximum) * 100) : 0}%`);
+            track.appendChild(bar);
+            row.append(heading, track);
+            container.appendChild(row);
+        });
+    }
+
+    function queueAgeLabel(records) {
+        const timestamps = records
+            .map(record => record.created_at || record.submitted_at || record.updated_at)
+            .map(value => new Date(value).getTime())
+            .filter(Number.isFinite);
+        if (!timestamps.length) return 'No pending items';
+        const days = Math.max(0, Math.floor((Date.now() - Math.min(...timestamps)) / 86400000));
+        if (days === 0) return 'Less than 1 day';
+        return `${days} ${days === 1 ? 'day' : 'days'}`;
+    }
+
+    function renderOverviewAnalytics(data) {
+        const availableValue = (source, records) => data.availability[source] ? records.length : null;
+        const reportsAvailable = data.availability.tenantReports || data.availability.landlordReports;
+        const reportsComplete = data.availability.tenantReports && data.availability.landlordReports;
+        const workload = [
+            { label: 'Account approvals', value: availableValue('users', data.pendingUsers), tone: 'primary' },
+            { label: 'Property reviews', value: availableValue('properties', data.pendingProperties), tone: 'navy' },
+            { label: 'Reservation decisions', value: availableValue('reservations', data.pendingReservations), tone: 'cyan' },
+            { label: 'Payment checks', value: availableValue('payments', data.pendingPayments), tone: 'violet' },
+            { label: reportsComplete ? 'Open cases' : 'Open cases (partial)', value: reportsAvailable ? data.openReports.length : null, tone: 'amber' }
+        ];
+        const urgentSeverities = new Set(['critical', 'major', 'high', 'urgent']);
+        const lowSeverities = new Set(['low', 'minor']);
+        const urgentCases = data.openReports.filter(report => urgentSeverities.has(String(report.severity || '').toLowerCase()));
+        const lowCases = data.openReports.filter(report => lowSeverities.has(String(report.severity || '').toLowerCase()));
+        const standardCases = data.openReports.filter(report => !urgentCases.includes(report) && !lowCases.includes(report));
+
+        renderBarChart('adminWorkloadChart', workload);
+        renderBarChart('adminCaseChart', [
+            { label: 'Urgent', value: reportsAvailable ? urgentCases.length : null, tone: 'amber' },
+            { label: 'Standard', value: reportsAvailable ? standardCases.length : null, tone: 'primary' },
+            { label: 'Low', value: reportsAvailable ? lowCases.length : null, tone: 'teal' }
+        ]);
+
+        const knownWorkload = workload.map(item => item.value).filter(Number.isFinite);
+        setMetric('adminAnalyticsWorkloadTotal', knownWorkload.length ? knownWorkload.reduce((sum, value) => sum + value, 0) : Number.NaN);
+        setMetric('adminUrgentCases', reportsAvailable ? urgentCases.length : Number.NaN);
+        const oldest = document.getElementById('adminOldestQueueAge');
+        if (oldest) {
+            oldest.textContent = data.availableSources
+                ? queueAgeLabel([
+                    ...data.pendingUsers,
+                    ...data.pendingProperties,
+                    ...data.pendingReservations,
+                    ...data.pendingPayments,
+                    ...data.openReports
+                ])
+                : 'Unavailable';
+        }
+        const coverage = document.getElementById('adminDataCoverage');
+        if (coverage) coverage.textContent = `${data.availableSources} of ${data.totalSources}`;
+        const updated = document.getElementById('adminAnalyticsUpdated');
+        if (updated) {
+            const completeness = data.availableSources === data.totalSources ? 'complete data' : 'partial data';
+            updated.textContent = `Updated ${new Intl.DateTimeFormat('en-PH', { hour: 'numeric', minute: '2-digit' }).format(new Date())} · ${completeness}`;
+        }
+    }
+
     async function loadOverview() {
         const queue = document.getElementById('adminPriorityQueue');
         if (!queue) return;
@@ -296,12 +394,31 @@
         const pendingReservations = reservations.filter(reservation => reservation.status === 'pending');
         const pendingPayments = payments.filter(payment => ['pending', 'pending_verification'].includes(payment.payment_status));
         const openReports = reports.filter(report => openStatuses.has(report.status));
+        const availability = {
+            users: usersResult.status === 'fulfilled',
+            properties: propertiesResult.status === 'fulfilled',
+            reservations: reservationsResult.status === 'fulfilled',
+            payments: paymentsResult.status === 'fulfilled',
+            tenantReports: tenantReportsResult.status === 'fulfilled',
+            landlordReports: landlordReportsResult.status === 'fulfilled'
+        };
 
-        setMetric('overviewPendingUsers', pendingUsers.length);
-        setMetric('overviewPendingProperties', pendingProperties.length);
-        setMetric('overviewPendingReservations', pendingReservations.length);
-        setMetric('overviewPendingPayments', pendingPayments.length);
-        setMetric('overviewOpenCases', openReports.length);
+        renderOverviewAnalytics({
+            pendingUsers,
+            pendingProperties,
+            pendingReservations,
+            pendingPayments,
+            openReports,
+            availability,
+            availableSources: requests.filter(result => result.status === 'fulfilled').length,
+            totalSources: requests.length
+        });
+
+        setMetric('overviewPendingUsers', availability.users ? pendingUsers.length : Number.NaN);
+        setMetric('overviewPendingProperties', availability.properties ? pendingProperties.length : Number.NaN);
+        setMetric('overviewPendingReservations', availability.reservations ? pendingReservations.length : Number.NaN);
+        setMetric('overviewPendingPayments', availability.payments ? pendingPayments.length : Number.NaN);
+        setMetric('overviewOpenCases', availability.tenantReports || availability.landlordReports ? openReports.length : Number.NaN);
 
         const priorityItems = [
             ...openReports.map(report => ({
@@ -334,7 +451,16 @@
         if (!priorityItems.length) {
             const empty = document.createElement('div');
             empty.className = 'admin-queue-empty';
-            empty.textContent = 'No account, property, or case reviews currently require attention.';
+            const failedCount = requests.filter(result => result.status === 'rejected').length;
+            if (failedCount === requests.length) {
+                empty.dataset.state = 'error';
+                empty.textContent = 'Administrative queues could not be loaded. Check the connection and refresh the analytics.';
+            } else if (failedCount) {
+                empty.dataset.state = 'warning';
+                empty.textContent = `No items were returned by the available queues. ${failedCount} ${failedCount === 1 ? 'source is' : 'sources are'} still unavailable.`;
+            } else {
+                empty.textContent = 'No account, property, or case reviews currently require attention.';
+            }
             queue.appendChild(empty);
         } else {
             priorityItems.slice(0, 7).forEach(item => queue.appendChild(createQueueItem(item)));
@@ -388,9 +514,25 @@
         if (meta.showSummary !== false) intro.appendChild(createSummary(meta));
         const flow = createGovernanceFlow(meta.stage);
         if (flow) intro.appendChild(flow);
-        content.insertBefore(intro, content.firstChild);
+        const breadcrumbs = content.querySelector(':scope > [data-domiknow-breadcrumbs]');
+        if (breadcrumbs) breadcrumbs.insertAdjacentElement('afterend', intro);
+        else content.insertBefore(intro, content.firstChild);
         enhanceAdminContent(content, page);
-        if (page === 'overview.html') loadOverview();
+        if (page === 'overview.html') {
+            const refreshAnalytics = document.getElementById('adminAnalyticsRefresh');
+            if (refreshAnalytics && !refreshAnalytics.dataset.bound) {
+                refreshAnalytics.dataset.bound = 'true';
+                refreshAnalytics.addEventListener('click', async () => {
+                    window.DomiKnowLoading?.setButton(refreshAnalytics, true, 'Refreshing...');
+                    try {
+                        await loadOverview();
+                    } finally {
+                        window.DomiKnowLoading?.setButton(refreshAnalytics, false);
+                    }
+                });
+            }
+            loadOverview();
+        }
     }
 
     if (document.readyState === 'loading') {

@@ -127,6 +127,9 @@
                 list.forEach(pay => {
                     const amount = parseFloat(pay.payment_amount).toLocaleString(undefined, { minimumFractionDigits: 2 });
                     const proofUrl = domiknowSafeExternalUrl(pay.payment_proof_url);
+                    const proofControl = proofUrl !== '#' && pay.payment_proof_available !== false
+                        ? `<a href="${proofUrl}" target="_blank" rel="noopener noreferrer" class="btn-primary" style="padding: 0.4rem 0.8rem; font-size: 0.75rem; width: auto; background-color: var(--text-secondary); text-decoration: none; cursor: pointer; display: inline-block;">View File</a>`
+                        : '<span class="status-badge status-muted" title="No file exists at the stored path">Unavailable</span>';
                     
                     const submitDate = new Date(pay.submitted_at).toLocaleDateString(undefined, { 
                         year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' 
@@ -161,7 +164,7 @@
                         <td style="text-transform: capitalize;">${domiknowEscapeHtml(String(pay.payment_method || 'Unknown').replace('_', ' '))}</td>
                         <td style="font-family: monospace; font-size: 0.85rem; font-weight: 600;">${domiknowEscapeHtml(pay.payment_reference_number)}</td>
                         <td>
-                            <a href="${proofUrl}" target="_blank" rel="noopener noreferrer" class="btn-primary" style="padding: 0.4rem 0.8rem; font-size: 0.75rem; width: auto; background-color: var(--text-secondary); text-decoration: none; cursor: pointer; display: inline-block;">View File</a>
+                            ${proofControl}
                         </td>
                         <td><span class="status-badge ${statusClass}">${statusLabel}</span></td>
                     `;

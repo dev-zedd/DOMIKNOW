@@ -73,6 +73,16 @@
                 ['.discovery-results-panel', 'Compare matching rentals', 'Cards keep the image, availability, capacity, location, price, and detail action together.']
             ]
         },
+        'public-property': {
+            label: 'Property details guide',
+            steps: [
+                ['.public-workspace-header', 'Keep your discovery context', 'Return to rental discovery, sign in, create an account, change the theme, or replay this guide from the header.'],
+                ['.property-image-banner', 'Confirm the listing identity', 'Review the property image, address, verification status, vacancy count, capacity, and community rating before continuing.'],
+                ['#availableSpacesSection', 'Compare actual rentable spaces', 'Availability and pricing come from configured rooms or bedspaces. Select a suitable option before applying.'],
+                ['.domiknow-map-frame', 'Verify the location', 'Use the customized map as location context, then confirm the complete address before entering a lease.'],
+                ['.sticky-card', 'Review cost and continue', 'Check rent and listed charges here. Sign in or create an account only when you are ready to apply.']
+            ]
+        },
         auth: {
             label: 'Account access guide',
             steps: [
@@ -109,6 +119,7 @@
             const role = Object.keys(ROLE_TOURS).find(value => layout.classList.contains(`dashboard-layout-${value}`));
             if (role) return normalizeTour(role, ROLE_TOURS[role]);
         }
+        if (path.includes('/pages/public/property-details')) return normalizeTour('public-property', CONTEXT_TOURS['public-property']);
         if (path.includes('/pages/public/properties')) return normalizeTour('public-discovery', CONTEXT_TOURS['public-discovery']);
         if (path.includes('/pages/auth/')) return normalizeTour('auth', CONTEXT_TOURS.auth);
         if (!path.includes('/pages/')) return normalizeTour('public-home', CONTEXT_TOURS['public-home']);
@@ -280,16 +291,19 @@
         else { button.classList.add('dk-tour-replay--floating'); document.body.appendChild(button); }
     }
 
-    function scheduleAutoStart() {
+    function scheduleAutoStart(delayOverride) {
         clearTimeout(autoStartTimer);
         const context = getContext();
         if (!context) return;
         addReplayButton();
         if (wasCompleted(context.id)) return;
+        const delay = Number.isFinite(delayOverride)
+            ? delayOverride
+            : (context.id === 'public-property' ? 3500 : AUTO_START_DELAY_MS);
         autoStartTimer = setTimeout(() => {
             if (document.querySelector('.dk-modal-root:not([hidden]), .modal-overlay.active, .nav-sheet-overlay.open, #domiknowLocationNotice')) return scheduleAutoStart();
             start();
-        }, AUTO_START_DELAY_MS);
+        }, delay);
     }
 
     function initialize() {
@@ -301,6 +315,7 @@
         observer.observe(document.body, { childList: true, subtree: true });
         setTimeout(() => observer.disconnect(), 15000);
         document.addEventListener('domiknow:shell-ready', scheduleAutoStart);
+        document.addEventListener('domiknow:property-ready', () => scheduleAutoStart(300));
         addEventListener('resize', () => {
             const target = activeSteps[activeIndex]?.target;
             if (!activeTour || !target?.isConnected) return;

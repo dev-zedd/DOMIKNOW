@@ -1,0 +1,523 @@
+/*
+ * DOMIKNOW responsive polish layer
+ * Cross-module safeguards for phones, tablets, compact laptops, landscape
+ * devices, touch input, and large text. Loaded after page/module styles.
+ */
+
+html,
+body {
+  max-width: 100%;
+}
+
+body {
+  min-width: 0 !important;
+}
+
+:where(main, section, article, aside, form, fieldset, .main-wrapper, .main-content-inner) {
+  min-width: 0;
+}
+
+:where(img, video, iframe) {
+  max-width: 100%;
+}
+
+:where(h1, h2, h3, h4, p, li, dd, dt, label, .card-title, .page-title, .detail-title) {
+  overflow-wrap: anywhere;
+}
+
+:where(input, select, textarea, button) {
+  max-width: 100%;
+}
+
+/* Compact laptops and tablets: reduce density before content starts clipping. */
+@media (max-width: 1023px) {
+  .dashboard-layout .topbar {
+    position: sticky;
+    top: 0;
+    z-index: 110;
+  }
+
+  .dashboard-layout .main-content-inner {
+    width: 100%;
+    max-width: none !important;
+    padding-right: clamp(16px, 3vw, 24px) !important;
+    padding-left: clamp(16px, 3vw, 24px) !important;
+  }
+
+  .dashboard-layout :where(
+    .tenant-page-summary,
+    .landlord-page-summary,
+    .maintenance-page-summary,
+    .admin-page-summary,
+    .page-header,
+    .section-header,
+    .app-detail-header,
+    .tracker-header
+  ) {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .dashboard-layout :where(
+    .stats-grid,
+    .stats-row,
+    .summary-grid,
+    .summary-strip,
+    .cards-grid,
+    .prop-grid,
+    .properties-grid,
+    .units-grid,
+    .billing-summary,
+    .payment-summary
+  ) {
+    min-width: 0;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  .dashboard-layout :where(.sticky-card, .details-right, .decision-panel, .timeline-card) {
+    position: static !important;
+    top: auto !important;
+  }
+
+  .dashboard-layout :where(.table-wrapper, .table-wrap, .table-container, .table-scroll, .ui-table-wrapper) {
+    max-width: 100%;
+    overflow-x: auto !important;
+    overscroll-behavior-inline: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .notification-center__hero {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .notification-center__summary {
+    width: 100%;
+    min-width: 0;
+  }
+}
+
+@media (max-width: 900px) {
+  /* Defeat the legacy application-tracker viewport lock on smaller devices. */
+  html {
+    height: auto !important;
+    min-height: 100%;
+    overflow-y: auto !important;
+  }
+
+  body[data-tenant-page="application-details"] {
+    height: auto !important;
+    min-height: 100dvh !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+  }
+
+  body[data-tenant-page="application-details"] :where(
+    .main-content-inner,
+    .dashboard-container,
+    .details-grid,
+    .details-left,
+    .details-right,
+    .flex-grow-card
+  ) {
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    overflow: visible !important;
+  }
+
+  .dashboard-layout .topbar-account-copy {
+    display: none !important;
+  }
+
+  .dashboard-layout .topbar-account {
+    display: grid;
+    grid-template-columns: 36px !important;
+    padding-left: 8px !important;
+  }
+
+  .dashboard-layout :where(.info-grid-3, .form-grid-3, .grid-cols-3) {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  .dashboard-layout :where(.details-grid, .detail-grid, .main-grid, .properties-layout, .wizard-grid) {
+    min-width: 0;
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+}
+
+/* Phones and narrow split-screen windows. */
+@media (max-width: 767px) {
+  html {
+    overflow-x: hidden !important;
+    scroll-padding-top: 76px;
+  }
+
+  body {
+    width: 100%;
+    overflow-x: hidden !important;
+  }
+
+  .dashboard-layout .topbar {
+    display: grid !important;
+    min-height: 64px !important;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 8px;
+    padding-right: max(12px, env(safe-area-inset-right)) !important;
+    padding-left: max(12px, env(safe-area-inset-left)) !important;
+  }
+
+  .dashboard-layout .topbar-left {
+    min-width: 0;
+  }
+
+  .dashboard-layout .topbar-heading {
+    min-width: 0;
+    flex: 1 1 auto;
+  }
+
+  .dashboard-layout .topbar-title {
+    width: 100%;
+    max-width: none !important;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .dashboard-layout .topbar-right {
+    gap: 6px !important;
+  }
+
+  .dashboard-layout .topbar-account {
+    display: none !important;
+  }
+
+  .dashboard-layout .main-content-inner {
+    padding-right: max(12px, env(safe-area-inset-right)) !important;
+    padding-left: max(12px, env(safe-area-inset-left)) !important;
+  }
+
+  .dashboard-layout .main-content-inner > *,
+  .dashboard-layout .main-content-inner :where(section, article, aside, form, fieldset, div) {
+    min-width: 0;
+  }
+
+  .dashboard-layout :where(
+    .stats-grid,
+    .stats-row,
+    .summary-grid,
+    .summary-strip,
+    .cards-grid,
+    .properties-grid,
+    .property-grid,
+    .prop-grid,
+    .units-grid,
+    .room-grid,
+    .rooms-grid,
+    .lease-grid,
+    .applications-grid,
+    .disputes-grid,
+    .maintenance-grid,
+    .details-grid,
+    .detail-grid,
+    .main-grid,
+    .info-grid,
+    .info-grid-2,
+    .info-grid-3,
+    .grid-info-cards,
+    .form-grid,
+    .form-grid-2,
+    .form-grid-3,
+    .form-cols,
+    .parties-grid,
+    .signature-sheet,
+    .contract-grid,
+    .photo-grid,
+    .billing-summary,
+    .payment-summary
+  ) {
+    min-width: 0;
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  /* Many older forms carry their column definition inline. Keep them fluid
+     without requiring a fragile page-by-page markup rewrite. */
+  .dashboard-layout .main-content-inner :where(
+    [style*="display: grid"],
+    [style*="display:grid"]
+  )[style*="grid-template-columns"] {
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr)) !important;
+  }
+
+  .dashboard-layout :where(.cat-grid, .prio-row, .severity-cards) {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  .dashboard-layout :where(
+    .form-actions,
+    .card-actions,
+    .card-action-bar,
+    .action-row,
+    .action-row-btn,
+    .filter-actions,
+    .page-actions,
+    .modal-footer,
+    .form-modal-footer,
+    .details-foot
+  ) {
+    align-items: stretch !important;
+    flex-wrap: wrap;
+  }
+
+  .dashboard-layout :where(
+    .form-actions,
+    .card-actions,
+    .card-action-bar,
+    .action-row,
+    .action-row-btn,
+    .filter-actions,
+    .page-actions
+  ) > :where(button, .btn, .btn-action, .action-btn, a) {
+    min-width: 0;
+    flex: 1 1 180px;
+    justify-content: center;
+  }
+
+  .dashboard-layout :where(.section-header-flex, .card-header, .panel-header) {
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .dashboard-layout :where(.card, .detail-card, .prop-section-card, .profile-card, .table-card, .list-card) {
+    max-width: 100%;
+  }
+
+  .dashboard-layout :where(.table-wrapper, .table-wrap, .table-container, .table-scroll, .ui-table-wrapper) {
+    margin-inline: 0;
+    border-radius: var(--radius-md);
+  }
+
+  .dashboard-layout :where(input[type="file"], input[type="date"], input[type="time"]) {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .dashboard-layout :where(#map, #locationMap, #landlordMap, .domiknow-map, .domiknow-map-frame) {
+    max-width: 100%;
+    border-radius: var(--radius-md) !important;
+  }
+
+  .dashboard-layout .bottom-nav-item {
+    min-width: 0;
+  }
+
+  .dashboard-layout .bottom-nav-item > span:last-child {
+    display: block;
+    width: 100%;
+    overflow: hidden;
+    padding-inline: 2px;
+    text-align: center;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  /* Preserve public navigation on phones as a horizontally scrollable second
+     row instead of removing every destination from the fixed header. */
+  .public-landing-page {
+    padding-top: 118px !important;
+  }
+
+  .public-landing-page .landing-header,
+  .public-landing-page .landing-header.scrolled {
+    grid-template-columns: minmax(0, 1fr) auto !important;
+    gap: 6px 10px !important;
+  }
+
+  .public-landing-page .nav-links {
+    display: flex !important;
+    grid-column: 1 / -1;
+    order: 3;
+    width: calc(100% + 28px);
+    margin: 0 -14px;
+    padding: 6px 14px 0;
+    justify-content: flex-start;
+    gap: 4px !important;
+    overflow-x: auto;
+    border-top: 1px solid var(--color-divider);
+    scrollbar-width: none !important;
+    scroll-snap-type: inline proximity;
+    overscroll-behavior-inline: contain;
+  }
+
+  .public-landing-page .nav-links::-webkit-scrollbar {
+    display: none !important;
+  }
+
+  .public-landing-page .nav-link {
+    display: inline-flex !important;
+    min-height: 38px;
+    flex: 0 0 auto;
+    align-items: center;
+    padding: 8px 10px !important;
+    scroll-snap-align: start;
+    white-space: nowrap;
+  }
+
+  .public-landing-page .auth-buttons {
+    min-width: 0;
+  }
+
+  .public-landing-page .auth-buttons .btn-secondary {
+    min-height: 42px;
+    padding-inline: 12px !important;
+  }
+
+  .public-landing-page :where(.public-section-shell, .public-final-cta, .feature-card, .step-card) {
+    max-width: 100%;
+  }
+
+  .public-listing-card,
+  .property-unit-card,
+  .public-feedback-card {
+    min-width: 0;
+  }
+
+  .notification-panel__toolbar,
+  .notification-center__toolbar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .notification-filters {
+    width: 100%;
+    overflow-x: auto;
+    scrollbar-width: none !important;
+  }
+
+  .notification-filter {
+    flex: 0 0 auto;
+  }
+
+  .notification-mark-all {
+    align-self: flex-start;
+    min-height: 44px;
+  }
+
+  .notification-item {
+    min-width: 0;
+  }
+
+  .chat-head-modal-header {
+    min-width: 0;
+    padding-inline: 12px !important;
+  }
+
+  .chat-head-switch-btn {
+    max-width: 42%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
+@media (max-width: 479px) {
+  .dashboard-layout :where(.cat-grid, .prio-row, .severity-cards) {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  .dashboard-layout .main-content-inner :where(
+    [style*="display: grid"],
+    [style*="display:grid"]
+  )[style*="grid-template-columns"] {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  .dashboard-layout :where(.modal-footer, .form-modal-footer, .details-foot) > :where(button, .btn, .btn-action) {
+    width: 100%;
+    flex: 1 1 100%;
+  }
+
+  .dashboard-layout :where(.tenant-page-title, .landlord-page-title, .maintenance-page-title, .admin-page-title) {
+    font-size: clamp(1.35rem, 7vw, 1.75rem) !important;
+  }
+
+  .notification-center__summary {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 6px;
+  }
+
+  .notification-summary-card {
+    min-width: 0;
+    padding: 10px 8px;
+  }
+
+  .notification-summary-card span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .public-landing-page .brand-wordmark {
+    font-size: 0.95rem;
+  }
+
+  .public-landing-page .auth-buttons .btn-secondary {
+    padding-inline: 10px !important;
+  }
+
+  table.responsive-cards td,
+  .responsive-cards table td {
+    grid-template-columns: minmax(88px, 0.72fr) minmax(0, 1.28fr);
+  }
+}
+
+@media (max-width: 359px) {
+  .dashboard-layout .topbar {
+    padding-inline: 8px !important;
+  }
+
+  .dashboard-layout .topbar-right {
+    gap: 4px !important;
+  }
+
+  .public-landing-page .brand-wordmark {
+    display: none;
+  }
+
+  .dk-modal-footer {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+}
+
+@media (max-width: 767px) and (orientation: landscape),
+       (max-height: 540px) and (pointer: coarse) {
+  .dashboard-layout .topbar {
+    min-height: 56px !important;
+  }
+
+  .dashboard-layout :where(.modal-box, .modal-container, .form-modal, .details-modal),
+  .notification-panel,
+  .dk-modal-dialog {
+    max-height: 96dvh !important;
+  }
+
+  .public-landing-page {
+    padding-top: 110px !important;
+  }
+}
+
+@media (hover: none) and (pointer: coarse) {
+  :where(button, [role="button"], .btn, .btn-action, .action-btn, .nav-link, .sidebar-link) {
+    min-height: 44px;
+    touch-action: manipulation;
+  }
+
+  :where(.card, .feature-card, .step-card, .prop-card, .public-listing-card):hover {
+    transform: none !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .public-landing-page .nav-links {
+    scroll-behavior: auto;
+  }
+}

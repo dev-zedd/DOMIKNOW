@@ -11,7 +11,9 @@ function domiknowEscapeHtml(value) {
 
 function domiknowSafeExternalUrl(value) {
     try {
-        const url = new URL(String(value || ''), window.location.origin);
+        const rawValue = String(value || '').trim();
+        if (!rawValue) return '#';
+        const url = new URL(rawValue, window.location.origin);
         return ['http:', 'https:'].includes(url.protocol) ? url.href : '#';
     } catch (error) {
         return '#';
@@ -273,9 +275,14 @@ function loadNotificationSystemAssets() {
 
     if (!document.head.querySelector('script[data-notification-system]')) {
         const script = document.createElement('script');
-        script.src = '/js/notification-system.js?v=20260823-2';
-        script.defer = true;
+        script.src = '/js/notification-system.js?v=20260826-1';
+        script.async = true;
         script.setAttribute('data-notification-system', '');
+        script.addEventListener('load', () => window.DomiKnowNotifications?.refreshSurface?.(), { once: true });
+        script.addEventListener('error', () => {
+            script.remove();
+            console.error('Unable to load the DOMIKNOW notification system.');
+        }, { once: true });
         document.head.appendChild(script);
     }
 }
@@ -985,6 +992,8 @@ function renderNewDashboardLayout(user) {
         }
     });
 
+    ensureContextBreadcrumbs(role, window.location.pathname);
+
     // 3. Attach interactive behaviors
     // Mobile Sidebar toggle
     const menuToggleBtn = document.getElementById('menuToggleBtn');
@@ -1137,6 +1146,7 @@ const parentNavigationPages = {
         'tenant-reports.html': 'reports.html'
     },
     landlord: {
+        'property-create.html': 'properties.html',
         'property-details.html': 'properties.html',
         'units.html': 'properties.html',
         'application-details.html': 'applications.html',
@@ -1146,6 +1156,83 @@ const parentNavigationPages = {
         'landlord-reports.html': 'reports.html'
     }
 };
+
+const contextualPageLabels = {
+    'property-create.html': 'Register property',
+    'property-details.html': 'Property details',
+    'units.html': 'Rooms and units',
+    'apply.html': 'Rental application',
+    'application-details.html': 'Application details',
+    'lease-create.html': 'Create lease',
+    'maintenance-details.html': 'Maintenance details',
+    'task-details.html': 'Task details',
+    'property-review-details.html': 'Property review details',
+    'report-detail.html': 'Case details',
+    'landlord-report-form.html': 'Report landlord',
+    'tenant-report-form.html': 'Report tenant',
+    'tenant-reports.html': 'Reports against me',
+    'landlord-reports.html': 'Reports against me'
+};
+
+function navigationLabelForFile(role, filename) {
+    if (typeof NAVIGATION_CONFIG === 'undefined') return null;
+    for (const section of NAVIGATION_CONFIG[role] || []) {
+        for (const item of section.items || []) {
+            if (String(item.href || '').endsWith(filename)) return item.label;
+            const subItem = (item.subItems || []).find(candidate => String(candidate.href || '').endsWith(filename));
+            if (subItem) return subItem.label;
+        }
+    }
+    return null;
+}
+
+function ensureContextBreadcrumbs(role, pathname = window.location.pathname) {
+    const content = document.querySelector('.main-content-inner');
+    if (!content) return;
+    content.querySelector('[data-domiknow-breadcrumbs]')?.remove();
+
+    const filename = pathname.split('/').pop().split('?')[0].split('#')[0];
+    const parentFilename = parentNavigationPages[role]?.[filename];
+    if (!parentFilename) return;
+
+    const legacyBreadcrumb = content.querySelector('.breadcrumb-nav');
+    if (legacyBreadcrumb) {
+        legacyBreadcrumb.classList.add('dk-breadcrumbs', 'dk-breadcrumbs--legacy');
+        legacyBreadcrumb.dataset.domiknowBreadcrumbs = '';
+        legacyBreadcrumb.setAttribute('role', 'navigation');
+        legacyBreadcrumb.setAttribute('aria-label', 'Breadcrumb');
+        legacyBreadcrumb.removeAttribute('style');
+        legacyBreadcrumb.querySelectorAll('a, .breadcrumb-separator, .breadcrumb-current').forEach(element => {
+            element.removeAttribute('style');
+        });
+        legacyBreadcrumb.querySelectorAll('.breadcrumb-separator').forEach(separator => {
+            separator.textContent = '/';
+        });
+        legacyBreadcrumb.querySelector('.breadcrumb-current')?.setAttribute('aria-current', 'page');
+        return;
+    }
+
+    const parentLabel = navigationLabelForFile(role, parentFilename) || 'Back to list';
+    const currentLabel = contextualPageLabels[filename]
+        || document.getElementById('appPageTitle')?.textContent.trim()
+        || 'Details';
+    const nav = document.createElement('nav');
+    nav.className = 'dk-breadcrumbs';
+    nav.dataset.domiknowBreadcrumbs = '';
+    nav.setAttribute('aria-label', 'Breadcrumb');
+    const list = document.createElement('ol');
+    const parentItem = document.createElement('li');
+    const parentLink = document.createElement('a');
+    parentLink.href = `/pages/${role}/${parentFilename}`;
+    parentLink.textContent = parentLabel;
+    parentItem.appendChild(parentLink);
+    const currentItem = document.createElement('li');
+    currentItem.textContent = currentLabel;
+    currentItem.setAttribute('aria-current', 'page');
+    list.append(parentItem, currentItem);
+    nav.appendChild(list);
+    content.insertBefore(nav, content.firstChild);
+}
 
 function updateActiveNavigationIndicators(pathname, role) {
     const filename = (pathname || window.location.pathname).split('/').pop().split('?')[0].split('#')[0] || 'properties.html';
@@ -1198,28 +1285,17 @@ function updateActiveNavigationIndicators(pathname, role) {
 }
 
 function showNavigationProgress() {
-    let bar = document.getElementById('domiknowNavProgressBar');
-    if (!bar) {
-        bar = document.createElement('div');
-        bar.id = 'domiknowNavProgressBar';
-        bar.style.cssText = 'position:fixed;top:0;left:0;height:3px;background:linear-gradient(90deg,#0f766e,#14b8a6,#06b6d4);z-index:99999;transition:width 0.2s ease,opacity 0.25s ease;width:0%;pointer-events:none;box-shadow:0 0 8px rgba(20,184,166,0.6);';
-        document.body.appendChild(bar);
-    }
-    bar.style.opacity = '1';
-    bar.style.width = '45%';
-    setTimeout(() => {
-        if (bar && bar.style.width === '45%') bar.style.width = '85%';
-    }, 100);
+    const mainContent = document.querySelector('.main-content-inner');
+    mainContent?.classList.add('dk-route-loading');
+    mainContent?.setAttribute('aria-busy', 'true');
+    return window.DomiKnowLoading?.start({ delay: 0, timeout: 15000 }) || null;
 }
 
-function hideNavigationProgress() {
-    const bar = document.getElementById('domiknowNavProgressBar');
-    if (!bar) return;
-    bar.style.width = '100%';
-    setTimeout(() => {
-        bar.style.opacity = '0';
-        setTimeout(() => { bar.style.width = '0%'; }, 250);
-    }, 150);
+function hideNavigationProgress(token) {
+    const mainContent = document.querySelector('.main-content-inner');
+    mainContent?.classList.remove('dk-route-loading');
+    mainContent?.removeAttribute('aria-busy');
+    if (token) window.DomiKnowLoading?.finish(token);
 }
 
 function loadExternalScript(src) {
@@ -1249,29 +1325,53 @@ function isModalElement(el) {
 }
 
 let isSeamlessNavigating = false;
+const seamlessPageCache = new Map();
+const SEAMLESS_CACHE_TTL = 30000;
+let pageStyleLifecyclePrepared = false;
+
+function preparePageStyleLifecycle() {
+    if (pageStyleLifecyclePrepared) return;
+    document.head.querySelectorAll('style').forEach(style => {
+        style.setAttribute('data-domiknow-page-style', '');
+    });
+    pageStyleLifecyclePrepared = true;
+}
+
+async function loadDashboardPageHtml(targetUrlString) {
+    const url = new URL(targetUrlString, window.location.href);
+    url.hash = '';
+    const cacheKey = url.href;
+    const cached = seamlessPageCache.get(cacheKey);
+    if (cached && cached.expiresAt > Date.now()) return cached.promise;
+
+    const promise = fetch(cacheKey, {
+        headers: {
+            'X-Requested-With': 'DOMIKNOW-SPA',
+            'X-DOMIKNOW-SILENT': '1'
+        },
+        domiknowLoading: false
+    }).then(async response => {
+        if (!response.ok) throw new Error(`Dashboard page returned ${response.status}`);
+        return response.text();
+    });
+
+    seamlessPageCache.set(cacheKey, {
+        promise,
+        expiresAt: Date.now() + SEAMLESS_CACHE_TTL
+    });
+    promise.catch(() => seamlessPageCache.delete(cacheKey));
+    return promise;
+}
+
 async function seamlessNavigateTo(targetUrlString, role, pushState = true) {
     if (isSeamlessNavigating) return;
     isSeamlessNavigating = true;
 
-    showNavigationProgress();
-
+    const navigationLoadingToken = showNavigationProgress();
     const mainContent = document.querySelector('.main-content-inner');
-    if (mainContent) {
-        mainContent.style.transition = 'opacity 0.1s ease-out';
-        mainContent.style.opacity = '0.35';
-    }
 
     try {
-        const res = await fetch(targetUrlString, {
-            headers: { 'X-Requested-With': 'DOMIKNOW-SPA' }
-        });
-
-        if (!res.ok) {
-            window.location.href = targetUrlString;
-            return;
-        }
-
-        const html = await res.text();
+        const html = await loadDashboardPageHtml(targetUrlString);
         const parser = new DOMParser();
         const newDoc = parser.parseFromString(html, 'text/html');
 
@@ -1303,7 +1403,11 @@ async function seamlessNavigateTo(targetUrlString, role, pushState = true) {
             navSheetOverlay.classList.remove('open');
         }
 
-        // Sync stylesheets and inline styles from new document
+        // Sync stylesheets and replace page-scoped inline styles. Without this
+        // lifecycle, inline rules from every visited screen remain in the head
+        // and can visually override later pages.
+        preparePageStyleLifecycle();
+        document.head.querySelectorAll('style[data-domiknow-page-style]').forEach(style => style.remove());
         newDoc.querySelectorAll('link[rel="stylesheet"], style').forEach(el => {
             if (el.tagName === 'LINK') {
                 const href = el.getAttribute('href');
@@ -1316,6 +1420,7 @@ async function seamlessNavigateTo(targetUrlString, role, pushState = true) {
             } else if (el.tagName === 'STYLE') {
                 const newStyle = document.createElement('style');
                 newStyle.textContent = el.textContent;
+                newStyle.setAttribute('data-domiknow-page-style', '');
                 document.head.appendChild(newStyle);
             }
         });
@@ -1326,8 +1431,7 @@ async function seamlessNavigateTo(targetUrlString, role, pushState = true) {
                 child.classList.contains('dashboard-layout') ||
                 child.id === 'floatingChatHeadFab' ||
                 child.id === 'chatHeadModal' ||
-                child.tagName === 'SCRIPT' ||
-                child.id === 'domiknowNavProgressBar'
+                child.tagName === 'SCRIPT'
             ) {
                 return;
             }
@@ -1380,6 +1484,7 @@ async function seamlessNavigateTo(targetUrlString, role, pushState = true) {
 
         // 6. Update active navigation indicators on sidebar
         updateActiveNavigationIndicators(window.location.pathname, role);
+        ensureContextBreadcrumbs(role, window.location.pathname);
 
         // 7. Trigger module enhancers for newly mounted content
         document.dispatchEvent(new CustomEvent('domiknow:page-content-updated', { detail: { role, path: window.location.pathname } }));
@@ -1416,16 +1521,13 @@ async function seamlessNavigateTo(targetUrlString, role, pushState = true) {
         window.scrollTo({ top: 0, behavior: 'instant' });
         if (mainContent) {
             mainContent.scrollTop = 0;
-            requestAnimationFrame(() => {
-                mainContent.style.opacity = '1';
-            });
         }
     } catch (err) {
         console.error('Seamless navigation error, falling back to standard load:', err);
         window.location.href = targetUrlString;
     } finally {
         isSeamlessNavigating = false;
-        hideNavigationProgress();
+        hideNavigationProgress(navigationLoadingToken);
     }
 }
 
@@ -1452,6 +1554,31 @@ function initSeamlessDashboardNavigation(role, sidebar) {
     if (window.__domiknowNavInitialized) return;
     window.__domiknowNavInitialized = true;
 
+    const dashboardPathPrefixes = ['/pages/tenant/', '/pages/landlord/', '/pages/admin/', '/pages/maintenance/'];
+    const getDashboardUrl = link => {
+        if (!link || link.hasAttribute('download') || (link.target && link.target !== '_self')) return null;
+        const href = link.getAttribute('href');
+        if (!href || href.startsWith('#') || href.startsWith('javascript:') || href.startsWith('mailto:') || href.startsWith('tel:')) return null;
+        try {
+            const url = new URL(link.href, window.location.origin);
+            if (url.origin !== window.location.origin) return null;
+            if (!dashboardPathPrefixes.some(prefix => url.pathname.startsWith(prefix))) return null;
+            if (url.pathname.includes('/auth/') || url.pathname.includes('/login') || url.pathname.includes('/register')) return null;
+            return url;
+        } catch (_error) {
+            return null;
+        }
+    };
+
+    const prefetchLink = event => {
+        const link = event.target instanceof Element ? event.target.closest('a[href]') : null;
+        const url = getDashboardUrl(link);
+        if (!url || url.pathname === window.location.pathname && url.search === window.location.search) return;
+        loadDashboardPageHtml(url.href).catch(() => {});
+    };
+    document.addEventListener('pointerover', prefetchLink, { passive: true });
+    document.addEventListener('focusin', prefetchLink);
+
     document.addEventListener('click', async (e) => {
         if (e.defaultPrevented || e.button !== 0 || e.ctrlKey || e.metaKey || e.shiftKey || e.altKey) return;
 
@@ -1463,20 +1590,8 @@ function initSeamlessDashboardNavigation(role, sidebar) {
         if (link.hasAttribute('download') || link.target === '_blank') return;
         if (link.id === 'newLogoutBtn' || link.id === 'sheetLogoutBtn') return;
 
-        let targetUrl;
-        try {
-            targetUrl = new URL(link.href, window.location.origin);
-        } catch(err) {
-            return;
-        }
-
-        if (targetUrl.origin !== window.location.origin) return;
-
-        // Check if internal dashboard page in the same portal
-        const validPathPrefixes = ['/pages/tenant/', '/pages/landlord/', '/pages/admin/', '/pages/maintenance/'];
-        const isDashboardPath = validPathPrefixes.some(prefix => targetUrl.pathname.startsWith(prefix));
-        if (!isDashboardPath) return;
-        if (targetUrl.pathname.includes('/auth/') || targetUrl.pathname.includes('/login') || targetUrl.pathname.includes('/register')) return;
+        const targetUrl = getDashboardUrl(link);
+        if (!targetUrl) return;
 
         // If clicking current page without params change, just scroll top
         if (targetUrl.pathname === window.location.pathname && targetUrl.search === window.location.search) {

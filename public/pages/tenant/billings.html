@@ -1020,6 +1020,13 @@
             const submitDate = new Date(pay.submitted_at).toLocaleString();
             const amount = parseFloat(pay.payment_amount).toLocaleString(undefined, { minimumFractionDigits: 2 });
             const proofUrl = domiknowSafeExternalUrl(pay.payment_proof_url);
+            const proofMarkup = proofUrl !== '#' && pay.payment_proof_available !== false
+                ? `<a href="${proofUrl}" target="_blank" rel="noopener noreferrer">
+                        <img src="${proofUrl}" class="receipt-preview" alt="Proof of payment">
+                   </a>`
+                : `<div role="status" style="margin-top:0.5rem;padding:1rem;border:1px dashed var(--border-color);border-radius:var(--radius-md);color:var(--text-muted);background:var(--bg-primary);">
+                        This proof file is unavailable. Legacy or demo payment records may not have an uploaded file.
+                   </div>`;
             
             let statusColor = '#f59e0b';
             let statusLabel = 'PENDING VERIFICATION';
@@ -1044,9 +1051,7 @@
                 <div style="margin-bottom:1.5rem; margin-top: 1rem;">
                     <span class="details-lbl">Proof of Payment</span>
                     <div>
-                        <a href="${proofUrl}" target="_blank" rel="noopener noreferrer">
-                            <img src="${proofUrl}" class="receipt-preview" alt="Proof of payment">
-                        </a>
+                        ${proofMarkup}
                     </div>
                 </div>
 

@@ -5,6 +5,7 @@ const paymentModel = require('../models/paymentModel');
 const auditLogModel = require('../models/auditLogModel');
 const responseHelper = require('../utils/responseHelper');
 const supabase = require('../config/supabaseClient');
+const { attachPaymentProofUrls } = require('../utils/paymentProofHelper');
 
 const adminMonitorController = {
     async getAllScreenings(req, res) {
@@ -40,16 +41,7 @@ const adminMonitorController = {
     async getAllPayments(req, res) {
         try {
             const list = await paymentModel.findAllPayments();
-            const { getSignedUrl } = require('../utils/storageHelper');
-            for (const payment of list) {
-                if (payment.payment_proof_path) {
-                    try {
-                        payment.payment_proof_url = await getSignedUrl('payment-proofs', payment.payment_proof_path);
-                    } catch (err) {
-                        console.error('Error generating signed URL for payment proof:', err);
-                    }
-                }
-            }
+            await attachPaymentProofUrls(list, 'admin-payments');
             return responseHelper.success(res, 'Admin: Global payments list retrieved', list);
         } catch (error) {
             console.error('Admin get all payments error:', error);

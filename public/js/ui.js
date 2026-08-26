@@ -177,12 +177,12 @@
         const path = window.location.pathname.replace(/\\/g, '/').toLowerCase();
         return path.includes('/pages/auth/') ||
             path.includes('/pages/public/') ||
+            path.includes('/pages/404') ||
             !path.includes('/pages/');
     }
 
     function ensureNonAdminMobileExperience() {
         const path = window.location.pathname.replace(/\\/g, '/').toLowerCase();
-        if (path.includes('/pages/admin/')) return;
 
         const viewport = document.head.querySelector('meta[name="viewport"]');
         if (viewport) {
@@ -196,6 +196,10 @@
             }
         }
 
+        // Admin remains desktop-first, but still needs safe-area support on
+        // notched tablets and phones when a page is opened in a narrow window.
+        if (path.includes('/pages/admin/')) return;
+
         let stylesheet = document.head.querySelector('link[href*="mobile-first.css"]');
         if (!stylesheet) {
             stylesheet = document.createElement('link');
@@ -204,6 +208,15 @@
             document.head.appendChild(stylesheet);
         }
         stylesheet.setAttribute('data-mobile-first', '');
+    }
+
+    function ensureResponsivePolish() {
+        if (document.head.querySelector('link[data-domiknow-responsive-polish]')) return;
+        const stylesheet = document.createElement('link');
+        stylesheet.rel = 'stylesheet';
+        stylesheet.href = '/css/responsive-polish.css?v=20260826-1';
+        stylesheet.setAttribute('data-domiknow-responsive-polish', '');
+        document.head.appendChild(stylesheet);
     }
 
     function ensureDomiKnowModalSystem() {
@@ -265,14 +278,14 @@
         if (!document.head.querySelector('link[data-domiknow-walkthrough]')) {
             const stylesheet = document.createElement('link');
             stylesheet.rel = 'stylesheet';
-            stylesheet.href = '/css/walkthrough-system.css?v=20260817-1';
+            stylesheet.href = '/css/walkthrough-system.css?v=20260826-1';
             stylesheet.setAttribute('data-domiknow-walkthrough', '');
             document.head.appendChild(stylesheet);
         }
 
         if (!document.head.querySelector('script[data-domiknow-walkthrough]')) {
             const script = document.createElement('script');
-            script.src = '/js/walkthrough-system.js?v=20260817-1';
+            script.src = '/js/walkthrough-system.js?v=20260826-1';
             script.defer = true;
             script.setAttribute('data-domiknow-walkthrough', '');
             document.head.appendChild(script);
@@ -284,7 +297,7 @@
         if (!stylesheet) {
             stylesheet = document.createElement('link');
             stylesheet.rel = 'stylesheet';
-            stylesheet.href = '/css/loading-system.css?v=20260823-1';
+            stylesheet.href = '/css/loading-system.css?v=20260826-1';
             document.head.appendChild(stylesheet);
         }
         stylesheet.setAttribute('data-domiknow-loading-system', '');
@@ -292,7 +305,7 @@
         let script = document.head.querySelector('script[src*="loading-system.js"]');
         if (!window.DomiKnowLoading && !script) {
             script = document.createElement('script');
-            script.src = '/js/loading-system.js?v=20260823-1';
+            script.src = '/js/loading-system.js?v=20260826-1';
             script.defer = true;
             document.head.appendChild(script);
         }
@@ -859,6 +872,7 @@
     }
 
     ensureBrandFavicons();
+    ensureResponsivePolish();
     ensureDomiKnowModalSystem();
     ensureDomiKnowWalkthroughSystem();
     ensureDomiKnowLoadingSystem();

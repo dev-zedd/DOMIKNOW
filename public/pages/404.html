@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex">
+    <title>Page Not Found - DOMIKNOW</title>
+    <link href="/css/input.css" rel="stylesheet">
+    <link href="/css/design-system.css" rel="stylesheet">
+    <link href="/css/error-page.css?v=20260826-1" rel="stylesheet">
+    <script src="/js/ui.js" defer></script>
+</head>
+<body class="domiknow-error-page">
+    <main id="mainContent" class="error-page-shell" aria-labelledby="errorTitle">
+        <a href="/index.html" class="error-page-brand brand-lockup" aria-label="DOMIKNOW home">
+            <img src="/images/domiknow-mark.svg" alt="" width="48" height="48">
+            <span class="brand-wordmark"><span class="brand-wordmark-domi">DOMI</span><span class="brand-wordmark-know">KNOW</span></span>
+        </a>
+
+        <section class="error-page-card">
+            <div class="error-page-visual" aria-hidden="true">
+                <span class="error-page-code">404</span>
+                <span class="error-page-pin"><span data-icon="pin"></span></span>
+            </div>
+            <div class="error-page-copy">
+                <p class="section-eyebrow">This route is unavailable</p>
+                <h1 id="errorTitle">We could not find that page.</h1>
+                <p>The link may be outdated, the record may have moved, or the address may have been entered incorrectly. Your account and saved rental activity are not affected.</p>
+                <div class="error-page-actions" aria-label="Page recovery actions">
+                    <a href="/pages/public/properties.html" class="btn btn-primary">Browse verified rentals</a>
+                    <button type="button" class="btn btn-secondary" id="errorGoBack">Go back</button>
+                </div>
+            </div>
+        </section>
+
+        <nav class="error-page-recovery" aria-label="Useful destinations">
+            <a href="/index.html"><span data-icon="roof" aria-hidden="true"></span><span><strong>Public home</strong><small>Return to the DOMIKNOW overview.</small></span></a>
+            <a href="/pages/auth/login.html"><span data-icon="worker" aria-hidden="true"></span><span><strong>Sign in</strong><small>Continue to your assigned workspace.</small></span></a>
+            <a href="/index.html#faqSection"><span data-icon="message" aria-hidden="true"></span><span><strong>Help and FAQs</strong><small>Review common rental and account questions.</small></span></a>
+        </nav>
+    </main>
+
+    <script>
+        document.getElementById('errorGoBack').addEventListener('click', () => {
+            let hasSafeHistory = false;
+            try {
+                hasSafeHistory = Boolean(document.referrer) && new URL(document.referrer).origin === window.location.origin;
+            } catch (_error) {
+                hasSafeHistory = false;
+            }
+            if (window.history.length > 1 && hasSafeHistory) window.history.back();
+            else window.location.href = '/index.html';
+        });
+    </script>
+</body>
+</html>

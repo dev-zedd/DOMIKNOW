@@ -37,6 +37,48 @@
             Building the latest operational snapshot…
         </div>
 
+        <section class="admin-analytics" aria-labelledby="adminAnalyticsTitle">
+            <div class="admin-analytics__header">
+                <div>
+                    <p class="admin-panel-eyebrow">Live operational analytics</p>
+                    <h2 id="adminAnalyticsTitle">Queue health and workload distribution</h2>
+                    <p>Counts are computed from the administrator's current authorized data sources. They are operational indicators, not fabricated forecasts.</p>
+                </div>
+                <div class="admin-analytics__actions">
+                    <span id="adminAnalyticsUpdated" aria-live="polite">Waiting for data</span>
+                    <button type="button" class="admin-secondary-action" id="adminAnalyticsRefresh">Refresh analytics</button>
+                </div>
+            </div>
+
+            <div class="admin-analytics-grid">
+                <article class="admin-analytics-panel admin-analytics-panel--wide" aria-labelledby="workloadChartTitle">
+                    <div class="admin-analytics-panel__heading">
+                        <div><span>Current workload</span><h3 id="workloadChartTitle">Items awaiting action</h3></div>
+                        <strong id="adminAnalyticsWorkloadTotal">&mdash;</strong>
+                    </div>
+                    <div id="adminWorkloadChart" class="admin-bar-chart" role="group" aria-label="Administrative workload by queue">
+                        <div class="admin-analytics-loading" role="status">Calculating queue distribution&hellip;</div>
+                    </div>
+                </article>
+
+                <article class="admin-analytics-panel" aria-labelledby="caseAnalyticsTitle">
+                    <div class="admin-analytics-panel__heading"><div><span>Trust and safety</span><h3 id="caseAnalyticsTitle">Open cases by urgency</h3></div></div>
+                    <div id="adminCaseChart" class="admin-bar-chart admin-bar-chart--compact" role="group" aria-label="Open case urgency distribution">
+                        <div class="admin-analytics-loading" role="status">Calculating case urgency&hellip;</div>
+                    </div>
+                </article>
+
+                <article class="admin-analytics-panel" aria-labelledby="queueHealthTitle">
+                    <div class="admin-analytics-panel__heading"><div><span>System status</span><h3 id="queueHealthTitle">Queue health</h3></div></div>
+                    <dl class="admin-health-metrics">
+                        <div><dt>Urgent open cases</dt><dd id="adminUrgentCases">&mdash;</dd></div>
+                        <div><dt>Oldest pending item</dt><dd id="adminOldestQueueAge">&mdash;</dd></div>
+                        <div><dt>Data sources available</dt><dd id="adminDataCoverage">&mdash;</dd></div>
+                    </dl>
+                </article>
+            </div>
+        </section>
+
         <section class="admin-overview-layout">
             <div class="admin-overview-panel">
                 <div class="admin-overview-panel__header">
