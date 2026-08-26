@@ -82,6 +82,7 @@
             const panelStep = Number(panel.dataset.registrationStep);
             const active = panelStep === currentStep;
             panel.hidden = !active;
+            panel.inert = !active;
             panel.classList.toggle('is-active', active);
         });
         indicators.forEach(indicator => {
@@ -103,7 +104,12 @@
             const heading = panels[currentStep - 1].querySelector('h2');
             heading?.setAttribute('tabindex', '-1');
             heading?.focus({ preventScroll: true });
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            if (window.innerWidth <= 900) {
+                form.closest('.auth-card')?.scrollIntoView({
+                    block: 'start',
+                    behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth'
+                });
+            }
         }
     }
 

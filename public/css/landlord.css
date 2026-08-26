@@ -332,6 +332,25 @@
   min-width: 760px;
 }
 
+.dashboard-layout-landlord .landlord-table-controls {
+  display: grid;
+  grid-template-columns: minmax(220px, 360px) minmax(0, 1fr);
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.dashboard-layout-landlord .landlord-table-search {
+  width: 100%;
+}
+
+.dashboard-layout-landlord .landlord-table-count {
+  color: var(--color-text-muted);
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-align: right;
+}
+
 .dashboard-layout-landlord .landlord-data-table thead th {
   padding: 12px 16px !important;
   border-bottom: 1px solid var(--color-border-strong) !important;
@@ -662,6 +681,8 @@ body[data-landlord-page="leases"] .app-card {
   .landlord-flow {
     overflow-x: auto;
     grid-template-columns: repeat(4, minmax(108px, 1fr));
+    overscroll-behavior-inline: contain;
+    scrollbar-width: thin;
   }
 
   .landlord-flow-step {
@@ -736,6 +757,90 @@ body[data-landlord-page="leases"] .app-card {
     border-radius: 16px !important;
     background: var(--color-bg-surface);
     box-shadow: var(--shadow-modal);
+  }
+
+  .dashboard-layout-landlord .main-content-inner > .dashboard-container {
+    width: 100% !important;
+    max-width: none !important;
+    margin-inline: 0 !important;
+    padding-inline: 0 !important;
+  }
+
+  .dashboard-layout-landlord :where(.filters-group, .filter-tabs, .status-tabs, .tabs-header, .tab-bar) {
+    display: flex;
+    max-width: 100%;
+    flex-wrap: nowrap !important;
+    gap: 8px;
+    overflow-x: auto;
+    padding-bottom: 6px;
+    overscroll-behavior-inline: contain;
+    scrollbar-width: thin;
+  }
+
+  .dashboard-layout-landlord :where(.filters-group, .filter-tabs, .status-tabs, .tabs-header, .tab-bar) > :where(button, a) {
+    min-height: 42px;
+    flex: 0 0 auto;
+    white-space: nowrap;
+  }
+
+  .dashboard-layout-landlord :where(.modal-container, .modal-box, .form-modal, .details-modal) {
+    width: min(calc(100vw - 24px), 720px) !important;
+    max-height: calc(100dvh - 24px) !important;
+    margin: 0 !important;
+    border-radius: 14px !important;
+  }
+
+  .dashboard-layout-landlord :where(.modal-header, .modal-body, .modal-footer, .form-modal-head, .form-modal-body, .form-modal-footer) {
+    padding-right: 16px !important;
+    padding-left: 16px !important;
+  }
+
+  .dashboard-layout-landlord :where(.modal-footer, .form-modal-footer, .card-action-bar) {
+    flex-wrap: wrap;
+    gap: 10px !important;
+  }
+
+  body[data-landlord-page="property-create"] :where(.profile-card, .upload-grid) [style*="grid-template-columns"],
+  body[data-landlord-page="units"] .modal-body [style*="grid-template-columns"],
+  body[data-landlord-page="lease-create"] form [style*="grid-template-columns"] {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  body[data-landlord-page="property-create"] .step-wizard-nav {
+    justify-content: flex-start;
+    overflow-x: auto;
+    overscroll-behavior-inline: contain;
+    scrollbar-width: thin;
+  }
+
+  body[data-landlord-page="property-create"] .step-header {
+    min-width: max-content;
+    min-height: 44px;
+    padding: 6px 8px;
+    border: 0;
+    background: transparent;
+    text-align: left;
+  }
+
+  body[data-landlord-page="property-create"] .location-actions > *,
+  body[data-landlord-page="property-create"] .card-action-bar > *,
+  body[data-landlord-page="units"] #openAddRoomModalBtn {
+    width: 100% !important;
+    justify-content: center;
+  }
+
+  body[data-landlord-page="property-create"] .upload-grid,
+  body[data-landlord-page="units"] .room-grid {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  body[data-landlord-page="units"] .units-header-card {
+    padding: 22px 18px !important;
+  }
+
+  body[data-landlord-page="units"] .stats-summary-bar {
+    grid-template-columns: minmax(0, 1fr) !important;
+    gap: 10px !important;
   }
 }
 
@@ -899,6 +1004,10 @@ body[data-landlord-page="application-details"] ::-webkit-scrollbar-thumb {
 }
 
 @media (max-width: 767px) {
+  .dashboard-layout-landlord .landlord-table-controls {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
   .dashboard-layout-landlord .landlord-table-scroll {
     overflow: visible !important;
     border: 0 !important;
@@ -924,6 +1033,7 @@ body[data-landlord-page="application-details"] ::-webkit-scrollbar-thumb {
   .dashboard-layout-landlord .landlord-record-table tbody {
     display: grid;
     gap: 10px;
+    padding: 0;
   }
 
   .dashboard-layout-landlord .landlord-record-table tbody tr {
@@ -966,5 +1076,19 @@ body[data-landlord-page="application-details"] ::-webkit-scrollbar-thumb {
 
   .dashboard-layout-landlord .landlord-record-table .landlord-table-state-cell::before {
     display: none;
+  }
+}
+
+@media (max-width: 479px) {
+  .dashboard-layout-landlord .landlord-table-controls {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .dashboard-layout-landlord .landlord-table-count {
+    text-align: left;
+  }
+
+  .dashboard-layout-landlord .landlord-record-table td {
+    grid-template-columns: 96px minmax(0, 1fr);
   }
 }

@@ -69,8 +69,13 @@
             display: flex;
             align-items: center;
             gap: 0.5rem;
+            padding: 0;
+            border: 0;
+            background: transparent;
             font-weight: 700;
             font-size: 0.9375rem;
+            font-family: inherit;
+            text-align: left;
             color: var(--text-muted);
             opacity: 0.5;
             transition: all var(--transition-fast);
@@ -261,19 +266,19 @@
         <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">Follow the 3-step wizard to register your property, upload verification permits, and upload building photos.</p>
 
         <!-- Wizard Navigation -->
-        <div class="step-wizard-nav">
-            <div id="stepHeader1" class="step-header active" onclick="goToStep(1)" title="Click to view Step 1: Property Details">
+        <div class="step-wizard-nav" aria-label="Property registration progress">
+            <button type="button" id="stepHeader1" class="step-header active" onclick="goToStep(1)" title="View Step 1: Property Details" aria-controls="stepPanel1" aria-current="step">
                 <span class="step-num">1</span>
                 <span>Step 1: Property Details</span>
-            </div>
-            <div id="stepHeader2" class="step-header" onclick="goToStep(2)" title="Click to view Step 2: Upload Documents">
+            </button>
+            <button type="button" id="stepHeader2" class="step-header" onclick="goToStep(2)" title="View Step 2: Upload Documents" aria-controls="stepPanel2">
                 <span class="step-num">2</span>
                 <span>Step 2: Upload Documents</span>
-            </div>
-            <div id="stepHeader3" class="step-header" onclick="goToStep(3)" title="Click to view Step 3: Property Photos">
+            </button>
+            <button type="button" id="stepHeader3" class="step-header" onclick="goToStep(3)" title="View Step 3: Property Photos" aria-controls="stepPanel3">
                 <span class="step-num">3</span>
                 <span>Step 3: Property Photos</span>
-            </div>
+            </button>
         </div>
 
         <div id="createFeedback" class="alert alert-success hidden"></div>
@@ -560,7 +565,7 @@
                 <div class="upload-card">
                     <div>
                         <div class="upload-card-title">2. Business Permit (If applicable) *</div>
-                        <div class="upload-card-desc">Mayors Permit or DTI Registration certificate.</div>
+                        <div class="upload-card-desc">Mayor's Permit or DTI registration certificate.</div>
                         <div id="statusDocPermit" style="font-size: 0.75rem; margin-bottom: 0.5rem; color: var(--text-muted);">Status: Pending Upload</div>
                     </div>
                     <input type="file" id="fileDocPermit" accept=".pdf, .jpg, .jpeg, .png" class="form-input" style="font-size: 0.8125rem;">
@@ -580,7 +585,7 @@
                 <div class="upload-card">
                     <div>
                         <div class="upload-card-title">4. Valid Government ID *</div>
-                        <div class="upload-card-desc">Landlords passport, UMID, Drivers License, or National ID.</div>
+                        <div class="upload-card-desc">Landlord's passport, UMID, driver's license, or National ID.</div>
                         <div id="statusDocGovId" style="font-size: 0.75rem; margin-bottom: 0.5rem; color: var(--text-muted);">Status: Pending Upload</div>
                     </div>
                     <input type="file" id="fileDocGovId" accept=".pdf, .jpg, .jpeg, .png" class="form-input" style="font-size: 0.8125rem;">

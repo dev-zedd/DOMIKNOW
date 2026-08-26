@@ -78,8 +78,8 @@
             border-color: var(--maintenance);
         }
     </style>
-    <link href="../../css/design-system.css" rel="stylesheet">
-    <script src="../../js/ui.js" defer></script>
+    <link href="../../css/design-system.css?v=20260827-1" rel="stylesheet">
+    <script src="../../js/ui.js?v=20260827-2" defer></script>
 </head>
 <body class="app-loading" data-role="maintenance" data-page-title="My Assigned Tasks">
     <!-- Navbar -->
@@ -102,20 +102,20 @@
 
     <!-- Main Content -->
     <main class="dashboard-container">
-        <h2>My Assigned Maintenance Tasks</h2>
-        <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">Manage assigned jobs, travel to properties, execute repairs, and submit evidence reports.</p>
+        <h2>Task queue</h2>
+        <p class="maintenance-page-lead">Review offers, update active work, and open completed work orders.</p>
 
         <div class="filters-group">
-            <button class="filter-btn active" data-filter="all" aria-pressed="true">All Jobs</button>
-            <button class="filter-btn" data-filter="assigned" aria-pressed="false">New Offers</button>
+            <button class="filter-btn active" data-filter="all" aria-pressed="true">All tasks</button>
+            <button class="filter-btn" data-filter="assigned" aria-pressed="false">New offers</button>
             <button class="filter-btn" data-filter="accepted" aria-pressed="false">Accepted</button>
             <button class="filter-btn" data-filter="in_progress" aria-pressed="false">Working</button>
             <button class="filter-btn" data-filter="completed" aria-pressed="false">Completed</button>
-            <button class="filter-btn" data-filter="closed" aria-pressed="false">History logs</button>
+            <button class="filter-btn" data-filter="closed" aria-pressed="false">Closed</button>
         </div>
 
         <div class="list-card">
-            <table>
+            <table class="maintenance-data-table" aria-label="Assigned maintenance tasks">
                 <thead>
                     <tr>
                         <th>Property & Unit</th>
@@ -129,7 +129,7 @@
                 </thead>
                 <tbody id="tasksTableBody" aria-live="polite" aria-busy="true">
                     <tr>
-                        <td colspan="7" role="status" style="text-align: center; color: var(--text-muted);">Loading assigned tasks...</td>
+                        <td colspan="7" role="status" class="maintenance-table-message">Loading assigned tasks...</td>
                     </tr>
                 </tbody>
             </table>
@@ -137,7 +137,7 @@
     </main>
 
     <script src="../../js/auth.js"></script>
-    <script src="../../js/dashboard.js"></script>
+    <script src="../../js/dashboard.js?v=20260827-1"></script>
     <script>
         const token = localStorage.getItem('domiknow_token');
         let myTasks = [];
@@ -170,8 +170,7 @@
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
                 if (!response.ok) {
-                    tableBody.innerHTML = `<tr><td colspan="7" role="alert" style="text-align: center; color: var(--error);">Assigned tasks could not be loaded. Please try again.</td></tr>`;
-                    tableBody.setAttribute('aria-busy', 'false');
+                    renderTaskMessage('Assigned tasks could not be loaded.', 'error', true);
                     return;
                 }
 
@@ -182,8 +181,7 @@
 
             } catch (err) {
                 console.error(err);
-                tableBody.innerHTML = `<tr><td colspan="7" role="alert" style="text-align: center; color: var(--error);">The maintenance service could not be reached. Check your connection and try again.</td></tr>`;
-                tableBody.setAttribute('aria-busy', 'false');
+                renderTaskMessage('The maintenance service could not be reached. Check your connection and try again.', 'error', true);
             }
         }
 
@@ -202,7 +200,7 @@
             });
 
             if (filtered.length === 0) {
-                tableBody.innerHTML = `<tr><td colspan="7" role="status" style="text-align: center; padding: 2rem; color: var(--text-muted);">No maintenance tasks match this filter. Select another status to view more work.</td></tr>`;
+                renderTaskMessage('No maintenance tasks match this filter. Select another status to view more work.');
                 return;
             }
 
@@ -216,28 +214,64 @@
                 if (['completed', 'verified', 'closed'].includes(task.status)) statusBadgeClass = 'status-active';
                 else if (task.status === 'rejected') statusBadgeClass = 'status-rejected';
 
-                const assignedDate = new Date(task.created_at).toLocaleDateString();
+                const assignedDate = task.created_at
+                    ? new Date(task.created_at).toLocaleDateString('en-PH')
+                    : 'Not recorded';
+                const taskStatus = String(task.status || 'assigned').replaceAll('_', ' ');
+                const actionLabel = ['verified', 'closed'].includes(task.status)
+                    ? 'View details'
+                    : task.status === 'assigned'
+                        ? 'Review offer'
+                        : task.status === 'completed'
+                            ? 'View report'
+                            : 'Update progress';
 
                 const row = document.createElement('tr');
                 row.innerHTML = `
-                    <td>
-                        <div style="font-weight:750; color:var(--text-primary);">${task.properties?.property_name || 'Property'}</div>
-                        <div style="font-size:0.75rem; color:var(--text-muted);">Unit: ${task.unit_number || 'N/A'}</div>
+                    <td data-label="Property and unit">
+                        <div class="maintenance-task-property">${task.properties?.property_name || 'Property not specified'}</div>
+                        <div class="maintenance-task-meta">Unit: ${task.unit_number || 'Not specified'}</div>
                     </td>
-                    <td>
-                        <div style="font-weight:700; color:var(--primary);">${task.issue_title}</div>
-                        <div style="font-size:0.75rem; color:var(--text-secondary); max-width: 200px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">Pref. Sch: ${task.preferred_schedule || '—'}</div>
+                    <td data-label="Problem and schedule">
+                        <div class="maintenance-task-title">${task.issue_title || 'Maintenance request'}</div>
+                        <div class="maintenance-task-meta">Preferred schedule: ${task.preferred_schedule || 'Not specified'}</div>
                     </td>
-                    <td style="text-transform: capitalize;">${task.issue_category}</td>
-                    <td><span class="status-badge ${priorityBadgeClass}" style="text-transform:capitalize;">${task.priority_level}</span></td>
-                    <td><span class="status-badge ${statusBadgeClass}" style="text-transform:capitalize;">${task.status.replace('_', ' ')}</span></td>
-                    <td>${assignedDate}</td>
-                    <td>
-                        <a href="task-details.html?id=${task.id}" class="action-btn">Update Progress</a>
+                    <td data-label="Category" class="maintenance-task-capitalize">${task.issue_category || 'Other'}</td>
+                    <td data-label="Priority"><span class="status-badge ${priorityBadgeClass}">${task.priority_level || 'Normal'}</span></td>
+                    <td data-label="Status"><span class="status-badge ${statusBadgeClass}">${taskStatus}</span></td>
+                    <td data-label="Assigned">${assignedDate}</td>
+                    <td data-label="Action">
+                        <a href="task-details.html?id=${task.id}" class="action-btn">${actionLabel}</a>
                     </td>
                 `;
                 tableBody.appendChild(row);
             });
+        }
+
+        function renderTaskMessage(message, type = 'empty', retry = false) {
+            const tableBody = document.getElementById('tasksTableBody');
+            const row = document.createElement('tr');
+            const cell = document.createElement('td');
+            cell.colSpan = 7;
+            cell.className = `maintenance-table-message maintenance-table-message--${type}`;
+            cell.setAttribute('role', type === 'error' ? 'alert' : 'status');
+
+            const copy = document.createElement('span');
+            copy.textContent = message;
+            cell.appendChild(copy);
+
+            if (retry) {
+                const retryButton = document.createElement('button');
+                retryButton.type = 'button';
+                retryButton.className = 'btn btn-secondary maintenance-retry-button';
+                retryButton.textContent = 'Try again';
+                retryButton.addEventListener('click', fetchAssignedTasks, { once: true });
+                cell.appendChild(retryButton);
+            }
+
+            row.appendChild(cell);
+            tableBody.replaceChildren(row);
+            tableBody.setAttribute('aria-busy', 'false');
         }
     </script>
 </body>

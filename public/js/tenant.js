@@ -8,6 +8,32 @@
         { key: 'pay', label: 'Pay', href: 'billings.html' }
     ];
 
+    window.tenantNotice = function tenantNotice(message, options = {}) {
+        const text = String(message || 'Please try again.');
+        const variant = options.variant
+            || (/success|submitted|uploaded|saved|completed/i.test(text) ? 'success'
+                : /required|select|choose|larger|too large|only file/i.test(text) ? 'warning'
+                    : /error|failed|network|unavailable|could not/i.test(text) ? 'danger'
+                        : 'info');
+        const title = options.title
+            || (variant === 'success' ? 'Action completed'
+                : variant === 'warning' ? 'Check this information'
+                    : variant === 'danger' ? 'Action could not be completed'
+                        : 'Tenant notice');
+
+        if (typeof window.domiknowAlert === 'function') {
+            return window.domiknowAlert({
+                variant,
+                eyebrow: options.eyebrow || 'Tenant workspace',
+                title,
+                message: text,
+                confirmLabel: options.confirmLabel || 'Got it'
+            });
+        }
+        window.alert(text);
+        return Promise.resolve();
+    };
+
     const PAGE_META = {
         'properties.html': {
             description: 'Find approved rentals in Siniloan, compare the details that matter, and choose with confidence.',
@@ -333,6 +359,47 @@
         });
     }
 
+    function improveDiscoveryPreferences() {
+        const controls = document.querySelector('.recommendation-controls');
+        const header = controls?.querySelector('.recommendation-controls__header');
+        if (!controls || !header || controls.querySelector('.tenant-preferences-toggle')) return;
+
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'tenant-preferences-toggle';
+        button.setAttribute('aria-controls', 'tenantRecommendationPreferences');
+        controls.id = controls.id || 'tenantRecommendationPreferences';
+
+        const syncButton = () => {
+            const collapsed = controls.classList.contains('tenant-preferences-collapsed');
+            button.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
+            button.innerHTML = `
+                <span>${collapsed ? 'Edit rental priorities' : 'Hide rental priorities'}</span>
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="m6 9 6 6 6-6"/>
+                </svg>`;
+        };
+
+        const mobileQuery = window.matchMedia('(max-width: 1023px)');
+        const syncViewport = () => {
+            controls.classList.toggle('tenant-preferences-collapsed', mobileQuery.matches);
+            syncButton();
+        };
+
+        button.addEventListener('click', () => {
+            const willCollapse = !controls.classList.contains('tenant-preferences-collapsed');
+            controls.classList.toggle('tenant-preferences-collapsed', willCollapse);
+            syncButton();
+            if (!willCollapse) {
+                window.requestAnimationFrame(() => controls.scrollIntoView({ behavior: 'smooth', block: 'start' }));
+            }
+        });
+
+        header.appendChild(button);
+        syncViewport();
+        mobileQuery.addEventListener?.('change', syncViewport);
+    }
+
     function initialize() {
         const layout = document.querySelector('.dashboard-layout-tenant');
         const content = layout && layout.querySelector('.main-content-inner');
@@ -358,6 +425,7 @@
         improveControls(document);
         improveTabs();
         improveModals();
+        improveDiscoveryPreferences();
     }
 
     if (document.readyState === 'loading') {

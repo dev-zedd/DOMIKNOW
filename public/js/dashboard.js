@@ -169,13 +169,14 @@ function populateDashboardUI(user) {
 
     // Modern Sidebar & Layout Injection
     renderNewDashboardLayout(user);
+    window.requestAnimationFrame(() => window.DomiKnowLoading?.upgradeLegacyLoading(document.body));
 }
 
 function loadTenantModuleAssets() {
     if (!document.querySelector('link[data-tenant-module]')) {
         const stylesheet = document.createElement('link');
         stylesheet.rel = 'stylesheet';
-        stylesheet.href = '/css/tenant.css';
+        stylesheet.href = '/css/tenant.css?v=20260827-3';
         stylesheet.setAttribute('data-tenant-module', '');
         document.head.appendChild(stylesheet);
     }
@@ -184,7 +185,7 @@ function loadTenantModuleAssets() {
 
     if (!document.querySelector('script[data-tenant-module]')) {
         const script = document.createElement('script');
-        script.src = '/js/tenant.js';
+        script.src = '/js/tenant.js?v=20260827-3';
         script.defer = true;
         script.setAttribute('data-tenant-module', '');
         document.head.appendChild(script);
@@ -195,7 +196,7 @@ function loadLandlordModuleAssets() {
     if (!document.querySelector('link[data-landlord-module]')) {
         const stylesheet = document.createElement('link');
         stylesheet.rel = 'stylesheet';
-        stylesheet.href = '/css/landlord.css';
+        stylesheet.href = '/css/landlord.css?v=20260827-4';
         stylesheet.setAttribute('data-landlord-module', '');
         document.head.appendChild(stylesheet);
     }
@@ -204,7 +205,7 @@ function loadLandlordModuleAssets() {
 
     if (!document.querySelector('script[data-landlord-module]')) {
         const script = document.createElement('script');
-        script.src = '/js/landlord.js';
+        script.src = '/js/landlord.js?v=20260827-4';
         script.defer = true;
         script.setAttribute('data-landlord-module', '');
         document.head.appendChild(script);
@@ -215,7 +216,7 @@ function loadMaintenanceModuleAssets() {
     if (!document.querySelector('link[data-maintenance-module]')) {
         const stylesheet = document.createElement('link');
         stylesheet.rel = 'stylesheet';
-        stylesheet.href = '/css/maintenance.css';
+        stylesheet.href = '/css/maintenance.css?v=20260827-1';
         stylesheet.setAttribute('data-maintenance-module', '');
         document.head.appendChild(stylesheet);
     }
@@ -224,7 +225,7 @@ function loadMaintenanceModuleAssets() {
 
     if (!document.querySelector('script[data-maintenance-module]')) {
         const script = document.createElement('script');
-        script.src = '/js/maintenance.js';
+        script.src = '/js/maintenance.js?v=20260827-1';
         script.defer = true;
         script.setAttribute('data-maintenance-module', '');
         document.head.appendChild(script);
@@ -863,10 +864,10 @@ function renderNewDashboardLayout(user) {
             </div>
         `;
     } else if (role === 'landlord') {
-        const activeTab = ['properties.html', 'property-create.html'].includes(activeNavigationFilename) ? 'portfolio' :
-                          activeNavigationFilename === 'applications.html' ? 'applications' :
-                          activeNavigationFilename === 'leases.html' ? 'leases' :
-                          activeNavigationFilename === 'billings.html' ? 'revenue' : 'more';
+        const activeTab = ['properties.html', 'property-create.html', 'property-details.html', 'units.html'].includes(activeNavigationFilename) ? 'portfolio' :
+                          ['applications.html', 'application-details.html'].includes(activeNavigationFilename) ? 'applications' :
+                          ['leases.html', 'lease-create.html'].includes(activeNavigationFilename) ? 'leases' :
+                          ['billings.html', 'payments.html'].includes(activeNavigationFilename) ? 'revenue' : 'more';
 
         topbarHtml += `
             <nav class="bottom-nav-bar" aria-label="Landlord quick navigation">
@@ -1088,9 +1089,23 @@ function renderNewDashboardLayout(user) {
         // 5. Keyboard Shortcuts alert trigger
         const shortcutsBtn = document.getElementById('popoverShortcutsBtn');
         if (shortcutsBtn) {
-            shortcutsBtn.addEventListener('click', (e) => {
+            shortcutsBtn.addEventListener('click', async (e) => {
                 e.preventDefault();
-                alert('Shortcuts:\nAlt + D: Discovery\nAlt + A: Applications\nAlt + L: Leases\nAlt + P: Payments\nAlt + S: Support\nAlt + R: Reports');
+                await window.domiknowAlert({
+                    variant: 'info',
+                    eyebrow: 'Tenant navigation',
+                    title: 'Keyboard shortcuts',
+                    message: 'Use these shortcuts to move between the main tenant tools.',
+                    details: [
+                        'Alt + D — Property discovery',
+                        'Alt + A — Applications',
+                        'Alt + L — Lease agreement',
+                        'Alt + P — Billing and payments',
+                        'Alt + S — Support tools',
+                        'Alt + R — Reports center'
+                    ],
+                    confirmLabel: 'Got it'
+                });
             });
         }
     }
