@@ -59,10 +59,10 @@
         .sig-input { width: 100%; padding: 0.6rem 0.9rem; border: 2px solid #10b981; border-radius: var(--radius-sm); font-size: 0.9rem; background-color: var(--bg-secondary); color: var(--text-primary); margin-top: 0.4rem; }
         .sig-input:focus { outline: none; border-color: #059669; box-shadow: 0 0 0 3px rgba(16,185,129,0.2); }
     </style>
-    <link href="../../css/design-system.css" rel="stylesheet">
-    <script src="../../js/ui.js" defer></script>
+    <link href="../../css/design-system.css?v=20260827-1" rel="stylesheet">
+    <script src="../../js/ui.js?v=20260827-3" defer></script>
 </head>
-<body>
+<body class="app-loading" data-role="tenant" data-page-title="Lease Agreement">
     <nav class="navbar navbar-tenant">
         <div class="navbar-container">
             <div class="navbar-brand-group">
@@ -113,7 +113,7 @@
     </div>
 
     <script src="../../js/auth.js"></script>
-    <script src="../../js/dashboard.js"></script>
+    <script src="../../js/dashboard.js?v=20260827-3"></script>
     <script>
         const token = localStorage.getItem('domiknow_token');
         let activeLease = null; // holds the full lease object for accept/reject
@@ -529,7 +529,7 @@
                 const sigInput = document.getElementById('sigNameInput');
                 const sigVal = sigInput ? sigInput.value.trim() : '';
                 if (!sigVal) {
-                    alert('Please type your signature name to sign the contract.');
+                    await window.domiknowAlert({ variant: 'warning', eyebrow: 'Signature required', title: 'Enter your full name', message: 'Type your full legal name before signing this lease.', confirmLabel: 'Review signature' });
                     return;
                 }
                 const confirmSignature = await window.domiknowConfirm({
@@ -551,14 +551,17 @@
                         body: JSON.stringify({ signature_name: sigVal })
                     });
                     const data = await res.json();
-                    if (!res.ok) { alert(data.message || 'Signature execution failed.'); return; }
+                    if (!res.ok) {
+                        await window.domiknowAlert({ variant: 'danger', eyebrow: 'Lease signature', title: 'Lease not signed', message: data.message || 'The signature could not be recorded. Please try again.' });
+                        return;
+                    }
 
-                    alert('Lease agreement successfully signed and accepted!');
+                    await window.domiknowAlert({ variant: 'success', eyebrow: 'Lease signature', title: 'Lease signed', message: 'Your lease agreement was signed and accepted successfully.' });
                     closeModal();
                     loadLeases();
                 } catch (e) {
                     console.error(e);
-                    alert('Network error signing agreement: ' + (e.message || e));
+                    await window.domiknowAlert({ variant: 'danger', eyebrow: 'Connection interrupted', title: 'Lease not signed', message: 'Your signature was not submitted. Check your connection and try again.' });
                 } finally {
                     if (acceptBtn) { acceptBtn.disabled = false; acceptBtn.textContent = 'Sign & Accept'; }
                 }
@@ -579,7 +582,10 @@
                     }
                 });
                 if (reason === null) return;
-                if (!reason.trim()) { alert('A concern note or rejection reason is required.'); return; }
+                if (!reason.trim()) {
+                    await window.domiknowAlert({ variant: 'warning', eyebrow: 'Concern required', title: 'Describe the requested change', message: 'Add a clear concern or rejection reason before returning this lease.' });
+                    return;
+                }
 
                 if (rejectBtn) { rejectBtn.disabled = true; rejectBtn.textContent = 'Submitting Appeal...'; }
                 try {
@@ -593,14 +599,17 @@
                         })
                     });
                     const data = await res.json();
-                    if (!res.ok) { alert(data.message || 'Rejection failed.'); return; }
+                    if (!res.ok) {
+                        await window.domiknowAlert({ variant: 'danger', eyebrow: 'Lease review', title: 'Concern not submitted', message: data.message || 'Your concern could not be submitted. Please try again.' });
+                        return;
+                    }
 
-                    alert('Lease agreement draft rejected and returned to landlord with your concern notes.');
+                    await window.domiknowAlert({ variant: 'success', eyebrow: 'Lease review', title: 'Concern submitted', message: 'The draft was returned to the landlord with your requested changes.' });
                     closeModal();
                     loadLeases();
                 } catch (e) {
                     console.error(e);
-                    alert('Network error rejecting agreement: ' + (e.message || e));
+                    await window.domiknowAlert({ variant: 'danger', eyebrow: 'Connection interrupted', title: 'Concern not submitted', message: 'Your concern was not submitted. Check your connection and try again.' });
                 } finally {
                     if (rejectBtn) { rejectBtn.disabled = false; rejectBtn.textContent = 'Reject & Appeal Draft'; }
                 }

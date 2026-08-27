@@ -521,11 +521,11 @@
             background: #94a3b8;
         }
     </style>
-    <link href="../../css/design-system.css" rel="stylesheet">
-    <script src="../../js/ui.js" defer></script>
+    <link href="../../css/design-system.css?v=20260827-1" rel="stylesheet">
+    <script src="../../js/ui.js?v=20260827-3" defer></script>
     <script src="../../js/map-system.js" defer></script>
 </head>
-<body>
+<body class="app-loading" data-role="tenant" data-page-title="Property Details">
     <nav class="navbar navbar-tenant">
         <div class="navbar-container">
             <div class="navbar-brand-group">
@@ -552,7 +552,7 @@
 
 
     <script src="../../js/auth.js"></script>
-    <script src="../../js/dashboard.js"></script>
+    <script src="../../js/dashboard.js?v=20260827-3"></script>
     <script>
         const token = localStorage.getItem('domiknow_token');
         const urlParams = new URLSearchParams(window.location.search);
@@ -562,18 +562,6 @@
             if (!propertyId) {
                 document.getElementById('propertyDetailsContent').innerHTML = `<p style="text-align: center; color: var(--error);">Missing Property ID parameter in URL.</p>`;
                 return;
-            }
-
-            // Instantly override topbar title with breadcrumbs to prevent flashing "Property Profile"
-            const initialTopbarTitle = document.querySelector('.topbar-title');
-            if (initialTopbarTitle) {
-                initialTopbarTitle.innerHTML = `
-                    <div class="breadcrumb-nav" style="font-size: 0.95rem; font-weight: 700; display: flex; align-items: center; gap: 0.35rem;">
-                        <a href="properties.html" style="color: #0f172a; text-decoration: none;">Discovery</a>
-                        <span class="breadcrumb-separator" style="color: #94a3b8; font-weight: 400;">&gt;</span>
-                        <span class="breadcrumb-current" style="color: #64748b; font-weight: 500;">Property Details</span>
-                    </div>
-                `;
             }
 
             fetchPropertyProfile();
@@ -596,17 +584,6 @@
 
                 const result = await response.json();
                 const prop = result.data;
-
-                const topbarTitle = document.querySelector('.topbar-title');
-                if (topbarTitle) {
-                    topbarTitle.innerHTML = `
-                        <div class="breadcrumb-nav" style="font-size: 0.95rem; font-weight: 700; display: flex; align-items: center; gap: 0.35rem;">
-                            <a href="properties.html" style="color: #0f172a; text-decoration: none;">Discovery</a>
-                            <span class="breadcrumb-separator" style="color: #94a3b8; font-weight: 400;">&gt;</span>
-                            <span class="breadcrumb-current" style="color: #64748b; font-weight: 500;">Property Details</span>
-                        </div>
-                    `;
-                }
 
                 renderProfileUI(prop);
 

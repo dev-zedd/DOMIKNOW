@@ -43,6 +43,8 @@ body.auth-page {
 
 .auth-page .auth-header {
   display: flex;
+  width: 100% !important;
+  max-width: none !important;
   min-width: 0;
   min-height: 100vh;
   flex-direction: column;
@@ -304,6 +306,11 @@ body.auth-page {
 .auth-page .auth-form .form-group { margin: 0 !important; }
 .auth-page .auth-form-intro { margin: 0; color: var(--color-text-secondary); font-size: var(--font-size-body-sm); line-height: 1.6; }
 
+/* Legacy form rules also use !important. Keep inactive steps out of both the
+   visual and accessibility trees by placing this after form display rules. */
+body.auth-page .hidden,
+body.auth-page [hidden] { display: none !important; }
+
 .auth-inline-actions {
   display: flex;
   gap: 14px;
@@ -313,7 +320,22 @@ body.auth-page {
 }
 
 .auth-inline-actions .auth-link { font-size: var(--font-size-label-sm) !important; }
+.auth-inline-actions--end { justify-content: flex-end; }
 .auth-primary-action { margin-top: 4px !important; }
+
+.auth-account-help {
+  display: flex;
+  gap: 6px;
+  align-items: baseline;
+  justify-content: center;
+  margin-top: 18px;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-label-sm);
+  line-height: 1.45;
+  text-align: center;
+}
+
+.auth-account-help .auth-link { font-size: inherit !important; }
 
 .auth-alert-action { display: grid; gap: 10px; width: 100%; }
 .auth-alert-action__button {
@@ -375,23 +397,16 @@ body.auth-page {
 
 .auth-recovery-progress span.is-active { background: var(--color-bg-surface); color: var(--color-action-primary); box-shadow: var(--shadow-xs); }
 .auth-recovery-success { display: grid; gap: 8px; padding-block: 24px; }
-.auth-recovery-success::before {
-  content: "✓";
-  display: grid;
-  width: 48px;
-  height: 48px;
-  place-items: center;
-  margin: 0 auto 3px;
-  border-radius: 50%;
-  background: var(--color-success-text);
-  color: #fff;
-  font-size: 1.4rem;
-  font-weight: 900;
-}
-.auth-recovery-success > span:first-child { display: none !important; }
 .auth-recovery-success__icon { display: grid; width: 48px; height: 48px; place-items: center; margin: 0 auto 3px; border-radius: 50%; background: var(--color-success-text); color: #fff; }
 .auth-recovery-success h3 { margin: 0; color: var(--color-success-text); }
 .auth-recovery-success p { margin: 0 0 8px; color: var(--color-text-secondary); font-size: var(--font-size-body-sm); line-height: 1.5; }
+.auth-success-action {
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  text-decoration: none;
+}
 
 .issued-account-note {
   display: grid;
@@ -684,5 +699,7 @@ body.auth-page {
   .registration-actions .btn { width: 100% !important; }
   .registration-actions:has(#registrationBack[hidden]) #registrationNext { grid-column: 1 / -1; }
   .auth-inline-actions { align-items: flex-start; flex-direction: column; gap: 8px; }
+  .auth-inline-actions--end { align-items: flex-end; }
+  .auth-account-help { align-items: center; flex-direction: column; }
   .auth-alert-action__button { width: 100% !important; }
 }

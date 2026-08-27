@@ -474,8 +474,8 @@
         /* ── Validation hints ───────────────────────────────── */
         .val-hint { font-size:0.73rem; color:var(--error); margin-top:0.35rem; display:none; }
     </style>
-    <link href="../../css/design-system.css" rel="stylesheet">
-    <script src="../../js/ui.js" defer></script>
+    <link href="../../css/design-system.css?v=20260827-1" rel="stylesheet">
+    <script src="../../js/ui.js?v=20260827-3" defer></script>
 </head>
 <body class="app-loading" data-role="tenant" data-page-title="Maintenance Requests">
     <!-- Navbar -->
@@ -730,7 +730,7 @@
     </div>
 
     <script src="../../js/auth.js"></script>
-    <script src="../../js/dashboard.js"></script>
+    <script src="../../js/dashboard.js?v=20260827-3"></script>
     <script>
         const token = localStorage.getItem('domiknow_token');
         let activeLeaseList = [];
@@ -1174,7 +1174,10 @@
                     }
                 });
                 if (remarks === null) return;
-                if (!remarks.trim()) { alert('Rework description is required.'); return; }
+                if (!remarks.trim()) {
+                    await window.domiknowAlert({ variant: 'warning', eyebrow: 'Maintenance review', title: 'Describe the remaining issue', message: 'Add a clear description before requesting additional work.' });
+                    return;
+                }
             } else {
                 const closeTicket = await window.domiknowConfirm({
                     variant: 'warning',
@@ -1197,9 +1200,11 @@
                     closeDetailsModal();
                     fetchMyRequests();
                 } else {
-                    alert(result.message || 'Failed to submit evaluation.');
+                    await window.domiknowAlert({ variant: 'danger', eyebrow: 'Maintenance review', title: 'Decision not submitted', message: result.message || 'Your maintenance evaluation could not be submitted. Please try again.' });
                 }
-            } catch { alert('Network error. Please try again.'); }
+            } catch {
+                await window.domiknowAlert({ variant: 'danger', eyebrow: 'Connection interrupted', title: 'Decision not submitted', message: 'Your maintenance evaluation was not submitted. Check your connection and try again.' });
+            }
         }
 
         // ── Form submit ───────────────────────────────────────

@@ -673,8 +673,8 @@
             30% { transform: translateY(-4px); opacity: 1; }
         }
     </style>
-    <link href="../../css/design-system.css" rel="stylesheet">
-    <script src="../../js/ui.js" defer></script>
+    <link href="../../css/design-system.css?v=20260827-1" rel="stylesheet">
+    <script src="../../js/ui.js?v=20260827-3" defer></script>
 </head>
 <body class="app-loading" data-role="tenant" data-page-title="Tenant Reports Center">
 
@@ -1018,7 +1018,7 @@
     </div>
 
     <script src="../../js/auth.js"></script>
-    <script src="../../js/dashboard.js"></script>
+    <script src="../../js/dashboard.js?v=20260827-3"></script>
     <script>
         const token = localStorage.getItem('domiknow_token');
         let currentReportId = null;
@@ -1204,7 +1204,7 @@
                     const file = fileInput.files[0];
                     if (!file) return;
                     if (file.size > 8 * 1024 * 1024) {
-                        alert('File too large. Maximum size is 8MB.');
+                        window.tenantNotice('File too large. Maximum size is 8MB.');
                         fileInput.value = '';
                         return;
                     }
@@ -1275,11 +1275,11 @@
                             if (feed) feed.scrollTop = feed.scrollHeight;
                         } else {
                             const r = await res.json();
-                            alert(r.message || 'Failed to post message.');
+                            window.tenantNotice(r.message || 'Failed to post message.');
                         }
                     } catch (err) {
                         console.error(err);
-                        alert('Network error posting message.');
+                        window.tenantNotice('Network error posting message.');
                     } finally {
                         if (sendBtn) { sendBtn.disabled = false; sendBtn.textContent = 'Send'; }
                     }
@@ -1509,7 +1509,7 @@
 
         $('btnReportLandlord').addEventListener('click', () => {
             if (tenantLeases.length === 0) {
-                alert('No lease records found. You can only file a report against a landlord if you have an active or completed lease.');
+                window.tenantNotice('No lease records found. You can only file a report against a landlord if you have an active or completed lease.');
                 return;
             }
             if (tenantLeases.length === 1) {
@@ -1629,12 +1629,12 @@
                 const res  = await fetch(`/api/landlord-reports/${reportId}/detail-filed`, { headers: { 'Authorization': `Bearer ${token}` } });
                 const json = await res.json();
                 if (!res.ok) {
-                    alert(json.message || 'Failed to load report details.');
+                    window.tenantNotice(json.message || 'Failed to load report details.');
                     closeFiledModal();
                     return;
                 }
                 const r = json.data;
-                if (!r) { alert('Failed to load report details.'); return; }
+                if (!r) { window.tenantNotice('Failed to load report details.'); return; }
 
                 $('fTitle').textContent = capWords(r.report_category);
                 $('fSubtitle').innerHTML = `<span>Filed ${fmtDate(r.created_at)}</span> &bull; <span>Ref: #${String(r.id).substring(0,8)}</span>`;
@@ -1694,7 +1694,7 @@
 
             } catch (err) {
                 console.error(err);
-                alert('Error fetching report details.');
+                window.tenantNotice('Error fetching report details.');
             }
         }
 
@@ -1821,7 +1821,7 @@
                 const res  = await fetch(`/api/tenant-reports/${reportId}/detail-tenant`, { headers:{ 'Authorization': `Bearer ${token}` } });
                 const json = await res.json();
                 const r    = json.data;
-                if (!r) { alert('Failed to load report details.'); return; }
+                if (!r) { window.tenantNotice('Failed to load report details.'); return; }
 
                 $('mTitle').textContent    = capWords(r.report_category);
                 $('mSubtitle').innerHTML   = `<span>Filed ${fmtDate(r.created_at)}</span> &bull; <span>Ref: #${String(r.id).substring(0,8)}</span>`;
@@ -1869,7 +1869,7 @@
 
             } catch (err) {
                 console.error(err);
-                alert('Error fetching details.');
+                window.tenantNotice('Error fetching details.');
             }
         }
 

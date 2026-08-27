@@ -19,6 +19,10 @@
   display: none !important;
 }
 
+.dk-modal-root [hidden] {
+  display: none !important;
+}
+
 .dk-modal-root[data-variant="success"] {
   --dk-modal-status-text: var(--color-success-text);
   --dk-modal-status-bg: var(--color-success-bg);

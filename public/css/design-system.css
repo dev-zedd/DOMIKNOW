@@ -8,13 +8,14 @@
  * the existing DOM without renaming hooks or changing application behavior.
  */
 
-/* ==========================================================================
-   0. Multi-Page Native View Transitions for Persistent Sidebar & Topbar
-   ========================================================================== */
+/* ===========================================================================
+   0. Reserved View-Transition Names
 
-@view-transition {
-  navigation: auto;
-}
+   Cross-document transitions are intentionally not enabled globally. They
+   produced aborted-transition errors during ordinary navigation and made
+   page changes feel like a refresh. These names remain available for future
+   same-document transitions started explicitly by application code.
+   ========================================================================== */
 
 #domiknowSidebar,
 .sidebar {

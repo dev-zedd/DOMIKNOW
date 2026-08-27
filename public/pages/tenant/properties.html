@@ -29,13 +29,13 @@
             border-color: #4f46e5;
         }
     </style>
-    <link href="../../css/design-system.css" rel="stylesheet">
+    <link href="../../css/design-system.css?v=20260827-1" rel="stylesheet">
     <link href="../../css/public-refinement.css" rel="stylesheet">
-    <script src="../../js/ui.js" defer></script>
+    <script src="../../js/ui.js?v=20260827-3" defer></script>
     <script src="../../js/map-system.js" defer></script>
     <script src="../../js/location-permission.js?v=20260817-9" defer></script>
 </head>
-<body data-tenant-page="recommendations">
+<body class="app-loading" data-role="tenant" data-page-title="Property Discovery" data-tenant-page="recommendations">
     <!-- Navbar -->
     <nav class="navbar navbar-tenant">
         <div class="navbar-container">
@@ -180,7 +180,7 @@
 
 
     <script src="../../js/auth.js"></script>
-    <script src="../../js/dashboard.js"></script>
+    <script src="../../js/dashboard.js?v=20260827-3"></script>
     <script>
         const token = localStorage.getItem('domiknow_token');
         let mapInstance = null;

@@ -149,8 +149,8 @@
             cursor: pointer;
         }
     </style>
-    <link href="../../css/design-system.css" rel="stylesheet">
-    <script src="../../js/ui.js" defer></script>
+    <link href="../../css/design-system.css?v=20260827-1" rel="stylesheet">
+    <script src="../../js/ui.js?v=20260827-2" defer></script>
 </head>
 <body class="app-loading" data-role="maintenance" data-page-title="Task Progress Details">
     <!-- Navbar -->
@@ -173,58 +173,66 @@
 
     <!-- Main Content -->
     <main class="dashboard-container">
-        <h2>Maintenance Task Progress</h2>
-        <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">Update the coordination pipeline status, request revisions, and file the task completion report.</p>
+        <h2>Work order details</h2>
+        <p class="maintenance-page-lead">Review access instructions, repair evidence, and the complete coordination history.</p>
+
+        <div id="taskLoadError" class="alert alert-danger hidden maintenance-load-error" role="alert" aria-live="assertive">
+            <div>
+                <strong>Work order unavailable</strong>
+                <p id="taskLoadErrorText">This work order could not be loaded.</p>
+            </div>
+            <button type="button" id="retryTaskButton" class="btn btn-secondary">Try again</button>
+        </div>
 
         <div class="details-grid">
             <!-- Left Column: Specs, Instructions, Actions -->
             <div class="details-card">
-                <h3 id="requestTitle" style="color: var(--primary); margin-bottom: 1.25rem;">Task details</h3>
+                <h3 id="requestTitle" class="maintenance-card-title">Task details</h3>
 
-                <div style="display:grid; grid-template-columns:1fr 1fr; gap:1.25rem; background:var(--bg-primary); border:1px solid var(--border-color); padding:1.25rem; border-radius:var(--radius-md); margin-bottom:1.5rem;">
-                    <div><span style="font-size:0.7rem; font-weight:700; color:var(--text-muted);">PROPERTY NAME</span><div style="font-weight:600;" id="propertyName">Loading...</div></div>
-                    <div><span style="font-size:0.7rem; font-weight:700; color:var(--text-muted);">UNIT / ROOM NO.</span><div style="font-weight:600;" id="unitNumber">Loading...</div></div>
-                    <div><span style="font-size:0.7rem; font-weight:700; color:var(--text-muted);">TENANT CONTACT</span><div style="font-weight:600;" id="tenantContact">Loading...</div></div>
-                    <div><span style="font-size:0.7rem; font-weight:700; color:var(--text-muted);">PREFERRED ENTRY SCHEDULE</span><div style="font-weight:600;" id="preferredSchedule">Loading...</div></div>
-                    <div><span style="font-size:0.7rem; font-weight:700; color:var(--text-muted);">CATEGORY</span><div style="font-weight:600; text-transform:capitalize;" id="issueCategory">Loading...</div></div>
-                    <div><span style="font-size:0.7rem; font-weight:700; color:var(--text-muted);">URGENCY PRIORITY</span><div style="font-weight:600; text-transform:capitalize;" id="priorityLevel">Loading...</div></div>
-                    <div><span style="font-size:0.7rem; font-weight:700; color:var(--text-muted);">TASK STATUS</span><div style="font-weight:800; text-transform:capitalize; color:var(--maintenance);" id="taskStatus">Loading...</div></div>
+                <div class="task-facts-grid" aria-label="Work order summary">
+                    <div class="task-fact"><span class="task-fact-label">Property</span><div class="task-fact-value" id="propertyName">Loading...</div></div>
+                    <div class="task-fact"><span class="task-fact-label">Unit or room</span><div class="task-fact-value" id="unitNumber">Loading...</div></div>
+                    <div class="task-fact"><span class="task-fact-label">Tenant contact</span><div class="task-fact-value" id="tenantContact">Loading...</div></div>
+                    <div class="task-fact"><span class="task-fact-label">Preferred entry schedule</span><div class="task-fact-value" id="preferredSchedule">Loading...</div></div>
+                    <div class="task-fact"><span class="task-fact-label">Category</span><div class="task-fact-value task-fact-value--capitalize" id="issueCategory">Loading...</div></div>
+                    <div class="task-fact"><span class="task-fact-label">Priority</span><div class="task-fact-value task-fact-value--capitalize" id="priorityLevel">Loading...</div></div>
+                    <div class="task-fact"><span class="task-fact-label">Status</span><div class="task-fact-value task-fact-value--status" id="taskStatus">Loading...</div></div>
                 </div>
 
-                <div style="margin-bottom:1.5rem;">
-                    <span style="font-size:0.72rem; color:var(--text-muted); font-weight:700; text-transform:uppercase;">Landlord remarks / Instructions</span>
-                    <div id="landlordRemarks" style="font-size:0.9rem; color:var(--text-secondary); background:var(--bg-primary); border:1px solid var(--border-color); padding:0.75rem; border-radius:4px; margin-top:0.25rem; white-space:pre-wrap;"></div>
+                <div class="task-copy-block">
+                    <span class="task-copy-label">Landlord instructions</span>
+                    <div id="landlordRemarks" class="task-copy-content"></div>
                 </div>
 
-                <div style="margin-bottom:1.5rem;">
-                    <span style="font-size:0.72rem; color:var(--text-muted); font-weight:700; text-transform:uppercase;">Problem Description</span>
-                    <div id="issueDescription" style="font-size:0.9rem; color:var(--text-secondary); background:var(--bg-primary); border:1px solid var(--border-color); padding:0.75rem; border-radius:4px; margin-top:0.25rem; white-space:pre-wrap;"></div>
+                <div class="task-copy-block">
+                    <span class="task-copy-label">Problem description</span>
+                    <div id="issueDescription" class="task-copy-content"></div>
                 </div>
 
-                <div id="imageContainer" class="hidden" style="margin-bottom:1.5rem;">
-                    <span style="font-size:0.72rem; color:var(--text-muted); font-weight:700; text-transform:uppercase;">Tenant Uploaded Photo</span>
-                    <div><a id="issueImgLink" target="_blank"><img id="issueImg" alt="Maintenance issue evidence" style="max-width:100%; max-height:220px; border:1px solid var(--border-color); border-radius:4px; margin-top:0.25rem;"></a></div>
+                <div id="imageContainer" class="hidden task-evidence-block">
+                    <span class="task-copy-label">Tenant photo</span>
+                    <div><a id="issueImgLink" target="_blank" rel="noopener"><img id="issueImg" alt="Maintenance issue evidence" class="task-evidence-image"></a></div>
                 </div>
 
                 <!-- Technician actions and report submissions -->
                 <div id="technicianActionPanel" class="action-panel-box hidden">
-                    <h4 style="margin:0;" id="actionPanelTitle">Action Coord Panel</h4>
+                    <h4 id="actionPanelTitle">Next action</h4>
                     <div id="panelFormContainer"></div>
                 </div>
             </div>
 
             <!-- Right Column: logs history -->
             <div class="timeline-card">
-                <h3>Coordination Log Timeline</h3>
+                <h3>Coordination history</h3>
                 <div class="timeline" id="timelineLogs">
-                    <p style="text-align: center; color: var(--text-muted); padding: 2rem;">No logs documented yet.</p>
+                    <p class="timeline-empty">Loading coordination history…</p>
                 </div>
             </div>
         </div>
     </main>
 
     <script src="../../js/auth.js"></script>
-    <script src="../../js/dashboard.js"></script>
+    <script src="../../js/dashboard.js?v=20260827-1"></script>
     <script>
         const token = localStorage.getItem('domiknow_token');
         const urlParams = new URLSearchParams(window.location.search);
@@ -232,7 +240,22 @@
         let taskDetails = null;
 
         document.addEventListener('DOMContentLoaded', () => {
-            if (!token || !taskId) return;
+            const retryButton = document.getElementById('retryTaskButton');
+            retryButton.addEventListener('click', () => {
+                if (!taskId) {
+                    window.location.href = 'tasks.html';
+                    return;
+                }
+                fetchTaskDetails();
+            });
+
+            if (!taskId) {
+                retryButton.textContent = 'Return to task queue';
+                showTaskLoadError('No work order was selected. Return to the task queue and choose a work order.');
+                return;
+            }
+
+            if (!token) return;
             fetchTaskDetails();
 
             // Setup container level event listeners for actions to avoid CSP issues
@@ -250,6 +273,8 @@
                     handleStatusUpdate(btn.dataset.status);
                 } else if (action === 'add-row') {
                     addMaterialRow();
+                } else if (action === 'remove-row') {
+                    btn.closest('tr')?.remove();
                 }
             });
 
@@ -262,27 +287,68 @@
             });
         });
 
+        function showTaskLoadError(message) {
+            document.getElementById('taskLoadErrorText').textContent = message;
+            document.getElementById('taskLoadError').classList.remove('hidden');
+            document.querySelector('.details-grid').classList.add('hidden');
+        }
+
+        function hideTaskLoadError() {
+            document.getElementById('taskLoadError').classList.add('hidden');
+            document.querySelector('.details-grid').classList.remove('hidden');
+        }
+
+        function setTaskLoading(loading) {
+            const grid = document.querySelector('.details-grid');
+            if (loading) grid.setAttribute('aria-busy', 'true');
+            else grid.removeAttribute('aria-busy');
+        }
+
+        async function getResponseMessage(response, fallback) {
+            const result = await response.json().catch(() => null);
+            return result?.message || fallback;
+        }
+
+        async function showTaskNotice(variant, title, message) {
+            if (typeof window.domiknowAlert === 'function') {
+                await window.domiknowAlert({
+                    variant,
+                    eyebrow: 'Maintenance work order',
+                    title,
+                    message,
+                    confirmLabel: 'Got it'
+                });
+            }
+        }
+
         async function fetchTaskDetails() {
+            hideTaskLoadError();
+            setTaskLoading(true);
             try {
                 const response = await fetch(`/api/maintenance/requests/${taskId}`, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
-                if (!response.ok) return;
+                if (!response.ok) {
+                    throw new Error(await getResponseMessage(response, 'This work order could not be loaded.'));
+                }
 
                 const result = await response.json();
                 const data = result.data;
                 const req = data.request;
+                if (!req) throw new Error('This work order is unavailable.');
                 taskDetails = req;
 
-                document.getElementById('propertyName').textContent = req.properties?.property_name;
-                document.getElementById('unitNumber').textContent = req.unit_number || 'N/A';
-                document.getElementById('tenantContact').textContent = `${req.tenant?.full_name || 'N/A'} (Phone: ${req.tenant?.contact_number || 'None'})`;
-                document.getElementById('preferredSchedule').textContent = req.preferred_schedule || '—';
-                document.getElementById('issueCategory').textContent = req.issue_category;
-                document.getElementById('priorityLevel').textContent = req.priority_level;
-                document.getElementById('taskStatus').textContent = req.status.replace('_', ' ');
-                document.getElementById('landlordRemarks').textContent = req.landlord_remarks || 'None';
-                document.getElementById('issueDescription').textContent = req.issue_description;
+                const tenantName = req.tenant?.full_name || 'Tenant not specified';
+                const tenantPhone = req.tenant?.contact_number;
+                document.getElementById('propertyName').textContent = req.properties?.property_name || 'Property not specified';
+                document.getElementById('unitNumber').textContent = req.unit_number || 'Not specified';
+                document.getElementById('tenantContact').textContent = `${tenantName} · ${tenantPhone || 'No phone provided'}`;
+                document.getElementById('preferredSchedule').textContent = req.preferred_schedule || 'Not specified';
+                document.getElementById('issueCategory').textContent = req.issue_category || 'Not specified';
+                document.getElementById('priorityLevel').textContent = req.priority_level || 'Not specified';
+                document.getElementById('taskStatus').textContent = (req.status || 'Not specified').replaceAll('_', ' ');
+                document.getElementById('landlordRemarks').textContent = req.landlord_remarks || 'No additional instructions provided.';
+                document.getElementById('issueDescription').textContent = req.issue_description || 'No problem description provided.';
 
                 if (req.image_url) {
                     document.getElementById('imageContainer').classList.remove('hidden');
@@ -295,19 +361,27 @@
                 // Render logs
                 const timeline = document.getElementById('timelineLogs');
                 if (data.updates && data.updates.length > 0) {
-                    timeline.innerHTML = '';
+                    timeline.replaceChildren();
                     data.updates.forEach(u => {
-                        const dt = new Date(u.created_at).toLocaleString();
+                        const dt = u.created_at
+                            ? new Date(u.created_at).toLocaleString('en-PH', { dateStyle: 'medium', timeStyle: 'short' })
+                            : 'Time not recorded';
                         const div = document.createElement('div');
                         div.className = 'timeline-item active';
-                        div.innerHTML = `
-                            <span class="timeline-meta">${dt} - ${u.status_update.replace('_', ' ').toUpperCase()}</span>
-                            <div class="timeline-notes">${u.notes}</div>
-                        `;
+                        const meta = document.createElement('span');
+                        meta.className = 'timeline-meta';
+                        meta.textContent = `${dt} · ${(u.status_update || 'Update').replaceAll('_', ' ').toUpperCase()}`;
+                        const notes = document.createElement('div');
+                        notes.className = 'timeline-notes';
+                        notes.textContent = u.notes || 'No notes provided.';
+                        div.append(meta, notes);
                         timeline.appendChild(div);
                     });
                 } else {
-                    timeline.innerHTML = '<p style="text-align: center; color: var(--text-muted); padding: 1rem;">No updates logged.</p>';
+                    const empty = document.createElement('p');
+                    empty.className = 'timeline-empty';
+                    empty.textContent = 'No coordination updates have been logged yet.';
+                    timeline.replaceChildren(empty);
                 }
 
                 // Action panel mapping
@@ -315,6 +389,10 @@
 
             } catch (err) {
                 console.error(err);
+                showTaskLoadError(err.message || 'This work order could not be loaded. Check your connection and try again.');
+            } finally {
+                setTaskLoading(false);
+                window.requestAnimationFrame(() => window.DomiKnowLoading?.upgradeLegacyLoading(document.body));
             }
         }
 
@@ -419,17 +497,18 @@
         }
 
         async function handleOfferResponse(response) {
-            if (response === 'decline') {
-                const declineOffer = await window.domiknowConfirm({
-                    variant: 'warning',
-                    eyebrow: 'Job assignment',
-                    title: 'Decline this repair job?',
-                    message: 'The landlord will need to assign another maintenance person, which may delay the tenant’s repair.',
-                    confirmLabel: 'Decline job',
-                    cancelLabel: 'Keep assignment'
-                });
-                if (!declineOffer) return;
-            }
+            const isAccepting = response === 'accept';
+            const confirmOffer = await window.domiknowConfirm({
+                variant: isAccepting ? 'info' : 'warning',
+                eyebrow: 'Job assignment',
+                title: isAccepting ? 'Accept this repair job?' : 'Decline this repair job?',
+                message: isAccepting
+                    ? 'You will take responsibility for this work order and keep its progress updated.'
+                    : 'The landlord will need to assign another maintenance person, which may delay the tenant’s repair.',
+                confirmLabel: isAccepting ? 'Accept job' : 'Decline job',
+                cancelLabel: isAccepting ? 'Review first' : 'Keep assignment'
+            });
+            if (!confirmOffer) return;
 
             try {
                 const res = await fetch(`/api/maintenance/requests/${taskId}/worker-respond`, {
@@ -442,23 +521,39 @@
                 });
 
                 if (res.ok) {
-                    alert(`You successfully ${response === 'accept' ? 'accepted' : 'declined'} the repair job.`);
+                    await showTaskNotice(
+                        'success',
+                        response === 'accept' ? 'Repair job accepted' : 'Repair job declined',
+                        response === 'accept'
+                            ? 'The work order is now in your active queue.'
+                            : 'The landlord can now assign another maintenance person.'
+                    );
                     if (response === 'accept') {
                         fetchTaskDetails();
                     } else {
                         window.location.href = 'tasks.html';
                     }
                 } else {
-                    const result = await res.json();
-                    alert(result.message || 'Responding failed.');
+                    await showTaskNotice('danger', 'Response not saved', await getResponseMessage(res, 'Your response could not be saved. Please try again.'));
                 }
             } catch(e) {
                 console.error(e);
-                alert('Connection failure.');
+                await showTaskNotice('danger', 'Connection interrupted', 'Your response was not saved. Check your connection and try again.');
             }
         }
 
         async function handleStatusUpdate(status) {
+            const readableStatus = status.replaceAll('_', ' ');
+            const confirmUpdate = await window.domiknowConfirm({
+                variant: 'info',
+                eyebrow: 'Progress update',
+                title: `Mark this work order as ${readableStatus}?`,
+                message: 'The landlord and tenant will see this progress update.',
+                confirmLabel: 'Update status',
+                cancelLabel: 'Not yet'
+            });
+            if (!confirmUpdate) return;
+
             try {
                 const res = await fetch(`/api/maintenance/requests/${taskId}/worker-status`, {
                     method: 'PUT',
@@ -470,15 +565,14 @@
                 });
 
                 if (res.ok) {
-                    alert(`Work status successfully updated to ${status}.`);
+                    await showTaskNotice('success', 'Progress updated', `The work order is now marked as ${readableStatus}.`);
                     fetchTaskDetails();
                 } else {
-                    const result = await res.json();
-                    alert(result.message || 'Updating status failed.');
+                    await showTaskNotice('danger', 'Progress not updated', await getResponseMessage(res, 'The progress update could not be saved. Please try again.'));
                 }
             } catch(e) {
                 console.error(e);
-                alert('Connection issue updating progress status.');
+                await showTaskNotice('danger', 'Connection interrupted', 'The progress update was not saved. Check your connection and try again.');
             }
         }
 
@@ -489,7 +583,7 @@
                 <td><input type="text" class="form-input material-name" placeholder="Material item name" required style="padding: 0.35rem 0.6rem; font-size:0.85rem;"></td>
                 <td><input type="number" class="form-input material-qty" value="1" min="1" required style="padding: 0.35rem 0.6rem; font-size:0.85rem; width:60px;"></td>
                 <td><input type="number" class="form-input material-cost" value="0.00" min="0" step="0.01" required style="padding: 0.35rem 0.6rem; font-size:0.85rem; width:90px;"></td>
-                <td><button type="button" class="remove-material-btn" aria-label="Remove material" onclick="this.closest('tr').remove()">&times;</button></td>
+                <td><button type="button" class="remove-material-btn" aria-label="Remove material" data-action="remove-row">&times;</button></td>
             `;
             tbody.appendChild(tr);
         }
@@ -505,8 +599,19 @@
 
         async function handleReportSubmit() {
             const btn = document.querySelector('#completionReportForm button[type="submit"]');
-            btn.disabled = true;
-            btn.textContent = 'Submitting report...';
+            const confirmReport = await window.domiknowConfirm({
+                variant: 'info',
+                eyebrow: 'Completion report',
+                title: 'Submit this completion report?',
+                message: 'The landlord will review the diagnosis, repair work, costs, and any uploaded evidence.',
+                confirmLabel: 'Submit report',
+                cancelLabel: 'Review report'
+            });
+            if (!confirmReport) return;
+
+            window.DomiKnowLoading?.setButton(btn, true, 'Submitting report…');
+
+            try {
 
             const beforeFile = document.getElementById('beforePhoto').files[0];
             const afterFile = document.getElementById('afterPhoto').files[0];
@@ -548,7 +653,6 @@
                 after_base64, after_filename, after_mimetype
             };
 
-            try {
                 const response = await fetch(`/api/maintenance/requests/${taskId}/worker-report`, {
                     method: 'POST',
                     headers: {
@@ -559,18 +663,16 @@
                 });
 
                 if (response.ok) {
-                    alert('Job completion report submitted to landlord successfully.');
+                    await showTaskNotice('success', 'Report submitted', 'The landlord can now review the completed repair and recorded costs.');
                     fetchTaskDetails();
                 } else {
-                    const result = await response.json();
-                    alert(result.message || 'Failed to submit completion report.');
+                    await showTaskNotice('danger', 'Report not submitted', await getResponseMessage(response, 'The completion report could not be submitted. Please try again.'));
                 }
             } catch(err) {
                 console.error(err);
-                alert('Connection failure sending completion report.');
+                await showTaskNotice('danger', 'Connection interrupted', 'The completion report was not submitted. Check your connection and try again.');
             } finally {
-                btn.disabled = false;
-                btn.textContent = 'Submit Completion Report';
+                window.DomiKnowLoading?.setButton(btn, false);
             }
         }
     </script>

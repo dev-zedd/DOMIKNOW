@@ -8,6 +8,48 @@
         { key: 'revenue', label: 'Revenue', href: 'billings.html' }
     ];
 
+    const nativeAlert = window.alert.bind(window);
+    let presentingLandlordNotice = false;
+
+    window.landlordNotice = function landlordNotice(message, options = {}) {
+        const text = String(message || 'Please try again.');
+        const variant = options.variant
+            || (/success|submitted|uploaded|saved|completed|generated|deleted/i.test(text) ? 'success'
+                : /required|select|choose|missing|maximum|cannot|before proceeding/i.test(text) ? 'warning'
+                    : /error|failed|network|unavailable|could not|not found/i.test(text) ? 'danger'
+                        : 'info');
+        const title = options.title
+            || (variant === 'success' ? 'Action completed'
+                : variant === 'warning' ? 'Check this information'
+                    : variant === 'danger' ? 'Action could not be completed'
+                        : 'Landlord notice');
+
+        if (typeof window.domiknowAlert === 'function') {
+            return window.domiknowAlert({
+                variant,
+                eyebrow: options.eyebrow || 'Landlord workspace',
+                title,
+                message: text,
+                confirmLabel: options.confirmLabel || 'Got it'
+            });
+        }
+        nativeAlert(text);
+        return Promise.resolve();
+    };
+
+    // Keep legacy landlord actions inside the DOMIKNOW dialog system while their
+    // existing asynchronous workflows are progressively modernized.
+    window.alert = (message) => {
+        if (presentingLandlordNotice) {
+            nativeAlert(String(message || 'Please try again.'));
+            return;
+        }
+        presentingLandlordNotice = true;
+        Promise.resolve(window.landlordNotice(message)).finally(() => {
+            presentingLandlordNotice = false;
+        });
+    };
+
     const PAGE_META = {
         'properties.html': {
             eyebrow: 'Portfolio overview',
@@ -242,6 +284,7 @@
             };
             labelRows();
             if (table.tBodies[0]) new MutationObserver(labelRows).observe(table.tBodies[0], { childList: true });
+            addTableControls(table);
         });
 
         document.querySelectorAll('.main-content-inner form').forEach((form) => {
@@ -252,7 +295,45 @@
         normalizeSemanticInlineStyles(document);
         improveIconography(document);
         improveTabs();
+        improveSteppers();
         improveModals();
+    }
+
+    function addTableControls(table) {
+        if (!table.tHead
+            || table.closest('.modal-overlay, .chat-head-modal')
+            || table.previousElementSibling?.classList.contains('landlord-table-controls')) return;
+
+        const controls = document.createElement('div');
+        controls.className = 'landlord-table-controls';
+
+        const search = document.createElement('input');
+        search.type = 'search';
+        search.className = 'form-input landlord-table-search';
+        search.placeholder = 'Search these records';
+        search.setAttribute('aria-label', 'Search visible records');
+
+        const count = document.createElement('span');
+        count.className = 'landlord-table-count';
+        count.setAttribute('aria-live', 'polite');
+        controls.append(search, count);
+        table.parentElement?.insertBefore(controls, table);
+
+        const filterRows = () => {
+            const query = search.value.trim().toLowerCase();
+            let visible = 0;
+            table.querySelectorAll('tbody tr').forEach((row) => {
+                if (row.querySelector('[colspan]')) return;
+                const matches = !query || row.textContent.toLowerCase().includes(query);
+                row.hidden = !matches;
+                if (matches) visible += 1;
+            });
+            count.textContent = `${visible} ${visible === 1 ? 'record' : 'records'}`;
+        };
+
+        search.addEventListener('input', filterRows);
+        if (table.tBodies[0]) new MutationObserver(filterRows).observe(table.tBodies[0], { childList: true });
+        filterRows();
     }
 
     function normalizeSemanticInlineStyles(root) {
@@ -378,6 +459,24 @@
         });
     }
 
+    function improveSteppers() {
+        document.querySelectorAll('.step-wizard-nav').forEach((stepper) => {
+            stepper.setAttribute('aria-label', stepper.getAttribute('aria-label') || 'Property registration progress');
+            const sync = () => {
+                stepper.querySelectorAll('.step-header').forEach((step) => {
+                    if (step.classList.contains('active')) step.setAttribute('aria-current', 'step');
+                    else step.removeAttribute('aria-current');
+                });
+            };
+            sync();
+            new MutationObserver(sync).observe(stepper, {
+                subtree: true,
+                attributes: true,
+                attributeFilter: ['class']
+            });
+        });
+    }
+
     function improveModals() {
         const overlays = Array.from(document.querySelectorAll('.modal-overlay, .chat-head-modal'));
         if (!overlays.length) return;
@@ -443,9 +542,19 @@
         const page = currentPage();
         const meta = PAGE_META[page];
 
-        if (!layout || !content || !meta || content.querySelector('.landlord-module-intro')) return;
+        if (!layout || !content) return;
 
         document.body.setAttribute('data-landlord-page', page.replace('.html', ''));
+
+        if (!document.body.dataset.landlordEnhanced) {
+            enhanceOperationalContent();
+            observeDynamicIconography();
+            document.body.dataset.landlordEnhanced = 'true';
+        }
+
+        if (!meta) return;
+
+        if (content.querySelector('.landlord-module-intro')) return;
 
         const intro = document.createElement('div');
         intro.className = 'landlord-module-intro';
@@ -457,8 +566,6 @@
         const breadcrumbs = content.querySelector(':scope > [data-domiknow-breadcrumbs]');
         if (breadcrumbs) breadcrumbs.insertAdjacentElement('afterend', intro);
         else content.insertBefore(intro, content.firstChild);
-        enhanceOperationalContent();
-        observeDynamicIconography();
     }
 
     if (document.readyState === 'loading') {

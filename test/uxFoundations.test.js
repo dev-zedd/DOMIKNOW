@@ -61,6 +61,28 @@ test('public trust content uses verified feedback and a focused closing CTA', ()
     assert.match(feedbackScript, /Browse rentals/);
 });
 
+test('public and authentication journeys keep progressive actions clear and theme-safe', () => {
+    const home = read('public/index.html');
+    const listings = read('public/pages/public/properties.html');
+    const forgotPassword = read('public/pages/auth/forgot-password.html');
+    const verifyCode = read('public/pages/auth/verify-code.html');
+    const authCss = read('public/css/auth-module.css');
+    const publicCss = read('public/css/public-module.css');
+    const designCss = read('public/css/design-system.css');
+    const loadingScript = read('public/js/loading-system.js');
+
+    assert.match(home, /class="nav-link public-nav-signup"/);
+    assert.match(listings, /class="public-nav-signup"/);
+    assert.match(forgotPassword, /id="resetForm"[^>]*hidden/);
+    assert.match(forgotPassword, /auth-recovery-success__icon/);
+    assert.match(verifyCode, /autocomplete="one-time-code"/);
+    assert.match(authCss, /body\.auth-page \[hidden\]\s*\{\s*display:\s*none\s*!important/);
+    assert.doesNotMatch(publicCss, /@view-transition\s*\{\s*navigation:\s*auto/);
+    assert.doesNotMatch(designCss, /@view-transition\s*\{\s*navigation:\s*auto/);
+    assert.match(loadingScript, /setAttribute\('aria-hidden', 'true'\)/);
+    assert.match(loadingScript, /setAttribute\('aria-hidden', 'false'\)/);
+});
+
 test('recovery and field-operation polish preserve safe navigation and accessible evidence', () => {
     const notFoundPage = read('public/pages/404.html');
     const uiScript = read('public/js/ui.js');
@@ -99,4 +121,78 @@ test('missing payment proof objects use an explicit unavailable state', () => {
     assert.match(tenantPayments, /This proof file is unavailable/);
     assert.match(landlordPayments, /No file exists at the stored path/);
     assert.match(adminPayments, /No file exists at the stored path/);
+});
+
+test('maintenance field workflows are mobile-first, recoverable, and use system dialogs', () => {
+    const tasks = read('public/pages/maintenance/tasks.html');
+    const details = read('public/pages/maintenance/task-details.html');
+    const notifications = read('public/pages/maintenance/notifications.html');
+    const maintenanceCss = read('public/css/maintenance.css');
+    const loadingScript = read('public/js/loading-system.js');
+
+    assert.match(tasks, /class="maintenance-data-table"/);
+    assert.match(tasks, /data-label="Property and unit"/);
+    assert.match(tasks, /Review offer/);
+    assert.match(tasks, /View details/);
+    assert.match(tasks, /renderTaskMessage/);
+    assert.match(details, /id="taskLoadError"/);
+    assert.match(details, /id="retryTaskButton"/);
+    assert.match(details, /window\.domiknowConfirm/);
+    assert.match(details, /showTaskNotice/);
+    assert.doesNotMatch(details, /\balert\s*\(/);
+    assert.doesNotMatch(details, /onclick=/);
+    assert.match(notifications, /Assigned work, schedule changes, repair updates/);
+    assert.match(maintenanceCss, /\.maintenance-data-table td::before/);
+    assert.match(maintenanceCss, /grid-template-columns:\s*minmax\(0, 1fr\)/);
+    assert.match(loadingScript, /record\.type === 'childList'/);
+    assert.match(loadingScript, /scheduleLegacyUpgrade\(mutationRoot\)/);
+});
+
+test('tenant journeys prioritize results on mobile and keep consequential actions in system dialogs', () => {
+    const tenantScript = read('public/js/tenant.js');
+    const tenantCss = read('public/css/tenant.css');
+    const dashboardScript = read('public/js/dashboard.js');
+    const propertyDetails = read('public/pages/tenant/property-details.html');
+    const applicationDetails = read('public/pages/tenant/application-details.html');
+    const leases = read('public/pages/tenant/leases.html');
+    const billings = read('public/pages/tenant/billings.html');
+    const loadingScript = read('public/js/loading-system.js');
+
+    assert.match(tenantScript, /improveDiscoveryPreferences/);
+    assert.match(tenantScript, /Edit rental priorities/);
+    assert.match(tenantScript, /tenant-preferences-collapsed/);
+    assert.match(tenantCss, /\.recommendation-controls\.tenant-preferences-collapsed \.filter-section/);
+    assert.match(tenantCss, /\.tenant-journey\s*\{[^}]*margin-left:\s*0 !important/is);
+    assert.match(propertyDetails, /data-page-title="Property Details"/);
+    assert.match(applicationDetails, /data-page-title="Application Details"/);
+    assert.doesNotMatch(propertyDetails, /topbarTitle\.innerHTML/);
+    assert.doesNotMatch(applicationDetails, /topbarTitle\.innerHTML/);
+    assert.doesNotMatch(leases, /\balert\s*\(/);
+    assert.doesNotMatch(billings, /\balert\s*\(/);
+    assert.match(dashboardScript, /title: 'Keyboard shortcuts'/);
+    assert.match(loadingScript, /data-dk-auto-loading/);
+});
+
+test('landlord operations stay searchable, responsive, and aligned to their parent workflow', () => {
+    const landlordScript = read('public/js/landlord.js');
+    const landlordCss = read('public/css/landlord.css');
+    const dashboardScript = read('public/js/dashboard.js');
+    const propertyCreate = read('public/pages/landlord/property-create.html');
+    const maintenance = read('public/pages/landlord/maintenance.html');
+    const modalCss = read('public/css/modal-system.css');
+
+    assert.match(landlordScript, /window\.landlordNotice/);
+    assert.match(landlordScript, /addTableControls/);
+    assert.match(landlordScript, /Search visible records/);
+    assert.match(landlordScript, /improveSteppers/);
+    assert.match(landlordCss, /\.landlord-table-controls/);
+    assert.match(landlordCss, /body\[data-landlord-page="units"\] \.room-grid/);
+    assert.match(landlordCss, /max-height:\s*calc\(100dvh - 24px\)/);
+    assert.match(dashboardScript, /'property-details\.html', 'units\.html'/);
+    assert.match(dashboardScript, /'billings\.html', 'payments\.html'/);
+    assert.match(propertyCreate, /button type="button" id="stepHeader1"/);
+    assert.match(propertyCreate, /aria-controls="stepPanel1"/);
+    assert.doesNotMatch(maintenance, /Tubo|Kuryente|Karpintero|Pintor/);
+    assert.doesNotMatch(maintenance, />\s*\+ Add Maintenance Worker/);
+    assert.match(modalCss, /\.dk-modal-root \[hidden\]\s*\{\s*display:\s*none\s*!important/);
 });

@@ -250,9 +250,15 @@
         const priceBox = document.createElement('div');
         priceBox.className = 'public-listing-card__price';
         const priceLabel = document.createElement('small');
-        priceLabel.textContent = 'Starting at';
+        const rentLabel = formatRentRange(property);
+        priceLabel.textContent = rentLabel === 'Price on request' ? 'Monthly rent' : 'Starting at';
         const price = document.createElement('strong');
-        price.innerHTML = `${formatRentRange(property)} <span>/ month</span>`;
+        price.textContent = rentLabel;
+        if (rentLabel !== 'Price on request') {
+            const suffix = document.createElement('span');
+            suffix.textContent = '/ month';
+            price.append(' ', suffix);
+        }
         priceBox.append(priceLabel, price);
         const actions = document.createElement('div');
         actions.className = 'public-listing-card__actions';
@@ -303,14 +309,16 @@
         const priceRow = document.createElement('div');
         priceRow.className = 'map-property-card__price-row';
         const priceLabel = document.createElement('span');
-        priceLabel.textContent = 'Starting at';
+        const rentLabel = formatRentRange(property);
+        priceLabel.textContent = rentLabel === 'Price on request' ? 'Monthly rent' : 'Starting at';
         const priceBox = document.createElement('div');
         priceBox.className = 'map-property-card__price';
         const price = document.createElement('strong');
-        price.textContent = formatRentRange(property);
+        price.textContent = rentLabel;
         const priceSuffix = document.createElement('span');
         priceSuffix.textContent = '/ month';
-        priceBox.append(price, priceSuffix);
+        priceBox.append(price);
+        if (rentLabel !== 'Price on request') priceBox.append(priceSuffix);
         priceRow.append(priceLabel, priceBox);
         const link = document.createElement('a');
         link.className = 'map-property-card__action';
@@ -346,7 +354,7 @@
             if (!validCoordinates(property)) return;
             const selected = String(property.id) === String(selectedPropertyId);
             const marker = L.marker([Number(property.latitude), Number(property.longitude)], {
-                icon: DomiknowMap.priceIcon(`${formatCurrency(property.min_available_monthly_rent ?? property.min_monthly_rent)}/mo`, {
+                icon: DomiknowMap.priceIcon(formatMarkerPrice(property.min_available_monthly_rent ?? property.min_monthly_rent), {
                     selected,
                     unavailable: !isAvailable(property)
                 }),
@@ -730,6 +738,11 @@
         if (value === null || value === undefined || value === '') return 'Price on request';
         const amount = Number(value);
         return Number.isFinite(amount) ? `₱${amount.toLocaleString('en-PH')}` : 'Price on request';
+    }
+
+    function formatMarkerPrice(value) {
+        const price = formatCurrency(value);
+        return price === 'Price on request' ? price : `${price}/mo`;
     }
 
     function formatRentRange(property) {
