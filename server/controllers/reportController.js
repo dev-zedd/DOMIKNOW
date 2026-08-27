@@ -6,7 +6,7 @@ const notificationModel = require('../models/notificationModel');
 const auditLogModel = require('../models/auditLogModel');
 const responseHelper = require('../utils/responseHelper');
 const supabase = require('../config/supabaseClient');
-const { uploadFile, getSignedUrl } = require('../utils/storageHelper');
+const { uploadFile, getSignedUrl, isStorageObjectNotFound } = require('../utils/storageHelper');
 
 const reportController = {
     // ----------------- Reports -----------------
@@ -80,7 +80,7 @@ const reportController = {
                     try {
                         report.attachment_url = await getSignedUrl('report-attachments', report.attachment_path);
                     } catch (err) {
-                        console.error('Error generating signed URL for report:', err);
+                        if (!isStorageObjectNotFound(err)) console.error('Error generating signed URL for report:', err);
                     }
                 }
             }
@@ -99,7 +99,7 @@ const reportController = {
                     try {
                         report.attachment_url = await getSignedUrl('report-attachments', report.attachment_path);
                     } catch (err) {
-                        console.error('Error generating signed URL for admin report:', err);
+                        if (!isStorageObjectNotFound(err)) console.error('Error generating signed URL for admin report:', err);
                     }
                 }
             }
@@ -252,7 +252,7 @@ const reportController = {
                     try {
                         dispute.attachment_url = await getSignedUrl('dispute-attachments', dispute.attachment_path);
                     } catch (err) {
-                        console.error('Error generating signed URL for dispute:', err);
+                        if (!isStorageObjectNotFound(err)) console.error('Error generating signed URL for dispute:', err);
                     }
                 }
             }
@@ -271,7 +271,7 @@ const reportController = {
                     try {
                         dispute.attachment_url = await getSignedUrl('dispute-attachments', dispute.attachment_path);
                     } catch (err) {
-                        console.error('Error generating signed URL for admin dispute:', err);
+                        if (!isStorageObjectNotFound(err)) console.error('Error generating signed URL for admin dispute:', err);
                     }
                 }
             }
@@ -388,7 +388,7 @@ const reportController = {
                     try {
                         violation.evidence_url = await getSignedUrl('violation-evidence', violation.evidence_path);
                     } catch (err) {
-                        console.error('Error generating signed URL for violation:', err);
+                        if (!isStorageObjectNotFound(err)) console.error('Error generating signed URL for violation:', err);
                     }
                 }
             }
@@ -407,7 +407,7 @@ const reportController = {
                     try {
                         violation.evidence_url = await getSignedUrl('violation-evidence', violation.evidence_path);
                     } catch (err) {
-                        console.error('Error generating signed URL for admin violation:', err);
+                        if (!isStorageObjectNotFound(err)) console.error('Error generating signed URL for admin violation:', err);
                     }
                 }
             }
@@ -497,7 +497,7 @@ const reportController = {
                     try {
                         m.attachment_url = await getSignedUrl('report-attachments', m.attachment_path);
                     } catch (err) {
-                        console.error('Error generating signed URL for message attachment:', err);
+                        if (!isStorageObjectNotFound(err)) console.error('Error generating signed URL for message attachment:', err);
                     }
                 }
             }

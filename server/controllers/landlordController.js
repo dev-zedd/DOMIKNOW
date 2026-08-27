@@ -3,7 +3,7 @@ const auditLogModel = require('../models/auditLogModel');
 const notificationModel = require('../models/notificationModel');
 const responseHelper = require('../utils/responseHelper');
 const supabase = require('../config/supabaseClient');
-const { uploadFile, getSignedUrl } = require('../utils/storageHelper');
+const { uploadFile, getSignedUrl, isStorageObjectNotFound } = require('../utils/storageHelper');
 
 const VALID_PROPERTY_TYPES = new Set([
     'apartment',
@@ -196,7 +196,12 @@ const landlordController = {
                         try {
                             doc.file_url = await getSignedUrl('property-documents', doc.file_path);
                         } catch (err) {
-                            console.warn('Signed URL refresh notice:', err.message || err);
+                            if (isStorageObjectNotFound(err)) {
+                                doc.file_url = null;
+                                doc.file_unavailable = true;
+                            } else {
+                                console.warn('Signed URL refresh notice:', err.message || err);
+                            }
                         }
                     }
                 }
@@ -426,7 +431,12 @@ const landlordController = {
                         try {
                             doc.file_url = await getSignedUrl('tenant-application-documents', doc.file_path);
                         } catch (err) {
-                            console.error('Error generating signed URL for application doc:', err);
+                            if (isStorageObjectNotFound(err)) {
+                                doc.file_url = null;
+                                doc.file_unavailable = true;
+                            } else {
+                                console.error('Error generating signed URL for application doc:', err);
+                            }
                         }
                     }
                 }

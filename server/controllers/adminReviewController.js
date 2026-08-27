@@ -2,7 +2,7 @@ const adminModel = require('../models/adminModel');
 const auditLogModel = require('../models/auditLogModel');
 const notificationModel = require('../models/notificationModel');
 const responseHelper = require('../utils/responseHelper');
-const { getSignedUrl } = require('../utils/storageHelper');
+const { getSignedUrl, isStorageObjectNotFound } = require('../utils/storageHelper');
 
 const adminReviewController = {
     async getPropertiesForReview(req, res) {
@@ -31,7 +31,13 @@ const adminReviewController = {
                         try {
                             doc.file_url = await getSignedUrl('property-documents', doc.file_path);
                         } catch (err) {
-                            console.warn(`Failed to refresh signed URL for document ${doc.id}:`, err.message);
+                            if (isStorageObjectNotFound(err)) {
+                                // File was deleted from storage — mark as unavailable and continue silently
+                                doc.file_url = null;
+                                doc.file_unavailable = true;
+                            } else {
+                                console.warn(`Failed to refresh signed URL for document ${doc.id}:`, err.message);
+                            }
                         }
                     }
                 }

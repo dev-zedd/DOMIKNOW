@@ -3,7 +3,7 @@ const userModel         = require('../models/userModel');
 const auditLogModel     = require('../models/auditLogModel');
 const notificationModel = require('../models/notificationModel');
 const responseHelper    = require('../utils/responseHelper');
-const { uploadFile, getSignedUrl } = require('../utils/storageHelper');
+const { uploadFile, getSignedUrl, isStorageObjectNotFound } = require('../utils/storageHelper');
 
 const BUCKET = 'tenant-report-evidence';
 
@@ -24,7 +24,12 @@ async function attachEvidenceUrls(evidenceList) {
             try {
                 ev.file_url = await getSignedUrl(BUCKET, ev.file_path);
             } catch (err) {
-                console.error('Error refreshing signed URL for evidence:', err);
+                if (isStorageObjectNotFound(err)) {
+                    ev.file_url = null;
+                    ev.file_unavailable = true;
+                } else {
+                    console.error('Error refreshing signed URL for evidence:', err);
+                }
             }
         }
     }

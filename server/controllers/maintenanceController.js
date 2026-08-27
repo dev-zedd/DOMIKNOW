@@ -5,7 +5,7 @@ const auditLogModel = require('../models/auditLogModel');
 const notificationModel = require('../models/notificationModel');
 const responseHelper = require('../utils/responseHelper');
 const supabase = require('../config/supabaseClient');
-const { uploadFile, getSignedUrl } = require('../utils/storageHelper');
+const { uploadFile, getSignedUrl, isStorageObjectNotFound } = require('../utils/storageHelper');
 
 const MAINTENANCE_CATEGORIES = new Set([
     'plumbing', 'electrical', 'aircon', 'door', 'roof', 'internet', 'appliance', 'others'
@@ -693,7 +693,12 @@ const maintenanceController = {
                 try {
                     request.image_url = await getSignedUrl('maintenance-images', request.image_path);
                 } catch (e) {
-                    console.error('Error generating request image signed url:', e);
+                    if (isStorageObjectNotFound(e)) {
+                        request.image_url = null;
+                        request.image_unavailable = true;
+                    } else {
+                        console.error('Error generating request image signed url:', e);
+                    }
                 }
             }
 
