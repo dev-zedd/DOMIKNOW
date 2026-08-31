@@ -20,8 +20,7 @@
         bar = document.createElement('div');
         bar.className = 'dk-loading-bar';
         bar.setAttribute('data-domiknow-loading-bar', '');
-        bar.setAttribute('role', 'progressbar');
-        bar.setAttribute('aria-label', 'Loading');
+        bar.setAttribute('aria-hidden', 'true');
         document.body.appendChild(bar);
         return bar;
     }
@@ -50,6 +49,9 @@
                 const bar = getProgressBar();
                 bar.classList.remove('is-finishing');
                 bar.classList.add('is-visible');
+                bar.setAttribute('aria-hidden', 'false');
+                bar.setAttribute('role', 'progressbar');
+                bar.setAttribute('aria-label', 'Loading');
             }, Math.max(0, delay));
         }
 
@@ -71,8 +73,14 @@
         const bar = document.querySelector('[data-domiknow-loading-bar]');
         if (!bar) return;
         bar.classList.add('is-finishing', 'is-visible');
+        bar.setAttribute('aria-hidden', 'false');
+        bar.setAttribute('role', 'progressbar');
+        bar.setAttribute('aria-label', 'Loading');
         finishTimer = window.setTimeout(() => {
             bar.classList.remove('is-visible', 'is-finishing');
+            bar.setAttribute('aria-hidden', 'true');
+            bar.removeAttribute('role');
+            bar.removeAttribute('aria-label');
         }, 170);
     }
 
@@ -86,6 +94,9 @@
         setBusyState(false);
         const bar = document.querySelector('[data-domiknow-loading-bar]');
         bar?.classList.remove('is-visible', 'is-finishing');
+        bar?.setAttribute('aria-hidden', 'true');
+        bar?.removeAttribute('role');
+        bar?.removeAttribute('aria-label');
     }
 
     function setButton(button, loading, label) {
@@ -214,11 +225,24 @@
             const text = node.textContent.trim();
             if (LEGACY_LOADING_PATTERN.test(text)) {
                 node.classList.add('dk-auto-skeleton');
+                node.setAttribute('data-dk-auto-loading', '');
                 node.setAttribute('aria-busy', 'true');
-                if (!node.hasAttribute('role')) node.setAttribute('role', 'status');
-            } else if (node.classList.contains('dk-auto-skeleton')) {
+                if (!node.hasAttribute('role')) {
+                    node.setAttribute('role', 'status');
+                    node.setAttribute('data-dk-auto-role', '');
+                }
+            } else if (
+                node.classList.contains('dk-auto-skeleton')
+                || node.hasAttribute('data-dk-auto-loading')
+                || (node.getAttribute('aria-busy') === 'true' && node.getAttribute('role') === 'status')
+            ) {
                 node.classList.remove('dk-auto-skeleton');
+                node.removeAttribute('data-dk-auto-loading');
                 node.removeAttribute('aria-busy');
+                if (node.hasAttribute('data-dk-auto-role')) {
+                    node.removeAttribute('data-dk-auto-role');
+                    node.removeAttribute('role');
+                }
             }
         });
     }
@@ -296,6 +320,12 @@
         const observer = new MutationObserver(records => {
             records.forEach(record => {
                 if (record.type === 'characterData') scheduleLegacyUpgrade(record.target.parentElement);
+                if (record.type === 'childList') {
+                    const mutationRoot = record.target instanceof Element
+                        ? record.target
+                        : record.target.parentElement;
+                    if (mutationRoot) scheduleLegacyUpgrade(mutationRoot);
+                }
                 record.addedNodes.forEach(node => {
                     if (node instanceof Element) scheduleLegacyUpgrade(node);
                 });

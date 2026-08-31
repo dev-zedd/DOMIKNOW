@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Application Tracker - DomiKnow</title>
     <link href="../../css/input.css" rel="stylesheet">
-    <link href="../../css/design-system.css" rel="stylesheet">
+    <link href="../../css/design-system.css?v=20260827-1" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -257,9 +257,9 @@
             background: #94a3b8;
         }
     </style>
-    <script src="../../js/ui.js" defer></script>
+    <script src="../../js/ui.js?v=20260827-3" defer></script>
 </head>
-<body>
+<body class="app-loading" data-role="tenant" data-page-title="Application Details">
     <nav class="navbar navbar-tenant">
         <div class="navbar-container">
             <div class="navbar-brand-group">
@@ -402,32 +402,19 @@
     </main>
 
     <script src="../../js/auth.js"></script>
-    <script src="../../js/dashboard.js"></script>
+    <script src="../../js/dashboard.js?v=20260827-3"></script>
     <script>
         const token = localStorage.getItem('domiknow_token');
         const urlParams = new URLSearchParams(window.location.search);
         const applicationId = urlParams.get('id');
         let currentApplication = null;
 
-        document.addEventListener('DOMContentLoaded', () => {
+        document.addEventListener('DOMContentLoaded', async () => {
             if (!token) return;
             if (!applicationId) {
-                alert('Missing Application ID parameter in URL.');
+                await window.domiknowAlert({ variant: 'warning', eyebrow: 'Application record', title: 'No application selected', message: 'Return to your applications and choose a record to review.' });
                 window.location.href = 'applications.html';
                 return;
-            }
-
-            // Instantly override topbar title with breadcrumbs to prevent flashing "Application Tracker"
-            const initialTopbarTitle = document.querySelector('.topbar-title');
-            if (initialTopbarTitle) {
-                initialTopbarTitle.innerHTML = `
-                    <div class="breadcrumb-nav" style="font-size: 0.95rem; font-weight: 700; display: flex; align-items: center; gap: 0.35rem;">
-                        <a href="applications.html" style="color: #0f172a; text-decoration: none;">My Applications</a>
-                        <span class="breadcrumb-separator" style="color: #94a3b8; font-weight: 400;">&gt;</span>
-                        <span class="breadcrumb-current" style="color: #64748b; font-weight: 500; margin-right: 0.75rem;">Application Tracker</span>
-                        <span data-application-status class="status-badge status-pending" style="font-size: 0.725rem; padding: 2px 8px; font-weight: 700; border-radius: 4px; display: inline-block;">LOADING...</span>
-                    </div>
-                `;
             }
 
             document.getElementById('btnUploadDoc').addEventListener('click', uploadDocument);
@@ -485,7 +472,7 @@
                 });
 
                 if (!response.ok) {
-                    alert('Failed to retrieve application details.');
+                    await window.domiknowAlert({ variant: 'danger', eyebrow: 'Application record', title: 'Application unavailable', message: 'This application could not be loaded. Return to your applications and try again.' });
                     window.location.href = 'applications.html';
                     return;
                 }
@@ -493,24 +480,12 @@
                 const result = await response.json();
                 currentApplication = result.data;
 
-                const topbarTitle = document.querySelector('.topbar-title');
-                if (topbarTitle) {
-                    topbarTitle.innerHTML = `
-                        <div class="breadcrumb-nav" style="font-size: 0.95rem; font-weight: 700; display: flex; align-items: center; gap: 0.35rem;">
-                            <a href="applications.html" style="color: #0f172a; text-decoration: none;">My Applications</a>
-                            <span class="breadcrumb-separator" style="color: #94a3b8; font-weight: 400;">&gt;</span>
-                            <span class="breadcrumb-current" style="color: #64748b; font-weight: 500; margin-right: 0.75rem;">Application Tracker</span>
-                            <span data-application-status class="status-badge" style="font-size: 0.725rem; padding: 2px 8px; font-weight: 700; border-radius: 4px; display: inline-block;">PENDING</span>
-                        </div>
-                    `;
-                }
-
                 renderApplicationUI();
                 renderDocumentsUI();
 
             } catch (err) {
                 console.error(err);
-                alert('Error reaching API.');
+                await window.domiknowAlert({ variant: 'danger', eyebrow: 'Connection interrupted', title: 'Application unavailable', message: 'The application could not be loaded. Check your connection and try again.' });
             }
         }
 
@@ -723,19 +698,19 @@
             const docType = document.getElementById('docType').value;
 
             if (fileInput.files.length === 0) {
-                alert('Please select a PDF or image file first.');
+                await window.domiknowAlert({ variant: 'warning', eyebrow: 'Application document', title: 'Choose a file', message: 'Select a PDF or image before uploading.' });
                 return;
             }
 
             const file = fileInput.files[0];
             const allowedTypes = new Set(['application/pdf', 'image/jpeg', 'image/png', 'image/webp']);
             if (file.size > 8 * 1024 * 1024) {
-                alert('This file is larger than 8 MB. Choose a smaller document.');
+                await window.domiknowAlert({ variant: 'warning', eyebrow: 'Application document', title: 'File is too large', message: 'Choose a document that is 8 MB or smaller.' });
                 fileInput.value = '';
                 return;
             }
             if (!allowedTypes.has(file.type)) {
-                alert('Upload a PDF, JPG, PNG, or WebP document.');
+                await window.domiknowAlert({ variant: 'warning', eyebrow: 'Application document', title: 'Unsupported file type', message: 'Upload a PDF, JPG, PNG, or WebP document.' });
                 fileInput.value = '';
                 return;
             }
@@ -765,15 +740,15 @@
 
                 if (response.ok) {
                     fileInput.value = '';
-                    alert('Document uploaded successfully!');
+                    await window.domiknowAlert({ variant: 'success', eyebrow: 'Application document', title: 'Document uploaded', message: 'The document was added to your application successfully.' });
                     fetchApplicationDetails();
                 } else {
-                    alert(result.message || 'Upload failed.');
+                    await window.domiknowAlert({ variant: 'danger', eyebrow: 'Application document', title: 'Upload failed', message: result.message || 'The document could not be uploaded. Please try again.' });
                 }
 
             } catch (err) {
                 console.error(err);
-                alert('An error occurred during file upload.');
+                await window.domiknowAlert({ variant: 'danger', eyebrow: 'Connection interrupted', title: 'Upload failed', message: 'The document was not uploaded. Check your connection and try again.' });
             } finally {
                 btn.disabled = false;
                 btn.textContent = 'Upload Document';

@@ -278,8 +278,8 @@
             color: var(--tenant);
         }
     </style>
-    <link href="../../css/design-system.css" rel="stylesheet">
-    <script src="../../js/ui.js" defer></script>
+    <link href="../../css/design-system.css?v=20260827-1" rel="stylesheet">
+    <script src="../../js/ui.js?v=20260827-3" defer></script>
 </head>
 <body class="app-loading" data-role="tenant" data-page-title="My Billings & Payments">
     <!-- Navbar -->
@@ -485,7 +485,7 @@
     </div>
 
     <script src="../../js/auth.js"></script>
-    <script src="../../js/dashboard.js"></script>
+    <script src="../../js/dashboard.js?v=20260827-3"></script>
     <script>
         const token = localStorage.getItem('domiknow_token');
         let myBillings = [];
@@ -909,7 +909,12 @@
 
                 const result = await response.json();
                 if (response.ok) {
-                    alert('Payment transaction proof successfully submitted for validation.');
+                    await window.domiknowAlert({
+                        variant: 'success',
+                        eyebrow: 'Payment proof',
+                        title: 'Proof submitted',
+                        message: 'Your payment proof was sent for landlord verification. Its status will update after review.'
+                    });
                     closePaymentModal();
                     loadTenantBillings();
                 } else {

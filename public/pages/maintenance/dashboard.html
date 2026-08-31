@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Maintenance Dashboard - DomiKnow</title>
     <link href="../../css/input.css" rel="stylesheet">
-    <link href="../../css/design-system.css" rel="stylesheet">
-    <script src="../../js/ui.js" defer></script>
+    <link href="../../css/design-system.css?v=20260827-1" rel="stylesheet">
+    <script src="../../js/ui.js?v=20260827-2" defer></script>
 </head>
 <body class="app-loading" data-role="maintenance" data-page-title="Maintenance Dashboard">
     <!-- Navbar -->
@@ -33,16 +33,16 @@
         <div id="pendingApprovalMsg" class="alert alert-warning hidden">
             <span class="alert-icon">Attention:</span>
             <div class="alert-content">
-                <h3 style="font-size: 0.9375rem; font-weight: 700; margin-bottom: 0.25rem;">Account Pending Admin Approval</h3>
-                <p style="font-size: 0.875rem; line-height: 1.5;">Your account requires administrator approval before you can receive and manage tasks. Please check back later.</p>
+                <h3>Account pending administrator approval</h3>
+                <p>Your account must be approved before you can receive and manage tasks.</p>
             </div>
         </div>
 
         <!-- Status Header -->
         <div class="status-card status-card-maintenance">
             <div class="status-card-info">
-                <h2>Dashboard</h2>
-                <p>Manage your assigned maintenance tasks.</p>
+                <h2>Field work status</h2>
+                <p>Check your account access before accepting an assignment.</p>
             </div>
             <div class="status-badge-container">
                 <span class="status-badge-label">Account Status</span>
@@ -52,7 +52,7 @@
 
         <!-- Profile Placeholder -->
         <div class="profile-card">
-            <h3 class="profile-card-title">Basic Profile</h3>
+            <h3 class="profile-card-title">Your account</h3>
             <div class="profile-info-row">
                 <p><strong>Name:</strong> <span class="user-name">Loading...</span></p>
             </div>
@@ -64,16 +64,16 @@
             <!-- Feature Card 1 -->
             <div class="feature-card">
                 <div class="feature-card-header">
-                    <h3 class="feature-card-title">Assigned Tasks</h3>
-                    <span class="feature-card-badge" style="background-color: var(--success); color: white;">Active</span>
+                    <h3 class="feature-card-title">Task queue</h3>
+                    <span class="feature-card-badge">Assigned work</span>
                 </div>
-                <p class="feature-card-desc">View and manage maintenance requests from properties assigned to you.</p>
-                <button onclick="window.location.href='tasks.html'" class="feature-card-btn" style="background-color: var(--maintenance); color: white; cursor: pointer;">View Tasks</button>
+                <p class="feature-card-desc">Review new offers, update active work, and open completed work orders.</p>
+                <a href="tasks.html" class="feature-card-btn">Open task queue</a>
             </div>
         </div>
     </main>
 
     <script src="../../js/auth.js"></script>
-    <script src="../../js/dashboard.js"></script>
+    <script src="../../js/dashboard.js?v=20260827-1"></script>
 </body>
 </html>

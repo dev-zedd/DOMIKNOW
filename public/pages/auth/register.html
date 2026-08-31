@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Register - DomiKnow</title>
     <link href="../../css/input.css" rel="stylesheet">
-    <link href="../../css/design-system.css" rel="stylesheet">
     <style>
         :root {
             --primary: #0355F3;
@@ -162,10 +161,11 @@
             display: block;
         }
     </style>
-    <link href="../../css/auth-module.css" rel="stylesheet">
+    <link href="../../css/design-system.css?v=20260827-1" rel="stylesheet">
+    <link href="../../css/auth-module.css?v=20260827-2" rel="stylesheet">
     <link href="../../css/mobile-first.css?v=20260817-1" rel="stylesheet">
-    <link href="../../css/loading-system.css?v=20260826-1" rel="stylesheet" data-domiknow-loading-system>
-    <script src="../../js/loading-system.js?v=20260826-1" defer data-domiknow-loading-system></script>
+    <link href="../../css/loading-system.css?v=20260827-1" rel="stylesheet" data-domiknow-loading-system>
+    <script src="../../js/loading-system.js?v=20260827-1" defer data-domiknow-loading-system></script>
     <script src="../../js/ui.js" defer></script>
 </head>
 <body class="auth-page auth-register-page">
@@ -187,9 +187,9 @@
                 <span class="brand-wordmark"><span class="brand-wordmark-domi">DOMI</span><span class="brand-wordmark-know">KNOW</span></span>
             </a>
         </div>
-        <h1 class="auth-title">Create your account</h1>
+        <h1 class="auth-title">Create an account</h1>
         <p class="auth-subtitle">
-            A guided setup for your DOMIKNOW rental workspace. Already registered?
+            Four short steps for tenants and landlords. Already registered?
             <a href="login.html" class="auth-link" data-preserve-redirect>Sign in</a>
         </p>
         <div class="auth-side-note" aria-label="What happens after registration">
@@ -203,31 +203,31 @@
     </div>
 
     <div class="auth-card">
-        <div id="errorMessage" class="alert alert-danger hidden" role="alert" aria-live="assertive" style="border-radius: 12px; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.75rem; background: #fef2f2; border: 1px solid #fecaca; padding: 1rem; color: #b91c1c;">
-            <span class="alert-icon" style="color: #ef4444; display: inline-flex; align-items: center; flex-shrink: 0;">
+        <div id="errorMessage" class="alert alert-danger hidden" role="alert" aria-live="assertive">
+            <span class="alert-icon">
                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
             </span>
-            <span class="alert-text" style="font-size: 0.875rem; font-weight: 600;">Error message</span>
+            <span class="alert-text">Error message</span>
         </div>
 
-        <div id="successMessage" class="alert alert-success hidden" role="status" aria-live="polite" style="border-radius: 12px; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.75rem; background: #ecfdf5; border: 1px solid #a7f3d0; padding: 1rem; color: #065f46;">
-            <span class="alert-icon" style="color: #10b981; display: inline-flex; align-items: center; flex-shrink: 0;">
+        <div id="successMessage" class="alert alert-success hidden" role="status" aria-live="polite">
+            <span class="alert-icon">
                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
             </span>
-            <span class="alert-text" style="font-size: 0.875rem; font-weight: 600;">Success message</span>
+            <span class="alert-text">Success message</span>
         </div>
 
         <nav class="registration-stepper" aria-label="Account setup progress">
-            <div class="registration-step is-active" data-step-indicator="1" aria-current="step">
+            <div class="registration-step is-active" data-step-indicator="1" aria-label="Step 1: Workspace" aria-current="step">
                 <span>1</span><strong>Workspace</strong>
             </div>
-            <div class="registration-step" data-step-indicator="2">
+            <div class="registration-step" data-step-indicator="2" aria-label="Step 2: Profile">
                 <span>2</span><strong>Profile</strong>
             </div>
-            <div class="registration-step" data-step-indicator="3">
+            <div class="registration-step" data-step-indicator="3" aria-label="Step 3: Security">
                 <span>3</span><strong>Security</strong>
             </div>
-            <div class="registration-step" data-step-indicator="4">
+            <div class="registration-step" data-step-indicator="4" aria-label="Step 4: Review">
                 <span>4</span><strong>Review</strong>
             </div>
         </nav>
@@ -242,7 +242,7 @@
                 <div class="registration-panel__heading">
                     <p class="auth-eyebrow">Start with your role</p>
                     <h2 id="workspaceStepTitle">How will you use DOMIKNOW?</h2>
-                    <p>Your role determines the tools, dashboard, and onboarding guidance you receive.</p>
+                    <p>Choose the workspace you need. You can review everything before creating the account.</p>
                 </div>
                 <fieldset class="role-choice-group">
                     <legend class="sr-only">Choose your account role</legend>

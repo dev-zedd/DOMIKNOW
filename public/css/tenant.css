@@ -220,6 +220,10 @@
   line-height: 1.55;
 }
 
+.tenant-preferences-toggle {
+  display: none;
+}
+
 .tenant-summary-action {
   display: inline-flex;
   min-height: 42px;
@@ -525,6 +529,43 @@ body[data-tenant-page="property-details"] #detailsMap {
     position: static !important;
     max-height: none;
   }
+
+  body[data-tenant-page="properties"] .tenant-preferences-toggle {
+    display: flex;
+    width: 100%;
+    min-height: 44px;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: 14px;
+    padding: 10px 12px;
+    border: 1px solid var(--color-border-strong);
+    border-radius: 8px;
+    background: var(--color-bg-surface);
+    color: var(--color-action-primary);
+    font: inherit;
+    font-size: 0.8125rem;
+    font-weight: 750;
+    text-align: left;
+  }
+
+  body[data-tenant-page="properties"] .tenant-preferences-toggle svg {
+    flex: 0 0 auto;
+    transition: transform var(--motion-fast);
+  }
+
+  body[data-tenant-page="properties"] .recommendation-controls:not(.tenant-preferences-collapsed) .tenant-preferences-toggle svg {
+    transform: rotate(180deg);
+  }
+
+  body[data-tenant-page="properties"] .recommendation-controls.tenant-preferences-collapsed .filter-section,
+  body[data-tenant-page="properties"] .recommendation-controls.tenant-preferences-collapsed .recommendation-reset {
+    display: none !important;
+  }
+
+  body[data-tenant-page="properties"] .recommendation-controls.tenant-preferences-collapsed {
+    padding-bottom: 14px !important;
+  }
 }
 
 @media (max-width: 767px) {
@@ -564,8 +605,49 @@ body[data-tenant-page="property-details"] #detailsMap {
   }
 
   .tenant-journey {
+    width: 100%;
+    max-width: 100%;
+    margin-right: 0 !important;
+    margin-left: 0 !important;
     overflow-x: auto;
     grid-template-columns: repeat(4, minmax(104px, 1fr));
+  }
+
+  body[data-tenant-page="properties"] .tenant-preferences-toggle {
+    display: flex;
+    width: 100%;
+    min-height: 44px;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: 14px;
+    padding: 10px 12px;
+    border: 1px solid var(--color-border-strong);
+    border-radius: 8px;
+    background: var(--color-bg-surface);
+    color: var(--color-action-primary);
+    font: inherit;
+    font-size: 0.8125rem;
+    font-weight: 750;
+    text-align: left;
+  }
+
+  body[data-tenant-page="properties"] .tenant-preferences-toggle svg {
+    flex: 0 0 auto;
+    transition: transform var(--motion-fast);
+  }
+
+  body[data-tenant-page="properties"] .recommendation-controls:not(.tenant-preferences-collapsed) .tenant-preferences-toggle svg {
+    transform: rotate(180deg);
+  }
+
+  body[data-tenant-page="properties"] .recommendation-controls.tenant-preferences-collapsed .filter-section,
+  body[data-tenant-page="properties"] .recommendation-controls.tenant-preferences-collapsed .recommendation-reset {
+    display: none !important;
+  }
+
+  body[data-tenant-page="properties"] .recommendation-controls.tenant-preferences-collapsed {
+    padding-bottom: 14px !important;
   }
 
   .tenant-journey-step {

@@ -223,7 +223,7 @@
         if (!document.head.querySelector('link[data-domiknow-modal-system]')) {
             const stylesheet = document.createElement('link');
             stylesheet.rel = 'stylesheet';
-            stylesheet.href = '/css/modal-system.css?v=20260817-3';
+            stylesheet.href = '/css/modal-system.css?v=20260827-4';
             stylesheet.setAttribute('data-domiknow-modal-system', '');
             document.head.appendChild(stylesheet);
         }
@@ -272,6 +272,24 @@
                 typeof input === 'object' ? input?.input?.value || input?.value || '' : ''
             )
         );
+
+        if (typeof window.tenantNotice !== 'function') {
+            window.tenantNotice = (message, options = {}) => {
+                const text = String(message || 'Please try again.');
+                const variant = options.variant
+                    || (/success|submitted|uploaded|saved|completed/i.test(text) ? 'success'
+                        : /required|select|choose|larger|too large|only file/i.test(text) ? 'warning'
+                            : /error|failed|network|unavailable|could not/i.test(text) ? 'danger'
+                                : 'info');
+                return window.domiknowAlert({
+                    variant,
+                    eyebrow: options.eyebrow || 'Tenant workspace',
+                    title: options.title || (variant === 'success' ? 'Action completed' : variant === 'warning' ? 'Check this information' : variant === 'danger' ? 'Action could not be completed' : 'Tenant notice'),
+                    message: text,
+                    confirmLabel: options.confirmLabel || 'Got it'
+                });
+            };
+        }
     }
 
     function ensureDomiKnowWalkthroughSystem() {
@@ -297,7 +315,7 @@
         if (!stylesheet) {
             stylesheet = document.createElement('link');
             stylesheet.rel = 'stylesheet';
-            stylesheet.href = '/css/loading-system.css?v=20260826-1';
+            stylesheet.href = '/css/loading-system.css?v=20260827-2';
             document.head.appendChild(stylesheet);
         }
         stylesheet.setAttribute('data-domiknow-loading-system', '');
@@ -305,7 +323,7 @@
         let script = document.head.querySelector('script[src*="loading-system.js"]');
         if (!window.DomiKnowLoading && !script) {
             script = document.createElement('script');
-            script.src = '/js/loading-system.js?v=20260826-1';
+            script.src = '/js/loading-system.js?v=20260827-3';
             script.defer = true;
             document.head.appendChild(script);
         }

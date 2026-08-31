@@ -3,21 +3,6 @@
  * Marketing, rental discovery, and unauthenticated property-detail experience.
  */
 
-@view-transition {
-  navigation: auto;
-}
-
-::view-transition-old(root) { animation: 120ms ease-out both public-page-leave; }
-::view-transition-new(root) { animation: 180ms ease-out both public-page-enter; }
-
-@keyframes public-page-leave { to { opacity: 0.94; } }
-@keyframes public-page-enter { from { opacity: 0.94; } }
-
-@media (prefers-reduced-motion: reduce) {
-  ::view-transition-old(root),
-  ::view-transition-new(root) { animation: none; }
-}
-
 .public-landing-page,
 .public-property-page {
   background: var(--color-bg-canvas) !important;
@@ -1271,6 +1256,8 @@
   color: var(--color-action-primary);
 }
 
+.public-workspace-nav .public-nav-signup { display: none; }
+
 .public-workspace-actions {
   display: flex;
   gap: 8px;
@@ -2460,6 +2447,18 @@
   .public-landing-page .public-discovery-bridge { width: calc(100% - 16px); gap: 28px; padding: 42px 22px; }
   .public-discovery-bridge__preview { min-height: 0; }
   .public-workspace-actions .btn { display: none; }
+  .public-workspace-nav .public-nav-signup {
+    display: inline-flex;
+    align-items: center;
+    border: 1px solid var(--color-action-primary);
+    background: var(--color-action-primary);
+    color: #fff;
+  }
+  .public-workspace-nav .public-nav-signup:hover,
+  .public-workspace-nav .public-nav-signup:focus-visible {
+    background: var(--color-action-primary-hover);
+    color: #fff;
+  }
   .discovery-heading h1 { font-size: 2.5rem; }
   .discovery-heading__note { padding: 14px; }
   .discovery-filter-panel__header { align-items: flex-start; }
