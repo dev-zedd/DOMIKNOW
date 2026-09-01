@@ -266,16 +266,19 @@ const maintenanceController = {
                 return responseHelper.error(res, 'Only approved requests can be assigned to a technician.');
             }
 
-            // Verify technician role
+            // Verify technician role and ownership — worker must belong to this landlord
             const { data: worker, error: workerErr } = await supabase
                 .from('users')
-                .select('role')
+                .select('role, created_by_landlord_id')
                 .eq('id', assigned_maintenance_id)
                 .maybeSingle();
 
             if (workerErr) throw workerErr;
             if (!worker || worker.role !== 'maintenance') {
                 return responseHelper.error(res, 'Selected user is not registered as maintenance personnel.');
+            }
+            if (worker.created_by_landlord_id !== landlordId) {
+                return responseHelper.error(res, 'You can only assign maintenance workers from your own team.', null, 403);
             }
 
             // Create assignment details
@@ -723,14 +726,20 @@ const maintenanceController = {
     },
 
     // ── Get Active Maintenance workers list ──────────────────────────────
+    // Admins see all workers; landlords see only their own workers.
     async getMaintenancePersonnel(req, res) {
         try {
-            const { data: workers, error } = await supabase
+            let query = supabase
                 .from('users')
                 .select('id, full_name, email')
                 .eq('role', 'maintenance')
                 .eq('account_status', 'active');
 
+            if (req.user.role === 'landlord') {
+                query = query.eq('created_by_landlord_id', req.user.id);
+            }
+
+            const { data: workers, error } = await query;
             if (error) throw error;
             return responseHelper.success(res, 'Active maintenance personnel list retrieved.', workers);
         } catch (error) {
@@ -765,14 +774,14 @@ const maintenanceController = {
             // Format worker display name with trade if provided
             const displayName = trade ? `${full_name.trim()} (${trade.trim()})` : full_name.trim();
 
-            // Create worker user
+            // Create worker user — scoped to the creating landlord
             const newWorker = await userModel.createUser({
                 full_name: displayName,
                 email: email.trim().toLowerCase(),
                 password_hash,
                 role: 'maintenance',
                 contact_number: contact_number || null,
-                address: `Created by Landlord #${landlordId}`,
+                created_by_landlord_id: landlordId,
                 is_verified: true,
                 account_status: 'active'
             });

@@ -215,6 +215,60 @@ NOTES:
   Address        : 3 Acevida Street, Brgy. Acevida, Siniloan, Laguna
 
 ================================================================================
+                      MAINTENANCE PERSONNEL (5 ACCOUNTS)
+              *** Each linked to their respective landlord ***
+================================================================================
+
+#1
+  Full Name      : Roque Mendoza
+  Email          : khaha4221@gmail.com
+  Password       : kylederoma23#
+  Role           : maintenance
+  Contact Number : 09812865449
+  Address        : Created by Landlord #landlord01
+  Linked To      : Ricardo Dela Torre (landlord01@domiknow.com)
+
+--------------------------------------------------------------------------------
+
+#2
+  Full Name      : Allan Bautista
+  Email          : worker01@domiknow.com
+  Password       : Worker01#2026
+  Role           : maintenance
+  Contact Number : +63 928 451 3670
+  Linked To      : Maricel Ocampo (landlord02@domiknow.com)
+
+--------------------------------------------------------------------------------
+
+#3
+  Full Name      : Ramon Cruz
+  Email          : worker02@domiknow.com
+  Password       : Worker02#2026
+  Role           : maintenance
+  Contact Number : +63 935 762 1894
+  Linked To      : Eduardo Espiritu (landlord03@domiknow.com)
+
+--------------------------------------------------------------------------------
+
+#4
+  Full Name      : Danilo Reyes
+  Email          : worker03@domiknow.com
+  Password       : Worker03#2026
+  Role           : maintenance
+  Contact Number : +63 947 213 5089
+  Linked To      : Rosario Manalo (landlord04@domiknow.com)
+
+--------------------------------------------------------------------------------
+
+#5
+  Full Name      : Victor Santos
+  Email          : worker04@domiknow.com
+  Password       : Worker04#2026
+  Role           : maintenance
+  Contact Number : +63 962 384 7015
+  Linked To      : Dante Villareal (landlord05@domiknow.com)
+
+================================================================================
                             SETUP CHECKLIST
 ================================================================================
 
@@ -224,8 +278,11 @@ NOTES:
   [ ] 4. node database/fixDemoImages.js
   [ ] 5. node database/fixDemoProfiles.js
   [ ] 6. node database/seedDemoActivity.js
-  [ ] 7. node database/seedDemoNotifications.js
-  [ ] 8. Approve all 5 landlord accounts via Admin panel
-  [ ] 9. Confirm all landlord account_status is 'active' before demo
+  [ ] 7. node database/seedDemoWorkers.js
+  [ ] 8. node database/fixMaintenanceDemo.js
+  [ ] 9. node database/seedDemoNotifications.js
+  [ ] 10. node database/uploadPaymentProofs.js
+  [ ] 11. Approve all 5 landlord accounts via Admin panel
+  [ ] 12. Confirm all landlord account_status is 'active' before demo
 
 ================================================================================

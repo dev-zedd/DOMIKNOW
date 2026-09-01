@@ -1,4 +1,4 @@
-`node_modules/
+node_modules/
 .env
 .DS_Store
 scratch/
@@ -8,10 +8,11 @@ database/seedDemoAccounts.js
 database/seedDemoProperties.js
 database/seedDemoActivity.js
 database/seedDemoNotifications.js
+database/seedDemoWorkers.js
 database/fixDemoDocuments.js
 database/fixDemoImages.js
 database/fixDemoProfiles.js
+database/fixMaintenanceDemo.js
 database/uploadPaymentProofs.js
 DEMO_ACCOUNTS.txt
 demoProofOfPaymentImages/
-database/uploadPaymentProofs.js
