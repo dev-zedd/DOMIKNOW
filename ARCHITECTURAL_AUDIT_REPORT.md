@@ -7,6 +7,7 @@
 
 ---
 
+
 ## EXECUTIVE SUMMARY
 
 This architectural audit provides a comprehensive analysis of the DomiKnow system from a software architecture perspective. The system is a multi-role rental property management platform built with Node.js, Express, Supabase PostgreSQL, and vanilla JavaScript frontend.
