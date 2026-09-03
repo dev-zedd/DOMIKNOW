@@ -63,6 +63,65 @@
   justify-content: center;
 }
 
+/* Completely hide all scrollbars on the tenant portal side for a clean, sleek look */
+html[data-tenant-portal],
+html:has(body[data-role="tenant"]),
+body[data-role="tenant"],
+body[data-role="tenant"] *,
+.dashboard-layout-tenant,
+.dashboard-layout-tenant *,
+.dashboard-layout-tenant .sidebar,
+.dashboard-layout-tenant .sidebar-tenant,
+.dashboard-layout-tenant #domiknowSidebar,
+.sidebar-tenant,
+.sidebar-tenant .sidebar-menu,
+.dashboard-layout-tenant .nav-sheet {
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+}
+
+html[data-tenant-portal]::-webkit-scrollbar,
+html:has(body[data-role="tenant"])::-webkit-scrollbar,
+body[data-role="tenant"]::-webkit-scrollbar,
+body[data-role="tenant"] *::-webkit-scrollbar,
+.dashboard-layout-tenant::-webkit-scrollbar,
+.dashboard-layout-tenant *::-webkit-scrollbar,
+.dashboard-layout-tenant .sidebar::-webkit-scrollbar,
+.dashboard-layout-tenant .sidebar *::-webkit-scrollbar,
+.dashboard-layout-tenant .sidebar-tenant::-webkit-scrollbar,
+.dashboard-layout-tenant #domiknowSidebar::-webkit-scrollbar,
+.sidebar-tenant::-webkit-scrollbar,
+.sidebar-tenant .sidebar-menu::-webkit-scrollbar,
+.dashboard-layout-tenant .nav-sheet::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+  background: transparent !important;
+}
+
+html[data-tenant-portal]::-webkit-scrollbar-thumb,
+html:has(body[data-role="tenant"])::-webkit-scrollbar-thumb,
+body[data-role="tenant"]::-webkit-scrollbar-thumb,
+body[data-role="tenant"] *::-webkit-scrollbar-thumb,
+.dashboard-layout-tenant::-webkit-scrollbar-thumb,
+.dashboard-layout-tenant *::-webkit-scrollbar-thumb,
+.dashboard-layout-tenant .sidebar::-webkit-scrollbar-thumb,
+.dashboard-layout-tenant .sidebar *::-webkit-scrollbar-thumb {
+  display: none !important;
+  background: transparent !important;
+  border: none !important;
+}
+
+html[data-tenant-portal]::-webkit-scrollbar-track,
+html:has(body[data-role="tenant"])::-webkit-scrollbar-track,
+body[data-role="tenant"]::-webkit-scrollbar-track,
+body[data-role="tenant"] *::-webkit-scrollbar-track,
+.dashboard-layout-tenant::-webkit-scrollbar-track,
+.dashboard-layout-tenant *::-webkit-scrollbar-track {
+  display: none !important;
+  background: transparent !important;
+}
+
 .dashboard-layout-tenant .sidebar-menu {
   gap: 2px !important;
   padding-right: 2px;
@@ -135,6 +194,18 @@
 .dashboard-layout-tenant .topbar {
   min-height: 76px;
   background: color-mix(in srgb, var(--color-bg-surface) 94%, transparent) !important;
+  position: sticky;
+  top: 0;
+  z-index: 110 !important;
+}
+
+/* Ensure all modals and overlays always appear in front of topbar and all content */
+.modal-overlay,
+.modal,
+.form-modal-overlay,
+.chat-head-modal,
+[role="dialog"] {
+  z-index: 9999 !important;
 }
 
 .dashboard-layout-tenant .topbar-title {
@@ -157,16 +228,169 @@
 
 .dashboard-layout-tenant .topbar-avatar {
   display: grid;
-  width: 36px;
-  height: 36px;
+  width: 38px;
+  height: 38px;
   place-items: center;
-  border: 1px solid color-mix(in srgb, var(--color-action-primary) 22%, var(--color-border-default));
-  border-radius: 11px;
+  border: 2px solid color-mix(in srgb, var(--color-action-primary) 35%, var(--color-border-default));
+  border-radius: 50% !important;
   background: var(--color-action-primary-subtle);
   color: var(--color-action-primary);
-  font-size: 0.75rem;
+  font-size: 0.8125rem;
   font-weight: 800;
   letter-spacing: 0.02em;
+  overflow: hidden;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+}
+
+.dashboard-layout-tenant .topbar-account-dropdown {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.dashboard-layout-tenant .topbar-avatar-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px;
+  background: transparent;
+  border: 2px solid transparent;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: transform var(--transition-fast), border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.dashboard-layout-tenant .topbar-avatar-btn:hover {
+  transform: scale(1.05);
+  border-color: var(--color-action-primary);
+}
+
+.dashboard-layout-tenant .topbar-avatar-btn:focus-visible {
+  outline: none;
+  border-color: var(--color-action-primary);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-action-primary) 28%, transparent);
+}
+
+.dashboard-layout-tenant .topbar-right > .dk-tour-replay,
+.dashboard-layout-tenant .topbar-right > .theme-toggle {
+  display: none !important;
+}
+
+.dashboard-layout-tenant .topbar-dropdown-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  min-width: 190px;
+  width: max-content;
+  background: var(--color-bg-surface);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-lg, 12px);
+  box-shadow: var(--shadow-dropdown);
+  padding: 6px;
+  z-index: 1100;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  animation: topbarDropdownFadeIn 0.16s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.dashboard-layout-tenant .topbar-dropdown-menu[hidden] {
+  display: none !important;
+}
+
+@keyframes topbarDropdownFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-6px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.dashboard-layout-tenant .topbar-dropdown-item,
+.dashboard-layout-tenant .topbar-dropdown-menu .topbar-dropdown-item,
+.dashboard-layout-tenant .topbar-dropdown-menu [data-theme-toggle] {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  gap: 12px !important;
+  width: 100% !important;
+  min-width: 100% !important;
+  height: auto !important;
+  min-height: 40px !important;
+  padding: 9px 12px !important;
+  border: none !important;
+  border-radius: var(--radius-md, 8px) !important;
+  background: transparent !important;
+  color: var(--color-text-primary) !important;
+  box-shadow: none !important;
+  text-decoration: none !important;
+  font-size: 0.875rem !important;
+  font-weight: 500 !important;
+  cursor: pointer !important;
+  text-align: left !important;
+  white-space: nowrap !important;
+  transition: background-color var(--transition-fast), color var(--transition-fast) !important;
+}
+
+.dashboard-layout-tenant .topbar-dropdown-item .dropdown-item-icon {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 20px !important;
+  height: 20px !important;
+  flex-shrink: 0 !important;
+  color: var(--color-text-secondary) !important;
+  transition: color var(--transition-fast) !important;
+}
+
+.dashboard-layout-tenant .topbar-dropdown-item svg {
+  width: 18px !important;
+  height: 18px !important;
+  flex-shrink: 0 !important;
+  color: inherit !important;
+}
+
+.dashboard-layout-tenant .topbar-dropdown-item:hover,
+.dashboard-layout-tenant .topbar-dropdown-item:focus-visible,
+.dashboard-layout-tenant .topbar-dropdown-item.active {
+  background: var(--color-bg-subtle, rgba(0, 0, 0, 0.05)) !important;
+  color: var(--color-action-primary) !important;
+  outline: none !important;
+}
+
+.dashboard-layout-tenant .topbar-dropdown-item:hover .dropdown-item-icon,
+.dashboard-layout-tenant .topbar-dropdown-item:focus-visible .dropdown-item-icon,
+.dashboard-layout-tenant .topbar-dropdown-item.active .dropdown-item-icon {
+  color: var(--color-action-primary) !important;
+}
+
+.dashboard-layout-tenant .topbar-dropdown-divider {
+  height: 1px;
+  background: var(--color-divider, var(--color-border-default));
+  margin: 4px 4px;
+}
+
+.dashboard-layout-tenant .topbar-dropdown-logout,
+.dashboard-layout-tenant .topbar-dropdown-menu .topbar-dropdown-logout {
+  color: var(--color-error-text, #ef4444) !important;
+}
+
+.dashboard-layout-tenant .topbar-dropdown-logout .dropdown-item-icon {
+  color: var(--color-error-text, #ef4444) !important;
+}
+
+.dashboard-layout-tenant .topbar-dropdown-logout:hover,
+.dashboard-layout-tenant .topbar-dropdown-logout:focus-visible {
+  background: color-mix(in srgb, var(--color-error-text, #ef4444) 10%, transparent) !important;
+  color: var(--color-error-text, #ef4444) !important;
+}
+
+.dashboard-layout-tenant .topbar-dropdown-logout:hover .dropdown-item-icon,
+.dashboard-layout-tenant .topbar-dropdown-logout:focus-visible .dropdown-item-icon {
+  color: var(--color-error-text, #ef4444) !important;
 }
 
 .dashboard-layout-tenant .topbar-account-copy {
@@ -408,27 +632,308 @@
   background: var(--color-bg-hover) !important;
 }
 
+/* Controls Bar */
 .tenant-table-controls {
-  display: grid;
-  grid-template-columns: minmax(200px, 1fr) minmax(150px, 220px) auto;
-  align-items: center;
-  gap: 10px;
-  padding: 12px 14px;
-  border-bottom: 1px solid var(--color-divider);
-  background: var(--color-bg-surface);
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  gap: 16px !important;
+  padding: 0 0 20px 0 !important;
+  background: transparent !important;
+  border-bottom: none !important;
+  flex-wrap: wrap;
 }
 
-.dashboard-layout-tenant .tenant-table-controls :where(input, select) {
-  min-height: 40px !important;
-  margin: 0 !important;
+.tenant-table-search-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 280px;
+  max-width: 100%;
+}
+
+.tenant-table-search-wrapper .tenant-search-icon {
+  position: absolute;
+  left: 14px;
+  color: var(--color-text-muted, #94a3b8);
+  pointer-events: none;
+}
+
+.dashboard-layout-tenant .tenant-table-controls .tenant-table-search {
+  width: 100% !important;
+  min-height: 42px !important;
+  padding: 9px 14px 9px 38px !important;
+  border: 1px solid var(--color-border-default) !important;
+  border-radius: 10px !important;
+  background: var(--color-bg-surface) !important;
+  color: var(--color-text-primary) !important;
+  font-size: 0.875rem !important;
+  box-shadow: none !important;
+}
+
+.dashboard-layout-tenant .tenant-table-controls .tenant-table-search:focus {
+  border-color: var(--color-action-primary) !important;
+  outline: none !important;
+}
+
+.tenant-table-controls-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-left: auto;
+}
+
+.dashboard-layout-tenant .tenant-table-controls .tenant-table-status {
+  min-height: 42px !important;
+  padding: 9px 36px 9px 14px !important;
+  border: 1px solid var(--color-border-default) !important;
+  border-radius: 10px !important;
+  background: var(--color-bg-surface) !important;
+  color: var(--color-text-primary) !important;
+  font-size: 0.875rem !important;
+  font-weight: 500 !important;
+  cursor: pointer;
+  box-shadow: none !important;
 }
 
 .tenant-table-count {
-  color: var(--color-text-muted);
-  font-size: 0.6875rem;
-  font-weight: 750;
+  color: var(--color-text-secondary, #64748b) !important;
+  font-size: 0.875rem !important;
+  font-weight: 500 !important;
   text-align: right;
   white-space: nowrap;
+}
+
+/* Applications / Record Table Card Layout */
+.dashboard-layout-tenant .app-card {
+  background: var(--color-bg-surface) !important;
+  border: 1px solid var(--color-border-default) !important;
+  border-radius: 16px !important;
+  padding: 24px !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04) !important;
+  margin-bottom: 2rem;
+}
+
+.dashboard-layout-tenant .app-card .tenant-table-scroll {
+  overflow: visible !important;
+}
+
+.dashboard-layout-tenant .app-card table {
+  width: 100% !important;
+  border-collapse: separate !important;
+  border-spacing: 0 12px !important;
+  display: block !important;
+}
+
+.dashboard-layout-tenant .app-card thead {
+  display: none !important;
+}
+
+.dashboard-layout-tenant .app-card tbody {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 12px !important;
+  width: 100% !important;
+}
+
+.dashboard-layout-tenant tbody tr.app-row-card {
+  display: grid !important;
+  grid-template-columns: minmax(220px, 1.4fr) repeat(5, minmax(110px, 1fr)) minmax(130px, auto) !important;
+  align-items: center !important;
+  gap: 16px !important;
+  padding: 16px 22px !important;
+  border: 1px solid var(--color-border-default) !important;
+  border-radius: 12px !important;
+  background: var(--color-bg-surface) !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03) !important;
+  transition: none !important;
+}
+
+.dashboard-layout-tenant tbody tr.app-row-card:hover,
+.dashboard-layout-tenant tbody tr.app-row-card:hover > td {
+  border-color: var(--color-border-default) !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03) !important;
+  background: var(--color-bg-surface) !important;
+  transform: none !important;
+}
+
+.dashboard-layout-tenant tbody tr.app-row-card > td {
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+  padding: 0 !important;
+  border: none !important;
+  background: transparent !important;
+}
+
+.dashboard-layout-tenant tbody tr.app-row-card td::before {
+  display: none !important;
+}
+
+.app-col-label {
+  font-size: 0.75rem !important;
+  font-weight: 500 !important;
+  color: var(--color-text-muted, #94a3b8) !important;
+  margin-bottom: 4px !important;
+  line-height: 1.2 !important;
+}
+
+.app-col-val {
+  font-size: 0.875rem !important;
+  font-weight: 600 !important;
+  color: var(--color-text-primary, #1e293b) !important;
+  line-height: 1.3 !important;
+}
+
+.app-col-val.remarks-text {
+  font-style: italic !important;
+  font-weight: 400 !important;
+  color: var(--color-text-secondary, #64748b) !important;
+  max-width: 170px !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+/* Property column */
+.app-cell-property {
+  min-width: 200px !important;
+}
+
+.app-property-wrapper {
+  display: flex !important;
+  align-items: center !important;
+  gap: 14px !important;
+}
+
+.app-property-icon {
+  width: 44px !important;
+  height: 44px !important;
+  min-width: 44px !important;
+  border-radius: 10px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex-shrink: 0 !important;
+  background: var(--color-action-primary-subtle, #eaf0ff) !important;
+  color: var(--color-action-primary, #0355f3) !important;
+  border: 1px solid color-mix(in srgb, var(--color-action-primary) 18%, transparent) !important;
+}
+
+.app-property-name {
+  font-size: 0.9375rem !important;
+  font-weight: 700 !important;
+  color: var(--color-text-primary, #042458) !important;
+  line-height: 1.3 !important;
+}
+
+.app-property-unit {
+  font-size: 0.8125rem !important;
+  color: var(--color-text-secondary, #475569) !important;
+  margin-top: 3px !important;
+}
+
+/* Status badge */
+.app-status-badge {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  padding: 4px 12px !important;
+  border-radius: 999px !important;
+  font-size: 0.75rem !important;
+  font-weight: 600 !important;
+  white-space: nowrap !important;
+  width: fit-content !important;
+}
+
+.app-status-dot {
+  width: 6px !important;
+  height: 6px !important;
+  border-radius: 50% !important;
+  background: currentColor !important;
+  display: inline-block !important;
+}
+
+.app-status-badge.status-pending {
+  background: var(--color-warning-bg, #fffbeb) !important;
+  color: var(--color-warning-text, #92400e) !important;
+  border: 1px solid var(--color-warning-border, #fde68a) !important;
+}
+
+.app-status-badge.status-approved,
+.app-status-badge.status-active {
+  background: var(--color-success-bg, #f0fdf4) !important;
+  color: var(--color-success-text, #166534) !important;
+  border: 1px solid var(--color-success-border, #bbf7d0) !important;
+}
+
+.app-status-badge.status-rejected {
+  background: var(--color-error-bg, #fef2f2) !important;
+  color: var(--color-error-text, #991b1b) !important;
+  border: 1px solid var(--color-error-border, #fecaca) !important;
+}
+
+/* Action button - DomiKnow Original Brand Colors */
+.app-cell-action {
+  align-items: flex-end !important;
+}
+
+.app-action-btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  padding: 8px 16px !important;
+  border: 1px solid var(--color-action-primary, #0355f3) !important;
+  border-radius: 8px !important;
+  color: var(--color-action-primary, #0355f3) !important;
+  background: transparent !important;
+  font-size: 0.8125rem !important;
+  font-weight: 600 !important;
+  text-decoration: none !important;
+  white-space: nowrap !important;
+  transition: all 0.18s ease !important;
+}
+
+.app-action-btn:hover {
+  background: var(--color-action-primary, #0355f3) !important;
+  color: #ffffff !important;
+}
+
+.app-action-btn svg {
+  transition: transform 0.18s ease !important;
+}
+
+.app-action-btn:hover svg {
+  transform: translateX(2px) !important;
+}
+
+@media (max-width: 1200px) {
+  .dashboard-layout-tenant tbody tr.app-row-card {
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)) !important;
+    gap: 14px 20px !important;
+  }
+  .app-cell-action {
+    align-items: flex-start !important;
+  }
+}
+
+@media (max-width: 640px) {
+  .dashboard-layout-tenant tbody tr.app-row-card {
+    grid-template-columns: 1fr !important;
+    padding: 16px !important;
+    gap: 12px !important;
+  }
+  .tenant-table-controls {
+    flex-direction: column !important;
+    align-items: stretch !important;
+  }
+  .tenant-table-search-wrapper {
+    width: 100% !important;
+  }
+  .tenant-table-controls-right {
+    justify-content: space-between !important;
+    width: 100% !important;
+  }
 }
 
 .tenant-record-table tr[hidden] {
@@ -1038,42 +1543,1122 @@ body[data-tenant-page="application-details"] ::-webkit-scrollbar-thumb {
   background: var(--color-border-strong);
 }
 
-@media (min-width: 901px) {
-  body[data-tenant-page="application-details"] .main-content-inner {
-    display: flex;
-    height: calc(100dvh - 76px) !important;
-    min-height: 0 !important;
+/* Remove breadcrumbs on tenant portal */
+.dashboard-layout-tenant :where(.dk-breadcrumbs, [data-domiknow-breadcrumbs], .breadcrumb-nav) {
+  display: none !important;
+}
+
+/* ==========================================================================
+   Application Details Page Layout & Cards
+   ========================================================================== */
+
+body[data-tenant-page="application-details"] .main-content-inner,
+body[data-tenant-page="application-details"] .dashboard-container,
+body[data-tenant-page="lease-details"] .main-content-inner,
+body[data-tenant-page="lease-details"] .dashboard-container,
+body[data-tenant-page="billings"] .main-content-inner,
+body[data-tenant-page="billings"] .dashboard-container {
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  overflow: visible !important;
+  display: block !important;
+}
+
+.app-back-nav {
+  margin-bottom: 16px;
+}
+
+.app-details-back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--color-action-primary, #0355f3);
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+
+.app-details-back-link:hover {
+  opacity: 0.85;
+  transform: translateX(-2px);
+  text-decoration: underline;
+}
+
+.app-details-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.45fr) minmax(340px, 1fr);
+  gap: 24px;
+  align-items: start;
+  margin-top: 24px;
+  margin-bottom: 40px;
+}
+
+body[data-tenant-page="lease-details"] .app-details-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+}
+
+.app-details-col {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.app-detail-card {
+  background: var(--color-bg-surface, #ffffff);
+  border: 1px solid var(--color-border-default, #e2e8f0);
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.app-card-header-flex {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.app-card-title-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.app-card-icon-box {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  background: var(--color-action-primary-subtle, #eaf0ff);
+  color: var(--color-action-primary, #0355f3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.app-card-corner-icon {
+  color: var(--color-text-muted, #94a3b8);
+  display: flex;
+  align-items: center;
+}
+
+.app-card-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--color-text-primary, #042458);
+  margin: 0;
+  line-height: 1.3;
+}
+
+.app-card-subtitle {
+  color: var(--color-text-secondary, #64748b);
+  font-size: 0.8125rem;
+  margin-top: 6px;
+  margin-bottom: 16px;
+}
+
+/* Status Notice Box */
+.app-status-notice {
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  border-radius: 12px;
+  padding: 16px 20px;
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  margin-top: 18px;
+}
+
+.app-status-notice-icon {
+  color: var(--color-action-primary, #0355f3);
+  flex-shrink: 0;
+  margin-top: 2px;
+  display: flex;
+}
+
+.app-status-notice-title {
+  color: var(--color-text-primary, #0f172a);
+  font-weight: 600;
+  font-size: 0.875rem;
+  line-height: 1.4;
+}
+
+.app-status-notice-sub {
+  color: var(--color-text-secondary, #475569);
+  font-size: 0.8125rem;
+  margin-top: 3px;
+  line-height: 1.4;
+}
+
+.app-status-timestamp {
+  font-size: 0.8125rem;
+  color: var(--color-text-secondary, #64748b);
+  margin-top: 14px;
+  font-weight: 500;
+}
+
+/* Property Specs */
+.app-prop-top-row {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+}
+
+.app-prop-thumb {
+  width: 110px;
+  height: 74px;
+  border-radius: 10px;
+  object-fit: cover;
+  border: 1px solid var(--color-border-default, #e2e8f0);
+  flex-shrink: 0;
+}
+
+.app-prop-specs-grid {
+  display: grid;
+  grid-template-columns: 1.15fr 1fr;
+  gap: 12px 20px;
+  flex-grow: 1;
+}
+
+.app-prop-spec-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.app-spec-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: var(--color-action-primary-subtle, #eaf0ff);
+  color: var(--color-action-primary, #0355f3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.app-spec-label {
+  font-size: 0.75rem;
+  color: var(--color-text-muted, #94a3b8);
+  font-weight: 500;
+  margin-bottom: 2px;
+}
+
+.app-spec-val {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--color-text-primary, #042458);
+  line-height: 1.2;
+}
+
+.app-prop-divider {
+  height: 1px;
+  background: var(--color-divider, #f1f5f9);
+  margin: 18px 0;
+}
+
+.app-prop-bottom-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.app-prop-meta-block .app-meta-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--color-text-secondary, #475569);
+  margin-bottom: 6px;
+}
+
+.app-prop-meta-block .app-meta-title svg {
+  color: var(--color-action-primary, #0355f3);
+}
+
+.app-prop-meta-block .app-meta-desc {
+  font-size: 0.8125rem;
+  color: var(--color-text-primary, #1e293b);
+  line-height: 1.5;
+}
+
+/* Introduction Message */
+.app-message-box {
+  background: var(--color-bg-subtle, #f8fafc);
+  border: 1px solid var(--color-border-default, #e2e8f0);
+  border-radius: 12px;
+  padding: 16px 20px;
+  min-height: 80px;
+}
+
+.app-message-text {
+  color: var(--color-text-primary, #334155);
+  font-size: 0.875rem;
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* Requirements items */
+.app-requirements-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.app-req-item {
+  border-radius: 10px;
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.app-req-item.submitted {
+  background: var(--color-success-bg, #f0fdf4);
+  border: 1px solid var(--color-success-border, #dcfce7);
+}
+
+.app-req-item.required {
+  background: var(--color-warning-bg, #fffbeb);
+  border: 1px solid var(--color-warning-border, #fef3c7);
+}
+
+.app-req-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.app-req-icon-circle {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  flex-shrink: 0;
+}
+
+.app-req-icon-circle.success {
+  background: #16a34a;
+}
+
+.app-req-icon-circle.warning {
+  background: #d97706;
+}
+
+.app-req-name {
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.app-req-item.submitted .app-req-name {
+  color: var(--color-success-text, #166534);
+}
+
+.app-req-item.required .app-req-name {
+  color: var(--color-warning-text, #92400e);
+}
+
+.app-req-badge {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.app-req-badge.success {
+  color: #16a34a;
+}
+
+.app-req-badge.warning {
+  color: #b45309;
+}
+
+/* Submitted Documents */
+.app-doc-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.app-submitted-doc-item {
+  background: var(--color-bg-subtle, #f8fafc);
+  border: 1px solid var(--color-border-default, #e2e8f0);
+  border-radius: 10px;
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  transition: border-color 0.15s ease;
+}
+
+.app-submitted-doc-item:hover {
+  border-color: var(--color-action-primary, #0355f3);
+}
+
+.app-doc-icon-box {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: #e2e8f0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #475569;
+  flex-shrink: 0;
+}
+
+.app-doc-link {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-text-primary, #1e293b);
+  text-decoration: none;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.app-doc-link:hover {
+  color: var(--color-action-primary, #0355f3);
+  text-decoration: underline;
+}
+
+/* Upload Document */
+.app-form-group {
+  margin-bottom: 14px;
+}
+
+.app-form-label {
+  display: block;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--color-text-primary, #1e293b);
+  margin-bottom: 6px;
+}
+
+.app-select {
+  width: 100%;
+  border: 1px solid var(--color-border-default, #dce3ec);
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 0.875rem;
+  color: var(--color-text-primary, #1e293b);
+  background: var(--color-bg-surface, #ffffff);
+  box-shadow: none;
+}
+
+.app-select:focus {
+  border-color: var(--color-action-primary, #0355f3);
+  outline: none;
+}
+
+.app-drag-drop-zone {
+  border: 2px dashed #cbd5e1;
+  border-radius: 12px;
+  padding: 28px 16px;
+  text-align: center;
+  background: #fafcff;
+  cursor: pointer;
+  margin-bottom: 16px;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.app-drag-drop-zone:hover {
+  border-color: var(--color-action-primary, #0355f3);
+  background: #f0f5ff;
+}
+
+.app-upload-icon-circle {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: #f1f5f9;
+  color: #64748b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 10px auto;
+}
+
+.app-upload-prompt {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-text-primary, #1e293b);
+}
+
+.app-browse-link {
+  color: var(--color-action-primary, #0355f3);
+  font-weight: 600;
+  margin-left: 4px;
+}
+
+.app-upload-hint {
+  font-size: 0.75rem;
+  color: var(--color-text-muted, #94a3b8);
+  margin-top: 4px;
+}
+
+.app-selected-file {
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: var(--color-action-primary, #0355f3);
+  margin-top: 8px;
+}
+
+.app-btn-upload {
+  width: 100%;
+  background: var(--color-action-primary, #0355f3);
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.875rem;
+  padding: 12px;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.app-btn-upload:hover {
+  background: var(--color-action-primary-hover, #0247d1);
+}
+
+.app-btn-upload:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+@media (max-width: 960px) {
+  .app-details-grid {
+    grid-template-columns: 1fr;
+  }
+  .app-prop-top-row {
     flex-direction: column;
-    overflow: hidden !important;
+    align-items: flex-start;
   }
-
-  body[data-tenant-page="application-details"] .tenant-module-intro {
-    flex: 0 0 auto;
+  .app-prop-thumb {
+    width: 100%;
+    height: 160px;
   }
-
-  body[data-tenant-page="application-details"] .dashboard-container {
-    height: auto !important;
-    min-height: 0 !important;
-    max-height: none !important;
-    flex: 1 1 auto;
-    overflow: hidden !important;
+  .app-prop-bottom-grid {
+    grid-template-columns: 1fr;
   }
 }
 
-@media (max-width: 900px) {
-  body[data-tenant-page="property-details"] .main-content-inner,
-  body[data-tenant-page="application-details"] .main-content-inner,
-  body[data-tenant-page="property-details"] .dashboard-container,
-  body[data-tenant-page="application-details"] .dashboard-container {
-    height: auto !important;
-    min-height: 0 !important;
-    max-height: none !important;
-    overflow: visible !important;
-  }
+/* ==========================================================================
+   Tenant Leases Page Redesign
+   ========================================================================== */
 
-  body[data-tenant-page="property-details"] :where(.detail-main, .detail-sidebar),
-  body[data-tenant-page="application-details"] :where(.details-left, .details-right) {
-    height: auto !important;
-    overflow: visible !important;
+.tenant-lease-card {
+  background: var(--color-bg-surface, #ffffff);
+  border: 1px solid var(--color-border-default, #e2e8f0);
+  border-radius: 16px;
+  padding: 28px 32px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  margin-bottom: 24px;
+}
+
+.tenant-lease-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.tenant-lease-title-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.tenant-lease-number {
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: var(--color-text-primary, #042458);
+  margin: 0;
+  line-height: 1.25;
+}
+
+.tenant-lease-property {
+  font-size: 0.9375rem;
+  color: var(--color-text-secondary, #64748b);
+  margin: 0;
+  font-weight: 500;
+}
+
+/* Status Badges */
+.tenant-lease-status-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 5px 16px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.tenant-lease-status-badge.status-active {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.tenant-lease-status-badge.status-pending {
+  background: #fffbeb;
+  color: #b45309;
+}
+
+.tenant-lease-status-badge.status-rejected {
+  background: #fef2f2;
+  color: #991b1b;
+}
+
+/* Dividers */
+.tenant-lease-divider {
+  height: 1px;
+  background: var(--color-divider, #f1f5f9);
+  margin: 22px 0;
+}
+
+/* 5-Column Grid */
+.tenant-lease-details-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 16px 24px;
+  align-items: start;
+}
+
+.tenant-lease-detail-item {
+  display: flex;
+  flex-direction: column;
+}
+
+.tenant-lease-label {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  color: var(--color-text-muted, #94a3b8);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 6px;
+}
+
+.tenant-lease-val {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-text-primary, #0f172a);
+  line-height: 1.35;
+  word-break: break-word;
+}
+
+.tenant-lease-val.space-val {
+  color: var(--color-action-primary, #0355f3);
+  font-weight: 600;
+}
+
+.tenant-lease-val.rent-val {
+  color: #059669;
+  font-weight: 700;
+}
+
+.tenant-lease-val.deposit-val {
+  font-weight: 700;
+  color: var(--color-text-primary, #0f172a);
+}
+
+/* Action button (Bottom Right) */
+.tenant-lease-actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.tenant-lease-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 20px;
+  border: 1px solid var(--color-border-default, #dce3ec);
+  border-radius: 8px;
+  background: var(--color-bg-surface, #ffffff);
+  color: var(--color-text-primary, #1e293b);
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+  transition: all 0.15s ease;
+  text-decoration: none;
+}
+
+.tenant-lease-btn:hover {
+  border-color: var(--color-action-primary, #0355f3);
+  color: var(--color-action-primary, #0355f3);
+  background: var(--color-bg-subtle, #f8fafc);
+}
+
+.tenant-lease-btn.primary {
+  background: var(--color-action-primary, #0355f3);
+  border-color: var(--color-action-primary, #0355f3);
+  color: #ffffff;
+}
+
+.tenant-lease-btn.primary:hover {
+  background: var(--color-action-primary-hover, #0247d1);
+  border-color: var(--color-action-primary-hover, #0247d1);
+  color: #ffffff;
+}
+
+.tenant-lease-btn svg {
+  transition: transform 0.15s ease;
+}
+
+.tenant-lease-btn:hover svg {
+  transform: translateX(3px);
+}
+
+@media (max-width: 1024px) {
+  .tenant-lease-details-grid {
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
   }
 }
+
+@media (max-width: 640px) {
+  .tenant-lease-card {
+    padding: 20px 18px;
+  }
+  .tenant-lease-card-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .tenant-lease-details-grid {
+    grid-template-columns: 1fr;
+  }
+  .tenant-lease-actions {
+    justify-content: stretch;
+  }
+  .tenant-lease-btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+/* ==========================================================================
+   Tenant Billings & Payments Redesign (Mockup Pixel-Match)
+   ========================================================================== */
+
+body[data-tenant-page="billings"] .tenant-table-controls {
+  display: none !important;
+}
+
+body[data-tenant-page="billings"] .tenant-subnav-tabs {
+  display: flex !important;
+  align-items: center !important;
+  gap: 28px !important;
+  border-bottom: 1px solid #e2e8f0 !important;
+  padding-bottom: 12px !important;
+  margin-bottom: 28px !important;
+}
+
+body[data-tenant-page="billings"] .tenant-tab-link {
+  background: none !important;
+  border: none !important;
+  padding: 0 !important;
+  font-size: 1rem !important;
+  font-weight: 500 !important;
+  color: #64748b !important;
+  cursor: pointer !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  transition: color 0.15s ease !important;
+  font-family: inherit !important;
+}
+
+body[data-tenant-page="billings"] .tenant-tab-link.active {
+  font-weight: 800 !important;
+  color: #042458 !important;
+}
+
+body[data-tenant-page="billings"] .tenant-tab-link:hover {
+  color: #042458 !important;
+}
+
+body[data-tenant-page="billings"] .tab-active-dot {
+  font-size: 1.25rem !important;
+  line-height: 1 !important;
+  color: #042458 !important;
+}
+
+/* Hero Balance Card */
+body[data-tenant-page="billings"] .tenant-billing-hero-card {
+  background: #ffffff !important;
+  border: 1px solid #e2e8f0 !important;
+  border-radius: 16px !important;
+  padding: 28px 32px !important;
+  box-shadow: 0 2px 8px rgba(4, 36, 88, 0.04) !important;
+  margin-bottom: 32px !important;
+}
+
+body[data-tenant-page="billings"] .billing-hero-top-row {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: flex-start !important;
+  gap: 16px !important;
+}
+
+body[data-tenant-page="billings"] .billing-hero-eyebrow {
+  font-size: 0.8125rem !important;
+  font-weight: 700 !important;
+  color: #475569 !important;
+  letter-spacing: 0.06em !important;
+  text-transform: uppercase !important;
+  margin-bottom: 8px !important;
+}
+
+body[data-tenant-page="billings"] .billing-hero-amount {
+  font-size: 2.25rem !important;
+  font-weight: 900 !important;
+  color: #042458 !important;
+  letter-spacing: -0.02em !important;
+  line-height: 1.1 !important;
+  font-family: "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, sans-serif !important;
+}
+
+body[data-tenant-page="billings"] .billing-hero-badge {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  padding: 8px 16px !important;
+  border-radius: 8px !important;
+  font-size: 0.8125rem !important;
+  font-weight: 750 !important;
+  letter-spacing: 0.04em !important;
+  text-transform: uppercase !important;
+}
+
+body[data-tenant-page="billings"] .billing-hero-badge.overdue {
+  background: #fffbeb !important;
+  color: #b45309 !important;
+  border: 1px solid #fde68a !important;
+}
+
+body[data-tenant-page="billings"] .billing-hero-badge.cleared {
+  background: #ecfdf5 !important;
+  color: #065f46 !important;
+  border: 1px solid #a7f3d0 !important;
+}
+
+body[data-tenant-page="billings"] .billing-hero-badge.pending {
+  background: #eff6ff !important;
+  color: #1e40af !important;
+  border: 1px solid #bfdbfe !important;
+}
+
+body[data-tenant-page="billings"] .billing-hero-divider {
+  height: 1px !important;
+  background: #f1f5f9 !important;
+  margin: 24px 0 !important;
+}
+
+body[data-tenant-page="billings"] .billing-hero-bottom-row {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  gap: 20px !important;
+  flex-wrap: wrap !important;
+}
+
+body[data-tenant-page="billings"] .billing-hero-notice {
+  font-size: 0.9375rem !important;
+  color: #475569 !important;
+  margin: 0 !important;
+  max-width: 620px !important;
+  line-height: 1.5 !important;
+}
+
+body[data-tenant-page="billings"] .btn-billing-hero-pay {
+  background: #042458 !important;
+  color: #ffffff !important;
+  padding: 12px 24px !important;
+  border-radius: 8px !important;
+  font-size: 0.875rem !important;
+  font-weight: 700 !important;
+  border: none !important;
+  cursor: pointer !important;
+  transition: all 0.15s ease !important;
+  white-space: nowrap !important;
+}
+
+body[data-tenant-page="billings"] .btn-billing-hero-pay:hover {
+  background: #0355f3 !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 4px 12px rgba(3, 85, 243, 0.25) !important;
+}
+
+/* Controls Bar (Single Line) */
+body[data-tenant-page="billings"] .billing-table-controls-bar {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  gap: 16px !important;
+  margin-top: 36px !important;
+  margin-bottom: 14px !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+body[data-tenant-page="billings"] .billing-table-title-group {
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  flex-shrink: 0 !important;
+}
+
+body[data-tenant-page="billings"] .billing-table-title {
+  font-size: 1.35rem !important;
+  font-weight: 800 !important;
+  color: #042458 !important;
+  margin: 0 !important;
+  letter-spacing: -0.01em !important;
+}
+
+body[data-tenant-page="billings"] .billing-count-badge {
+  background: #e2e8f0 !important;
+  color: #475569 !important;
+  font-size: 0.75rem !important;
+  font-weight: 700 !important;
+  padding: 3px 10px !important;
+  border-radius: 999px !important;
+  white-space: nowrap !important;
+}
+
+body[data-tenant-page="billings"] .billing-filter-group {
+  display: flex !important;
+  align-items: center !important;
+  gap: 12px !important;
+  margin-left: auto !important;
+  flex-shrink: 0 !important;
+}
+
+body[data-tenant-page="billings"] .billing-search-box {
+  position: relative !important;
+  display: flex !important;
+  align-items: center !important;
+}
+
+body[data-tenant-page="billings"] .billing-search-box svg {
+  position: absolute !important;
+  left: 12px !important;
+  color: #94a3b8 !important;
+  pointer-events: none !important;
+}
+
+body[data-tenant-page="billings"] .billing-search-box input {
+  padding: 9px 14px 9px 36px !important;
+  border: 1px solid #cbd5e1 !important;
+  border-radius: 8px !important;
+  font-size: 0.875rem !important;
+  color: #0f172a !important;
+  width: 220px !important;
+  background: #ffffff !important;
+  outline: none !important;
+  transition: border-color 0.15s ease !important;
+  box-shadow: none !important;
+  box-sizing: border-box !important;
+}
+
+body[data-tenant-page="billings"] .billing-search-box input:focus {
+  border-color: #0355f3 !important;
+  box-shadow: 0 0 0 2px rgba(3, 85, 243, 0.15) !important;
+}
+
+body[data-tenant-page="billings"] .billing-select-wrap {
+  position: relative !important;
+}
+
+body[data-tenant-page="billings"] .billing-status-select {
+  padding: 9px 34px 9px 14px !important;
+  border: 1px solid #cbd5e1 !important;
+  border-radius: 8px !important;
+  font-size: 0.875rem !important;
+  font-weight: 500 !important;
+  color: #334155 !important;
+  background: #ffffff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23475569' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E") no-repeat right 10px center !important;
+  -webkit-appearance: none !important;
+  -moz-appearance: none !important;
+  appearance: none !important;
+  cursor: pointer !important;
+  outline: none !important;
+  box-shadow: none !important;
+  box-sizing: border-box !important;
+}
+
+body[data-tenant-page="billings"] .billing-status-select:focus {
+  border-color: #0355f3 !important;
+}
+
+/* Data Table Card Container & Table */
+body[data-tenant-page="billings"] .billing-table-card {
+  background: #ffffff !important;
+  border: 1px solid #e2e8f0 !important;
+  border-radius: 12px !important;
+  overflow: hidden !important;
+  box-shadow: none !important;
+  margin-top: 12px !important;
+  margin-bottom: 36px !important;
+  padding: 0 !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+body[data-tenant-page="billings"] .tenant-billing-table {
+  width: 100% !important;
+  border-collapse: collapse !important;
+  border-spacing: 0 !important;
+  text-align: left !important;
+  font-size: 0.875rem !important;
+  font-family: "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, "Helvetica Neue", Arial, sans-serif !important;
+  background: #ffffff !important;
+  margin: 0 !important;
+}
+
+body[data-tenant-page="billings"] .tenant-billing-table thead {
+  background: #f8fafc !important;
+  border-bottom: 1px solid #e2e8f0 !important;
+}
+
+body[data-tenant-page="billings"] .tenant-billing-table th {
+  background: #f8fafc !important;
+  border: none !important;
+  border-bottom: 1px solid #e2e8f0 !important;
+  padding: 14px 20px !important;
+  font-size: 0.6875rem !important;
+  font-weight: 750 !important;
+  color: #64748b !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.06em !important;
+  white-space: nowrap !important;
+}
+
+body[data-tenant-page="billings"] .tenant-billing-table th.col-action-th {
+  text-align: right !important;
+  padding-right: 28px !important;
+}
+
+body[data-tenant-page="billings"] .tenant-billing-table tbody tr {
+  background: #ffffff !important;
+  border-bottom: 1px solid #f1f5f9 !important;
+  transition: none !important;
+}
+
+body[data-tenant-page="billings"] .tenant-billing-table tbody tr:hover {
+  background: transparent !important;
+}
+
+body[data-tenant-page="billings"] .tenant-billing-table tbody tr:hover td {
+  background: transparent !important;
+}
+
+body[data-tenant-page="billings"] .tenant-billing-table tbody tr:last-child {
+  border-bottom: none !important;
+}
+
+body[data-tenant-page="billings"] .tenant-billing-table tbody tr:last-child td {
+  border-bottom: none !important;
+}
+
+body[data-tenant-page="billings"] .tenant-billing-table td {
+  padding: 16px 20px !important;
+  border: none !important;
+  border-bottom: 1px solid #f1f5f9 !important;
+  vertical-align: middle !important;
+  color: #475569 !important;
+  font-size: 0.875rem !important;
+  background: #ffffff !important;
+}
+
+body[data-tenant-page="billings"] .tenant-billing-table td.col-action-td {
+  text-align: right !important;
+  padding-right: 28px !important;
+}
+
+body[data-tenant-page="billings"] .col-cycle {
+  font-weight: 700 !important;
+  color: #042458 !important;
+}
+
+body[data-tenant-page="billings"] .col-property {
+  color: #475569 !important;
+  font-weight: 500 !important;
+}
+
+body[data-tenant-page="billings"] .col-rent {
+  color: #475569 !important;
+  font-weight: 500 !important;
+  font-family: "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, sans-serif !important;
+}
+
+body[data-tenant-page="billings"] .col-total {
+  font-weight: 700 !important;
+  color: #042458 !important;
+  font-family: "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, sans-serif !important;
+}
+
+body[data-tenant-page="billings"] .col-due {
+  color: #475569 !important;
+  font-weight: 500 !important;
+}
+
+body[data-tenant-page="billings"] .table-status-pill {
+  display: inline-block !important;
+  padding: 4px 10px !important;
+  border-radius: 6px !important;
+  font-size: 0.6875rem !important;
+  font-weight: 750 !important;
+  letter-spacing: 0.05em !important;
+  text-transform: uppercase !important;
+}
+
+body[data-tenant-page="billings"] .table-status-pill.overdue {
+  background: #fef2f2 !important;
+  color: #991b1b !important;
+  border: 1px solid #fecaca !important;
+}
+
+body[data-tenant-page="billings"] .table-status-pill.paid {
+  background: #ecfdf5 !important;
+  color: #065f46 !important;
+  border: 1px solid #a7f3d0 !important;
+}
+
+body[data-tenant-page="billings"] .table-status-pill.pending,
+body[data-tenant-page="billings"] .table-status-pill.waiting_verification {
+  background: #eff6ff !important;
+  color: #1e40af !important;
+  border: 1px solid #bfdbfe !important;
+}
+
+body[data-tenant-page="billings"] .btn-table-action {
+  background: none !important;
+  border: none !important;
+  color: #042458 !important;
+  font-weight: 700 !important;
+  font-size: 0.875rem !important;
+  cursor: pointer !important;
+  padding: 0 !important;
+  text-decoration: none !important;
+  transition: color 0.15s ease !important;
+  white-space: nowrap !important;
+}
+
+body[data-tenant-page="billings"] .btn-table-action:hover {
+  color: #0355f3 !important;
+  text-decoration: underline !important;
+}
+

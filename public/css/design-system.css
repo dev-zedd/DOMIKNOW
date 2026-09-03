@@ -362,7 +362,6 @@ body::-webkit-scrollbar-thumb,
   border-radius: var(--radius-full) !important;
 }
 
-.sidebar::-webkit-scrollbar,
 .estates-right-panel::-webkit-scrollbar,
 .estates-cards-grid::-webkit-scrollbar,
 .filter-tabs::-webkit-scrollbar,

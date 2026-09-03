@@ -6,163 +6,316 @@
     <title>My Billings & Payments - DomiKnow</title>
     <link href="../../css/input.css" rel="stylesheet">
     <style>
-        /* ── Tabs Bar ── */
-        .tab-bar {
-            display: flex;
-            gap: 0.5rem;
-            border-bottom: 2px solid var(--border-color);
-            margin-bottom: 1.5rem;
-        }
-        .tab-btn {
-            padding: 0.75rem 1.25rem;
-            font-weight: 700;
-            font-size: 0.9rem;
-            color: var(--text-muted);
-            background: transparent;
-            border: none;
-            border-bottom: 3px solid transparent;
-            cursor: pointer;
-            transition: all 0.18s ease;
+        /* ── Modern Subnav Tab Bar ── */
+        .tenant-subnav-tabs {
             display: flex;
             align-items: center;
-            gap: 0.5rem;
+            gap: 28px;
+            border-bottom: 1px solid var(--color-border-default, #e2e8f0);
+            padding-bottom: 14px;
+            margin-bottom: 24px;
         }
-        .tab-btn:hover {
-            color: var(--primary);
-        }
-        .tab-btn.active {
-            color: var(--primary);
-            border-bottom-color: var(--primary);
-        }
-
-        /* ── Payments list/details styles ── */
-        .payment-card {
-            background-color: var(--bg-secondary);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-lg);
-            padding: 1.5rem;
-            box-shadow: var(--shadow-md);
-            overflow-x: auto;
-            margin-bottom: 2rem;
-        }
-        .details-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1.25rem;
-            background-color: var(--bg-primary);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-md);
-            padding: 1.25rem;
-            margin-bottom: 1.5rem;
-        }
-        .details-item {
-            display: flex;
-            flex-direction: column;
-        }
-        .details-lbl {
-            font-size: 0.72rem;
-            text-transform: uppercase;
-            color: var(--text-muted);
+        .tenant-tab-link {
+            background: none;
+            border: none;
+            padding: 0;
+            font-size: 1.0625rem;
             font-weight: 700;
+            color: #94a3b8;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: color 0.15s ease;
         }
-        .details-val {
-            font-size: 0.95rem;
-            font-weight: 600;
-            color: var(--text-primary);
-            margin-top: 0.15rem;
+        .tenant-tab-link:hover {
+            color: var(--color-action-primary, #0355f3);
         }
-        .receipt-preview {
-            max-width: 100%;
-            max-height: 250px;
-            object-fit: contain;
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-sm);
-            margin-top: 0.5rem;
+        .tenant-tab-link.active {
+            color: var(--color-text-primary, #042458);
+        }
+        .tab-active-dot {
+            font-size: 1.25rem;
+            line-height: 1;
+            color: var(--color-text-primary, #042458);
         }
 
-        /* Modern aesthetic styling */
-        .current-bill-card {
-            background: linear-gradient(135deg, #4f46e5 0%, #3730a3 100%);
-            color: white;
-            border-radius: var(--radius-lg, 12px);
-            padding: 1.75rem 2rem;
-            box-shadow: 0 10px 25px -5px rgba(79, 70, 229, 0.3);
-            margin-bottom: 2rem;
+        /* ── Hero Balance Card ── */
+        .tenant-billing-hero-card {
+            background: #ffffff;
+            border: 1px solid var(--color-border-default, #e2e8f0);
+            border-radius: 16px;
+            padding: 28px 32px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+            margin-bottom: 28px;
+        }
+        .billing-hero-top-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+        .billing-hero-eyebrow {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: #64748b;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            margin-bottom: 4px;
+        }
+        .billing-hero-amount {
+            font-size: 2.25rem;
+            font-weight: 800;
+            color: var(--color-text-primary, #042458);
+            letter-spacing: -0.02em;
+            line-height: 1.15;
+        }
+        .billing-hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 14px;
+            border-radius: 999px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+        }
+        .billing-hero-badge.overdue {
+            background: #fefce8;
+            border: 1px solid #fef08a;
+            color: #854d0e;
+        }
+        .billing-hero-badge.cleared {
+            background: #ecfdf5;
+            border: 1px solid #a7f3d0;
+            color: #065f46;
+        }
+        .billing-hero-badge.pending {
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            color: #1e40af;
+        }
+        .billing-hero-divider {
+            border-top: 1px solid #f1f5f9;
+            margin: 24px 0 20px 0;
+        }
+        .billing-hero-bottom-row {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            gap: 20px;
             flex-wrap: wrap;
-            gap: 1.5rem;
-            border: 1px solid rgba(255, 255, 255, 0.15);
         }
-        .current-bill-title {
-            font-size: 0.85rem;
-            text-transform: uppercase;
-            letter-spacing: 0.08em;
-            opacity: 0.9;
-            margin-bottom: 0.35rem;
-            font-weight: 600;
+        .billing-hero-notice {
+            font-size: 0.875rem;
+            color: #64748b;
+            line-height: 1.5;
+            max-width: 540px;
+            margin: 0;
         }
-        .current-bill-amount {
-            font-size: 2.25rem;
-            font-weight: 850;
-            line-height: 1.1;
-            letter-spacing: -0.02em;
-        }
-        .current-bill-due {
-            font-size: 0.9rem;
-            opacity: 0.95;
-            margin-top: 0.35rem;
-        }
-        .current-bill-status-badge {
-            background-color: rgba(255, 255, 255, 0.2);
-            padding: 0.4rem 0.85rem;
-            border-radius: 20px;
+        .btn-billing-hero-pay {
+            background: var(--color-text-primary, #042458);
+            color: #ffffff;
+            border: none;
+            border-radius: 8px;
+            padding: 12px 24px;
+            font-size: 0.875rem;
             font-weight: 700;
-            font-size: 0.78rem;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            backdrop-filter: blur(4px);
+            cursor: pointer;
+            transition: background 0.18s ease, transform 0.15s ease;
+            white-space: nowrap;
+        }
+        .btn-billing-hero-pay:hover {
+            background: var(--color-action-primary, #0355f3);
+            transform: translateY(-1px);
         }
 
-        .billing-card {
-            background-color: var(--bg-secondary);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-lg);
-            padding: 1.5rem;
-            box-shadow: var(--shadow-md);
-            overflow-x: auto;
-            margin-bottom: 2rem;
+        /* ── Controls Bar: Title, Count, Search, Filter ── */
+        .billing-table-controls-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            flex-wrap: wrap;
+            margin-top: 32px;
+            margin-bottom: 16px;
         }
-        table {
+        .billing-table-title-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .billing-table-title {
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: var(--color-text-primary, #042458);
+            margin: 0;
+        }
+        .billing-count-badge {
+            background: #f1f5f9;
+            color: #475569;
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 3px 10px;
+            border-radius: 999px;
+        }
+        .billing-filter-group {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .billing-search-box {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+        .billing-search-box svg {
+            position: absolute;
+            left: 12px;
+            color: #94a3b8;
+            pointer-events: none;
+        }
+        .billing-search-box input {
+            padding: 8px 14px 8px 34px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            color: #0f172a;
+            width: 220px;
+            background: #ffffff;
+            outline: none;
+            transition: border-color 0.15s ease;
+        }
+        .billing-search-box input:focus {
+            border-color: var(--color-action-primary, #0355f3);
+        }
+        .billing-select-wrap {
+            position: relative;
+        }
+        .billing-status-select {
+            padding: 8px 32px 8px 14px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #334155;
+            background: #ffffff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23475569' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E") no-repeat right 10px center;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            cursor: pointer;
+            outline: none;
+        }
+        .billing-status-select:focus {
+            border-color: var(--color-action-primary, #0355f3);
+        }
+
+        /* ── Data Table Card ── */
+        .billing-table-card {
+            background: #ffffff;
+            border: 1px solid var(--color-border-default, #e2e8f0);
+            border-radius: 12px;
+            overflow-x: auto;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+            margin-bottom: 36px;
+        }
+        .tenant-billing-table {
             width: 100%;
             border-collapse: collapse;
             text-align: left;
-            font-size: 0.9125rem;
+            font-size: 0.875rem;
         }
-        th {
+        .tenant-billing-table th {
+            background: #f8fafc;
+            border-bottom: 1px solid #e2e8f0;
+            padding: 14px 20px;
+            font-size: 0.6875rem;
             font-weight: 700;
-            color: var(--text-secondary);
-            padding: 0.75rem 1rem;
-            border-bottom: 2px solid var(--border-color);
+            color: #64748b;
             text-transform: uppercase;
-            font-size: 0.72rem;
+            letter-spacing: 0.05em;
+            white-space: nowrap;
+        }
+        .tenant-billing-table td {
+            padding: 16px 20px;
+            border-bottom: 1px solid #f1f5f9;
+            vertical-align: middle;
+            color: #475569;
+            font-size: 0.875rem;
+        }
+        .tenant-billing-table tr:last-child td {
+            border-bottom: none;
+        }
+        .col-cycle {
+            font-weight: 700;
+            color: #0f172a;
+        }
+        .col-property {
+            color: #475569;
+            font-weight: 500;
+        }
+        .col-rent {
+            color: #475569;
+            font-weight: 500;
+        }
+        .col-total {
+            font-weight: 700;
+            color: #0f172a;
+        }
+        .col-due {
+            color: #475569;
+            font-weight: 500;
+        }
+        .table-status-pill {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.6875rem;
+            font-weight: 700;
+            text-transform: uppercase;
             letter-spacing: 0.05em;
         }
-        td {
-            padding: 1.15rem 1rem;
-            border-bottom: 1px solid var(--border-color);
-            color: var(--text-primary);
+        .table-status-pill.overdue {
+            background: #fef2f2;
+            color: #991b1b;
+            border: 1px solid #fecaca;
         }
-        tr:hover td {
-            background-color: var(--bg-primary);
+        .table-status-pill.paid {
+            background: #ecfdf5;
+            color: #065f46;
+            border: 1px solid #a7f3d0;
+        }
+        .table-status-pill.pending,
+        .table-status-pill.waiting_verification {
+            background: #eff6ff;
+            color: #1e40af;
+            border: 1px solid #bfdbfe;
+        }
+        .btn-table-action {
+            background: none;
+            border: none;
+            color: #042458;
+            font-weight: 700;
+            font-size: 0.875rem;
+            cursor: pointer;
+            padding: 0;
+            text-decoration: none;
+            transition: color 0.15s ease;
+            white-space: nowrap;
+        }
+        .btn-table-action:hover {
+            color: var(--color-action-primary, #0355f3);
+            text-decoration: underline;
         }
 
-        /* Modal Overlay & Containers */
+        /* ── Modals ── */
         .modal-overlay {
             position: fixed;
             inset: 0;
-            background-color: rgba(15, 23, 42, 0.65);
+            background-color: rgba(4, 36, 88, 0.45);
             backdrop-filter: blur(4px);
             display: flex;
             justify-content: center;
@@ -171,96 +324,109 @@
             padding: 1.5rem;
         }
         .modal-container {
-            background-color: var(--bg-secondary);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-lg);
+            background-color: #ffffff;
+            border: 1px solid var(--color-border-default, #e2e8f0);
+            border-radius: 16px;
             width: 100%;
             max-width: 580px;
-            max-height: 92vh;
+            max-height: 90vh;
             overflow-y: auto;
-            box-shadow: 0 25px 60px rgba(0,0,0,0.4);
+            box-shadow: 0 20px 50px rgba(4, 36, 88, 0.18);
             display: flex;
             flex-direction: column;
         }
         .modal-header {
-            padding: 1.25rem 2rem;
-            border-bottom: 1px solid var(--border-color);
+            padding: 1.25rem 1.75rem;
+            border-bottom: 1px solid var(--color-border-default, #e2e8f0);
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background-color: var(--bg-primary);
+            background-color: #ffffff;
             position: sticky;
             top: 0;
             z-index: 10;
         }
         .modal-body {
-            padding: 2rem;
+            padding: 1.75rem;
             overflow-y: auto;
         }
         .modal-footer {
-            padding: 1rem 2rem;
-            border-top: 1px solid var(--border-color);
+            padding: 1.25rem 1.75rem;
+            border-top: 1px solid var(--color-border-default, #e2e8f0);
             display: flex;
-            justify-content: space-between;
+            justify-content: flex-end;
             align-items: center;
-            background-color: var(--bg-primary);
-            gap: 1rem;
+            background-color: #f8fafc;
+            gap: 12px;
         }
         .modal-close-x {
             background: transparent;
             border: none;
             cursor: pointer;
-            color: var(--text-secondary);
+            color: var(--color-text-secondary, #64748b);
             display: flex;
             align-items: center;
-            padding: 0.2rem;
+            padding: 4px;
+            border-radius: 6px;
+            transition: background 0.15s ease, color 0.15s ease;
+        }
+        .modal-close-x:hover {
+            background: #f1f5f9;
+            color: var(--color-text-primary, #042458);
         }
 
         .action-btn {
-            padding: 0.45rem 1rem;
-            font-size: 0.8125rem;
-            border-radius: var(--radius-sm);
+            padding: 9px 18px;
+            font-size: 0.875rem;
+            border-radius: 8px;
             cursor: pointer;
             font-weight: 700;
             border: 1px solid transparent;
-            transition: all 0.2s ease;
+            transition: all 0.15s ease;
             text-decoration: none;
-            display: inline-block;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
         }
         .btn-pay {
-            background-color: var(--tenant);
+            background-color: var(--color-action-primary, #0355f3);
             color: white;
         }
         .btn-pay:hover {
-            background-color: var(--tenant-hover);
+            background-color: var(--color-action-primary-hover, #0247d1);
         }
         .btn-detail {
-            background-color: var(--bg-primary);
-            border-color: var(--border-color);
-            color: var(--text-primary);
+            background-color: #ffffff;
+            border-color: #cbd5e1;
+            color: var(--color-text-primary, #042458);
         }
         .btn-detail:hover {
-            background-color: var(--border-color);
+            background-color: #f8fafc;
         }
         .btn-close {
-            background-color: var(--text-secondary);
-            color: white;
+            background-color: #f1f5f9;
+            color: #475569;
+            border-color: #e2e8f0;
+        }
+        .btn-close:hover {
+            background-color: #e2e8f0;
         }
 
         /* Detail Breakdown system */
         .breakdown-box {
-            background-color: var(--bg-primary);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-md);
+            background-color: #f8fafc;
+            border: 1px solid var(--color-border-default, #e2e8f0);
+            border-radius: 12px;
             padding: 1.25rem;
             margin-bottom: 1.5rem;
         }
         .breakdown-row {
             display: flex;
             justify-content: space-between;
-            padding: 0.5rem 0;
-            border-bottom: 1px solid var(--border-color);
+            padding: 0.6rem 0;
+            border-bottom: 1px solid #e2e8f0;
             font-size: 0.88rem;
+            color: #475569;
         }
         .breakdown-row:last-of-type {
             border-bottom: none;
@@ -268,20 +434,53 @@
         .breakdown-row.total {
             font-weight: 800;
             font-size: 1.1rem;
-            color: var(--tenant);
-            border-top: 2px solid var(--border-color);
+            color: var(--color-text-primary, #042458);
+            border-top: 2px solid #cbd5e1;
             margin-top: 0.5rem;
             padding-top: 0.75rem;
         }
-        .movein-text {
+
+        /* Payments Details Grid */
+        .details-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.25rem;
+            background-color: #f8fafc;
+            border: 1px solid var(--color-border-default, #e2e8f0);
+            border-radius: 12px;
+            padding: 1.25rem;
+            margin-bottom: 1.5rem;
+        }
+        .details-item {
+            display: flex;
+            flex-direction: column;
+        }
+        .details-lbl {
+            font-size: 0.6875rem;
+            text-transform: uppercase;
+            color: #64748b;
             font-weight: 700;
-            color: var(--tenant);
+            letter-spacing: 0.05em;
+        }
+        .details-val {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--color-text-primary, #042458);
+            margin-top: 0.2rem;
+        }
+        .receipt-preview {
+            max-width: 100%;
+            max-height: 250px;
+            object-fit: contain;
+            border: 1px solid var(--color-border-default, #e2e8f0);
+            border-radius: 8px;
+            margin-top: 0.5rem;
         }
     </style>
-    <link href="../../css/design-system.css?v=20260827-1" rel="stylesheet">
+    <link href="../../css/design-system.css?v=20260904-1" rel="stylesheet">
     <script src="../../js/ui.js?v=20260827-3" defer></script>
 </head>
-<body class="app-loading" data-role="tenant" data-page-title="My Billings & Payments">
+<body class="app-loading" data-role="tenant" data-page-title="My Billings & Payments" data-tenant-page="billings">
     <!-- Navbar -->
     <nav class="navbar navbar-tenant">
         <div class="navbar-container">
@@ -306,12 +505,15 @@
 
     <!-- Main Content -->
     <main class="dashboard-container">
-
-
-        <!-- Tab Bar -->
-        <div class="tab-bar">
-            <button class="tab-btn active" id="btnTabBillings">My Billings</button>
-            <button class="tab-btn" id="btnTabPayments">My Payments</button>
+        <!-- Subnav Tab Bar -->
+        <div class="tenant-subnav-tabs">
+            <button type="button" class="tenant-tab-link active" id="btnTabBillings">
+                <span>My Billings</span>
+                <span class="tab-active-dot">•</span>
+            </button>
+            <button type="button" class="tenant-tab-link" id="btnTabPayments">
+                <span>My Payments</span>
+            </button>
         </div>
 
         <!-- Billings Tab Content -->
@@ -321,23 +523,47 @@
                 <!-- Rendered by JS -->
             </div>
 
-            <!-- Billing Invoice Log History -->
-            <h3 style="margin-top: 1.5rem;">Billing Statement Logs</h3>
-            <div class="billing-card" style="margin-top: 1rem;">
-                <table>
+            <!-- Controls Bar: Title, Count, Search, Filter -->
+            <div class="billing-table-controls-bar">
+                <div class="billing-table-title-group">
+                    <h2 class="billing-table-title">Billing Statement Logs</h2>
+                    <span class="billing-count-badge" id="billingsCountBadge">0 records</span>
+                </div>
+                <div class="billing-filter-group">
+                    <div class="billing-search-box">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                        </svg>
+                        <input type="text" id="billingSearchInput" placeholder="Search these records" autocomplete="off">
+                    </div>
+                    <div class="billing-select-wrap">
+                        <select id="billingStatusSelect" class="billing-status-select">
+                            <option value="all">All statuses</option>
+                            <option value="overdue">Overdue</option>
+                            <option value="paid">Paid</option>
+                            <option value="pending">Pending</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Billing Invoice Log History Table Card -->
+            <div class="billing-table-card">
+                <table class="tenant-billing-table" data-no-table-controls="true">
                     <thead>
                         <tr>
-                            <th>Billing Cycle</th>
-                            <th>Property Name</th>
-                            <th>Rent Amount</th>
-                            <th>Total Invoiced</th>
-                            <th>Due Date</th>
-                            <th>Payment Status</th>
-                            <th>Action</th>
+                            <th>BILLING CYCLE</th>
+                            <th>PROPERTY NAME</th>
+                            <th>RENT AMOUNT</th>
+                            <th>TOTAL INVOICED</th>
+                            <th>DUE DATE</th>
+                            <th>PAYMENT STATUS</th>
+                            <th class="col-action-th">ACTION</th>
                         </tr>
                     </thead>
                     <tbody id="billingsTableBody">
-                        <tr><td colspan="7" style="text-align:center;color:var(--text-muted);">Loading statements history...</td></tr>
+                        <tr><td colspan="7" style="text-align:center;color:#64748b;padding:2.5rem;">Loading statements history...</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -345,25 +571,29 @@
 
         <!-- Payments Tab Content -->
         <div id="paymentsTab" class="tab-pane hidden">
-            <h3>My Payment Logs</h3>
-            <p style="color: var(--text-secondary); margin-bottom: 1.25rem; font-size: 0.88rem;">Review the audit logs and verification status of your GCash, Maya, or bank transfer payments.</p>
-            <div class="payment-card">
-                <table>
+            <div class="billing-table-controls-bar" style="margin-top:0;">
+                <div class="billing-table-title-group">
+                    <h2 class="billing-table-title">My Payment Logs</h2>
+                    <span class="billing-count-badge" id="paymentsCountBadge">0 records</span>
+                </div>
+            </div>
+            <div class="billing-table-card" style="margin-top: 1rem;">
+                <table class="tenant-billing-table" data-no-table-controls="true">
                     <thead>
                         <tr>
-                            <th>Date Submitted</th>
-                            <th>Billing Month</th>
-                            <th>Property Name</th>
-                            <th>Amount Paid</th>
-                            <th>Method</th>
-                            <th>Reference Code</th>
-                            <th>Verification Status</th>
-                            <th>Action</th>
+                            <th>DATE SUBMITTED</th>
+                            <th>BILLING MONTH</th>
+                            <th>PROPERTY NAME</th>
+                            <th>AMOUNT PAID</th>
+                            <th>METHOD</th>
+                            <th>REFERENCE CODE</th>
+                            <th>VERIFICATION STATUS</th>
+                            <th class="col-action-th">ACTION</th>
                         </tr>
                     </thead>
                     <tbody id="paymentsTableBody">
                         <tr>
-                            <td colspan="8" style="text-align: center; color: var(--text-muted);">Loading payment transactions...</td>
+                            <td colspan="8" style="text-align: center; color: #64748b; padding: 2.5rem;">Loading payment transactions...</td>
                         </tr>
                     </tbody>
                 </table>
@@ -485,7 +715,7 @@
     </div>
 
     <script src="../../js/auth.js"></script>
-    <script src="../../js/dashboard.js?v=20260827-3"></script>
+    <script src="../../js/dashboard.js?v=20260904-15"></script>
     <script>
         const token = localStorage.getItem('domiknow_token');
         let myBillings = [];
@@ -537,6 +767,10 @@
 
             document.getElementById('paymentForm').addEventListener('submit', handlePaymentSubmit);
 
+            // Search and Status filters
+            document.getElementById('billingSearchInput')?.addEventListener('input', applyBillingFilters);
+            document.getElementById('billingStatusSelect')?.addEventListener('change', applyBillingFilters);
+
             // Tab switcher buttons
             document.getElementById('btnTabBillings').addEventListener('click', () => switchTab('billings'));
             document.getElementById('btnTabPayments').addEventListener('click', () => switchTab('payments'));
@@ -571,13 +805,106 @@
             });
         });
 
+        let allVisibleBills = [];
+
+        function getComputedStatus(bill) {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const status = bill.billing_status || 'unpaid';
+            if (status === 'overdue' || (status === 'pending_payment' && new Date(bill.due_date) < today)) {
+                return 'overdue';
+            }
+            return status;
+        }
+
+        function applyBillingFilters() {
+            const query = (document.getElementById('billingSearchInput')?.value || '').toLowerCase().trim();
+            const statusFilter = document.getElementById('billingStatusSelect')?.value || 'all';
+
+            const filtered = allVisibleBills.filter(bill => {
+                const computedStatus = getComputedStatus(bill);
+                if (statusFilter !== 'all') {
+                    if (statusFilter === 'overdue' && computedStatus !== 'overdue') return false;
+                    if (statusFilter === 'paid' && computedStatus !== 'paid') return false;
+                    if (statusFilter === 'pending' && !['pending_payment', 'unpaid', 'waiting_verification'].includes(computedStatus)) return false;
+                }
+
+                if (query) {
+                    const cycle = (bill.billing_month || '').toLowerCase();
+                    const prop = (bill.properties?.property_name || '').toLowerCase();
+                    const rent = String(bill.rent_amount || '');
+                    const total = String(bill.total_amount || '');
+                    const due = bill.due_date ? new Date(bill.due_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }).toLowerCase() : '';
+                    if (!cycle.includes(query) && !prop.includes(query) && !rent.includes(query) && !total.includes(query) && !due.includes(query)) {
+                        return false;
+                    }
+                }
+                return true;
+            });
+
+            renderBillingsTable(filtered);
+            const countBadge = document.getElementById('billingsCountBadge');
+            if (countBadge) {
+                countBadge.textContent = `${filtered.length} record${filtered.length === 1 ? '' : 's'}`;
+            }
+        }
+
+        function renderBillingsTable(bills) {
+            const tbody = document.getElementById('billingsTableBody');
+            if (!bills || bills.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:#64748b;padding:3rem 1.5rem;">No matching billing statements found.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = '';
+            bills.forEach(bill => {
+                const rent = parseFloat(bill.rent_amount || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                const total = parseFloat(bill.total_amount || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                
+                let dueStr = '—';
+                if (bill.due_date) {
+                    const d = new Date(bill.due_date);
+                    dueStr = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+                }
+
+                const computedStatus = getComputedStatus(bill);
+                let statusBadgeClass = 'pending';
+                let statusDisplay = computedStatus.replace(/_/g, ' ').toUpperCase();
+
+                if (computedStatus === 'paid') {
+                    statusBadgeClass = 'paid';
+                    statusDisplay = 'PAID';
+                } else if (computedStatus === 'overdue') {
+                    statusBadgeClass = 'overdue';
+                    statusDisplay = 'OVERDUE';
+                } else if (computedStatus === 'waiting_verification') {
+                    statusBadgeClass = 'waiting_verification';
+                    statusDisplay = 'WAITING VERIFICATION';
+                }
+
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="col-cycle">${domiknowEscapeHtml(bill.billing_month || 'N/A')}</td>
+                    <td class="col-property">${domiknowEscapeHtml(bill.properties?.property_name || 'Property')}</td>
+                    <td class="col-rent">₱${rent}</td>
+                    <td class="col-total">₱${total}</td>
+                    <td class="col-due">${dueStr}</td>
+                    <td><span class="table-status-pill ${statusBadgeClass}">${statusDisplay}</span></td>
+                    <td class="col-action-td">
+                        <button type="button" class="btn-table-action" data-bill-id="${domiknowEscapeHtml(bill.id || '')}">View Details</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
         async function loadTenantBillings() {
             const tbody = document.getElementById('billingsTableBody');
             const dashboard = document.getElementById('currentBillContainer');
             try {
                 const res = await fetch('/api/billings/my', { headers: { 'Authorization': `Bearer ${token}` } });
                 if (!res.ok) {
-                    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:#ef4444;">Failed to load billing statements.</td></tr>`;
+                    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:#ef4444;padding:2rem;">Failed to load billing statements.</td></tr>`;
                     return;
                 }
 
@@ -586,105 +913,126 @@
 
                 // Filter out 'draft' bills - they should not be visible to the tenant
                 const visibleBills = myBillings.filter(b => b.billing_status !== 'draft');
+                allVisibleBills = visibleBills;
 
                 if (visibleBills.length === 0) {
                     dashboard.innerHTML = `
-                        <div class="current-bill-card" style="background:var(--bg-secondary); border:1px solid var(--border-color); color:var(--text-primary);">
-                            <div>
-                                <h3 style="margin:0;">No Current Outstanding Bill</h3>
-                                <p style="color:var(--text-secondary); margin-top:0.25rem;">You currently have no active or unpaid invoices listed for this month.</p>
+                        <div class="tenant-billing-hero-card">
+                            <div class="billing-hero-top-row">
+                                <div>
+                                    <div class="billing-hero-eyebrow">NO CURRENT OUTSTANDING BILL</div>
+                                    <div class="billing-hero-amount">₱0.00 PHP</div>
+                                </div>
+                                <div>
+                                    <span class="billing-hero-badge cleared">
+                                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                            <polyline points="20 6 9 17 4 12"></polyline>
+                                        </svg>
+                                        <span>ALL BILLS SETTLED</span>
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="billing-hero-divider"></div>
+                            <div class="billing-hero-bottom-row">
+                                <p class="billing-hero-notice">You currently have no active or unpaid invoices listed.</p>
                             </div>
                         </div>
                     `;
-                    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:var(--text-muted);padding:2rem;">No logs found.</td></tr>`;
+                    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:#64748b;padding:3rem 1.5rem;">No logs found.</td></tr>`;
+                    const countBadge = document.getElementById('billingsCountBadge');
+                    if (countBadge) countBadge.textContent = '0 records';
                     return;
                 }
 
-                // Identify latest active/unpaid current bill
                 // Filter all unpaid / pending / overdue bills to calculate Total Outstanding Balance
                 const unpaidBills = visibleBills.filter(b => ['pending_payment', 'unpaid', 'overdue', 'waiting_verification'].includes(b.billing_status));
                 
                 if (unpaidBills.length > 0) {
                     const totalOutstanding = unpaidBills.reduce((sum, b) => sum + parseFloat(b.total_amount || 0), 0);
-                    const formattedTotal = totalOutstanding.toLocaleString(undefined, { minimumFractionDigits: 2 });
+                    const formattedTotal = totalOutstanding.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
                     
                     // Identify earliest due bill
                     const earliestBill = [...unpaidBills].sort((a, b) => new Date(a.due_date) - new Date(b.due_date))[0];
-                    const due = new Date(earliestBill.due_date).toLocaleDateString('en-PH', { month:'long', day:'numeric', year:'numeric' });
+                    const isOverdue = unpaidBills.some(b => getComputedStatus(b) === 'overdue');
                     
-                    const isOverdue = unpaidBills.some(b => b.billing_status === 'overdue' || new Date(b.due_date) < new Date());
-                    const statusLabel = isOverdue ? 'OVERDUE BALANCE DETECTED' : `${unpaidBills.length} UNPAID INVOICE${unpaidBills.length > 1 ? 'S' : ''}`;
-                    const badgeBg = isOverdue ? 'rgba(239, 68, 68, 0.3)' : 'rgba(255, 255, 255, 0.2)';
+                    const eyebrow = isOverdue ? 'CURRENT OVERDUE BALANCE' : 'CURRENT OUTSTANDING BALANCE';
+                    const badgeMarkup = isOverdue
+                        ? `<span class="billing-hero-badge overdue">
+                               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                   <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                                   <line x1="12" y1="9" x2="12" y2="13"></line>
+                                   <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                               </svg>
+                               <span>OVERDUE BALANCE DETECTED</span>
+                           </span>`
+                        : `<span class="billing-hero-badge pending">
+                               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                   <circle cx="12" cy="12" r="10"></circle>
+                                   <polyline points="12 6 12 12 16 14"></polyline>
+                               </svg>
+                               <span>PAYMENT PENDING</span>
+                           </span>`;
 
                     dashboard.innerHTML = `
-                        <div class="current-bill-card">
-                            <div>
-                                <div class="current-bill-title">Total Outstanding Balance (${unpaidBills.length} Invoice${unpaidBills.length > 1 ? 's' : ''})</div>
-                                <div class="current-bill-amount">₱${formattedTotal}</div>
-                                <div class="current-bill-due">Earliest Due Date: <strong>${due}</strong></div>
+                        <div class="tenant-billing-hero-card">
+                            <div class="billing-hero-top-row">
+                                <div>
+                                    <div class="billing-hero-eyebrow">${eyebrow}</div>
+                                    <div class="billing-hero-amount">₱${formattedTotal} PHP</div>
+                                </div>
+                                <div>
+                                    ${badgeMarkup}
+                                </div>
                             </div>
-                            <div style="display:flex; flex-direction:column; align-items:flex-end; gap:0.5rem;">
-                                <span class="current-bill-status-badge" id="bannerStatusBadge">${statusLabel}</span>
-                                <button type="button" class="action-btn btn-detail" data-bill-id="${domiknowEscapeHtml(earliestBill.id || '')}" style="background-color:white; color:#4f46e5; border:none; margin-top:0.5rem;">View Earliest Invoice & Pay</button>
+                            <div class="billing-hero-divider"></div>
+                            <div class="billing-hero-bottom-row">
+                                <p class="billing-hero-notice">
+                                    Please settle your outstanding amount immediately to avoid disruption or penalties on your tenancy services.
+                                </p>
+                                <button type="button" class="btn-billing-hero-pay" data-bill-id="${domiknowEscapeHtml(earliestBill?.id || '')}">
+                                    View Earliest Invoice & Pay
+                                </button>
                             </div>
                         </div>
                     `;
-                    const badgeEl = document.getElementById('bannerStatusBadge');
-                    if (badgeEl) badgeEl.style.backgroundColor = badgeBg;
                 } else {
-                    // Latest paid bill as summary
                     const latestPaid = visibleBills.find(b => b.billing_status === 'paid');
-                    const paidMsg = latestPaid 
-                        ? `Your latest billing cycle for <strong>${domiknowEscapeHtml(latestPaid.billing_month || 'the latest period')}</strong> was fully paid.`
-                        : 'No pending statements currently require action.';
-                    
                     dashboard.innerHTML = `
-                        <div class="current-bill-card" style="background:#10b981;">
-                            <div>
-                                <h3 style="margin:0;color:white;">All Bills Cleared</h3>
-                                <p style="color:white; opacity:0.9; margin-top:0.25rem;">${paidMsg}</p>
+                        <div class="tenant-billing-hero-card">
+                            <div class="billing-hero-top-row">
+                                <div>
+                                    <div class="billing-hero-eyebrow">TOTAL BALANCE CLEARED</div>
+                                    <div class="billing-hero-amount">₱0.00 PHP</div>
+                                </div>
+                                <div>
+                                    <span class="billing-hero-badge cleared">
+                                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                            <polyline points="20 6 9 17 4 12"></polyline>
+                                        </svg>
+                                        <span>ALL BILLS SETTLED</span>
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="billing-hero-divider"></div>
+                            <div class="billing-hero-bottom-row">
+                                <p class="billing-hero-notice">
+                                    ${latestPaid ? `Your latest billing statement for ${domiknowEscapeHtml(latestPaid.billing_month || 'the current period')} was fully paid. Thank you!` : 'You have no outstanding balance due at this time.'}
+                                </p>
+                                ${latestPaid ? `
+                                    <button type="button" class="btn-billing-hero-pay" data-bill-id="${domiknowEscapeHtml(latestPaid.id || '')}">
+                                        View Latest Statement
+                                    </button>
+                                ` : ''}
                             </div>
                         </div>
                     `;
                 }
 
-                // Render Logs Table
-                tbody.innerHTML = '';
-                visibleBills.forEach(bill => {
-                    const rent = parseFloat(bill.rent_amount || 0).toLocaleString(undefined, { minimumFractionDigits: 2 });
-                    const total = parseFloat(bill.total_amount || 0).toLocaleString(undefined, { minimumFractionDigits: 2 });
-                    const due = new Date(bill.due_date).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
-                    
-                    const today = new Date();
-                    today.setHours(0,0,0,0);
-                    let statusLabel = bill.billing_status;
-                    let badgeClass = 'status-pending';
-
-                    if (statusLabel === 'paid') badgeClass = 'status-active';
-                    else if (statusLabel === 'cancelled') badgeClass = 'status-rejected';
-                    else if (statusLabel === 'overdue' || (statusLabel === 'pending_payment' && new Date(bill.due_date) < today)) {
-                        statusLabel = 'overdue';
-                        badgeClass = 'status-rejected';
-                    }
-
-                    const tr = document.createElement('tr');
-                    tr.innerHTML = `
-                        <td style="font-weight:700;color:var(--primary);">${domiknowEscapeHtml(bill.billing_month || 'N/A')}</td>
-                        <td>${domiknowEscapeHtml(bill.properties?.property_name || 'Property')}</td>
-                        <td>₱${rent}</td>
-                        <td style="font-weight:700;color:var(--text-primary);">₱${total}</td>
-                        <td style="font-weight:600;">${due}</td>
-                        <td><span class="status-badge ${badgeClass}">${statusLabel.replace('_',' ').toUpperCase()}</span></td>
-                        <td>
-                            <button type="button" class="action-btn btn-detail" data-bill-id="${domiknowEscapeHtml(bill.id || '')}">View Details</button>
-                        </td>
-                    `;
-                    tbody.appendChild(tr);
-                });
+                applyBillingFilters();
 
             } catch (err) {
                 console.error(err);
-                tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:#ef4444;">Connection error loading billings.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:#ef4444;padding:2rem;">Connection error loading billings.</td></tr>`;
             }
         }
 
@@ -943,12 +1291,16 @@
             if (tabName === 'billings') {
                 btnBillings.classList.add('active');
                 btnPayments.classList.remove('active');
+                btnBillings.innerHTML = '<span>My Billings</span> <span class="tab-active-dot">•</span>';
+                btnPayments.innerHTML = '<span>My Payments</span>';
                 tabBillings.classList.remove('hidden');
                 tabPayments.classList.add('hidden');
                 loadTenantBillings();
             } else {
                 btnBillings.classList.remove('active');
                 btnPayments.classList.add('active');
+                btnBillings.innerHTML = '<span>My Billings</span>';
+                btnPayments.innerHTML = '<span>My Payments</span> <span class="tab-active-dot">•</span>';
                 tabBillings.classList.add('hidden');
                 tabPayments.classList.remove('hidden');
                 fetchTenantPayments();
@@ -957,53 +1309,58 @@
 
         async function fetchTenantPayments() {
             const tableBody = document.getElementById('paymentsTableBody');
-            tableBody.innerHTML = '<tr><td colspan="8" style="text-align: center; color: var(--text-muted);">Loading payment transactions...</td></tr>';
+            const countBadge = document.getElementById('paymentsCountBadge');
+            tableBody.innerHTML = '<tr><td colspan="8" style="text-align: center; color: #64748b; padding: 2.5rem;">Loading payment transactions...</td></tr>';
             try {
                 const response = await fetch('/api/payments/my', {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
 
                 if (!response.ok) {
-                    tableBody.innerHTML = `<tr><td colspan="8" style="text-align: center; color: var(--error);">Failed to load payment logs.</td></tr>`;
+                    tableBody.innerHTML = `<tr><td colspan="8" style="text-align: center; color: #ef4444; padding: 2rem;">Failed to load payment logs.</td></tr>`;
                     return;
                 }
 
                 const result = await response.json();
                 paymentsList = result.data || [];
 
+                if (countBadge) {
+                    countBadge.textContent = `${paymentsList.length} record${paymentsList.length === 1 ? '' : 's'}`;
+                }
+
                 if (paymentsList.length === 0) {
-                    tableBody.innerHTML = `<tr><td colspan="8" style="text-align: center; padding: 3rem; color: var(--text-muted);">No payment entries submitted yet. Outstanding invoices can be settled in My Billings.</td></tr>`;
+                    tableBody.innerHTML = `<tr><td colspan="8" style="text-align: center; padding: 3rem; color: #64748b;">No payment entries submitted yet. Outstanding invoices can be settled in My Billings.</td></tr>`;
                     return;
                 }
 
                 tableBody.innerHTML = '';
                 paymentsList.forEach(pay => {
-                    const amount = parseFloat(pay.payment_amount).toLocaleString(undefined, { minimumFractionDigits: 2 });
-                    const submitDate = new Date(pay.submitted_at).toLocaleDateString(undefined, { 
-                        year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' 
+                    const amount = parseFloat(pay.payment_amount || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                    const submitDate = new Date(pay.submitted_at).toLocaleDateString('en-US', { 
+                        year: 'numeric', month: 'short', day: 'numeric'
                     });
 
-                    let statusClass = 'status-pending';
+                    let statusClass = 'pending';
                     let statusLabel = 'PENDING VERIFICATION';
                     if (pay.payment_status === 'verified') {
-                        statusClass = 'status-active';
+                        statusClass = 'paid';
                         statusLabel = 'PAID';
                     } else if (pay.payment_status === 'rejected') {
-                        statusClass = 'status-rejected';
+                        statusClass = 'overdue';
                         statusLabel = 'REJECTED';
                     }
 
                     const row = document.createElement('tr');
                     row.innerHTML = `
-                        <td>${submitDate}</td>
-                        <td style="font-weight: 700; color: var(--primary);">${domiknowEscapeHtml(pay.billing_records?.billing_month || 'N/A')}</td>
-                        <td>${domiknowEscapeHtml(pay.properties?.property_name || 'Property')}</td>
-                        <td style="font-weight:700; color: var(--text-primary);">₱${amount}</td>
-                        <td style="text-transform: capitalize;">${domiknowEscapeHtml(String(pay.payment_method || 'unspecified').replace(/_/g, ' '))}</td>
-                        <td style="font-family: monospace; font-size: 0.85rem; font-weight: 600;">${domiknowEscapeHtml(pay.payment_reference_number || 'N/A')}</td>
-                        <td><span class="status-badge ${statusClass}">${statusLabel}</span></td>
-                        <td>
-                            <button type="button" class="action-btn btn-view" data-payment-id="${domiknowEscapeHtml(pay.id || '')}">View Details</button>
+                        <td class="col-due">${submitDate}</td>
+                        <td class="col-cycle">${domiknowEscapeHtml(pay.billing_records?.billing_month || 'N/A')}</td>
+                        <td class="col-property">${domiknowEscapeHtml(pay.properties?.property_name || 'Property')}</td>
+                        <td class="col-total">₱${amount}</td>
+                        <td class="col-due" style="text-transform: capitalize;">${domiknowEscapeHtml(String(pay.payment_method || 'unspecified').replace(/_/g, ' '))}</td>
+                        <td style="font-family: monospace; font-size: 0.85rem; font-weight: 600; color: #334155;">${domiknowEscapeHtml(pay.payment_reference_number || 'N/A')}</td>
+                        <td><span class="table-status-pill ${statusClass}">${statusLabel}</span></td>
+                        <td class="col-action-td">
+                            <button type="button" class="btn-table-action" data-payment-id="${domiknowEscapeHtml(pay.id || '')}">View Details</button>
                         </td>
                     `;
                     tableBody.appendChild(row);
@@ -1011,7 +1368,7 @@
 
             } catch (err) {
                 console.error(err);
-                tableBody.innerHTML = `<tr><td colspan="8" style="text-align: center; color: var(--error);">Error reaching payments API.</td></tr>`;
+                tableBody.innerHTML = `<tr><td colspan="8" style="text-align: center; color: #ef4444; padding: 2rem;">Error reaching payments API.</td></tr>`;
             }
         }
 

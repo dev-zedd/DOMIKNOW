@@ -3,21 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Application Tracker - DomiKnow</title>
+    <title>Application Details - DomiKnow</title>
     <link href="../../css/input.css" rel="stylesheet">
-    <link href="../../css/design-system.css?v=20260827-1" rel="stylesheet">
+    <link href="../../css/design-system.css?v=20260904-1" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --primary: #0355F3;
-            --accent: #F98E6E;
-            --bg-color: #f8fafc;
-            --text-dark: #0F4953;
-            --text-normal: #1e293b;
-            --text-muted: #64748b;
-            --border-color: #e2e8f0;
-        }
-
         /* Prevent layout flashing shift on page load */
         body:not(.app-ready) {
             visibility: hidden;
@@ -28,234 +18,6 @@
             opacity: 1;
             transition: opacity 0.15s ease-in;
         }
-
-        /* Viewport lock override */
-        body, html {
-            overflow: hidden !important;
-            height: 100vh !important;
-            margin: 0;
-            background-color: var(--bg-color);
-            color: var(--text-normal);
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-        }
-        
-        .main-content-inner {
-            height: calc(100vh - 72px) !important;
-            min-height: calc(100vh - 72px) !important;
-            padding: 0.5rem 1.5rem 0.5rem 1.5rem !important;
-            overflow: hidden !important;
-            box-sizing: border-box !important;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .dashboard-container {
-            height: 100% !important;
-            max-height: 100% !important;
-            overflow: hidden !important;
-            padding: 0 !important;
-            display: flex;
-            flex-direction: column;
-            flex-grow: 1;
-            margin-top: 0 !important;
-            max-width: 100% !important;
-        }
-
-        .navbar-brand-group {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-        
-        .breadcrumb-nav {
-            font-size: 0.8rem;
-            font-weight: 500;
-            color: #64748b;
-            display: inline-flex;
-            align-items: center;
-        }
-        
-        .breadcrumb-nav a {
-            color: #0f172a;
-            text-decoration: none;
-            font-weight: 600;
-        }
-        
-        .breadcrumb-nav a:hover {
-            color: #2563eb;
-            text-decoration: underline;
-        }
-        
-        .breadcrumb-separator {
-            margin: 0 0.35rem;
-            color: #94a3b8;
-            font-weight: 400;
-        }
-        
-        .breadcrumb-current {
-            color: #64748b;
-            font-weight: 500;
-        }
-
-        .tracker-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 1rem;
-            margin-top: 0.25rem;
-            margin-bottom: 0.5rem;
-            flex-shrink: 0;
-        }
-
-        .tracker-header h2 {
-            margin: 0;
-            font-size: 1.35rem;
-            font-weight: 700;
-            color: #0f172a;
-        }
-
-        .details-grid {
-            display: grid;
-            grid-template-columns: 1.6fr 1.4fr;
-            gap: 0.75rem;
-            flex-grow: 1;
-            height: 0;
-            overflow: hidden;
-        }
-
-        @media (max-width: 900px) {
-            .details-grid {
-                grid-template-columns: 1fr;
-                height: auto;
-                overflow-y: auto;
-            }
-            body, html {
-                overflow: auto;
-            }
-            .dashboard-container {
-                height: auto;
-                overflow: auto;
-            }
-        }
-
-        .details-left, .details-right {
-            display: flex;
-            flex-direction: column;
-            gap: 0.75rem;
-            height: 100%;
-            overflow-y: auto;
-            padding-right: 2px;
-        }
-
-        .prop-section-card {
-            background-color: white;
-            border: 1px solid #e2e8f0;
-            border-radius: 8px;
-            padding: 0.85rem;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.02);
-            flex-shrink: 0;
-        }
-
-        /* Set scrollable behavior for personal message card or checklist */
-        .flex-grow-card {
-            flex-grow: 1;
-            height: 0;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-            flex-shrink: 1 !important;
-        }
-
-        .scrollable-card-body {
-            flex-grow: 1;
-            overflow-y: auto;
-            margin-top: 0.25rem;
-        }
-
-        .section-header-flex {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid var(--border-color);
-            padding-bottom: 0.35rem;
-            margin-bottom: 0.6rem;
-        }
-
-        .section-header-flex h3 {
-            margin: 0;
-            font-size: 0.95rem;
-            font-weight: 700;
-            color: #0f172a;
-        }
-
-        .info-block {
-            margin-bottom: 0.6rem;
-        }
-
-        .info-lbl {
-            font-size: 0.65rem;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            color: var(--text-muted);
-            font-weight: 700;
-            margin-bottom: 0.15rem;
-        }
-
-        .info-val {
-            font-size: 0.825rem;
-            font-weight: 600;
-            color: #0f172a;
-        }
-
-        .doc-list {
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-        }
-
-        .doc-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0.45rem 0.65rem;
-            background-color: #f8fafc;
-            border: 1px solid #e2e8f0;
-            border-radius: 6px;
-        }
-
-        .doc-info {
-            display: flex;
-            flex-direction: column;
-            gap: 0.15rem;
-        }
-
-        .doc-title {
-            font-weight: 700;
-            font-size: 0.78rem;
-            color: #0f172a;
-        }
-
-        .doc-meta {
-            font-size: 0.725rem;
-            color: var(--text-muted);
-        }
-
-        /* Custom Scrollbar Styles for elegant UI */
-        ::-webkit-scrollbar {
-            width: 4px;
-            height: 4px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #f1f5f9;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #cbd5e1;
-            border-radius: 4px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #94a3b8;
-        }
     </style>
     <script src="../../js/ui.js?v=20260827-3" defer></script>
 </head>
@@ -263,12 +25,13 @@
     <nav class="navbar navbar-tenant">
         <div class="navbar-container">
             <div class="navbar-brand-group">
-                <div class="breadcrumb-nav" style="font-size: 0.95rem; font-weight: 700; display: flex; align-items: center;">
-                    <a href="applications.html" style="color: #0f172a; text-decoration: none;">My Applications</a>
-                    <span class="breadcrumb-separator" style="color: #94a3b8; margin: 0 0.5rem; font-weight: 400;">&gt;</span>
-                    <span class="breadcrumb-current" style="color: #64748b; font-weight: 500; margin-right: 0.75rem;">Application Tracker</span>
-                    <span data-application-status class="status-badge" style="font-size: 0.725rem; padding: 2px 8px; font-weight: 700; border-radius: 4px; display: inline-block;">PENDING</span>
-                </div>
+                <a href="applications.html" class="app-details-back-link">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <line x1="19" y1="12" x2="5" y2="12"></line>
+                        <polyline points="12 19 5 12 12 5"></polyline>
+                    </svg>
+                    <span>Back to applications</span>
+                </a>
             </div>
             <div class="navbar-right">
                 <span class="navbar-user-welcome">Welcome, <span class="user-name">User</span></span>
@@ -279,130 +42,210 @@
 
     <!-- Main Content -->
     <main class="dashboard-container">
-        <div id="generalFeedback" class="alert alert-success hidden"></div>
+        <div class="app-back-nav">
+            <a href="applications.html" class="app-details-back-link">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <line x1="19" y1="12" x2="5" y2="12"></line>
+                    <polyline points="12 19 5 12 12 5"></polyline>
+                </svg>
+                <span>Back to applications</span>
+            </a>
+        </div>
 
-        <div class="details-grid">
-            <!-- Left Panel: Specs -->
-            <div class="details-left">
-                <!-- Status/Remarks alert -->
-                <div id="landlordRemarksCard" class="prop-section-card">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
-                        <div style="display: flex; align-items: center; gap: 0.5rem;">
-                            <h3 class="profile-card-title" style="margin: 0; font-size: 0.95rem; font-weight: 700; color: #0f172a;">Landlord Review Statement</h3>
-                            <span data-application-status class="status-badge status-pending" style="font-size: 0.725rem; padding: 2px 8px; font-weight: 700; border-radius: 4px; display: inline-block;">LOADING...</span>
+        <div class="app-details-grid">
+            <!-- Left Column -->
+            <div class="app-details-col">
+                <!-- 1. Application Status Card -->
+                <div class="app-detail-card">
+                    <div class="app-card-header-flex">
+                        <div class="app-card-title-group">
+                            <div class="app-card-icon-box">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                    <polyline points="14 2 14 8 20 8"></polyline>
+                                </svg>
+                            </div>
+                            <h2 class="app-card-title">Application Status</h2>
+                            <span data-application-status class="status-badge app-status-badge status-pending">PENDING</span>
                         </div>
-                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
-                    </div>
-                    <p id="landlordRemarksText" style="color: var(--text-normal); line-height: 1.6; font-style: italic; background-color: #f8fafc; padding: 0.75rem; border-radius: 6px; border: 1px solid var(--border-color); margin: 0; font-size: 0.8rem;">Your application is currently awaiting review by the landlord. Updates will be posted here when available.</p>
-                    <div id="reviewedAtText" style="font-size: 0.7rem; color: var(--text-muted); margin-top: 0.5rem;">Submitted on -</div>
-                </div>
-
-                <!-- Property info -->
-                <div class="prop-section-card">
-                    <div class="section-header-flex">
-                        <h3>Target Property Details</h3>
-                    </div>
-
-                    <div style="display: flex; gap: 0.85rem; align-items: flex-start; margin-bottom: 0.6rem;">
-                        <img id="propThumbImg" src="https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&w=150&q=80" alt="Property" style="width: 80px; height: 60px; object-fit: cover; border-radius: 6px; border: 1px solid #e2e8f0; flex-shrink: 0;">
-                        <div style="flex-grow: 1;">
-                            <div style="display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 0.5rem; margin-bottom: 0.35rem;">
-                                <div class="info-block" style="margin-bottom: 0;">
-                                    <div class="info-lbl" style="font-size: 0.6rem; color: #94a3b8; font-weight: 700; margin-bottom: 0.1rem;">PROPERTY NAME</div>
-                                    <div id="propName" class="info-val" style="color: #0f172a; font-size: 0.85rem; font-weight: 700;">-</div>
-                                </div>
-                                <div class="info-block" style="margin-bottom: 0;">
-                                    <div class="info-lbl" style="font-size: 0.6rem; color: #94a3b8; font-weight: 700; margin-bottom: 0.1rem;">RENT</div>
-                                    <div id="propRent" class="info-val" style="color: #16a34a; font-size: 0.85rem; font-weight: 700;">-</div>
-                                </div>
-                            </div>
-                            <div style="display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 0.5rem; margin-bottom: 0;">
-                                <div class="info-block" style="margin-bottom: 0;">
-                                    <div class="info-lbl" style="font-size: 0.6rem; color: #94a3b8; font-weight: 700; margin-bottom: 0.1rem;">TYPE</div>
-                                    <div id="propType" class="info-val" style="font-size: 0.8rem; font-weight: 600; color: #334155;">-</div>
-                                </div>
-                                <div class="info-block" style="margin-bottom: 0;">
-                                    <div class="info-lbl" style="font-size: 0.6rem; color: #94a3b8; font-weight: 700; margin-bottom: 0.1rem;">TARGET ROOM / BED SPACE</div>
-                                    <div id="targetSpace" class="info-val" style="font-weight: 700; color: #0f4953; font-size: 0.8rem;">-</div>
-                                </div>
-                            </div>
+                        <div class="app-card-corner-icon">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                <polyline points="14 2 14 8 20 8"></polyline>
+                            </svg>
                         </div>
                     </div>
 
-                    <div class="info-block" style="margin-bottom: 0.6rem; border-top: 1px solid #f1f5f9; padding-top: 0.5rem;">
-                        <div class="info-lbl" style="font-size: 0.6rem; color: #94a3b8; font-weight: 700; margin-bottom: 0.15rem;">ADDRESS</div>
-                        <div id="propAddress" class="info-val" style="font-weight: 500; color: #475569; font-size: 0.78rem; line-height: 1.4;">-</div>
+                    <div class="app-status-notice">
+                        <div class="app-status-notice-icon">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <line x1="12" y1="16" x2="12" y2="12"></line>
+                                <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                            </svg>
+                        </div>
+                        <div class="app-status-notice-content">
+                            <div id="landlordRemarksText" class="app-status-notice-title">Your application is now being reviewed by the landlord.</div>
+                            <div id="landlordRemarksSub" class="app-status-notice-sub">We'll notify you here once there are updates.</div>
+                        </div>
                     </div>
 
-                    <div class="info-block" style="margin-bottom: 0; border-top: 1px dashed var(--border-color); padding-top: 0.5rem;">
-                        <div class="info-lbl" style="font-size: 0.6rem; color: #94a3b8; font-weight: 700; margin-bottom: 0.15rem;">CURFEW & RULES</div>
-                        <div id="propRules" class="info-val" style="font-size: 0.78rem; font-style: italic; font-weight: normal; color: #64748b;">-</div>
+                    <div id="reviewedAtText" class="app-status-timestamp">Submitted on -</div>
+                </div>
+
+                <!-- 2. Property Details Card -->
+                <div class="app-detail-card">
+                    <h2 class="app-card-title" style="margin-bottom: 1.25rem;">Property Details</h2>
+
+                    <div class="app-prop-top-row">
+                        <img id="propThumbImg" src="https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&w=300&q=80" alt="Property thumbnail" class="app-prop-thumb">
+                        <div class="app-prop-specs-grid">
+                            <div class="app-prop-spec-item">
+                                <div class="app-spec-icon">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+                                </div>
+                                <div>
+                                    <div class="app-spec-label">Property</div>
+                                    <div id="propName" class="app-spec-val">-</div>
+                                </div>
+                            </div>
+                            <div class="app-prop-spec-item">
+                                <div class="app-spec-icon">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
+                                </div>
+                                <div>
+                                    <div class="app-spec-label">Rent</div>
+                                    <div id="propRent" class="app-spec-val">-</div>
+                                </div>
+                            </div>
+                            <div class="app-prop-spec-item">
+                                <div class="app-spec-icon">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="21" x2="4" y2="14"></line><line x1="4" y1="10" x2="4" y2="3"></line><line x1="12" y1="21" x2="12" y2="12"></line><line x1="12" y1="8" x2="12" y2="3"></line><line x1="20" y1="21" x2="20" y2="16"></line><line x1="20" y1="12" x2="20" y2="3"></line><line x1="1" y1="14" x2="7" y2="14"></line><line x1="9" y1="8" x2="15" y2="8"></line><line x1="17" y1="16" x2="23" y2="16"></line></svg>
+                                </div>
+                                <div>
+                                    <div class="app-spec-label">Type</div>
+                                    <div id="propType" class="app-spec-val">-</div>
+                                </div>
+                            </div>
+                            <div class="app-prop-spec-item">
+                                <div class="app-spec-icon">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 4v16"></path><path d="M2 8h18a2 2 0 0 1 2 2v10"></path><path d="M2 17h20"></path><path d="M6 8v9"></path></svg>
+                                </div>
+                                <div>
+                                    <div class="app-spec-label">Target Room</div>
+                                    <div id="targetSpace" class="app-spec-val">-</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="app-prop-divider"></div>
+
+                    <div class="app-prop-bottom-grid">
+                        <div class="app-prop-meta-block">
+                            <div class="app-meta-title">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                                <span>Address</span>
+                            </div>
+                            <div id="propAddress" class="app-meta-desc">-</div>
+                        </div>
+                        <div class="app-prop-meta-block">
+                            <div class="app-meta-title">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                                <span>House Rules</span>
+                            </div>
+                            <div id="propRules" class="app-meta-desc">-</div>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Personal Message -->
-                <div class="prop-section-card" style="flex-grow: 1; display: flex; flex-direction: column; min-height: 120px;">
-                    <div class="section-header-flex" style="flex-shrink: 0; margin-bottom: 0.5rem;">
-                        <h3 style="margin: 0;">Your Introduction Message</h3>
+                <!-- 3. Your Message Card -->
+                <div class="app-detail-card">
+                    <div class="app-card-title-group" style="margin-bottom: 1rem;">
+                        <div class="app-card-icon-box">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                        </div>
+                        <h2 class="app-card-title">Your Message</h2>
                     </div>
-                    <div class="info-block" style="margin: 0; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 0.75rem; flex-grow: 1; overflow-y: auto;">
-                        <p id="appMessage" style="color: #475569; line-height: 1.5; font-size: 0.8rem; margin: 0;">-</p>
+                    <div class="app-message-box">
+                        <p id="appMessage" class="app-message-text">-</p>
                     </div>
                 </div>
             </div>
 
-            <!-- Right Panel: Documents and Uploads -->
-            <div class="details-right">
-                <!-- Requirements Status Checklist -->
-                <div class="prop-section-card" id="checklistCard">
-                    <h3 class="profile-card-title" style="margin-bottom: 0.4rem; color: #0f172a; font-size: 0.9rem;">Requirements Checklist</h3>
-                    <p style="color: var(--text-muted); font-size: 0.75rem; margin-top: 0; margin-bottom: 0.75rem;">Please make sure all required verification certificates are uploaded below to prevent processing delays.</p>
+            <!-- Right Column -->
+            <div class="app-details-col">
+                <!-- 1. Requirements Card -->
+                <div class="app-detail-card" id="checklistCard">
+                    <div class="app-card-title-group" style="margin-bottom: 0.25rem;">
+                        <div class="app-card-icon-box">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect></svg>
+                        </div>
+                        <h2 class="app-card-title">Requirements</h2>
+                    </div>
+                    <p class="app-card-subtitle">Complete the required documents below.</p>
                     
-                    <div id="requirementsChecklist" style="display: flex; flex-direction: column; gap: 0.5rem;">
-                        <!-- Will be populated dynamically -->
+                    <div id="requirementsChecklist" class="app-requirements-list">
+                        <!-- Populated dynamically -->
                     </div>
                 </div>
 
-                <!-- Document List -->
-                <div class="prop-section-card" style="flex-grow: 1; display: flex; flex-direction: column; overflow: hidden; min-height: 300px;">
-                    <h3 class="profile-card-title" style="margin-bottom: 0.5rem; color: #0f172a; font-size: 0.9rem; flex-shrink: 0;">Your Submitted Documents</h3>
-                    
-                    <div id="documentList" class="doc-list" style="margin-bottom: 0.5rem; overflow-y: auto; flex-grow: 1; padding-right: 4px;">
-                        <p style="color: var(--text-muted); font-size: 0.78rem; font-style: italic; margin: 0;">No document uploads attached.</p>
+                <!-- 2. Submitted Documents Card -->
+                <div class="app-detail-card">
+                    <div class="app-card-title-group" style="margin-bottom: 1rem;">
+                        <div class="app-card-icon-box">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path></svg>
+                        </div>
+                        <h2 class="app-card-title">Submitted Documents</h2>
                     </div>
 
-                    <!-- Let them upload another document if the application is still pending -->
-                    <div id="uploadPanel" style="border-top: 1px solid var(--border-color); padding-top: 0.6rem; margin-top: auto; flex-shrink: 0;">
-                        <h4 style="font-size: 0.8rem; margin-top: 0; margin-bottom: 0.4rem; font-weight: 700; color: #0f172a;">Upload Additional File</h4>
-                        <div class="form-group" style="margin-bottom: 0.5rem;">
-                            <label for="docType" class="form-label" style="font-size: 0.6rem; margin-bottom: 0.15rem; color: #94a3b8; font-weight: 700;">CATEGORY</label>
-                            <select id="docType" class="form-select" style="padding: 0.4rem; font-size: 0.78rem; border-radius: 6px;">
-                                <option value="valid_id">Government Valid ID</option>
-                                <option value="proof_of_income">Proof of Income</option>
-                                <option value="student_id">Student ID Card</option>
-                                <option value="parent_guardian_id">Parent/Guardian ID</option>
-                                <option value="certificate_of_registration">Certificate of Registration (COR)</option>
-                                <option value="other">Other Supporting Documents</option>
-                            </select>
-                        </div>
-                        <div class="form-group" style="margin-bottom: 0.6rem;">
-                            <div class="drag-drop-zone" id="dragDropZone" style="border: 2px dashed #cbd5e1; border-radius: 8px; padding: 0.75rem; text-align: center; background: #f8fafc; cursor: pointer; transition: all 0.15s;">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin: 0 auto 0.25rem auto; display: block;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
-                                <div style="font-size: 0.75rem; font-weight: 600; color: #475569;">Click to upload or drag & drop.</div>
-                                <div style="font-size: 0.65rem; color: #94a3b8; margin-top: 0.1rem;">Supports PDF, JPG, PNG (Max 5MB)</div>
-                                <div id="selectedFileName" style="font-size: 0.725rem; font-weight: 700; color: #0f4953; margin-top: 0.35rem; display: none;"></div>
-                            </div>
-                            <input type="file" id="docFileInput" accept="application/pdf, image/png, image/jpeg, image/jpg" class="form-input" style="display: none;">
-                        </div>
-                        <button id="btnUploadDoc" class="btn-primary" style="background-color: #f1f5f9; color: #334155; border: 1px solid #cbd5e1; font-size: 0.78rem; padding: 0.45rem; border-radius: 6px; font-weight: 600; width: 100%;">Upload Document</button>
+                    <div id="documentList" class="app-doc-list">
+                        <p style="color: var(--color-text-muted, #94a3b8); font-size: 0.8125rem; font-style: italic; margin: 0;">No document uploads attached.</p>
                     </div>
+                </div>
+
+                <!-- 3. Upload Document Card -->
+                <div class="app-detail-card" id="uploadPanel">
+                    <div class="app-card-title-group" style="margin-bottom: 1.25rem;">
+                        <div class="app-card-icon-box">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                        </div>
+                        <h2 class="app-card-title">Upload Document</h2>
+                    </div>
+
+                    <div class="app-form-group">
+                        <label for="docType" class="app-form-label">Document Type</label>
+                        <select id="docType" class="app-select">
+                            <option value="valid_id">Valid ID (Government/Student ID)</option>
+                            <option value="proof_of_income">Proof of Income (Payslip/Certificate/Permit)</option>
+                            <option value="student_id">Student ID Card</option>
+                            <option value="parent_guardian_id">Parent/Guardian ID</option>
+                            <option value="certificate_of_registration">Certificate of Registration (COR)</option>
+                            <option value="other">Other Supporting Documents</option>
+                        </select>
+                    </div>
+
+                    <div class="app-drag-drop-zone" id="dragDropZone">
+                        <div class="app-upload-icon-circle">
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                        </div>
+                        <div class="app-upload-prompt">
+                            <span>Drag and drop your file here</span>
+                            <span class="app-browse-link">or click to browse</span>
+                        </div>
+                        <div class="app-upload-hint">PDF, JPG, PNG (Max 5MB)</div>
+                        <div id="selectedFileName" class="app-selected-file" style="display: none;"></div>
+                        <input type="file" id="docFileInput" accept="application/pdf, image/png, image/jpeg, image/jpg" style="display: none;">
+                    </div>
+
+                    <button id="btnUploadDoc" class="app-btn-upload">Upload</button>
                 </div>
             </div>
         </div>
     </main>
 
     <script src="../../js/auth.js"></script>
-    <script src="../../js/dashboard.js?v=20260827-3"></script>
+    <script src="../../js/dashboard.js?v=20260904-15"></script>
     <script>
         const token = localStorage.getItem('domiknow_token');
         const urlParams = new URLSearchParams(window.location.search);
@@ -422,48 +265,48 @@
             // Bind drag and drop file interactions
             const zone = document.getElementById('dragDropZone');
             const fileInput = document.getElementById('docFileInput');
-            const fileNameDisplay = document.getElementById('selectedFileName');
 
             if (zone && fileInput) {
                 zone.addEventListener('click', () => fileInput.click());
                 
                 zone.addEventListener('dragover', (e) => {
                     e.preventDefault();
-                    zone.style.borderColor = '#0f4953';
+                    zone.style.borderColor = 'var(--color-action-primary, #0355f3)';
                     zone.style.background = '#eff6ff';
                 });
                 
                 zone.addEventListener('dragleave', () => {
                     zone.style.borderColor = '#cbd5e1';
-                    zone.style.background = '#f8fafc';
+                    zone.style.background = '#fafcff';
                 });
                 
                 zone.addEventListener('drop', (e) => {
                     e.preventDefault();
                     zone.style.borderColor = '#cbd5e1';
-                    zone.style.background = '#f8fafc';
+                    zone.style.background = '#fafcff';
                     if (e.dataTransfer.files.length > 0) {
                         fileInput.files = e.dataTransfer.files;
                         updateSelectedFileName();
                     }
                 });
                 
-                fileInput.addEventListener('change', () => {
-                    updateSelectedFileName();
-                });
-            }
-
-            function updateSelectedFileName() {
-                if (fileInput.files.length > 0) {
-                    fileNameDisplay.textContent = `Selected: ${fileInput.files[0].name}`;
-                    fileNameDisplay.style.display = 'block';
-                } else {
-                    fileNameDisplay.style.display = 'none';
-                }
+                fileInput.addEventListener('change', updateSelectedFileName);
             }
 
             fetchApplicationDetails();
         });
+
+        function updateSelectedFileName() {
+            const fileInput = document.getElementById('docFileInput');
+            const fileNameDisplay = document.getElementById('selectedFileName');
+            if (fileInput.files.length > 0) {
+                fileNameDisplay.textContent = `Selected: ${fileInput.files[0].name}`;
+                fileNameDisplay.style.display = 'block';
+            } else {
+                fileNameDisplay.textContent = '';
+                fileNameDisplay.style.display = 'none';
+            }
+        }
 
         async function fetchApplicationDetails() {
             try {
@@ -495,38 +338,50 @@
 
             // Keep the header and review card status in sync.
             document.querySelectorAll('[data-application-status]').forEach((badge) => {
-                badge.className = 'status-badge';
-                badge.textContent = String(app.status || 'pending').toUpperCase();
-                if (app.status === 'approved') badge.classList.add('status-active');
-                else if (app.status === 'rejected') badge.classList.add('status-rejected');
+                badge.className = 'status-badge app-status-badge';
+                const statusKey = String(app.status || 'pending').toLowerCase();
+                badge.textContent = statusKey.toUpperCase();
+                if (statusKey === 'approved') badge.classList.add('status-approved');
+                else if (statusKey === 'rejected' || statusKey === 'cancelled') badge.classList.add('status-rejected');
                 else badge.classList.add('status-pending');
             });
 
             // Render remarks
             const remarksText = document.getElementById('landlordRemarksText');
+            const remarksSub = document.getElementById('landlordRemarksSub');
             const reviewedText = document.getElementById('reviewedAtText');
 
-            if (app.status === 'approved' || app.status === 'rejected') {
-                remarksText.textContent = app.landlord_remarks || 'No specific remarks were entered by the landlord.';
-                remarksText.style.fontStyle = 'normal';
-                remarksText.style.fontWeight = '600';
+            if (app.status === 'approved') {
+                remarksText.textContent = app.landlord_remarks || 'Your application has been approved by the landlord!';
+                remarksSub.textContent = 'You can proceed to review your tenancy and lease agreement.';
                 
                 const rDate = app.reviewed_at 
-                    ? new Date(app.reviewed_at).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })
+                    ? new Date(app.reviewed_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' })
                     : 'N/A';
                 reviewedText.textContent = `Reviewed on ${rDate}`;
                 
-                // Hide uploads panel once reviewed
-                document.getElementById('uploadPanel').classList.add('hidden');
-            } else {
-                remarksText.textContent = 'Your application is currently awaiting review by the landlord. Updates will be posted here when available.';
-                remarksText.style.fontStyle = 'italic';
-                remarksText.style.fontWeight = 'normal';
+                // Hide uploads panel once approved
+                document.getElementById('uploadPanel')?.classList.add('hidden');
+            } else if (app.status === 'rejected') {
+                remarksText.textContent = app.landlord_remarks || 'Your application was declined by the landlord.';
+                remarksSub.textContent = 'You can browse and apply for other available listings.';
                 
-                const sDate = new Date(app.created_at).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+                const rDate = app.reviewed_at 
+                    ? new Date(app.reviewed_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' })
+                    : 'N/A';
+                reviewedText.textContent = `Reviewed on ${rDate}`;
+                
+                document.getElementById('uploadPanel')?.classList.add('hidden');
+            } else {
+                remarksText.textContent = 'Your application is now being reviewed by the landlord.';
+                remarksSub.textContent = "We'll notify you here once there are updates.";
+                
+                const sDate = app.created_at 
+                    ? new Date(app.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' })
+                    : 'N/A';
                 reviewedText.textContent = `Submitted on ${sDate}`;
                 
-                document.getElementById('uploadPanel').classList.remove('hidden');
+                document.getElementById('uploadPanel')?.classList.remove('hidden');
             }
 
             // Render property details
@@ -535,7 +390,7 @@
             // Set thumbnail image src
             const thumbImg = document.getElementById('propThumbImg');
             if (thumbImg) {
-                thumbImg.src = domiknowSafeExternalUrl(prop?.main_image_url || 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&w=150&q=80');
+                thumbImg.src = domiknowSafeExternalUrl(prop?.main_image_url || 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&w=300&q=80');
             }
             
             let rentVal = null;
@@ -549,21 +404,22 @@
                 spaceLabel = `Room ${targetUnit.unit_number}`;
                 if (targetBed) {
                     rentVal = Number(targetBed.monthly_rent) > 0 ? Number(targetBed.monthly_rent) : null;
-                    spaceLabel += ` (Bed Space: ${targetBed.bed_label})`;
+                    spaceLabel += ` (Bed ${targetBed.bed_label})`;
                 }
             }
 
             document.getElementById('propRent').textContent = Number.isFinite(rentVal)
-                ? `₱${rentVal.toLocaleString('en-PH')}/month`
-                : 'Rent not available';
+                ? `₱${rentVal.toLocaleString('en-PH')} / month`
+                : (prop?.monthly_rent ? `₱${Number(prop.monthly_rent).toLocaleString('en-PH')} / month` : 'Rent not available');
             document.getElementById('targetSpace').textContent = spaceLabel;
-            document.getElementById('propType').textContent = String(prop?.property_type || 'Property').replace(/_/g, ' ').toUpperCase();
+            document.getElementById('propType').textContent = String(prop?.property_type || 'Property').replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
             document.getElementById('propAddress').textContent = `${prop?.address || 'Address not specified'}, Barangay ${prop?.barangay || 'Not specified'}, Siniloan`;
-            // Parse house_rules — may be a JSON-encoded object from the landlord form
+            
+            // House rules
             (function() {
                 const rulesEl = document.getElementById('propRules');
                 if (!rulesEl) return;
-                let raw = prop.house_rules || '';
+                let raw = prop?.house_rules || '';
                 let display = '';
                 try {
                     const parsed = JSON.parse(raw);
@@ -573,17 +429,16 @@
                         if (Array.isArray(parsed.custom_policies)) {
                             parsed.custom_policies.forEach(p => lines.push(`${p.name}: ${p.value}`));
                         }
-                        display = lines.join('\n');
+                        display = lines.join('. ');
                     }
                 } catch (e) {
-                    display = raw; // plain text
+                    display = raw;
                 }
                 rulesEl.textContent = display || 'No specific rules provided.';
-                rulesEl.style.whiteSpace = 'pre-line'; // respect newlines
             })();
 
             // Personal statement
-            document.getElementById('appMessage').textContent = app.application_message || 'No introduction message provided.';
+            document.getElementById('appMessage').textContent = app.application_message || 'No message provided.';
         }
 
         function renderRequirementsChecklist(docs) {
@@ -593,50 +448,47 @@
             const hasID = docs.some(d => ['valid_id', 'student_id', 'parent_guardian_id'].includes(d.document_type));
             const hasIncome = docs.some(d => ['proof_of_income', 'certificate_of_registration'].includes(d.document_type));
 
-            const idBadge = hasID
-                ? `<div style="display: flex; align-items: center; justify-content: space-between; padding: 0.45rem 0.75rem; background-color: #f0fdf4; border: 1px solid #dcfce7; border-radius: 6px;">
-                     <span style="font-size: 0.78rem; font-weight: 600; color: #16a34a; display: flex; align-items: center; gap: 0.35rem;">
-                       <span style="width: 14px; height: 14px; border-radius: 50%; background-color: #16a34a; display: flex; align-items: center; justify-content: center; color: white; flex-shrink: 0;">
-                         <svg xmlns="http://www.w3.org/2000/svg" width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            const idHtml = hasID
+                ? `<div class="app-req-item submitted">
+                     <div class="app-req-left">
+                       <span class="app-req-icon-circle success">
+                         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
                        </span>
-                       Identity Verification (Government/Student ID)
-                     </span>
-                     <span style="font-size: 0.68rem; font-weight: 700; color: #16a34a; text-transform: uppercase;">Submitted</span>
+                       <span class="app-req-name">Valid ID (Government/Student ID)</span>
+                     </div>
+                     <span class="app-req-badge success">SUBMITTED</span>
                    </div>`
-                : `<div style="display: flex; align-items: center; justify-content: space-between; padding: 0.45rem 0.75rem; background-color: #fffbeb; border: 1px solid #fde68a; border-radius: 6px;">
-                     <span style="font-size: 0.78rem; font-weight: 600; color: #b45309; display: flex; align-items: center; gap: 0.35rem;">
-                       <span style="width: 14px; height: 14px; border-radius: 50%; background-color: #d97706; display: flex; align-items: center; justify-content: center; color: white; flex-shrink: 0;">
-                         <svg xmlns="http://www.w3.org/2000/svg" width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                : `<div class="app-req-item required">
+                     <div class="app-req-left">
+                       <span class="app-req-icon-circle warning">
+                         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
                        </span>
-                       Identity Verification (Government/Student ID)
-                     </span>
-                     <span style="font-size: 0.68rem; font-weight: 700; color: #b45309; text-transform: uppercase;">Required</span>
+                       <span class="app-req-name">Valid ID (Government/Student ID)</span>
+                     </div>
+                     <span class="app-req-badge warning">REQUIRED</span>
                    </div>`;
 
-            const incomeBadge = hasIncome
-                ? `<div style="display: flex; align-items: center; justify-content: space-between; padding: 0.45rem 0.75rem; background-color: #f0fdf4; border: 1px solid #dcfce7; border-radius: 6px;">
-                     <span style="font-size: 0.78rem; font-weight: 600; color: #16a34a; display: flex; align-items: center; gap: 0.35rem;">
-                       <span style="width: 14px; height: 14px; border-radius: 50%; background-color: #16a34a; display: flex; align-items: center; justify-content: center; color: white; flex-shrink: 0;">
-                         <svg xmlns="http://www.w3.org/2000/svg" width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            const incomeHtml = hasIncome
+                ? `<div class="app-req-item submitted">
+                     <div class="app-req-left">
+                       <span class="app-req-icon-circle success">
+                         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
                        </span>
-                       Proof of Income (Payslip/Certificate/Permit)
-                     </span>
-                     <span style="font-size: 0.68rem; font-weight: 700; color: #16a34a; text-transform: uppercase;">Submitted</span>
+                       <span class="app-req-name">Proof of Income (Payslip/Certificate/Permit)</span>
+                     </div>
+                     <span class="app-req-badge success">SUBMITTED</span>
                    </div>`
-                : `<div style="display: flex; align-items: center; justify-content: space-between; padding: 0.45rem 0.75rem; background-color: #fffbeb; border: 1px solid #fde68a; border-radius: 6px;">
-                     <span style="font-size: 0.78rem; font-weight: 600; color: #b45309; display: flex; align-items: center; gap: 0.35rem;">
-                       <span style="width: 14px; height: 14px; border-radius: 50%; background-color: #d97706; display: flex; align-items: center; justify-content: center; color: white; flex-shrink: 0;">
-                         <svg xmlns="http://www.w3.org/2000/svg" width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                : `<div class="app-req-item required">
+                     <div class="app-req-left">
+                       <span class="app-req-icon-circle warning">
+                         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
                        </span>
-                       Proof of Income (Payslip/Certificate/Permit)
-                     </span>
-                     <span style="font-size: 0.68rem; font-weight: 700; color: #b45309; text-transform: uppercase;">Required</span>
+                       <span class="app-req-name">Proof of Income (Payslip/Certificate/Permit)</span>
+                     </div>
+                     <span class="app-req-badge warning">REQUIRED</span>
                    </div>`;
 
-            container.innerHTML = `
-                ${idBadge}
-                ${incomeBadge}
-            `;
+            container.innerHTML = idHtml + incomeHtml;
         }
 
         function renderDocumentsUI() {
@@ -647,7 +499,7 @@
             renderRequirementsChecklist(docs);
 
             if (docs.length === 0) {
-                container.innerHTML = '<p style="color: var(--text-muted); font-size: 0.78rem; font-style: italic; margin: 0;">No document uploads attached.</p>';
+                container.innerHTML = '<p style="color: var(--color-text-muted, #94a3b8); font-size: 0.8125rem; font-style: italic; margin: 0;">No document uploads attached.</p>';
                 return;
             }
 
@@ -656,24 +508,13 @@
                 const documentType = domiknowEscapeHtml(String(doc.document_type || 'document').replace(/_/g, ' ').toUpperCase());
                 const fileName = domiknowEscapeHtml(doc.file_name || 'Uploaded file');
                 const item = document.createElement('div');
-                item.style.padding = '0.5rem 0.6rem';
-                item.style.borderRadius = '6px';
-                item.style.border = '1px solid #e2e8f0';
-                item.style.backgroundColor = '#f8fafc';
-                item.style.display = 'flex';
-                item.style.alignItems = 'center';
-                item.style.gap = '0.5rem';
-                item.style.marginBottom = '0.4rem';
-
+                item.className = 'app-submitted-doc-item';
                 item.innerHTML = `
-                    <div style="width: 28px; height: 28px; border-radius: 50%; background-color: #e2e8f0; display: flex; align-items: center; justify-content: center; color: #475569; flex-shrink: 0;">
-                        ${doc.document_type === 'valid_id' || doc.document_type === 'student_id'
-                            ? `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path></svg>`
-                            : `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>`
-                        }
+                    <div class="app-doc-icon-box">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
                     </div>
                     <div style="flex-grow: 1; min-width: 0;">
-                        <a href="${fileUrl}" target="_blank" rel="noopener noreferrer" style="color: #0f172a; text-decoration: none; font-weight: 600; font-size: 0.78rem; display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                        <a href="${fileUrl}" target="_blank" rel="noopener noreferrer" class="app-doc-link">
                             ${documentType} - ${fileName}
                         </a>
                     </div>
@@ -707,11 +548,13 @@
             if (file.size > 8 * 1024 * 1024) {
                 await window.domiknowAlert({ variant: 'warning', eyebrow: 'Application document', title: 'File is too large', message: 'Choose a document that is 8 MB or smaller.' });
                 fileInput.value = '';
+                updateSelectedFileName();
                 return;
             }
             if (!allowedTypes.has(file.type)) {
                 await window.domiknowAlert({ variant: 'warning', eyebrow: 'Application document', title: 'Unsupported file type', message: 'Upload a PDF, JPG, PNG, or WebP document.' });
                 fileInput.value = '';
+                updateSelectedFileName();
                 return;
             }
             btn.disabled = true;
@@ -740,6 +583,7 @@
 
                 if (response.ok) {
                     fileInput.value = '';
+                    updateSelectedFileName();
                     await window.domiknowAlert({ variant: 'success', eyebrow: 'Application document', title: 'Document uploaded', message: 'The document was added to your application successfully.' });
                     fetchApplicationDetails();
                 } else {
@@ -751,7 +595,7 @@
                 await window.domiknowAlert({ variant: 'danger', eyebrow: 'Connection interrupted', title: 'Upload failed', message: 'The document was not uploaded. Check your connection and try again.' });
             } finally {
                 btn.disabled = false;
-                btn.textContent = 'Upload Document';
+                btn.textContent = 'Upload';
             }
         }
     </script>

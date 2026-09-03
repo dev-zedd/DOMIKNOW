@@ -173,10 +173,11 @@ function populateDashboardUI(user) {
 }
 
 function loadTenantModuleAssets() {
+    document.documentElement.setAttribute('data-tenant-portal', 'true');
     if (!document.querySelector('link[data-tenant-module]')) {
         const stylesheet = document.createElement('link');
         stylesheet.rel = 'stylesheet';
-        stylesheet.href = '/css/tenant.css?v=20260827-3';
+        stylesheet.href = '/css/tenant.css?v=20260904-15';
         stylesheet.setAttribute('data-tenant-module', '');
         document.head.appendChild(stylesheet);
     }
@@ -185,7 +186,7 @@ function loadTenantModuleAssets() {
 
     if (!document.querySelector('script[data-tenant-module]')) {
         const script = document.createElement('script');
-        script.src = '/js/tenant.js?v=20260827-3';
+        script.src = '/js/tenant.js?v=20260904-4';
         script.defer = true;
         script.setAttribute('data-tenant-module', '');
         document.head.appendChild(script);
@@ -289,8 +290,13 @@ function loadNotificationSystemAssets() {
 }
 
 async function requestAuthenticatedLogout() {
-    if (typeof window.logout === 'function') {
-        return window.logout();
+    try {
+        if (typeof window.logout === 'function') {
+            const res = await window.logout();
+            if (res !== false) return res;
+        }
+    } catch (e) {
+        console.warn('window.logout error:', e);
     }
 
     const modalOptions = {
@@ -301,9 +307,14 @@ async function requestAuthenticatedLogout() {
         confirmLabel: 'Log out',
         cancelLabel: 'Stay signed in'
     };
-    const shouldLogout = typeof window.domiknowConfirm === 'function'
-        ? await window.domiknowConfirm(modalOptions)
-        : window.confirm(modalOptions.message);
+    let shouldLogout = false;
+    try {
+        shouldLogout = typeof window.domiknowConfirm === 'function'
+            ? await window.domiknowConfirm(modalOptions)
+            : window.confirm(modalOptions.message);
+    } catch (e) {
+        shouldLogout = window.confirm(modalOptions.message);
+    }
 
     if (!shouldLogout) return false;
     localStorage.removeItem('domiknow_token');
@@ -532,14 +543,7 @@ function renderNewDashboardLayout(user) {
                 section: 'Safety & records',
                 items: [
                     { label: 'Reports center', href: 'reports.html', icon: 'Reports' },
-                    { label: 'Policy violations', href: 'policy-violations.html', icon: 'Policy Violations' },
-                    { label: 'Notifications', href: 'notifications.html', icon: 'Notifications' }
-                ]
-            },
-            {
-                section: 'Account',
-                items: [
-                    { label: 'My profile', href: 'profile.html', icon: 'Profile' }
+                    { label: 'Policy violations', href: 'policy-violations.html', icon: 'Policy Violations' }
                 ]
             }
         ];
@@ -551,7 +555,6 @@ function renderNewDashboardLayout(user) {
                         <span class="app-brand-mark" aria-hidden="true">D</span>
                         <span class="tenant-brand-copy">
                             <span class="app-brand-name">DOMI<span class="app-brand-accent">KNOW</span></span>
-                            <span class="role-badge navbar-badge ${roleBadgeClass}">Tenant portal</span>
                         </span>
                     </div>
                 </div>
@@ -575,12 +578,6 @@ function renderNewDashboardLayout(user) {
         
         sidebarHtml += `
                 </nav>
-                <div class="sidebar-footer">
-                    <button type="button" id="newLogoutBtn" class="sidebar-link sidebar-logout" aria-label="Log out of DOMIKNOW">
-                        <svg class="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-                        <span>Log out</span>
-                    </button>
-                </div>
             </aside>
         `;
     } else if (role === 'landlord') {
@@ -758,19 +755,59 @@ function renderNewDashboardLayout(user) {
                     <button type="button" id="menuToggleBtn" class="mobile-menu-toggle topbar-action" aria-label="Open navigation" aria-controls="domiknowSidebar" aria-expanded="false">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/></svg>
                     </button>
+                    ${role === 'tenant' ? `
+                    <h1 class="sr-only" id="appPageTitle">${pageTitle}</h1>
+                    ` : `
                     <div class="topbar-heading">
-                        <span class="topbar-context">${role === 'tenant' ? 'Tenant portal' : role === 'landlord' ? 'Landlord console' : role === 'maintenance' ? 'Field operations' : role === 'admin' ? 'Platform control center' : `${roleLabel} workspace`}</span>
+                        <span class="topbar-context">${role === 'landlord' ? 'Landlord console' : role === 'maintenance' ? 'Field operations' : role === 'admin' ? 'Platform control center' : `${roleLabel} workspace`}</span>
                         <h1 class="topbar-title" id="appPageTitle">${pageTitle}</h1>
                     </div>
+                    `}
                 </div>
                 <div class="topbar-right">
                     <button type="button" class="topbar-action notification-trigger" data-notification-trigger aria-label="Open notifications" aria-controls="domiknowNotificationOverlay" aria-expanded="false" title="Notifications">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
                         <span class="notification-trigger__badge" data-notification-badge hidden>0</span>
                     </button>
+                    ${role !== 'tenant' ? `
                     <button type="button" class="topbar-action theme-toggle" data-theme-toggle aria-label="Toggle color theme" aria-pressed="false" title="Toggle color theme">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.66 6.34l1.41-1.41"/></svg>
                     </button>
+                    ` : ''}
+                    ${role === 'tenant' ? `
+                    <div class="topbar-account-dropdown" id="topbarAccountDropdown">
+                        <button type="button" class="topbar-avatar-btn" id="profileDropdownBtn" aria-expanded="false" aria-haspopup="true" aria-label="Open account menu" title="Account menu">
+                            <span class="topbar-avatar" aria-hidden="true">${shellUserName.trim().charAt(0).toUpperCase() || 'T'}</span>
+                        </button>
+                        <div class="topbar-dropdown-menu" id="profileDropdownMenu" role="menu" aria-labelledby="profileDropdownBtn" hidden>
+                            <a href="/pages/tenant/profile.html" class="topbar-dropdown-item ${activeNavigationFilename === 'profile.html' ? 'active' : ''}" id="dropdownProfileLink" role="menuitem">
+                                <span class="dropdown-item-icon" aria-hidden="true">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                                </span>
+                                <span>Profile</span>
+                            </a>
+                            <button type="button" class="topbar-dropdown-item" id="dropdownThemeBtn" role="menuitem" aria-label="Toggle color theme">
+                                <span class="dropdown-item-icon" id="dropdownThemeIcon" aria-hidden="true">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+                                </span>
+                                <span id="dropdownThemeLabel">Dark mode</span>
+                            </button>
+                            <button type="button" class="topbar-dropdown-item" id="dropdownTutorialBtn" data-walkthrough-replay role="menuitem" aria-label="Play tutorial walkthrough">
+                                <span class="dropdown-item-icon" aria-hidden="true">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
+                                </span>
+                                <span>Tutorial</span>
+                            </button>
+                            <div class="topbar-dropdown-divider" role="separator"></div>
+                            <button type="button" class="topbar-dropdown-item topbar-dropdown-logout" id="dropdownLogoutBtn" role="menuitem">
+                                <span class="dropdown-item-icon" aria-hidden="true">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                                </span>
+                                <span>Log out</span>
+                            </button>
+                        </div>
+                    </div>
+                    ` : `
                     <a class="topbar-account" href="/pages/${role}/profile.html" aria-label="Open your profile" title="Open profile" ${activeNavigationFilename === 'profile.html' ? 'aria-current="page"' : ''}>
                         <span class="topbar-avatar" aria-hidden="true">${shellUserName.trim().charAt(0).toUpperCase() || 'T'}</span>
                         <span class="topbar-account-copy">
@@ -778,6 +815,7 @@ function renderNewDashboardLayout(user) {
                             <span class="user-name">Checking account...</span>
                         </span>
                     </a>
+                    `}
                 </div>
             </header>
             <div class="main-content-inner">
@@ -847,18 +885,6 @@ function renderNewDashboardLayout(user) {
                             ${getLinkIcon('Policy Violations')}
                             <span>Policy violations</span>
                         </a>
-                        <a href="/pages/tenant/notifications.html" class="nav-sheet-item" ${activeNavigationFilename === 'notifications.html' ? 'aria-current="page"' : ''}>
-                            ${getLinkIcon('Notifications')}
-                            <span>Notifications</span>
-                        </a>
-                        <a href="/pages/tenant/profile.html" class="nav-sheet-item" ${activeNavigationFilename === 'profile.html' ? 'aria-current="page"' : ''}>
-                            ${getLinkIcon('Profile')}
-                            <span>My profile</span>
-                        </a>
-                        <button type="button" id="sheetLogoutBtn" class="nav-sheet-item logout" aria-label="Log out of DOMIKNOW">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-                            <span>Log out</span>
-                        </button>
                     </nav>
                 </section>
             </div>
@@ -1031,6 +1057,104 @@ function renderNewDashboardLayout(user) {
         logoutBtn.addEventListener('click', requestAuthenticatedLogout);
     }
 
+    // Tenant Header Profile Dropdown behavior
+    const profileDropdownBtn = document.getElementById('profileDropdownBtn');
+    const profileDropdownMenu = document.getElementById('profileDropdownMenu');
+    const dropdownProfileLink = document.getElementById('dropdownProfileLink');
+    const dropdownThemeBtn = document.getElementById('dropdownThemeBtn');
+    const dropdownTutorialBtn = document.getElementById('dropdownTutorialBtn');
+    const dropdownLogoutBtn = document.getElementById('dropdownLogoutBtn');
+
+    const updateDropdownThemeState = () => {
+        const currentTheme = document.documentElement.getAttribute('data-theme') || localStorage.getItem('domiknow_theme') || 'light';
+        const isDark = currentTheme === 'dark';
+        const label = document.getElementById('dropdownThemeLabel');
+        const iconContainer = document.getElementById('dropdownThemeIcon');
+        if (label) {
+            label.textContent = isDark ? 'Light mode' : 'Dark mode';
+        }
+        if (iconContainer) {
+            iconContainer.innerHTML = isDark
+                ? `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.66 6.34l1.41-1.41"/></svg>`
+                : `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>`;
+        }
+    };
+
+    if (profileDropdownBtn && profileDropdownMenu) {
+        updateDropdownThemeState();
+
+        profileDropdownBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const isOpen = !profileDropdownMenu.hidden;
+            profileDropdownMenu.hidden = isOpen;
+            profileDropdownBtn.setAttribute('aria-expanded', String(!isOpen));
+            if (!isOpen) {
+                updateDropdownThemeState();
+            }
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!profileDropdownMenu.hidden && !profileDropdownBtn.contains(e.target) && !profileDropdownMenu.contains(e.target)) {
+                profileDropdownMenu.hidden = true;
+                profileDropdownBtn.setAttribute('aria-expanded', 'false');
+            }
+        });
+    }
+
+    if (dropdownProfileLink) {
+        dropdownProfileLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            if (profileDropdownMenu) profileDropdownMenu.hidden = true;
+            if (profileDropdownBtn) profileDropdownBtn.setAttribute('aria-expanded', 'false');
+            window.location.href = '/pages/tenant/profile.html';
+        });
+    }
+
+    if (dropdownThemeBtn) {
+        dropdownThemeBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            const currentTheme = document.documentElement.getAttribute('data-theme') || localStorage.getItem('domiknow_theme') || 'light';
+            const nextTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', nextTheme);
+            document.documentElement.style.colorScheme = nextTheme;
+            localStorage.setItem('domiknow_theme', nextTheme);
+            document.querySelectorAll('[data-theme-toggle]').forEach(ctrl => {
+                ctrl.setAttribute('aria-pressed', String(nextTheme === 'dark'));
+                ctrl.setAttribute('data-theme-state', nextTheme);
+            });
+            updateDropdownThemeState();
+        });
+    }
+
+    if (dropdownTutorialBtn) {
+        dropdownTutorialBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            if (profileDropdownMenu) profileDropdownMenu.hidden = true;
+            if (profileDropdownBtn) profileDropdownBtn.setAttribute('aria-expanded', 'false');
+            if (window.DomiKnowWalkthrough && typeof window.DomiKnowWalkthrough.replay === 'function') {
+                window.DomiKnowWalkthrough.replay();
+            } else if (window.DomiKnowWalkthrough && typeof window.DomiKnowWalkthrough.start === 'function') {
+                window.DomiKnowWalkthrough.start({ force: true });
+            } else {
+                const existingReplayBtn = document.querySelector('.dk-tour-replay');
+                if (existingReplayBtn) existingReplayBtn.click();
+            }
+        });
+    }
+
+    if (dropdownLogoutBtn) {
+        dropdownLogoutBtn.addEventListener('click', async (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            if (profileDropdownMenu) profileDropdownMenu.hidden = true;
+            if (profileDropdownBtn) profileDropdownBtn.setAttribute('aria-expanded', 'false');
+            await requestAuthenticatedLogout();
+        });
+    }
+
     // --- Tenant Specific Custom Interactive Behaviors ---
     const isTenant = sidebar && sidebar.classList.contains('sidebar-tenant');
     if (isTenant || document.getElementById('btnOpenNavSheet')) {
@@ -1113,6 +1237,17 @@ function renderNewDashboardLayout(user) {
     document.addEventListener('keydown', (event) => {
         if (event.key !== 'Escape') return;
 
+        const profileMenu = document.getElementById('profileDropdownMenu');
+        const profileBtn = document.getElementById('profileDropdownBtn');
+        if (profileMenu && !profileMenu.hidden) {
+            profileMenu.hidden = true;
+            if (profileBtn) {
+                profileBtn.setAttribute('aria-expanded', 'false');
+                profileBtn.focus();
+            }
+            return;
+        }
+
         const openNavSheet = document.getElementById('navSheetOverlay');
         const navSheetTrigger = document.getElementById('btnOpenNavSheet');
         if (openNavSheet && openNavSheet.classList.contains('open')) {
@@ -1157,6 +1292,7 @@ const parentNavigationPages = {
         'property-details.html': 'properties.html',
         'apply.html': 'properties.html',
         'application-details.html': 'applications.html',
+        'lease-details.html': 'leases.html',
         'landlord-report-form.html': 'reports.html',
         'tenant-reports.html': 'reports.html'
     },
@@ -1165,6 +1301,7 @@ const parentNavigationPages = {
         'property-details.html': 'properties.html',
         'units.html': 'properties.html',
         'application-details.html': 'applications.html',
+        'lease-details.html': 'leases.html',
         'lease-create.html': 'leases.html',
         'maintenance-details.html': 'maintenance.html',
         'tenant-report-form.html': 'reports.html',
@@ -1178,6 +1315,7 @@ const contextualPageLabels = {
     'units.html': 'Rooms and units',
     'apply.html': 'Rental application',
     'application-details.html': 'Application details',
+    'lease-details.html': 'Lease details',
     'lease-create.html': 'Create lease',
     'maintenance-details.html': 'Maintenance details',
     'task-details.html': 'Task details',
@@ -1204,7 +1342,12 @@ function navigationLabelForFile(role, filename) {
 function ensureContextBreadcrumbs(role, pathname = window.location.pathname) {
     const content = document.querySelector('.main-content-inner');
     if (!content) return;
-    content.querySelector('[data-domiknow-breadcrumbs]')?.remove();
+    content.querySelectorAll('[data-domiknow-breadcrumbs], .dk-breadcrumbs').forEach(el => el.remove());
+
+    if (role === 'tenant') {
+        content.querySelectorAll('.breadcrumb-nav').forEach(el => el.remove());
+        return;
+    }
 
     const filename = pathname.split('/').pop().split('?')[0].split('#')[0];
     const parentFilename = parentNavigationPages[role]?.[filename];
@@ -1285,6 +1428,21 @@ function updateActiveNavigationIndicators(pathname, role) {
 
     // 3. Nav sheet items
     document.querySelectorAll('.nav-sheet-item').forEach(item => {
+        if (item.tagName === 'BUTTON') return;
+        const linkHref = item.getAttribute('href') || '';
+        const linkFile = linkHref.split('/').pop().split('?')[0].split('#')[0];
+        const isActive = linkFile === activeNavFilename;
+        if (isActive) {
+            item.classList.add('active');
+            item.setAttribute('aria-current', 'page');
+        } else {
+            item.classList.remove('active');
+            item.removeAttribute('aria-current');
+        }
+    });
+
+    // 4. Header dropdown items
+    document.querySelectorAll('.topbar-dropdown-item').forEach(item => {
         if (item.tagName === 'BUTTON') return;
         const linkHref = item.getAttribute('href') || '';
         const linkFile = linkHref.split('/').pop().split('?')[0].split('#')[0];
@@ -1417,6 +1575,12 @@ async function seamlessNavigateTo(targetUrlString, role, pushState = true) {
         if (navSheetOverlay && navSheetOverlay.classList.contains('open')) {
             navSheetOverlay.classList.remove('open');
         }
+
+        // Close header profile dropdown if open
+        const profileMenu = document.getElementById('profileDropdownMenu');
+        const profileBtn = document.getElementById('profileDropdownBtn');
+        if (profileMenu) profileMenu.hidden = true;
+        if (profileBtn) profileBtn.setAttribute('aria-expanded', 'false');
 
         // Sync stylesheets and replace page-scoped inline styles. Without this
         // lifecycle, inline rules from every visited screen remain in the head

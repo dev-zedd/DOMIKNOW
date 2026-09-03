@@ -68,6 +68,12 @@
             eyebrow: 'Your tenancy',
             step: 'lease'
         },
+        'lease-details.html': {
+            description: 'Review your complete lease agreement, rental terms, utilities, and electronic signatures.',
+            eyebrow: 'Lease agreement',
+            step: 'lease',
+            action: { label: 'All leases', href: 'leases.html', secondary: true }
+        },
         'billings.html': {
             description: 'See what is due, review statement details, submit payment proof, and track verification.',
             eyebrow: 'Money & records',
@@ -168,6 +174,9 @@
 
     function improveTables() {
         document.querySelectorAll('.main-content-inner table').forEach((table, tableIndex) => {
+            if (table.hasAttribute('data-no-table-controls') || table.dataset.customTable === 'true' || document.body.dataset.tenantPage === 'billings') {
+                return;
+            }
             table.classList.add('tenant-data-table', 'tenant-record-table');
             const wrapper = table.parentElement;
             if (wrapper) wrapper.classList.add('tenant-table-scroll');
@@ -194,15 +203,28 @@
     }
 
     function addTableControls(table, tableIndex) {
-        if (!table.tHead || table.closest('.modal-overlay, .chat-head-modal') || table.previousElementSibling?.classList.contains('tenant-table-controls')) return;
+        if (!table.tHead || table.closest('.modal-overlay, .chat-head-modal') || table.hasAttribute('data-no-table-controls') || table.closest('[data-no-table-controls]') || document.body.dataset.tenantPage === 'billings' || table.previousElementSibling?.classList.contains('tenant-table-controls')) return;
         const controls = document.createElement('div');
         controls.className = 'tenant-table-controls';
+
+        const searchWrapper = document.createElement('div');
+        searchWrapper.className = 'tenant-table-search-wrapper';
+        searchWrapper.innerHTML = `
+            <svg class="tenant-search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <circle cx="11" cy="11" r="8"/>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+            </svg>
+        `;
 
         const search = document.createElement('input');
         search.type = 'search';
         search.className = 'form-input tenant-table-search';
         search.placeholder = 'Search these records';
         search.setAttribute('aria-label', `Search table ${tableIndex + 1}`);
+        searchWrapper.appendChild(search);
+
+        const rightGroup = document.createElement('div');
+        rightGroup.className = 'tenant-table-controls-right';
 
         const status = document.createElement('select');
         status.className = 'form-input tenant-table-status';
@@ -212,7 +234,9 @@
         const count = document.createElement('span');
         count.className = 'tenant-table-count';
         count.setAttribute('aria-live', 'polite');
-        controls.append(search, status, count);
+
+        rightGroup.append(status, count);
+        controls.append(searchWrapper, rightGroup);
         table.parentElement?.insertBefore(controls, table);
 
         const syncStatusOptions = () => {
@@ -412,12 +436,13 @@
 
         const intro = document.createElement('div');
         intro.className = 'tenant-module-intro';
-        intro.appendChild(createPageSummary(meta));
 
         const journey = createWorkflow(meta.step);
         if (journey) intro.appendChild(journey);
 
-        const breadcrumbs = content.querySelector(':scope > [data-domiknow-breadcrumbs]');
+        if (!intro.hasChildNodes()) return;
+
+        const breadcrumbs = content.querySelector(':scope > [data-domiknow-breadcrumbs], :scope > .app-details-back-link, :scope > .app-back-nav');
         if (breadcrumbs) breadcrumbs.insertAdjacentElement('afterend', intro);
         else content.insertBefore(intro, content.firstChild);
         improveTables();

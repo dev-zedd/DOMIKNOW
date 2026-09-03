@@ -51,13 +51,6 @@ const NAVIGATION_CONFIG = {
           ]
         }
       ]
-    },
-    {
-      section: 'Account',
-      items: [
-        { label: 'Notifications', href: 'notifications.html' },
-        { label: 'My Profile', href: 'profile.html' }
-      ]
     }
   ],
   landlord: [
