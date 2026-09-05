@@ -249,6 +249,7 @@
     </div>
 
     <script src="../../js/auth.js"></script>
+    <script src="../../js/landlord-cache.js"></script>
     <script src="../../js/dashboard.js"></script>
     <script>
         const token = localStorage.getItem('domiknow_token');
@@ -281,28 +282,47 @@
             fetchReports();
         });
 
-        async function fetchReports() {
+        async function fetchReports(forceRefresh = false) {
             const container = $('reportsContainer');
             try {
+                if (!forceRefresh) {
+                    const cached = window.landlordCache?.get('reports', 'againstMe');
+                    if (cached && Array.isArray(cached)) {
+                        renderReportsAgainstMe(cached);
+                    }
+                }
+
                 const res  = await fetch('/api/landlord-reports/against-me', { headers: { 'Authorization': `Bearer ${token}` } });
                 const json = await res.json();
                 const reports = json.data || [];
+                window.landlordCache?.set('reports', 'againstMe', reports);
+                renderReportsAgainstMe(reports);
 
-                if (reports.length === 0) {
-                    container.innerHTML = `
-                        <div class="empty-state">
-                            <div class="empty-icon">
-                                <svg class="svg-icon" width="40" height="40" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
-                            </div>
-                            <div style="font-weight:700;font-size:1.1rem;color:var(--text-primary);">No Incident Reports Against You</div>
-                            <div style="font-size:.85rem;margin-top:.4rem;">You currently have clean records with no active tenant reports.</div>
-                        </div>
-                    `;
-                    return;
+            } catch (err) {
+                console.error(err);
+                if (!container.querySelector('.report-item-card')) {
+                    container.innerHTML = `<div style="padding:2rem;text-align:center;color:#ef4444;">Failed to load reports. Please try again.</div>`;
                 }
+            }
+        }
 
-                container.innerHTML = '';
-                reports.forEach(r => {
+        function renderReportsAgainstMe(reports) {
+            const container = $('reportsContainer');
+            if (reports.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">
+                            <svg class="svg-icon" width="40" height="40" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                        </div>
+                        <div style="font-weight:700;font-size:1.1rem;color:var(--text-primary);">No Incident Reports Against You</div>
+                        <div style="font-size:.85rem;margin-top:.4rem;">You currently have clean records with no active tenant reports.</div>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = '';
+            reports.forEach(r => {
                     const card = document.createElement('div');
                     card.className = 'report-item-card';
                     card.onclick   = () => openModal(r.id);

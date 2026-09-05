@@ -3,6 +3,9 @@ const auditLogModel = require('../models/auditLogModel');
 const notificationModel = require('../models/notificationModel');
 const responseHelper = require('../utils/responseHelper');
 const { uploadFile } = require('../utils/storageHelper');
+const cache = require('../utils/cacheHelper');
+
+const TTL = { complaints: 90 }; // Landlord complaints – 1.5 min
 
 const VALID_STATUSES = ['submitted', 'under_review', 'in_progress', 'resolved', 'closed', 'rejected'];
 const VALID_CATEGORIES = ['billing_concern', 'landlord_concern', 'safety_concern', 'policy_violation', 'utility_concern', 'noise_complaint', 'other'];
@@ -97,6 +100,9 @@ const complaintController = {
                     reference_id: complaint.id
                 })
             ]);
+            // Invalidate landlord's complaints cache so new complaint appears
+            cache.invalidateLandlord(lease.landlord_id, 'complaints');
+
             return responseHelper.success(res, 'Complaint submitted successfully. The landlord will be notified.', complaint, 201);
 
         } catch (error) {
@@ -145,9 +151,18 @@ const complaintController = {
     // ── LANDLORD: Get received complaints ─────────────────────────────────
     async getLandlordComplaints(req, res) {
         try {
+            const landlordId = req.user.id;
             const { status } = req.query;
             const validStatus = status && VALID_STATUSES.includes(status) ? status : null;
-            const list = await complaintModel.findByLandlordId(req.user.id, validStatus);
+            const cacheKey = cache.landlordKey(landlordId, 'complaints', validStatus || 'all');
+
+            const cached = cache.get(cacheKey);
+            if (cached) {
+                return responseHelper.success(res, 'Complaints received retrieved.', cached);
+            }
+
+            const list = await complaintModel.findByLandlordId(landlordId, validStatus);
+            cache.set(cacheKey, list, TTL.complaints);
             return responseHelper.success(res, 'Complaints received retrieved.', list);
         } catch (error) {
             console.error('Get landlord complaints error:', error);
@@ -208,6 +223,9 @@ const complaintController = {
                 message: `Complaint ${complaint.complaint_number || id} is now ${status.replaceAll('_', ' ')}.`,
                 reference_id: id
             });
+            // Invalidate landlord's complaints cache
+            cache.invalidateLandlord(landlordId, 'complaints');
+
             return responseHelper.success(res, `Complaint status updated to "${status}".`, updated);
 
         } catch (error) {

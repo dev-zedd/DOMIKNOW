@@ -696,6 +696,7 @@
     </main>
 
     <script src="../../js/auth.js"></script>
+    <script src="../../js/landlord-cache.js"></script>
     <script src="../../js/dashboard.js"></script>
     <script>
         const token = localStorage.getItem('domiknow_token');
@@ -974,6 +975,7 @@
                 const json = await res.json();
 
                 if (res.ok) {
+                    window.landlordCache?.invalidate('tenantReports');
                     sucEl.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Tenant incident report submitted successfully! Redirecting...`;
                     sucEl.style.display = 'flex';
                     setTimeout(() => {

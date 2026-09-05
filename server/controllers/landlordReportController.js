@@ -5,6 +5,13 @@ const notificationModel  = require('../models/notificationModel');
 const responseHelper     = require('../utils/responseHelper');
 const auditLogModel  = require('../models/auditLogModel');
 const storageHelper  = require('../utils/storageHelper');
+const cache          = require('../utils/cacheHelper');
+
+// Cache TTLs (seconds)
+const TTL = {
+    reportsList:  60,  // Reports-against-me list  – 1 min
+    reportDetail: 90   // Single report detail      – 1.5 min
+};
 
 const ALLOWED_CATEGORIES = [
     'maintenance_neglect',
@@ -145,6 +152,9 @@ const landlordReportController = {
                 reference_id: report.id
             });
 
+            // Invalidate landlord's reports cache so newly filed case appears
+            cache.invalidateLandlord(lease.landlord_id, 'reports');
+
             return responseHelper.success(res, 'Landlord report submitted successfully. It is now pending admin review.', report, 201);
 
         } catch (error) {
@@ -226,7 +236,15 @@ const landlordReportController = {
     async getReportsAgainstMe(req, res) {
         try {
             const landlordId = req.user.id;
-            const reports    = await landlordReportModel.findReportsByLandlordId(landlordId);
+            const cacheKey   = cache.landlordKey(landlordId, 'reports');
+
+            const cached = cache.get(cacheKey);
+            if (cached) {
+                return responseHelper.success(res, 'Reports against landlord retrieved.', cached);
+            }
+
+            const reports = await landlordReportModel.findReportsByLandlordId(landlordId);
+            cache.set(cacheKey, reports, TTL.reportsList);
             return responseHelper.success(res, 'Reports against landlord retrieved.', reports);
         } catch (error) {
             console.error('getReportsAgainstMe error:', error);
@@ -238,6 +256,12 @@ const landlordReportController = {
         try {
             const landlordId = req.user.id;
             const reportId   = req.params.id;
+            const cacheKey   = cache.landlordKey(landlordId, 'reports', reportId);
+
+            const cached = cache.get(cacheKey);
+            if (cached) {
+                return responseHelper.success(res, 'Landlord report details retrieved.', cached);
+            }
 
             const report = await landlordReportModel.findLandlordReportById(reportId);
             if (!report) {
@@ -253,10 +277,9 @@ const landlordReportController = {
                 evidence = await landlordReportModel.findEvidenceByReportId(reportId);
             }
 
-            return responseHelper.success(res, 'Landlord report details retrieved.', {
-                ...report,
-                evidence
-            });
+            const payload = { ...report, evidence };
+            cache.set(cacheKey, payload, TTL.reportDetail);
+            return responseHelper.success(res, 'Landlord report details retrieved.', payload);
         } catch (error) {
             console.error('getLandlordReportDetailForLandlord error:', error);
             return responseHelper.error(res, 'Failed to retrieve report detail.', error, 500);
@@ -277,6 +300,9 @@ const landlordReportController = {
             if (result.error) {
                 return responseHelper.error(res, result.error, null, 400);
             }
+
+            // Bust the list and the specific report detail from cache
+            cache.invalidateLandlord(landlordId, 'reports');
 
             await auditLogModel.log(
                 landlordId,

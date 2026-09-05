@@ -540,6 +540,7 @@
     </main>
 
     <script src="../../js/auth.js"></script>
+    <script src="../../js/landlord-cache.js"></script>
     <script src="../../js/dashboard.js"></script>
     <script>
         const token = localStorage.getItem('domiknow_token');
@@ -893,6 +894,7 @@
                     body: JSON.stringify({ decision, rejection_reason: reason })
                 });
                 if (res.ok) {
+                    window.landlordCache?.invalidate('maintenance');
                     showActionAlert(`Request ${decision === 'approve' ? 'approved' : 'rejected'} successfully.`, 'ok');
                     setTimeout(loadRequest, 800);
                 } else {
@@ -920,6 +922,7 @@
                     body: JSON.stringify({ assigned_maintenance_id: workerId, due_date: dueDate, instructions: instruct })
                 });
                 if (res.ok) {
+                    window.landlordCache?.invalidate('maintenance');
                     showActionAlert('Worker assigned and notified successfully.', 'ok');
                     setTimeout(loadRequest, 800);
                 } else {
@@ -942,6 +945,7 @@
                     body: JSON.stringify({ decision, remarks })
                 });
                 if (res.ok) {
+                    window.landlordCache?.invalidate('maintenance');
                     showActionAlert(decision === 'accept' ? 'Work verified successfully.' : 'Rework request sent.', 'ok');
                     setTimeout(loadRequest, 800);
                 } else {

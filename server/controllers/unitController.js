@@ -2,6 +2,17 @@ const unitModel = { ...require('../models/unitModel') };
 const propertyModel = require('../models/propertyModel');
 const supabase = require('../config/supabaseClient');
 const { uploadFile } = require('../utils/storageHelper');
+const cache = require('../utils/cacheHelper');
+
+// Cache TTLs (seconds)
+const TTL = {
+    unitList: 120,  // Units under a property – 2 min
+    unitDetail: 180 // Single unit detail – 3 min
+};
+
+/** Cache key helpers */
+const unitListKey   = (propertyId) => `units:property:${propertyId}`;
+const unitDetailKey = (unitId)     => `units:detail:${unitId}`;
 
 const unitController = {
     /**
@@ -13,7 +24,15 @@ const unitController = {
             const { propertyId } = req.params;
             const { status } = req.query;
 
+            // Include optional status filter in key so filtered and unfiltered lists are cached separately
+            const cacheKey = status ? `${unitListKey(propertyId)}:${status}` : unitListKey(propertyId);
+            const cached = cache.get(cacheKey);
+            if (cached) {
+                return res.json({ success: true, count: cached.length, data: cached });
+            }
+
             const units = await unitModel.findByPropertyId(propertyId, status || null);
+            cache.set(cacheKey, units, TTL.unitList);
 
             res.json({
                 success: true,
@@ -37,6 +56,12 @@ const unitController = {
     async getUnitById(req, res) {
         try {
             const { id } = req.params;
+            const cacheKey = unitDetailKey(id);
+            const cached = cache.get(cacheKey);
+            if (cached) {
+                return res.json({ success: true, data: cached });
+            }
+
             const unit = await unitModel.findById(id);
 
             if (!unit) {
@@ -46,6 +71,7 @@ const unitController = {
                 });
             }
 
+            cache.set(cacheKey, unit, TTL.unitDetail);
             res.json({
                 success: true,
                 data: unit
@@ -205,6 +231,9 @@ const unitController = {
                     : `Room/Unit '${unit_number}' successfully created.`,
                 data: createdUnit
             });
+
+            // Invalidate unit list for this property
+            cache.invalidatePrefix(unitListKey(propertyId));
         } catch (error) {
             console.error('Error creating room/unit:', error);
             res.status(500).json({
@@ -308,6 +337,12 @@ const unitController = {
                 message: 'Room / Unit updated successfully.',
                 data: updatedUnit
             });
+
+            // Invalidate unit detail and property list
+            cache.del(unitDetailKey(id));
+            if (updatedUnit && updatedUnit.property_id) {
+                cache.invalidatePrefix(unitListKey(updatedUnit.property_id));
+            }
         } catch (error) {
             console.error('Error updating unit:', error);
             res.status(500).json({
@@ -342,6 +377,12 @@ const unitController = {
                 message: `Unit status updated to '${status}'.`,
                 data: updatedUnit
             });
+
+            // Invalidate unit detail and property list
+            cache.del(unitDetailKey(id));
+            if (updatedUnit && updatedUnit.property_id) {
+                cache.invalidatePrefix(unitListKey(updatedUnit.property_id));
+            }
         } catch (error) {
             console.error('Error updating unit status:', error);
             res.status(500).json({
@@ -419,6 +460,9 @@ const unitController = {
                 message: `Bed status updated to '${status}'.`,
                 data: updatedBed
             });
+
+            // Invalidate unit detail (bed status is embedded in unit detail)
+            cache.del(unitDetailKey(unitId));
         } catch (error) {
             console.error('Error updating bed status:', error);
             res.status(500).json({
@@ -481,6 +525,12 @@ const unitController = {
             }
 
             await unitModel.deleteUnit(id);
+
+            // Invalidate unit detail and property list
+            cache.del(unitDetailKey(id));
+            if (unit && unit.property_id) {
+                cache.invalidatePrefix(unitListKey(unit.property_id));
+            }
 
             res.json({
                 success: true,
@@ -586,6 +636,9 @@ const unitController = {
                 message: 'Room photo uploaded successfully.',
                 data: imgRecord
             });
+
+            // Invalidate unit detail so new image appears on next fetch
+            cache.del(unitDetailKey(id));
         } catch (error) {
             console.error('Upload unit image error:', error);
             res.status(500).json({
@@ -666,6 +719,9 @@ const unitController = {
                 success: true,
                 message: 'Image deleted successfully.'
             });
+
+            // Invalidate unit detail so image removal is reflected
+            cache.del(unitDetailKey(unitId));
         } catch (error) {
             console.error('Delete unit image error:', error);
             res.status(500).json({

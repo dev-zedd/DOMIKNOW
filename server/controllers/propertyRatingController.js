@@ -3,6 +3,9 @@ const userModel = require('../models/userModel');
 const auditLogModel = require('../models/auditLogModel');
 const notificationModel = require('../models/notificationModel');
 const responseHelper = require('../utils/responseHelper');
+const cache = require('../utils/cacheHelper');
+
+const TTL = { propertyRatings: 120 }; // Landlord property ratings – 2 min
 
 const EDIT_WINDOW_DAYS = 7;
 
@@ -127,6 +130,9 @@ const propertyRatingController = {
                 reference_id: result.id
             });
 
+            // Invalidate landlord's property ratings cache so new rating appears
+            cache.invalidateLandlord(lease.landlord_id, 'propertyRatings');
+
             return responseHelper.success(res, 'Property rating submitted successfully. Thank you!', result, 201);
 
         } catch (error) {
@@ -236,6 +242,9 @@ const propertyRatingController = {
             const updated = await propertyRatingModel.updateRating(id, tenantId, updates);
             await propertyRatingModel.recalculatePropertyRating(existing.property_id);
 
+            // Invalidate landlord's property ratings cache
+            cache.invalidateLandlord(existing.landlord_id, 'propertyRatings');
+
             await auditLogModel.log(tenantId, 'EDIT_PROPERTY_RATING', `Tenant edited property rating ${id}`);
             return responseHelper.success(res, 'Property rating updated successfully.', updated);
 
@@ -248,7 +257,16 @@ const propertyRatingController = {
     // Landlord: Get ratings received for their properties
     async getLandlordPropertyRatings(req, res) {
         try {
-            const list = await propertyRatingModel.findByLandlordId(req.user.id);
+            const landlordId = req.user.id;
+            const cacheKey   = cache.landlordKey(landlordId, 'propertyRatings');
+
+            const cached = cache.get(cacheKey);
+            if (cached) {
+                return responseHelper.success(res, 'Received property ratings retrieved.', cached);
+            }
+
+            const list = await propertyRatingModel.findByLandlordId(landlordId);
+            cache.set(cacheKey, list, TTL.propertyRatings);
             return responseHelper.success(res, 'Received property ratings retrieved.', list);
         } catch (error) {
             console.error('Get landlord property ratings error:', error);

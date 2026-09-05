@@ -1,6 +1,9 @@
 const feedbackModel = require('../models/feedbackModel');
 const auditLogModel = require('../models/auditLogModel');
 const responseHelper = require('../utils/responseHelper');
+const cache = require('../utils/cacheHelper');
+
+const TTL = { feedback: 120 }; // Landlord feedback – 2 min
 
 const feedbackController = {
     async getPublicFeedback(req, res) {
@@ -69,6 +72,9 @@ const feedbackController = {
             // 5. Log audit
             await auditLogModel.log(tenantId, 'TENANT_SUBMITTED_FEEDBACK', `Tenant submitted feedback ${feedback.id} for property ${property_id}`);
 
+            // Invalidate landlord's feedback cache so newly submitted feedback appears
+            cache.invalidateLandlord(lease.landlord_id, 'feedback');
+
             return responseHelper.success(res, 'Feedback submitted successfully.', feedback, 201);
 
         } catch (error) {
@@ -89,7 +95,16 @@ const feedbackController = {
 
     async getLandlordFeedback(req, res) {
         try {
-            const list = await feedbackModel.findByLandlordId(req.user.id);
+            const landlordId = req.user.id;
+            const cacheKey   = cache.landlordKey(landlordId, 'feedback');
+
+            const cached = cache.get(cacheKey);
+            if (cached) {
+                return responseHelper.success(res, 'Feedback for landlord properties retrieved successfully.', cached);
+            }
+
+            const list = await feedbackModel.findByLandlordId(landlordId);
+            cache.set(cacheKey, list, TTL.feedback);
             return responseHelper.success(res, 'Feedback for landlord properties retrieved successfully.', list);
         } catch (error) {
             console.error('Get landlord feedback error:', error);

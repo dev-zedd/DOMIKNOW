@@ -93,6 +93,7 @@
     </main>
 
     <script src="../../js/auth.js"></script>
+    <script src="../../js/landlord-cache.js"></script>
     <script src="../../js/dashboard.js"></script>
     <script>
         const token = localStorage.getItem('domiknow_token');
@@ -102,36 +103,57 @@
             fetchTenantApplications();
         });
 
-        async function fetchTenantApplications() {
+        async function fetchTenantApplications(forceRefresh = false) {
             const tableBody = document.getElementById('applicationsTableBody');
             try {
+                if (!forceRefresh) {
+                    const cached = window.landlordCache?.get('applications', 'list');
+                    if (cached && Array.isArray(cached)) {
+                        renderApplicationsList(cached);
+                    }
+                }
+
                 const response = await fetch('/api/landlord/applications', {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
 
                 if (!response.ok) {
-                    tableBody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: var(--error);">Failed to load applications.</td></tr>`;
+                    if (!tableBody.querySelector('tr')) {
+                        tableBody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: var(--error);">Failed to load applications.</td></tr>`;
+                    }
                     return;
                 }
 
                 const result = await response.json();
                 const applications = result.data || [];
+                window.landlordCache?.set('applications', 'list', applications);
+                renderApplicationsList(applications);
 
-                if (applications.length === 0) {
-                    tableBody.innerHTML = `
-                        <tr>
-                            <td colspan="7" class="empty-state">
-                                <span class="empty-icon"><span data-icon="folder"></span></span>
-                                <h3 style="margin-top: 0.5rem; color: var(--text-secondary);">No Applications Received</h3>
-                                <p style="font-size: 0.875rem;">When tenants discover your approved listings and apply, they will appear here.</p>
-                            </td>
-                        </tr>
-                    `;
-                    return;
+            } catch (err) {
+                console.error(err);
+                if (!tableBody.querySelector('tr')) {
+                    tableBody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: var(--error);">Network error.</td></tr>`;
                 }
+            }
+        }
 
-                tableBody.innerHTML = '';
-                applications.forEach(app => {
+        function renderApplicationsList(applications) {
+            const tableBody = document.getElementById('applicationsTableBody');
+            if (applications.length === 0) {
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="7" class="empty-state">
+                            <span class="empty-icon"><span data-icon="folder"></span></span>
+                            <h3 style="margin-top: 0.5rem; color: var(--text-secondary);">No Applications Received</h3>
+                            <p style="font-size: 0.875rem;">When tenants discover your approved listings and apply, they will appear here.</p>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tableBody.innerHTML = '';
+            applications.forEach(app => {
                     // Status styling
                     let statusClass = 'status-pending';
                     if (app.status === 'approved') statusClass = 'status-active';

@@ -3,6 +3,13 @@ const userModel = require('../models/userModel');
 const auditLogModel = require('../models/auditLogModel');
 const notificationModel = require('../models/notificationModel');
 const responseHelper = require('../utils/responseHelper');
+const cache = require('../utils/cacheHelper');
+
+// Cache TTLs (seconds)
+const TTL = {
+    ratingsList:  90,  // Received ratings list  – 1.5 min
+    ratingDetail: 120  // Single rating detail    – 2 min
+};
 
 const EDIT_WINDOW_DAYS = 7;
 
@@ -110,6 +117,9 @@ const landlordRatingController = {
             // 5. Recalculate landlord average rating
             await landlordRatingModel.recalculateLandlordRating(lease.landlord_id);
 
+            // Bust the landlord's received-ratings list cache
+            cache.invalidateLandlord(lease.landlord_id, 'ratings');
+
             // 6. Write Audit Log
             await auditLogModel.log(tenantId, 'SUBMIT_LANDLORD_RATING', `Tenant submitted landlord rating ${result.id} for lease ${lease_id}`);
 
@@ -144,6 +154,14 @@ const landlordRatingController = {
     async getLandlordRatingById(req, res) {
         try {
             const { id } = req.params;
+            const userId   = req.user.id;
+            const cacheKey = `ratings:detail:${id}`;
+
+            const cached = cache.get(cacheKey);
+            if (cached) {
+                return responseHelper.success(res, 'Landlord rating details retrieved.', cached);
+            }
+
             const rating = await landlordRatingModel.findById(id);
 
             if (!rating) {
@@ -151,10 +169,11 @@ const landlordRatingController = {
             }
 
             // Ownership check (only tenant who submitted or the landlord who is rated can view details)
-            if (rating.tenant_id !== req.user.id && rating.landlord_id !== req.user.id) {
+            if (rating.tenant_id !== userId && rating.landlord_id !== userId) {
                 return responseHelper.error(res, 'Access denied.', null, 403);
             }
 
+            cache.set(cacheKey, rating, TTL.ratingDetail);
             return responseHelper.success(res, 'Landlord rating details retrieved.', rating);
         } catch (error) {
             console.error('Get landlord rating details error:', error);
@@ -226,6 +245,10 @@ const landlordRatingController = {
             const updated = await landlordRatingModel.updateRating(id, tenantId, updates);
             await landlordRatingModel.recalculateLandlordRating(existing.landlord_id);
 
+            // Bust the landlord's received-ratings list and the detail entry
+            cache.invalidateLandlord(existing.landlord_id, 'ratings');
+            cache.del(`ratings:detail:${id}`);
+
             await auditLogModel.log(tenantId, 'EDIT_LANDLORD_RATING', `Tenant edited landlord rating ${id}`);
             return responseHelper.success(res, 'Landlord rating updated successfully.', updated);
 
@@ -238,7 +261,16 @@ const landlordRatingController = {
     // Landlord: Get ratings received
     async getLandlordReceivedRatings(req, res) {
         try {
-            const list = await landlordRatingModel.findByLandlordId(req.user.id);
+            const landlordId = req.user.id;
+            const cacheKey   = cache.landlordKey(landlordId, 'ratings');
+
+            const cached = cache.get(cacheKey);
+            if (cached) {
+                return responseHelper.success(res, 'Received landlord ratings retrieved.', cached);
+            }
+
+            const list = await landlordRatingModel.findByLandlordId(landlordId);
+            cache.set(cacheKey, list, TTL.ratingsList);
             return responseHelper.success(res, 'Received landlord ratings retrieved.', list);
         } catch (error) {
             console.error('Get landlord received ratings error:', error);

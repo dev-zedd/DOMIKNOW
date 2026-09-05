@@ -318,6 +318,7 @@
     </div>
 
     <script src="../../js/auth.js"></script>
+    <script src="../../js/landlord-cache.js"></script>
     <script src="../../js/dashboard.js"></script>
     <script>
         const token = localStorage.getItem('domiknow_token');
@@ -345,19 +346,36 @@
 
         // ── Fetch ───────────────────────────────────────────────────────────
 
-        async function fetchComplaints() {
+        async function fetchComplaints(forceRefresh = false) {
             const tbody = document.getElementById('complaintsTableBody');
+            const cacheKey = currentFilter || 'all';
             try {
+                if (!forceRefresh) {
+                    const cached = window.landlordCache?.get('disputes', cacheKey);
+                    if (cached && Array.isArray(cached)) {
+                        allComplaints = cached;
+                        renderTable();
+                    }
+                }
+
                 const url = currentFilter ? `/api/landlord/complaints?status=${currentFilter}` : '/api/landlord/complaints';
                 const res = await fetch(url, { headers: { 'Authorization': `Bearer ${token}` } });
-                if (!res.ok) { tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;color:var(--error);">Failed to load.</td></tr>`; return; }
+                if (!res.ok) {
+                    if (!allComplaints || allComplaints.length === 0) {
+                        tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;color:var(--error);">Failed to load.</td></tr>`;
+                    }
+                    return;
+                }
                 const result = await res.json();
                 allComplaints = result.data || [];
+                window.landlordCache?.set('disputes', cacheKey, allComplaints);
                 updateStats();
                 renderTable();
             } catch (err) {
                 console.error(err);
-                tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;color:var(--error);">Network error.</td></tr>`;
+                if (!allComplaints || allComplaints.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;color:var(--error);">Network error.</td></tr>`;
+                }
             }
         }
 
@@ -669,11 +687,12 @@
                 });
                 const result = await res.json();
                 if (res.ok) {
+                    window.landlordCache?.invalidate('disputes');
                     if (successEl) { successEl.textContent = result.message || 'Status updated.'; successEl.classList.add('visible'); }
                     // Refresh modal content
                     setTimeout(async () => {
                         closeModal();
-                        await fetchComplaints();
+                        await fetchComplaints(true);
                     }, 900);
                 } else {
                     if (errorEl) { errorEl.textContent = result.message || 'Update failed.'; errorEl.classList.add('visible'); }

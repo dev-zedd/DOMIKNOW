@@ -198,6 +198,7 @@
     </main>
 
     <script src="../../js/auth.js"></script>
+    <script src="../../js/landlord-cache.js"></script>
     <script src="../../js/dashboard.js"></script>
     <script>
         const token = localStorage.getItem('domiknow_token');
@@ -209,28 +210,42 @@
             fetchLandlordProperties();
         });
 
-        async function fetchLandlordProperties() {
+        async function fetchLandlordProperties(forceRefresh = false) {
             const grid = document.getElementById('propertiesGrid');
             try {
+                if (!forceRefresh) {
+                    const cached = window.landlordCache?.get('properties', 'list');
+                    if (cached && Array.isArray(cached)) {
+                        allProperties = cached;
+                        renderProperties();
+                        grid.setAttribute('aria-busy', 'false');
+                    }
+                }
+
                 const response = await fetch('/api/landlord/properties', {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
 
                 if (!response.ok) {
-                    grid.innerHTML = `<p role="alert" style="grid-column: 1/-1; text-align: center; color: var(--error);">Your properties could not be loaded. Please try again.</p>`;
-                    grid.setAttribute('aria-busy', 'false');
+                    if (!allProperties || allProperties.length === 0) {
+                        grid.innerHTML = `<p role="alert" style="grid-column: 1/-1; text-align: center; color: var(--error);">Your properties could not be loaded. Please try again.</p>`;
+                        grid.setAttribute('aria-busy', 'false');
+                    }
                     return;
                 }
 
                 const result = await response.json();
                 allProperties = result.data || [];
+                window.landlordCache?.set('properties', 'list', allProperties);
                 renderProperties();
                 grid.setAttribute('aria-busy', 'false');
 
             } catch (err) {
                 console.error(err);
-                grid.innerHTML = `<p role="alert" style="grid-column: 1/-1; text-align: center; color: var(--error);">The property service could not be reached. Check your connection and try again.</p>`;
-                grid.setAttribute('aria-busy', 'false');
+                if (!allProperties || allProperties.length === 0) {
+                    grid.innerHTML = `<p role="alert" style="grid-column: 1/-1; text-align: center; color: var(--error);">The property service could not be reached. Check your connection and try again.</p>`;
+                    grid.setAttribute('aria-busy', 'false');
+                }
             }
         }
 
@@ -399,8 +414,9 @@
                 const result = await response.json();
 
                 if (response.ok) {
+                    window.landlordCache?.invalidate('properties');
                     alert('Property listing deleted successfully!');
-                    fetchLandlordProperties();
+                    fetchLandlordProperties(true);
                 } else {
                     alert(result.message || 'Failed to delete property.');
                 }

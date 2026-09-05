@@ -849,6 +849,7 @@
     </div>
 
     <script src="../../js/auth.js"></script>
+    <script src="../../js/landlord-cache.js"></script>
     <script src="../../js/dashboard.js"></script>
     <script>
         const token = localStorage.getItem('domiknow_token');
@@ -1309,34 +1310,55 @@
         }
 
         // ── Tab 1: Load Reports Filed By Me (Reports Filed against Tenant) ────
-        async function loadFiledReports() {
+        async function loadFiledReports(forceRefresh = false) {
             const container = $('tabFiledContent');
             try {
+                if (!forceRefresh) {
+                    const cached = window.landlordCache?.get('tenantReports', 'myFiled');
+                    if (cached && Array.isArray(cached)) {
+                        renderFiledReportsList(cached);
+                    }
+                }
+
                 const res  = await fetch('/api/tenant-reports/my-filed', { headers: { 'Authorization': `Bearer ${token}` } });
                 const json = await res.json();
 
                 if (!res.ok) {
-                    container.innerHTML = `<div style="padding:2rem;text-align:center;color:#ef4444;">${json.message || 'Failed to load filed reports.'}</div>`;
+                    if (!container.querySelector('.report-card')) {
+                        container.innerHTML = `<div style="padding:2rem;text-align:center;color:#ef4444;">${json.message || 'Failed to load filed reports.'}</div>`;
+                    }
                     return;
                 }
 
                 const reports = json.data || [];
+                window.landlordCache?.set('tenantReports', 'myFiled', reports);
+                renderFiledReportsList(reports);
 
-                if (reports.length === 0) {
-                    container.innerHTML = `
-                        <div class="empty-state">
-                            <div class="empty-icon">
-                                <svg class="svg-icon" width="40" height="40" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
-                            </div>
-                            <div style="font-weight:700;font-size:1.1rem;color:var(--text-primary);">No Reports Filed Yet</div>
-                            <div style="font-size:.85rem;margin-top:.4rem;">You haven't filed any incident reports against your tenants.</div>
-                        </div>
-                    `;
-                    return;
+            } catch (err) {
+                console.error(err);
+                if (!container.querySelector('.report-card')) {
+                    container.innerHTML = `<div style="padding:2rem;text-align:center;color:#ef4444;">Failed to load filed reports.</div>`;
                 }
+            }
+        }
 
-                container.innerHTML = '';
-                reports.forEach(r => {
+        function renderFiledReportsList(reports) {
+            const container = $('tabFiledContent');
+            if (reports.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">
+                            <svg class="svg-icon" width="40" height="40" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+                        </div>
+                        <div style="font-weight:700;font-size:1.1rem;color:var(--text-primary);">No Reports Filed Yet</div>
+                        <div style="font-size:.85rem;margin-top:.4rem;">You haven't filed any incident reports against your tenants.</div>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = '';
+            reports.forEach(r => {
                     const card = document.createElement('div');
                     card.className = 'report-item-card';
                     card.onclick   = () => openFiledModal(r.id);
@@ -1489,35 +1511,56 @@
         }
 
         // ── Tab 2: Load Reports Against Me (Reports Filed by Tenant) ──────────
-        async function loadReportsAgainstMe() {
+        async function loadReportsAgainstMe(forceRefresh = false) {
             const container = $('tabAgainstContent');
             try {
+                if (!forceRefresh) {
+                    const cached = window.landlordCache?.get('reports', 'againstMe');
+                    if (cached && Array.isArray(cached)) {
+                        renderReportsAgainstMeList(cached);
+                    }
+                }
+
                 const res  = await fetch('/api/landlord-reports/against-me', { headers: { 'Authorization': `Bearer ${token}` } });
                 const json = await res.json();
 
                 if (!res.ok) {
-                    container.innerHTML = `<div style="padding:2rem;text-align:center;color:#ef4444;">${json.message || 'Failed to load reports against you.'}</div>`;
+                    if (!container.querySelector('.report-card')) {
+                        container.innerHTML = `<div style="padding:2rem;text-align:center;color:#ef4444;">${json.message || 'Failed to load reports against you.'}</div>`;
+                    }
                     return;
                 }
 
                 const reports = json.data || [];
+                window.landlordCache?.set('reports', 'againstMe', reports);
+                renderReportsAgainstMeList(reports);
 
-                if (reports.length === 0) {
-                    container.innerHTML = `
-                        <div class="empty-state">
-                            <div class="empty-icon">
-                                <svg class="svg-icon" width="40" height="40" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
-                            </div>
-                            <div style="font-weight:700;font-size:1.1rem;color:var(--text-primary);">No Incident Reports Against You</div>
-                            <div style="font-size:.85rem;margin-top:.4rem;">You currently have clean records with no active tenant reports.</div>
-                        </div>
-                    `;
-                    $('againstCountBadge').style.display = 'none';
-                    return;
+            } catch (err) {
+                console.error(err);
+                if (!container.querySelector('.report-card')) {
+                    container.innerHTML = `<div style="padding:2rem;text-align:center;color:#ef4444;">Failed to load reports against you.</div>`;
                 }
+            }
+        }
 
-                // Show badge count
-                $('againstCountBadge').textContent = reports.length;
+        function renderReportsAgainstMeList(reports) {
+            const container = $('tabAgainstContent');
+            if (reports.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">
+                            <svg class="svg-icon" width="40" height="40" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                        </div>
+                        <div style="font-weight:700;font-size:1.1rem;color:var(--text-primary);">No Incident Reports Against You</div>
+                        <div style="font-size:.85rem;margin-top:.4rem;">You currently have clean records with no active tenant reports.</div>
+                    </div>
+                `;
+                $('againstCountBadge').style.display = 'none';
+                return;
+            }
+
+            // Show badge count
+            $('againstCountBadge').textContent = reports.length;
                 $('againstCountBadge').style.display = 'inline-block';
 
                 container.innerHTML = '';

@@ -735,6 +735,7 @@
     </div>
 
     <script src="../../js/auth.js"></script>
+    <script src="../../js/landlord-cache.js"></script>
     <script src="../../js/dashboard.js"></script>
     <script>
         const token = localStorage.getItem('domiknow_token');
@@ -989,12 +990,22 @@
             }
         }
 
-        async function fetchPropertyUnits() {
+        async function fetchPropertyUnits(forceRefresh = false) {
             try {
+                if (!forceRefresh) {
+                    const cached = window.landlordCache?.get('units', propertyId);
+                    if (cached && Array.isArray(cached)) {
+                        propertyUnitsList = cached;
+                        document.getElementById('statTotalRooms').textContent = propertyUnitsList.length;
+                        renderRoomsUI();
+                    }
+                }
+
                 const response = await fetch(`/api/properties/${propertyId}/units`);
                 if (response.ok) {
                     const result = await response.json();
                     propertyUnitsList = result.data || [];
+                    window.landlordCache?.set('units', propertyId, propertyUnitsList);
                     document.getElementById('statTotalRooms').textContent = propertyUnitsList.length;
                     renderRoomsUI();
                 }
@@ -1246,7 +1257,8 @@
                         room.images = room.images.filter(img => img.id !== imageId);
                         renderPhotoPreviews(room.images);
                     }
-                    fetchPropertyUnits();
+                    window.landlordCache?.invalidate('units');
+                    fetchPropertyUnits(true);
                 } else {
                     const result = await res.json();
                     alert(result.message || 'Failed to delete photo.');
@@ -1351,8 +1363,9 @@
                     await Promise.all(uploadPromises);
                 }
 
+                window.landlordCache?.invalidateMultiple(['units', 'properties']);
                 document.getElementById('roomModal').classList.remove('active');
-                fetchPropertyUnits();
+                fetchPropertyUnits(true);
 
             } catch (err) {
                 console.error(err);
@@ -1479,8 +1492,9 @@
 
                 const result = await response.json();
                 if (response.ok) {
+                    window.landlordCache?.invalidateMultiple(['units', 'properties']);
                     document.getElementById('roomModal').classList.remove('active');
-                    fetchPropertyUnits();
+                    fetchPropertyUnits(true);
                 } else {
                     alert(result.message || 'Failed to delete room.');
                 }

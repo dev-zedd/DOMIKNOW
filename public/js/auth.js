@@ -288,6 +288,7 @@ async function logout() {
 
         if (!shouldLogout) return false;
 
+        if (window.landlordCache) window.landlordCache.invalidateAll();
         localStorage.removeItem('domiknow_token');
         localStorage.removeItem('domiknow_role');
         window.location.href = '/pages/auth/login.html';

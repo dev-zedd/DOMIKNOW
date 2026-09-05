@@ -4,6 +4,13 @@ const userModel = require('../models/userModel');
 const auditLogModel = require('../models/auditLogModel');
 const notificationModel = require('../models/notificationModel');
 const responseHelper = require('../utils/responseHelper');
+const cache = require('../utils/cacheHelper');
+
+// Cache TTLs (seconds)
+const TTL = {
+    leases: 120,      // Lease list – 2 min
+    leaseDetail: 180  // Single lease – 3 min
+};
 
 const leaseController = {
     async createLease(req, res) {
@@ -109,6 +116,9 @@ const leaseController = {
                 });
             }
 
+            // Invalidate the leases list so the new record appears on next fetch
+            cache.invalidateLandlord(landlordId, 'leases');
+
             return responseHelper.success(res, 'Lease agreement drafted successfully and sent to tenant for review.', lease, 201);
 
         } catch (error) {
@@ -184,6 +194,10 @@ const leaseController = {
             // Audit log
             await auditLogModel.log(landlordId, 'UPDATE_LEASE_DETAILS', `Landlord updated and re-submitted lease agreement ${updated.lease_number || id}`);
 
+            // Invalidate lease list and specific lease detail
+            cache.del(cache.landlordKey(landlordId, 'leases', id));
+            cache.del(cache.landlordKey(landlordId, 'leases'));
+
             return responseHelper.success(res, 'Lease agreement successfully updated and re-sent to tenant.', updated);
 
         } catch (error) {
@@ -198,6 +212,18 @@ const leaseController = {
             const userId = req.user.id;
             const userRole = req.user.role;
 
+            // Only cache landlord reads – tenants are handled separately
+            const cacheKey = userRole === 'landlord'
+                ? cache.landlordKey(userId, 'leases', id)
+                : null;
+
+            if (cacheKey) {
+                const cached = cache.get(cacheKey);
+                if (cached) {
+                    return responseHelper.success(res, 'Lease agreement details retrieved.', cached);
+                }
+            }
+
             const lease = await leaseModel.findLeaseById(id);
             if (!lease) {
                 return responseHelper.error(res, 'Lease agreement not found.', null, 404);
@@ -211,6 +237,7 @@ const leaseController = {
                 return responseHelper.error(res, 'Access denied to this lease record.', null, 403);
             }
 
+            if (cacheKey) cache.set(cacheKey, lease, TTL.leaseDetail);
             return responseHelper.success(res, 'Lease agreement details retrieved.', lease);
         } catch (error) {
             console.error('Get lease by ID error:', error);
@@ -220,7 +247,15 @@ const leaseController = {
 
     async getLandlordLeases(req, res) {
         try {
-            const list = await leaseModel.findByLandlordId(req.user.id);
+            const userId = req.user.id;
+            const cacheKey = cache.landlordKey(userId, 'leases');
+            const cached = cache.get(cacheKey);
+            if (cached) {
+                return responseHelper.success(res, 'Landlord lease directory retrieved', cached);
+            }
+
+            const list = await leaseModel.findByLandlordId(userId);
+            cache.set(cacheKey, list, TTL.leases);
             return responseHelper.success(res, 'Landlord lease directory retrieved', list);
         } catch (error) {
             console.error('Get landlord leases error:', error);
@@ -349,6 +384,14 @@ const leaseController = {
 
             await auditLogModel.log(tenantId, 'ACCEPT_LEASE', `Tenant accepted lease agreement ${acceptedLease.lease_number || id}`);
 
+            // Invalidate landlord's leases, billings, and units cache
+            cache.del(cache.landlordKey(acceptedLease.landlord_id, 'leases', id));
+            cache.invalidateLandlord(acceptedLease.landlord_id, 'leases');
+            cache.invalidateLandlord(acceptedLease.landlord_id, 'billings');
+            if (acceptedLease.property_id) {
+                cache.invalidatePrefix(`units:property:${acceptedLease.property_id}`);
+            }
+
             return responseHelper.success(res, 'Lease agreement accepted successfully. Status is now ACTIVE.', acceptedLease);
 
         } catch (error) {
@@ -371,6 +414,10 @@ const leaseController = {
             }
 
             await auditLogModel.log(tenantId, 'REJECT_LEASE', `Tenant rejected lease agreement ${rejectedLease.lease_number || id} with concern notes`);
+
+            // Invalidate landlord's leases cache
+            cache.del(cache.landlordKey(rejectedLease.landlord_id, 'leases', id));
+            cache.invalidateLandlord(rejectedLease.landlord_id, 'leases');
 
             return responseHelper.success(res, 'Lease agreement returned to landlord with your concern notes for review and adjustments.', rejectedLease);
 
@@ -435,6 +482,10 @@ const leaseController = {
             }
 
             await auditLogModel.log(landlordId, 'UPDATE_LEASE_STATUS', `Landlord updated status of lease ${id} to ${lease_status}`);
+
+            // Invalidate lease list and specific detail
+            cache.del(cache.landlordKey(landlordId, 'leases', id));
+            cache.del(cache.landlordKey(landlordId, 'leases'));
 
             return responseHelper.success(res, `Lease status successfully updated to ${lease_status}`, updated);
 

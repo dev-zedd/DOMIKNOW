@@ -215,6 +215,7 @@
     </div>
 
     <script src="../../js/auth.js"></script>
+    <script src="../../js/landlord-cache.js"></script>
     <script src="../../js/dashboard.js"></script>
     <script>
         const token = localStorage.getItem('domiknow_token');
@@ -286,15 +287,14 @@
                     const json = await res.json();
 
                     if (res.ok) {
-                        showWorkerOk('Worker account created successfully! The worker can now log in.');
-                        form.reset();
-                        setTimeout(() => { closeModal(); }, 1600);
+                        showWorkerOk('Worker account created successfully!');
+                        setTimeout(() => { closeModal(); }, 1200);
                     } else {
                         showWorkerErr(json.message || 'Failed to create worker account.');
                     }
                 } catch (err) {
                     console.error(err);
-                    showWorkerErr('Network error. Please try again.');
+                    showWorkerErr('An error occurred during account creation.');
                 } finally {
                     submitBtn.disabled = false;
                     submitBtn.textContent = 'Create Worker Account';
@@ -315,24 +315,37 @@
             document.getElementById('workerAlertOk').style.display = 'none';
         }
 
-        async function fetchMaintenanceQueue() {
+        async function fetchMaintenanceQueue(forceRefresh = false) {
             const tableBody = document.getElementById('maintenanceQueueBody');
             try {
+                if (!forceRefresh) {
+                    const cached = window.landlordCache?.get('maintenance', 'list');
+                    if (cached && Array.isArray(cached)) {
+                        requestQueue = cached;
+                        renderQueueTable();
+                    }
+                }
+
                 const response = await fetch('/api/maintenance/requests/landlord', {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
                 if (!response.ok) {
-                    tableBody.innerHTML = `<tr><td colspan="8" style="text-align: center; color: var(--error);">Failed to load maintenance queue.</td></tr>`;
+                    if (!requestQueue || requestQueue.length === 0) {
+                        tableBody.innerHTML = `<tr><td colspan="8" style="text-align: center; color: var(--error);">Failed to load maintenance queue.</td></tr>`;
+                    }
                     return;
                 }
 
                 const result = await response.json();
                 requestQueue = result.data || [];
+                window.landlordCache?.set('maintenance', 'list', requestQueue);
                 renderQueueTable();
 
             } catch (err) {
                 console.error(err);
-                tableBody.innerHTML = `<tr><td colspan="8" style="text-align: center; color: var(--error);">Error reaching service api.</td></tr>`;
+                if (!requestQueue || requestQueue.length === 0) {
+                    tableBody.innerHTML = `<tr><td colspan="8" style="text-align: center; color: var(--error);">Error reaching service api.</td></tr>`;
+                }
             }
         }
 

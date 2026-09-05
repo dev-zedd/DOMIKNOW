@@ -6,6 +6,14 @@ const notificationModel = require('../models/notificationModel');
 const responseHelper = require('../utils/responseHelper');
 const supabase = require('../config/supabaseClient');
 const { uploadFile, getSignedUrl, isStorageObjectNotFound } = require('../utils/storageHelper');
+const cache = require('../utils/cacheHelper');
+
+// Cache TTLs (seconds)
+const TTL = {
+    maintenanceList: 60,   // Queue list – 1 min (changes often)
+    maintenanceDetail: 90, // Single request – 1.5 min
+    personnel: 180         // Workers list – 3 min
+};
 
 const MAINTENANCE_CATEGORIES = new Set([
     'plumbing', 'electrical', 'aircon', 'door', 'roof', 'internet', 'appliance', 'others'
@@ -91,6 +99,10 @@ const maintenanceController = {
                 message: `${issue_title} was reported${unit_number ? ` for unit ${unit_number}` : ''}. Review its priority and assign the next action.`,
                 reference_id: request.id
             });
+
+            // Invalidate landlord's maintenance requests cache so new ticket appears
+            cache.invalidateLandlord(lease.landlord_id, 'maintenance');
+
             return responseHelper.success(res, 'Maintenance request successfully submitted.', request, 201);
 
         } catch (error) {
@@ -169,6 +181,11 @@ const maintenanceController = {
                 });
             }
             await Promise.all(recipients.map(notification => notificationModel.create(notification)));
+
+            // Invalidate landlord's maintenance cache for this task and list
+            cache.del(cache.landlordKey(request.landlord_id, 'maintenance', id));
+            cache.invalidateLandlord(request.landlord_id, 'maintenance');
+
             return responseHelper.success(res, `Request successfully updated as ${newStatus}.`, updated);
 
         } catch (error) {
@@ -180,7 +197,15 @@ const maintenanceController = {
     // ── Landlord: Get queue list ─────────────────────────────────────────
     async getLandlordMaintenanceRequests(req, res) {
         try {
-            const list = await maintenanceModel.findByLandlordId(req.user.id);
+            const userId = req.user.id;
+            const cacheKey = cache.landlordKey(userId, 'maintenance');
+            const cached = cache.get(cacheKey);
+            if (cached) {
+                return responseHelper.success(res, 'Landlord maintenance queue retrieved.', cached);
+            }
+
+            const list = await maintenanceModel.findByLandlordId(userId);
+            cache.set(cacheKey, list, TTL.maintenanceList);
             return responseHelper.success(res, 'Landlord maintenance queue retrieved.', list);
         } catch (error) {
             console.error('Get landlord queue error:', error);
@@ -239,6 +264,11 @@ const maintenanceController = {
                     : `${request.issue_title} was approved and is ready for technician assignment.`,
                 reference_id: id
             });
+
+            // Invalidate landlord maintenance list and specific detail
+            cache.del(cache.landlordKey(landlordId, 'maintenance', id));
+            cache.del(cache.landlordKey(landlordId, 'maintenance'));
+
             return responseHelper.success(res, `Request successfully marked as ${newStatus}.`, updated);
 
         } catch (error) {
@@ -320,6 +350,11 @@ const maintenanceController = {
                     reference_id: id
                 })
             ]);
+
+            // Invalidate landlord maintenance caches
+            cache.del(cache.landlordKey(landlordId, 'maintenance', id));
+            cache.del(cache.landlordKey(landlordId, 'maintenance'));
+
             return responseHelper.success(res, 'Technician assigned successfully.', updated);
 
         } catch (error) {
@@ -388,6 +423,11 @@ const maintenanceController = {
                 });
             }
             await Promise.all(verificationNotifications.map(notification => notificationModel.create(notification)));
+
+            // Invalidate landlord maintenance caches
+            cache.del(cache.landlordKey(landlordId, 'maintenance', id));
+            cache.del(cache.landlordKey(landlordId, 'maintenance'));
+
             return responseHelper.success(res, `Request successfully updated as ${newStatus}.`, updated);
 
         } catch (error) {
@@ -672,15 +712,27 @@ const maintenanceController = {
     async getRequestDetails(req, res) {
         try {
             const { id } = req.params;
+            const role = req.user.role;
+            const userId = req.user.id;
+
+            // Cache for landlord detail view only
+            const cacheKey = role === 'landlord'
+                ? cache.landlordKey(userId, 'maintenance', id)
+                : null;
+
+            if (cacheKey) {
+                const cached = cache.get(cacheKey);
+                if (cached) {
+                    return responseHelper.success(res, 'Request details retrieved successfully.', cached);
+                }
+            }
+
             const request = await maintenanceModel.findRequestDetails(id);
             if (!request) {
                 return responseHelper.error(res, 'Maintenance request not found.', null, 404);
             }
 
             // Authorization check
-            const role = req.user.role;
-            const userId = req.user.id;
-
             if (role === 'tenant' && request.tenant_id !== userId) {
                 return responseHelper.error(res, 'Access denied.', null, 403);
             }
@@ -711,13 +763,10 @@ const maintenanceController = {
             const materials = await maintenanceModel.findMaterials(id);
             const report = await maintenanceModel.findReport(id);
 
-            return responseHelper.success(res, 'Request details retrieved successfully.', {
-                request,
-                assignment,
-                updates,
-                materials,
-                report
-            });
+            const payload = { request, assignment, updates, materials, report };
+            if (cacheKey) cache.set(cacheKey, payload, TTL.maintenanceDetail);
+
+            return responseHelper.success(res, 'Request details retrieved successfully.', payload);
 
         } catch (error) {
             console.error('Get request details error:', error);
@@ -729,18 +778,33 @@ const maintenanceController = {
     // Admins see all workers; landlords see only their own workers.
     async getMaintenancePersonnel(req, res) {
         try {
+            const userId = req.user.id;
+            const role = req.user.role;
+
+            // Cache per-landlord worker list
+            const cacheKey = role === 'landlord'
+                ? cache.landlordKey(userId, 'maintenance:personnel')
+                : 'admin:maintenance:personnel';
+
+            const cached = cache.get(cacheKey);
+            if (cached) {
+                return responseHelper.success(res, 'Active maintenance personnel list retrieved.', cached);
+            }
+
             let query = supabase
                 .from('users')
                 .select('id, full_name, email')
                 .eq('role', 'maintenance')
                 .eq('account_status', 'active');
 
-            if (req.user.role === 'landlord') {
-                query = query.eq('created_by_landlord_id', req.user.id);
+            if (role === 'landlord') {
+                query = query.eq('created_by_landlord_id', userId);
             }
 
             const { data: workers, error } = await query;
             if (error) throw error;
+
+            cache.set(cacheKey, workers, TTL.personnel);
             return responseHelper.success(res, 'Active maintenance personnel list retrieved.', workers);
         } catch (error) {
             console.error('Get technicians list error:', error);
@@ -804,6 +868,9 @@ const maintenanceController = {
                     reference_id: newWorker.id
                 })
             ]);
+
+            // Invalidate the personnel list so the new worker appears on next fetch
+            cache.del(cache.landlordKey(landlordId, 'maintenance:personnel'));
 
             return responseHelper.success(res, 'Maintenance worker account created successfully.', {
                 id: newWorker.id,

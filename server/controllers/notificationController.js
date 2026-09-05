@@ -1,5 +1,8 @@
 const notificationModel = require('../models/notificationModel');
 const responseHelper = require('../utils/responseHelper');
+const cache = require('../utils/cacheHelper');
+
+const TTL = { notifications: 30 }; // Short TTL – notifications change frequently
 
 const notificationController = {
     /**
@@ -9,14 +12,18 @@ const notificationController = {
     async getMyNotifications(req, res) {
         try {
             const userId = req.user.id;
+            const cacheKey = `notifications:${userId}:my`;
+            const cached = cache.get(cacheKey);
+            if (cached) {
+                return responseHelper.success(res, 'Notifications retrieved successfully.', cached);
+            }
+
             const notifications = await notificationModel.findByUserId(userId);
-
             const unreadCount = notifications.filter(n => !n.read_status).length;
+            const payload = { notifications, unreadCount };
+            cache.set(cacheKey, payload, TTL.notifications);
 
-            return responseHelper.success(res, 'Notifications retrieved successfully.', {
-                notifications,
-                unreadCount
-            });
+            return responseHelper.success(res, 'Notifications retrieved successfully.', payload);
         } catch (error) {
             console.error('[notificationController] getMyNotifications error:', error);
             return responseHelper.error(res, 'Failed to retrieve notifications.', error, 500);
@@ -33,6 +40,8 @@ const notificationController = {
             const { id } = req.params;
 
             const updated = await notificationModel.markAsRead(id, userId);
+            // Invalidate cached notification list so unread count reflects immediately
+            cache.del(`notifications:${userId}:my`);
             return responseHelper.success(res, 'Notification marked as read.', updated);
         } catch (error) {
             console.error('[notificationController] markAsRead error:', error);
@@ -48,6 +57,8 @@ const notificationController = {
         try {
             const userId = req.user.id;
             await notificationModel.markAllRead(userId);
+            // Invalidate cached notification list
+            cache.del(`notifications:${userId}:my`);
             return responseHelper.success(res, 'All notifications marked as read.');
         } catch (error) {
             console.error('[notificationController] markAllRead error:', error);
@@ -65,6 +76,8 @@ const notificationController = {
             const { id } = req.params;
 
             await notificationModel.delete(id, userId);
+            // Invalidate cached notification list
+            cache.del(`notifications:${userId}:my`);
             return responseHelper.success(res, 'Notification deleted successfully.');
         } catch (error) {
             console.error('[notificationController] deleteNotification error:', error);

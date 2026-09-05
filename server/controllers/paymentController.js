@@ -5,6 +5,10 @@ const responseHelper = require('../utils/responseHelper');
 const supabase = require('../config/supabaseClient');
 const { uploadFile } = require('../utils/storageHelper');
 const { attachPaymentProofUrls } = require('../utils/paymentProofHelper');
+const cache = require('../utils/cacheHelper');
+
+// Cache TTL (seconds)
+const TTL = { payments: 90 }; // Payments list – 1.5 min
 
 const paymentController = {
     async submitPayment(req, res) {
@@ -108,6 +112,10 @@ const paymentController = {
                 reference_id: paymentRecord.id
             });
 
+            // Invalidate landlord's payments and billings cache so pending proof appears
+            cache.invalidateLandlord(billing.landlord_id, 'payments');
+            cache.invalidateLandlord(billing.landlord_id, 'billings');
+
             return responseHelper.success(res, 'Payment proof successfully submitted and logged for verification.', paymentRecord, 201);
 
         } catch (error) {
@@ -129,8 +137,16 @@ const paymentController = {
 
     async getLandlordPayments(req, res) {
         try {
-            const list = await paymentModel.findByLandlordId(req.user.id);
+            const userId = req.user.id;
+            const cacheKey = cache.landlordKey(userId, 'payments');
+            const cached = cache.get(cacheKey);
+            if (cached) {
+                return responseHelper.success(res, 'Landlord payments log retrieved successfully', cached);
+            }
+
+            const list = await paymentModel.findByLandlordId(userId);
             await attachPaymentProofUrls(list, 'landlord-payments');
+            cache.set(cacheKey, list, TTL.payments);
             return responseHelper.success(res, 'Landlord payments log retrieved successfully', list);
         } catch (error) {
             console.error('Get landlord payments error:', error);
@@ -172,6 +188,10 @@ const paymentController = {
                     : `Your payment proof was not accepted. ${verification_remarks || 'Review the billing entry and submit a valid proof.'}`,
                 reference_id: updated.billing_id || id
             });
+
+            // Invalidate landlord payments and billings caches – verification updates both
+            cache.invalidateLandlord(landlordId, 'payments');
+            cache.invalidateLandlord(landlordId, 'billings');
 
             return responseHelper.success(res, `Payment submission successfully marked as ${payment_status}`, updated);
 

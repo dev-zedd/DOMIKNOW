@@ -4,6 +4,10 @@ const auditLogModel = require('../models/auditLogModel');
 const notificationModel = require('../models/notificationModel');
 const responseHelper = require('../utils/responseHelper');
 const { uploadFile, deleteFile } = require('../utils/storageHelper');
+const cache = require('../utils/cacheHelper');
+
+const TTL = { profile: 300 }; // Profile – 5 min
+const profileKey = (userId) => `user:${userId}:profile`;
 
 function matchesImageSignature(buffer, mimeType) {
     if (mimeType === 'image/jpeg' || mimeType === 'image/jpg') {
@@ -23,10 +27,19 @@ function matchesImageSignature(buffer, mimeType) {
 const userController = {
     async getProfile(req, res) {
         try {
-            const user = await userModel.findById(req.user.id);
+            const userId = req.user.id;
+            const cacheKey = profileKey(userId);
+            const cached = cache.get(cacheKey);
+            if (cached) {
+                return responseHelper.success(res, 'Profile retrieved', cached);
+            }
+
+            const user = await userModel.findById(userId);
             if (!user) {
                 return responseHelper.error(res, 'User not found', null, 404);
             }
+
+            cache.set(cacheKey, user, TTL.profile);
             return responseHelper.success(res, 'Profile retrieved', user);
         } catch (error) {
             console.error('Get profile error:', error);
@@ -46,6 +59,10 @@ const userController = {
             });
 
             await auditLogModel.log(req.user.id, 'PROFILE_UPDATE', 'User updated their profile.');
+
+            // Invalidate profile and dashboard caches
+            cache.del(profileKey(req.user.id));
+            cache.del(`dashboard:${req.user.id}:me`);
 
             return responseHelper.success(res, 'Profile updated successfully', updatedUser);
         } catch (error) {
@@ -87,6 +104,11 @@ const userController = {
             });
 
             await auditLogModel.log(req.user.id, 'PROFILE_IMAGE_UPDATE', 'User updated their profile photo.');
+
+            // Invalidate profile and dashboard caches
+            cache.del(profileKey(req.user.id));
+            cache.del(`dashboard:${req.user.id}:me`);
+
             return responseHelper.success(res, 'Profile photo updated successfully', updatedUser);
         } catch (error) {
             console.error('Upload profile image error:', error);
@@ -101,6 +123,11 @@ const userController = {
                 profile_image_url: null
             });
             await auditLogModel.log(req.user.id, 'PROFILE_IMAGE_REMOVE', 'User removed their profile photo.');
+
+            // Invalidate profile and dashboard caches
+            cache.del(profileKey(req.user.id));
+            cache.del(`dashboard:${req.user.id}:me`);
+
             return responseHelper.success(res, 'Profile photo removed successfully', updatedUser);
         } catch (error) {
             console.error('Remove profile image error:', error);

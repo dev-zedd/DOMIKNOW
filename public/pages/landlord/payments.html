@@ -204,6 +204,7 @@
     </div>
 
     <script src="../../js/auth.js"></script>
+    <script src="../../js/landlord-cache.js"></script>
     <script src="../../js/dashboard.js"></script>
     <script>
         const token = localStorage.getItem('domiknow_token');
@@ -227,30 +228,51 @@
             });
         });
 
-        async function fetchLandlordPayments() {
+        async function fetchLandlordPayments(forceRefresh = false) {
             const tableBody = document.getElementById('paymentsTableBody');
             try {
+                if (!forceRefresh) {
+                    const cached = window.landlordCache?.get('payments', 'list');
+                    if (cached && Array.isArray(cached)) {
+                        renderPaymentsList(cached);
+                    }
+                }
+
                 const response = await fetch('/api/payments', {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
 
                 if (!response.ok) {
-                    tableBody.innerHTML = `<tr><td colspan="9" style="text-align: center; color: var(--error);">Failed to load payments queue.</td></tr>`;
+                    if (!tableBody.querySelector('tr')) {
+                        tableBody.innerHTML = `<tr><td colspan="9" style="text-align: center; color: var(--error);">Failed to load payments queue.</td></tr>`;
+                    }
                     return;
                 }
 
                 const result = await response.json();
                 const list = result.data || [];
+                window.landlordCache?.set('payments', 'list', list);
+                renderPaymentsList(list);
 
-                if (list.length === 0) {
-                    tableBody.innerHTML = `<tr><td colspan="9" style="text-align: center; padding: 3rem; color: var(--text-muted);">No payment submissions found.</td></tr>`;
-                    return;
+            } catch (err) {
+                console.error(err);
+                if (!tableBody.querySelector('tr')) {
+                    tableBody.innerHTML = `<tr><td colspan="9" style="text-align: center; color: var(--error);">Network error.</td></tr>`;
                 }
+            }
+        }
 
-                tableBody.innerHTML = '';
-                paymentsMap = {};
+        function renderPaymentsList(list) {
+            const tableBody = document.getElementById('paymentsTableBody');
+            if (list.length === 0) {
+                tableBody.innerHTML = `<tr><td colspan="9" style="text-align: center; padding: 3rem; color: var(--text-muted);">No payment submissions found.</td></tr>`;
+                return;
+            }
 
-                list.forEach(pay => {
+            tableBody.innerHTML = '';
+            paymentsMap = {};
+
+            list.forEach(pay => {
                     paymentsMap[pay.id] = pay;
                     const amount = parseFloat(pay.payment_amount).toLocaleString(undefined, { minimumFractionDigits: 2 });
                     
@@ -361,9 +383,10 @@
 
                 const result = await response.json();
                 if (response.ok) {
+                    window.landlordCache?.invalidateMultiple(['payments', 'billings']);
                     alert(`Payment transaction successfully assessed as ${status.toUpperCase()}.`);
                     hideModal();
-                    fetchLandlordPayments();
+                    fetchLandlordPayments(true);
                 } else {
                     errorDiv.textContent = result.message || 'Verification update failed.';
                     errorDiv.classList.remove('hidden');

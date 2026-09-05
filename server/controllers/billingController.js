@@ -3,6 +3,13 @@ const auditLogModel = require('../models/auditLogModel');
 const notificationModel = require('../models/notificationModel');
 const responseHelper = require('../utils/responseHelper');
 const supabase = require('../config/supabaseClient');
+const cache = require('../utils/cacheHelper');
+
+// Cache TTLs (seconds) – billings can change frequently (overdue auto-apply) so keep TTL short
+const TTL = {
+    billings: 60,       // Billing list – 1 min
+    billingDetail: 120  // Single billing – 2 min
+};
 
 async function checkAndApplyOverduePenalties(userId, isLandlord = true) {
     try {
@@ -191,6 +198,9 @@ const billingController = {
                 reference_id: billing.id
             });
 
+            // Invalidate billing list so the new statement appears on next fetch
+            cache.invalidateLandlord(landlordId, 'billings');
+
             return responseHelper.success(res, 'Billing statement generated successfully.', billing, 201);
 
         } catch (error) {
@@ -304,6 +314,10 @@ const billingController = {
                 reference_id: updated.id
             });
 
+            // Invalidate billing list and specific detail
+            cache.del(cache.landlordKey(landlordId, 'billings', id));
+            cache.invalidateLandlord(landlordId, 'billings');
+
             return responseHelper.success(res, 'Billing details updated successfully.', updated);
 
         } catch (error) {
@@ -335,6 +349,10 @@ const billingController = {
             await billingModel.deleteBilling(id);
             await auditLogModel.log(landlordId, 'DELETE_BILLING', `Landlord deleted billing statement ${id} (${existingBill.billing_month})`);
 
+            // Invalidate billing caches
+            cache.del(cache.landlordKey(landlordId, 'billings', id));
+            cache.invalidateLandlord(landlordId, 'billings');
+
             return responseHelper.success(res, 'Billing statement deleted successfully.');
         } catch (error) {
             console.error('Delete billing error:', error);
@@ -344,8 +362,18 @@ const billingController = {
 
     async getLandlordBillings(req, res) {
         try {
-            await checkAndApplyOverduePenalties(req.user.id, true);
-            const list = await billingModel.findByLandlordId(req.user.id);
+            const userId = req.user.id;
+            const cacheKey = cache.landlordKey(userId, 'billings');
+            const cached = cache.get(cacheKey);
+            if (cached) {
+                return responseHelper.success(res, 'Landlord billings retrieved successfully', cached);
+            }
+
+            // On cache miss, run overdue check to apply penalties before fetching fresh data
+            await checkAndApplyOverduePenalties(userId, true);
+
+            const list = await billingModel.findByLandlordId(userId);
+            cache.set(cacheKey, list, TTL.billings);
             return responseHelper.success(res, 'Landlord billings retrieved successfully', list);
         } catch (error) {
             console.error('Get landlord billings error:', error);
@@ -430,6 +458,18 @@ const billingController = {
             const userId = req.user.id;
             const role = req.user.role;
 
+            // Cache only landlord reads
+            const cacheKey = role === 'landlord'
+                ? cache.landlordKey(userId, 'billings', id)
+                : null;
+
+            if (cacheKey) {
+                const cached = cache.get(cacheKey);
+                if (cached) {
+                    return responseHelper.success(res, 'Billing details retrieved successfully', cached);
+                }
+            }
+
             const billing = await billingModel.findById(id);
             if (!billing) {
                 return responseHelper.error(res, 'Billing statement not found.', null, 404);
@@ -443,6 +483,7 @@ const billingController = {
                 return responseHelper.error(res, 'Access denied.', null, 403);
             }
 
+            if (cacheKey) cache.set(cacheKey, billing, TTL.billingDetail);
             return responseHelper.success(res, 'Billing details retrieved successfully', billing);
         } catch (error) {
             console.error('Get billing details error:', error);
@@ -452,7 +493,15 @@ const billingController = {
 
     async getLandlordOverdueBillings(req, res) {
         try {
-            const list = await billingModel.findOverdueByLandlordId(req.user.id);
+            const userId = req.user.id;
+            const cacheKey = cache.landlordKey(userId, 'billings:overdue');
+            const cached = cache.get(cacheKey);
+            if (cached) {
+                return responseHelper.success(res, 'Landlord overdue billings retrieved successfully', cached);
+            }
+
+            const list = await billingModel.findOverdueByLandlordId(userId);
+            cache.set(cacheKey, list, TTL.billings);
             return responseHelper.success(res, 'Landlord overdue billings retrieved successfully', list);
         } catch (error) {
             console.error('Get landlord overdue billings error:', error);

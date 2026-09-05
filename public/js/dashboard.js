@@ -69,6 +69,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         if (!response.ok) {
             // Token invalid or expired
+            if (window.landlordCache) window.landlordCache.invalidateAll();
             localStorage.removeItem('domiknow_token');
             localStorage.removeItem('domiknow_role');
             window.location.href = '/pages/auth/login.html';
@@ -197,6 +198,13 @@ function loadTenantModuleAssets() {
 
 function loadLandlordModuleAssets() {
     document.documentElement.setAttribute('data-landlord-portal', 'true');
+    if (!document.querySelector('script[data-landlord-cache]')) {
+        const cacheScript = document.createElement('script');
+        cacheScript.src = '/js/landlord-cache.js?v=20260905-1';
+        cacheScript.setAttribute('data-landlord-cache', '');
+        document.head.appendChild(cacheScript);
+    }
+
     if (!document.querySelector('link[data-landlord-module]')) {
         const stylesheet = document.createElement('link');
         stylesheet.rel = 'stylesheet';
@@ -320,6 +328,7 @@ async function requestAuthenticatedLogout() {
     }
 
     if (!shouldLogout) return false;
+    if (window.landlordCache) window.landlordCache.invalidateAll();
     localStorage.removeItem('domiknow_token');
     localStorage.removeItem('domiknow_role');
     window.location.href = '/pages/auth/login.html';

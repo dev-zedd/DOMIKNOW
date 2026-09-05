@@ -477,6 +477,7 @@
     </main>
 
     <script src="../../js/auth.js"></script>
+    <script src="../../js/landlord-cache.js"></script>
     <script src="../../js/dashboard.js"></script>
     <script>
         const token = localStorage.getItem('domiknow_token');
@@ -548,20 +549,34 @@
             rulesArea.value = currentRules.join('\n');
         }
 
-        async function fetchPropertyDetails() {
+        async function fetchPropertyDetails(forceRefresh = false) {
             try {
+                if (!forceRefresh) {
+                    const cached = window.landlordCache?.get('properties', propertyId);
+                    if (cached) {
+                        currentProperty = cached;
+                        renderDetailsUI();
+                        renderGalleryUI();
+                        renderDocumentsUI();
+                        updateMapMarker();
+                    }
+                }
+
                 const response = await fetch(`/api/landlord/properties/${propertyId}`, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
 
                 if (!response.ok) {
-                    alert('Failed to retrieve property details. You may not own this listing.');
-                    window.location.href = 'properties.html';
+                    if (!currentProperty) {
+                        alert('Failed to retrieve property details. You may not own this listing.');
+                        window.location.href = 'properties.html';
+                    }
                     return;
                 }
 
                 const result = await response.json();
                 currentProperty = result.data;
+                window.landlordCache?.set('properties', propertyId, currentProperty);
 
                 renderDetailsUI();
                 renderGalleryUI();
@@ -570,7 +585,7 @@
 
             } catch (err) {
                 console.error(err);
-                alert('Error reaching server API.');
+                if (!currentProperty) alert('Error reaching server API.');
             }
         }
 
@@ -1064,12 +1079,13 @@
                 const result = await response.json();
                 
                 if (response.ok) {
+                    window.landlordCache?.invalidate('properties');
                     const feedback = document.getElementById('generalFeedback');
                     feedback.textContent = 'Property specs updated successfully and returned for admin review!';
                     feedback.classList.remove('hidden');
                     
                     toggleMode(false);
-                    fetchPropertyDetails();
+                    fetchPropertyDetails(true);
 
                     setTimeout(() => {
                         feedback.classList.add('hidden');
@@ -1134,8 +1150,9 @@
                 const result = await response.json();
 
                 if (response.ok) {
+                    window.landlordCache?.invalidate('properties');
                     alert('Document updated successfully!');
-                    fetchPropertyDetails();
+                    fetchPropertyDetails(true);
                 } else {
                     alert(result.message || 'Upload failed.');
                 }
@@ -1189,8 +1206,9 @@
                 const result = await response.json();
 
                 if (response.ok) {
+                    window.landlordCache?.invalidate('properties');
                     alert('Photo updated successfully!');
-                    fetchPropertyDetails();
+                    fetchPropertyDetails(true);
                 } else {
                     alert(result.message || 'Upload failed.');
                 }

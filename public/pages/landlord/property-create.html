@@ -683,6 +683,7 @@
     </main>
 
     <script src="../../js/auth.js"></script>
+    <script src="../../js/landlord-cache.js"></script>
     <script src="../../js/dashboard.js"></script>
     <script>
         const token = localStorage.getItem('domiknow_token');
@@ -1500,6 +1501,7 @@
                 
                 if (response.ok && result.data) {
                     createdPropertyId = result.data.id;
+                    window.landlordCache?.invalidate('properties');
                     const feedback = document.getElementById('createFeedback');
                     if (feedback) {
                         feedback.className = 'alert alert-success';
@@ -1702,6 +1704,8 @@
             await uploadSinglePhoto('filePhotoHallway', false, 'statusPhotoHallway');
             await uploadSinglePhoto('filePhotoParking', false, 'statusPhotoParking');
             await uploadSinglePhoto('filePhotoExterior', false, 'statusPhotoExterior');
+
+            window.landlordCache?.invalidate('properties');
 
             const feedback = document.getElementById('createFeedback');
             if (feedback) {

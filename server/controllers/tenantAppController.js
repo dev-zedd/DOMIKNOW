@@ -5,6 +5,7 @@ const notificationModel = require('../models/notificationModel');
 const responseHelper = require('../utils/responseHelper');
 const supabase = require('../config/supabaseClient');
 const { uploadFile, getSignedUrl, isStorageObjectNotFound } = require('../utils/storageHelper');
+const cache = require('../utils/cacheHelper');
 
 const tenantAppController = {
     async createApplication(req, res) {
@@ -122,6 +123,11 @@ const tenantAppController = {
                 }) : Promise.resolve(null)
             ]);
 
+            // Invalidate landlord's applications cache so new applicant appears immediately
+            if (property.landlord_id) {
+                cache.invalidateLandlord(property.landlord_id, 'applications');
+            }
+
             return responseHelper.success(res, 'Rental application submitted successfully. Please upload required documents.', newApp, 201);
 
         } catch (error) {
@@ -177,6 +183,12 @@ const tenantAppController = {
             });
 
             await auditLogModel.log(tenantId, 'UPLOAD_APPLICATION_DOCUMENT', `Tenant uploaded document (${document_type}) for application ${id}`);
+
+            // Invalidate landlord's cached application detail so newly uploaded document appears
+            if (application.landlord_id) {
+                cache.del(cache.landlordKey(application.landlord_id, 'applications', id));
+                cache.invalidateLandlord(application.landlord_id, 'applications');
+            }
 
             return responseHelper.success(res, 'Application document uploaded successfully', docRecord);
 

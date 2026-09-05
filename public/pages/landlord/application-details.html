@@ -611,6 +611,7 @@
     </main>
 
     <script src="../../js/auth.js"></script>
+    <script src="../../js/landlord-cache.js"></script>
     <script src="../../js/dashboard.js"></script>
     <script>
         const token = localStorage.getItem('domiknow_token');
@@ -639,20 +640,32 @@
             fetchApplicationDetails();
         });
 
-        async function fetchApplicationDetails() {
+        async function fetchApplicationDetails(forceRefresh = false) {
             try {
+                if (!forceRefresh) {
+                    const cached = window.landlordCache?.get('applications', applicationId);
+                    if (cached) {
+                        currentApplication = cached;
+                        renderApplicationUI();
+                        renderDocumentsUI();
+                    }
+                }
+
                 const response = await fetch(`/api/landlord/applications/${applicationId}`, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
 
                 if (!response.ok) {
-                    alert('Failed to retrieve application details. You may not own the target property.');
-                    window.location.href = 'applications.html';
+                    if (!currentApplication) {
+                        alert('Failed to retrieve application details. You may not own the target property.');
+                        window.location.href = 'applications.html';
+                    }
                     return;
                 }
 
                 const result = await response.json();
                 currentApplication = result.data;
+                window.landlordCache?.set('applications', applicationId, currentApplication);
 
                 const screening = await checkScreeningRecord();
 
@@ -663,7 +676,7 @@
 
             } catch (err) {
                 console.error(err);
-                alert('Error reaching API.');
+                if (!currentApplication) alert('Error reaching API.');
             }
         }
 
@@ -1246,11 +1259,12 @@
                 const result = await response.json();
 
                 if (response.ok) {
+                    window.landlordCache?.invalidateMultiple(['applications', 'units', 'leases']);
                     const feedback = document.getElementById('generalFeedback');
                     feedback.textContent = `Tenant application successfully ${status}!`;
                     feedback.classList.remove('hidden');
 
-                    fetchApplicationDetails();
+                    fetchApplicationDetails(true);
 
                     setTimeout(() => {
                         feedback.classList.add('hidden');

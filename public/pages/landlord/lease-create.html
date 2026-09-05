@@ -571,6 +571,7 @@
     </main>
 
     <script src="../../js/auth.js"></script>
+    <script src="../../js/landlord-cache.js"></script>
     <script src="../../js/dashboard.js"></script>
     <script>
         const token = localStorage.getItem('domiknow_token');
@@ -1457,6 +1458,7 @@
 
                 const result = await response.json();
                 if (response.ok) {
+                    window.landlordCache?.invalidateMultiple(['leases', 'applications', 'billings', 'units']);
                     successDiv.textContent = result.message || 'Lease agreement successfully executed!';
                     successDiv.classList.remove('hidden');
                     e.target.reset();

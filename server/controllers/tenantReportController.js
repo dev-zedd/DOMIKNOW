@@ -4,6 +4,12 @@ const auditLogModel     = require('../models/auditLogModel');
 const notificationModel = require('../models/notificationModel');
 const responseHelper    = require('../utils/responseHelper');
 const { uploadFile, getSignedUrl, isStorageObjectNotFound } = require('../utils/storageHelper');
+const cache             = require('../utils/cacheHelper');
+
+const TTL = {
+    tenantReports: 90,  // Landlord filed reports list – 1.5 min
+    reportDetail: 120   // Single report detail – 2 min
+};
 
 const BUCKET = 'tenant-report-evidence';
 
@@ -165,6 +171,9 @@ const tenantReportController = {
                 reference_id: report.id
             });
 
+            // Invalidate landlord's reports cache so newly filed report appears
+            cache.invalidateLandlord(landlordId, 'tenantReports');
+
             return responseHelper.success(res, 'Tenant report submitted successfully. It is now pending admin review.', report, 201);
 
         } catch (error) {
@@ -179,7 +188,16 @@ const tenantReportController = {
      */
     async getLandlordTenantReports(req, res) {
         try {
-            const reports = await tenantReportModel.findReportsByLandlordId(req.user.id);
+            const landlordId = req.user.id;
+            const cacheKey   = cache.landlordKey(landlordId, 'tenantReports');
+
+            const cached = cache.get(cacheKey);
+            if (cached) {
+                return responseHelper.success(res, 'Landlord tenant reports retrieved.', cached);
+            }
+
+            const reports = await tenantReportModel.findReportsByLandlordId(landlordId);
+            cache.set(cacheKey, reports, TTL.tenantReports);
             return responseHelper.success(res, 'Landlord tenant reports retrieved.', reports);
         } catch (error) {
             console.error('getLandlordTenantReports error:', error);
@@ -194,7 +212,13 @@ const tenantReportController = {
     async getTenantReportDetailForLandlord(req, res) {
         try {
             const landlordId = req.user.id;
-            const { id } = req.params;
+            const { id }     = req.params;
+            const cacheKey   = cache.landlordKey(landlordId, 'tenantReports', id);
+
+            const cached = cache.get(cacheKey);
+            if (cached) {
+                return responseHelper.success(res, 'Report details retrieved.', cached);
+            }
 
             const report = await tenantReportModel.findTenantReportById(id);
             if (!report || report.landlord_id !== landlordId) {
@@ -204,8 +228,9 @@ const tenantReportController = {
             let evidence = await tenantReportModel.findEvidenceByReportId(id);
             evidence = await attachEvidenceUrls(evidence);
 
-            return responseHelper.success(res, 'Report details retrieved.', { ...report, evidence });
-
+            const payload = { ...report, evidence };
+            cache.set(cacheKey, payload, TTL.reportDetail);
+            return responseHelper.success(res, 'Report details retrieved.', payload);
         } catch (error) {
             console.error('getTenantReportDetailForLandlord error:', error);
             return responseHelper.error(res, 'Failed to get report details.', error, 500);
@@ -244,6 +269,10 @@ const tenantReportController = {
                 'ADD_ADDITIONAL_EVIDENCE',
                 `Landlord added ${uploadedFiles.length} additional evidence file(s) to tenant report ${id}. Status reset to pending_admin_review.`
             );
+
+            // Invalidate report detail and list cache
+            cache.del(cache.landlordKey(landlordId, 'tenantReports', id));
+            cache.invalidateLandlord(landlordId, 'tenantReports');
 
             return responseHelper.success(res, 'Additional evidence submitted. Report is now back under admin review.', result.data);
 

@@ -4,6 +4,15 @@ const notificationModel = require('../models/notificationModel');
 const responseHelper = require('../utils/responseHelper');
 const supabase = require('../config/supabaseClient');
 const { uploadFile, getSignedUrl, isStorageObjectNotFound } = require('../utils/storageHelper');
+const cache = require('../utils/cacheHelper');
+
+// Cache TTLs (seconds)
+const TTL = {
+    properties: 120,      // Properties list – 2 min
+    propertyDetail: 180,  // Single property – 3 min
+    applications: 90,     // Applications list – 1.5 min
+    applicationDetail: 120 // Single application – 2 min
+};
 
 const VALID_PROPERTY_TYPES = new Set([
     'apartment',
@@ -155,6 +164,9 @@ const landlordController = {
                 reference_id: prop.id
             });
 
+            // Invalidate properties list so the new entry appears on next fetch
+            cache.invalidateLandlord(landlordId, 'properties');
+
             return responseHelper.success(res, 'Property submitted successfully for admin review.', prop, 201);
 
         } catch (error) {
@@ -165,7 +177,15 @@ const landlordController = {
 
     async getMyProperties(req, res) {
         try {
-            const properties = await landlordModel.findByLandlordId(req.user.id);
+            const userId = req.user.id;
+            const cacheKey = cache.landlordKey(userId, 'properties');
+            const cached = cache.get(cacheKey);
+            if (cached) {
+                return responseHelper.success(res, 'Your properties retrieved successfully', cached);
+            }
+
+            const properties = await landlordModel.findByLandlordId(userId);
+            cache.set(cacheKey, properties, TTL.properties);
             return responseHelper.success(res, 'Your properties retrieved successfully', properties);
         } catch (error) {
             console.error('Get my properties error:', error);
@@ -176,11 +196,18 @@ const landlordController = {
     async getMyPropertyById(req, res) {
         try {
             const { id } = req.params;
-            let property = await landlordModel.findPropertyById(id, req.user.id);
+            const userId = req.user.id;
+            const cacheKey = cache.landlordKey(userId, 'properties', id);
+            const cached = cache.get(cacheKey);
+            if (cached) {
+                return responseHelper.success(res, 'Property details retrieved', cached);
+            }
+
+            let property = await landlordModel.findPropertyById(id, userId);
 
             if (!property && req.user) {
                 property = await landlordModel.findPropertyById(id, null);
-                if (property && property.landlord_id !== req.user.id && req.user.role !== 'admin') {
+                if (property && property.landlord_id !== userId && req.user.role !== 'admin') {
                     property = null;
                 }
             }
@@ -207,6 +234,7 @@ const landlordController = {
                 }
             }
 
+            cache.set(cacheKey, property, TTL.propertyDetail);
             return responseHelper.success(res, 'Property details retrieved', property);
         } catch (error) {
             console.error('Get property by id error:', error);
@@ -255,6 +283,9 @@ const landlordController = {
                 message: `${validation.data.property_name} was updated and returned to the property review queue. Verify the revised details and documents before deciding.`,
                 reference_id: id
             });
+
+            // Invalidate both the list and the specific property detail
+            cache.invalidateLandlord(landlordId, 'properties');
 
             return responseHelper.success(res, 'Property updated successfully and returned to review queue', updated);
 
@@ -323,6 +354,9 @@ const landlordController = {
             });
 
             await auditLogModel.log(landlordId, 'UPLOAD_PROPERTY_IMAGE', `Landlord uploaded image for property ${id}`);
+
+            // Invalidate the specific property detail so the new image appears
+            cache.del(cache.landlordKey(landlordId, 'properties', id));
 
             return responseHelper.success(res, 'Property image uploaded successfully', imgRecord);
 
@@ -397,6 +431,9 @@ const landlordController = {
 
             await auditLogModel.log(landlordId, 'UPLOAD_PROPERTY_DOCUMENT', `Landlord uploaded document (${document_type}) for property ${id}`);
 
+            // Invalidate the specific property detail so the new document appears
+            cache.del(cache.landlordKey(landlordId, 'properties', id));
+
             return responseHelper.success(res, 'Property document uploaded successfully', docRecord);
 
         } catch (error) {
@@ -407,7 +444,15 @@ const landlordController = {
 
     async getTenantApplications(req, res) {
         try {
-            const list = await landlordModel.findTenantApplications(req.user.id);
+            const userId = req.user.id;
+            const cacheKey = cache.landlordKey(userId, 'applications');
+            const cached = cache.get(cacheKey);
+            if (cached) {
+                return responseHelper.success(res, 'Tenant applications retrieved successfully', cached);
+            }
+
+            const list = await landlordModel.findTenantApplications(userId);
+            cache.set(cacheKey, list, TTL.applications);
             return responseHelper.success(res, 'Tenant applications retrieved successfully', list);
         } catch (error) {
             console.error('Get landlord tenant applications error:', error);
@@ -418,7 +463,14 @@ const landlordController = {
     async getTenantApplicationById(req, res) {
         try {
             const { id } = req.params;
-            const details = await landlordModel.findApplicationDetails(id, req.user.id);
+            const userId = req.user.id;
+            const cacheKey = cache.landlordKey(userId, 'applications', id);
+            const cached = cache.get(cacheKey);
+            if (cached) {
+                return responseHelper.success(res, 'Application details retrieved', cached);
+            }
+
+            const details = await landlordModel.findApplicationDetails(id, userId);
 
             if (!details) {
                 return responseHelper.error(res, 'Application not found or access denied.', null, 404);
@@ -442,6 +494,7 @@ const landlordController = {
                 }
             }
 
+            cache.set(cacheKey, details, TTL.applicationDetail);
             return responseHelper.success(res, 'Application details retrieved', details);
         } catch (error) {
             console.error('Get landlord application by id error:', error);
@@ -507,6 +560,16 @@ const landlordController = {
                 reference_id: updated.id
             });
 
+            // Invalidate application list and specific detail
+            cache.del(cache.landlordKey(landlordId, 'applications', id));
+            cache.del(cache.landlordKey(landlordId, 'applications'));
+
+            // If a unit or bed was reserved or freed, bust units and property cache
+            if (updated.property_id) {
+                cache.invalidatePrefix(`units:property:${updated.property_id}`);
+                cache.del(cache.landlordKey(landlordId, 'properties', updated.property_id));
+            }
+
             return responseHelper.success(res, `Tenant application successfully marked as ${status}`, updated);
 
         } catch (error) {
@@ -526,6 +589,9 @@ const landlordController = {
             }
 
             await auditLogModel.log(landlordId, 'DELETE_PROPERTY', `Landlord deleted property ${id}`);
+
+            // Invalidate the list and the specific detail entry
+            cache.invalidateLandlord(landlordId, 'properties');
 
             return responseHelper.success(res, 'Property deleted successfully');
         } catch (error) {
