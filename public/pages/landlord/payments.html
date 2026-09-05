@@ -324,11 +324,6 @@
                     `;
                     tableBody.appendChild(row);
                 });
-
-            } catch (err) {
-                console.error(err);
-                tableBody.innerHTML = `<tr><td colspan="9" style="text-align: center; color: var(--error);">Error reaching payments API.</td></tr>`;
-            }
         }
 
         function openVerifyModal(pay) {

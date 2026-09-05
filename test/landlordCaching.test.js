@@ -312,3 +312,25 @@ test('client landlord-cache.js evaluates and manages cache with session storage'
     assert.equal(clientCache.get('properties', 'list'), null);
     assert.equal(clientCache.get('disputes', 'all'), null);
 });
+
+test('leases.html client-side script implements caching for list, details, and applications queue', () => {
+    const html = fs.readFileSync(path.resolve(__dirname, '../public/pages/landlord/leases.html'), 'utf8');
+
+    // Asserts script inclusion
+    assert.ok(html.includes('src="../../js/landlord-cache.js"'), 'leases.html must include landlord-cache.js');
+
+    // Asserts leases list caching
+    assert.ok(html.includes("window.landlordCache?.get('leases', 'list')"), 'leases.html must check cached leases');
+    assert.ok(html.includes("window.landlordCache?.set('leases', 'list', leases)"), 'leases.html must cache leases');
+
+    // Asserts individual contract caching
+    assert.ok(html.includes("window.landlordCache?.get('leases', String(leaseId))"), 'leases.html must check cached lease contract');
+    assert.ok(html.includes("window.landlordCache?.set('leases', String(leaseId), lease)"), 'leases.html must cache lease contract');
+
+    // Asserts approved applications queue caching
+    assert.ok(html.includes("window.landlordCache?.get('applications', 'list')"), 'leases.html must check cached applications queue');
+    assert.ok(html.includes("window.landlordCache?.set('applications', 'list', allApps)"), 'leases.html must cache applications queue');
+
+    // Asserts invalidation event listener
+    assert.ok(html.includes("domiknow:landlord-cache-invalidated"), 'leases.html must listen for cache invalidations');
+});

@@ -344,11 +344,6 @@
                     `;
                     container.appendChild(card);
                 });
-
-            } catch (err) {
-                console.error(err);
-                container.innerHTML = `<div style="padding:2rem;text-align:center;color:#ef4444;">Failed to load reports. Please try again.</div>`;
-            }
         }
 
         async function openModal(reportId) {

@@ -144,6 +144,15 @@
             fetchLandlordLeases();
         });
 
+        // Listen for cache invalidations dispatched by other landlord actions
+        window.addEventListener('domiknow:landlord-cache-invalidated', (e) => {
+            if (!token) return;
+            const domain = e.detail?.domain;
+            if (!domain || domain === 'leases' || domain === 'applications') {
+                fetchLandlordLeases(true);
+            }
+        });
+
         // ── Event delegation on table body ──────────────────────────────────
         document.getElementById('leasesTableBody').addEventListener('click', (e) => {
             const viewBtn = e.target.closest('[data-action="view"]');
@@ -156,7 +165,7 @@
                 if (!forceRefresh) {
                     const cached = window.landlordCache?.get('leases', 'list');
                     if (cached && Array.isArray(cached)) {
-                        fetchApprovedAppsQueue(cached);
+                        fetchApprovedAppsQueue(cached, false);
                         renderLeasesList(cached);
                     }
                 }
@@ -170,7 +179,7 @@
                 }
 
                 // Populate top Approved Applications Queue table
-                fetchApprovedAppsQueue(leases);
+                fetchApprovedAppsQueue(leases, forceRefresh);
                 renderLeasesList(leases);
 
             } catch (err) {
@@ -251,11 +260,6 @@
                     `;
                     tbody.appendChild(tr);
                 });
-
-            } catch (err) {
-                console.error('fetchLandlordLeases error:', err);
-                document.getElementById('leasesTableBody').innerHTML = `<tr><td colspan="8" style="text-align:center;color:#ef4444;">Connection error loading leases.</td></tr>`;
-            }
         }
 
         function renderUtilitiesConfigHTML(uConfig) {
@@ -311,204 +315,229 @@
             return `<div class="contract-value">${legacyList.length ? legacyList.join(', ') : 'None'}</div>`;
         }
 
-        async function openContract(leaseId) {
+        function renderContractDetails(lease) {
+            const content = document.getElementById('modalContent');
+            document.getElementById('modalLeaseNumber').textContent = `Agreement: ${lease.lease_number || 'DRAFT'}`;
+            document.getElementById('modalLeaseDate').textContent   = `Created ${fmtDateLong(lease.created_at)} · Status: ${lease.lease_status.replace(/_/g,' ').toUpperCase()}`;
+
+            const start   = fmtDateLong(lease.lease_start_date);
+            const end     = fmtDateLong(lease.lease_end_date);
+            const rent    = fmtMoney(lease.monthly_rent);
+            const deposit = fmtMoney(lease.security_deposit);
+            const advance = fmtMoney(lease.advance_payment || 0);
+            const months  = monthDiff(lease.lease_start_date, lease.lease_end_date);
+            const address = buildAddress(lease.properties);
+            const utilities = Array.isArray(lease.utilities_covered) ? lease.utilities_covered : [];
+            const utiltiesStr = utilities.length ? utilities.join(', ') + (lease.utilities_other ? `, ${lease.utilities_other}` : '') : 'None';
+
+            // landlord/tenant keys come from findLeaseById with named aliases
+            const landlord = lease.landlord || {};
+            const tenant   = lease.tenant   || {};
+            const prop     = lease.properties || {};
+
+            const sigStatusColor = lease.lease_status === 'active' ? '#10b981' : lease.lease_status === 'rejected' ? '#ef4444' : '#f59e0b';
+            const sigStatusLabel = lease.lease_status === 'active' ? 'ACCEPTED & SIGNED' : lease.lease_status === 'rejected' ? 'REJECTED BY TENANT' : 'PENDING TENANT SIGNATURE';
+
+            content.innerHTML = `
+                <!-- Tenant Concern / Appeal Alert -->
+                ${lease.lease_status === 'rejected' && lease.terms_and_conditions ? `
+                    <div style="background:rgba(239, 68, 68, 0.08);border:1px solid rgba(239, 68, 68, 0.25);border-radius:var(--radius-md);padding:1rem;margin-bottom:1.5rem;">
+                        <div style="font-weight:700;color:#ef4444;font-size:0.9rem;display:flex;align-items:center;gap:0.4rem;margin-bottom:0.35rem;">
+                            <svg class="svg-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                            Tenant Appeal & Rejection Concerns
+                        </div>
+                        <div style="font-size:0.85rem;color:var(--text-primary);white-space:pre-wrap;line-height:1.4;">${(lease.terms_and_conditions).replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div>
+                        <div style="font-size:0.75rem;color:var(--text-muted);margin-top:0.35rem;">Click 'Edit & Re-submit' to adjust contract terms for the tenant.</div>
+                    </div>
+                ` : ''}
+
+                <!-- Parties -->
+                <div class="contract-section">
+                    <div class="contract-section-title">Contracting Parties</div>
+                    <div class="parties-grid">
+                        <div class="party-box">
+                            <div class="party-role">Landlord (Lessor)</div>
+                            <div class="party-name">${landlord.full_name || '—'}</div>
+                            <div class="party-detail">Phone: ${landlord.contact_number || '—'}<br>Email: ${landlord.email || '—'}</div>
+                        </div>
+                        <div class="party-box">
+                            <div class="party-role">Tenant (Lessee)</div>
+                            <div class="party-name">${tenant.full_name || '—'}</div>
+                            <div class="party-detail">Phone: ${tenant.contact_number || '—'}<br>Email: ${tenant.email || '—'}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Property -->
+                <div class="contract-section">
+                    <div class="contract-section-title">Leased Property</div>
+                    <div class="contract-grid">
+                        <div class="contract-item"><span class="contract-label">Property Name</span><span class="contract-value">${prop.property_name || '—'}</span></div>
+                        <div class="contract-item"><span class="contract-label">Unit Number</span><span class="contract-value" style="color:var(--landlord);">${
+                            lease.property_units ? `Room ${lease.property_units.unit_number}${lease.unit_beds ? ` (Bed Space: ${lease.unit_beds.bed_label})` : ''}` : 'N/A'
+                        }</span></div>
+                        <div class="contract-item"><span class="contract-label">Property Type</span><span class="contract-value">${(prop.property_type || '').replace(/_/g,' ').toUpperCase() || '—'}</span></div>
+                    </div>
+                    <div style="margin-top:0.75rem;">
+                        <span class="contract-label">Full Address</span>
+                        <div class="contract-value" style="font-weight:500;margin-top:0.2rem;">${address}</div>
+                    </div>
+                </div>
+
+                <!-- Financial & Duration -->
+                <div class="contract-section">
+                    <div class="contract-section-title">Tenancy Period & Financial Terms</div>
+                    <div class="contract-grid">
+                        <div class="contract-item"><span class="contract-label">Lease Start</span><span class="contract-value">${start}</span></div>
+                        <div class="contract-item"><span class="contract-label">Lease End</span><span class="contract-value">${end}</span></div>
+                        <div class="contract-item"><span class="contract-label">Duration</span><span class="contract-value">${months} Month(s)</span></div>
+                        <div class="contract-item"><span class="contract-label">Monthly Rent</span><span class="contract-value" style="color:var(--landlord);">₱${rent}</span></div>
+                        <div class="contract-item"><span class="contract-label">Security Deposit</span><span class="contract-value">₱${deposit}</span></div>
+                        <div class="contract-item"><span class="contract-label">Advance Payment</span><span class="contract-value">₱${advance}</span></div>
+                        <div class="contract-item"><span class="contract-label">Payment Due</span><span class="contract-value">${lease.payment_due_day || 5}th of every month</span></div>
+                        <div class="contract-item"><span class="contract-label">Late Fee / Grace Period</span><span class="contract-value">${lease.late_fee_amount || 'None'} / ${lease.grace_period || 0} days</span></div>
+                    </div>
+                </div>
+
+                <!-- Utilities Configuration -->
+                <div class="contract-section">
+                    <div class="contract-section-title">Utilities Configuration (Legal Arrangement)</div>
+                    ${renderUtilitiesConfigHTML(lease.utilities_covered)}
+                </div>
+
+                <!-- Included Property & Unit Amenities -->
+                ${(() => {
+                    const amenList = (prop && prop.amenities) || [];
+                    if (!amenList.length) return '';
+                    return `
+                        <div class="contract-section">
+                            <div class="contract-section-title">Included Property Amenities & Facilities</div>
+                            <div style="display:flex;flex-wrap:wrap;gap:0.4rem;margin-top:0.5rem;">
+                                ${amenList.map(a => `
+                                    <div style="background:var(--bg-primary);border:1px solid var(--border-color);border-radius:var(--radius-md);padding:0.4rem 0.75rem;font-size:0.8rem;font-weight:700;color:var(--text-primary);display:inline-flex;align-items:center;gap:0.35rem;">
+                                        <svg class="svg-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="color:var(--landlord);"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                        <span>${a}</span>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    `;
+                })()}
+
+                <!-- Rules & Policies -->
+                <div class="contract-section">
+                    <div class="contract-section-title">Rules & Policies</div>
+                    <div class="contract-grid">
+                        <div class="contract-item"><span class="contract-label">Max Occupants</span><span class="contract-value">${lease.max_occupants || 1} person(s)</span></div>
+                        ${(() => {
+                            const uCov = typeof lease.utilities_covered === 'object' && lease.utilities_covered !== null ? lease.utilities_covered : {};
+                            const customPols = lease.custom_policies || uCov.custom_policies || [];
+                            if (!Array.isArray(customPols) || !customPols.length) {
+                                return `
+                                    <div class="contract-item"><span class="contract-label">Pet Policy</span><span class="contract-value">${lease.pet_policy || '—'}${lease.pet_conditions ? ` — ${lease.pet_conditions}` : ''}</span></div>
+                                    <div class="contract-item"><span class="contract-label">Smoking Policy</span><span class="contract-value">${lease.smoking_policy || '—'}</span></div>
+                                `;
+                            }
+                            return customPols.map(cp => {
+                                if (!cp || !cp.name) return '';
+                                const isAllowed = cp.value === 'Allowed';
+                                const valColor = isAllowed ? '#10b981' : '#ef4444';
+                                return `
+                                    <div class="contract-item">
+                                        <span class="contract-label">${(cp.name).replace(/</g,'&lt;').replace(/>/g,'&gt;')}</span>
+                                        <span class="contract-value" style="color:${valColor};font-weight:700;">${cp.value || 'Not Allowed'}</span>
+                                    </div>
+                                `;
+                            }).join('');
+                        })()}
+                    </div>
+                    <div style="margin-top:0.85rem;padding-top:0.75rem;border-top:1px dashed var(--border-color);">
+                        <div class="contract-label" style="margin-bottom:0.35rem;font-weight:700;">Additional House Rules & Specific Premises Guidelines</div>
+                        <div class="contract-textarea">${lease.house_rules || 'No specific house rules outlined.'}</div>
+                    </div>
+                </div>
+
+                <!-- Maintenance -->
+                <div class="contract-section">
+                    <div class="contract-section-title">Maintenance Responsibilities</div>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+                        <div><div class="contract-label" style="margin-bottom:0.4rem;">Landlord</div><div class="contract-textarea">${lease.landlord_responsibilities || '—'}</div></div>
+                        <div><div class="contract-label" style="margin-bottom:0.4rem;">Tenant</div><div class="contract-textarea">${lease.tenant_responsibilities || '—'}</div></div>
+                    </div>
+                </div>
+
+                <!-- Termination & Extra Terms -->
+                <div class="contract-section">
+                    <div class="contract-section-title">Termination & Extra Terms</div>
+                    <div class="contract-label" style="margin-bottom:0.4rem;">Termination Policy</div>
+                    <div class="contract-textarea">${lease.termination_policy || '—'}</div>
+                    ${lease.additional_terms ? `<div class="contract-label" style="margin-top:1rem;margin-bottom:0.4rem;">Additional Terms</div><div class="contract-textarea">${lease.additional_terms}</div>` : ''}
+                </div>
+
+                <!-- Signatures -->
+                <div class="contract-section">
+                    <div class="contract-section-title">Electronic Signatures</div>
+                    <div class="signature-sheet">
+                        <div>
+                            <div class="contract-label">Landlord (Lessor)</div>
+                            <div style="font-weight:700;color:#10b981;font-size:0.85rem;margin-bottom:0.5rem;">SIGNED & VERIFIED</div>
+                            <div class="signature-box">
+                                <div class="signature-name">${lease.landlord_signature_name || '—'}</div>
+                                <div class="sig-date">Signed on ${lease.landlord_signature_date ? fmtDateTimeLocal(lease.landlord_signature_date) : '—'}</div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="contract-label">Tenant (Lessee)</div>
+                            <div style="font-weight:700;color:${sigStatusColor};font-size:0.85rem;margin-bottom:0.5rem;">${sigStatusLabel}</div>
+                            <div class="signature-box">
+                                <div class="signature-name" style="color:${lease.lease_status === 'rejected' ? '#ef4444' : 'var(--primary)'};">${lease.tenant_signature_name || '— Awaiting —'}</div>
+                                <div class="sig-date">${lease.tenant_signature_date ? `Signed on ${fmtDateTimeLocal(lease.tenant_signature_date)}` : 'Not yet signed.'}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        async function openContract(leaseId, forceRefresh = false) {
             const modal   = document.getElementById('contractModal');
             const content = document.getElementById('modalContent');
-            document.getElementById('modalLeaseNumber').textContent = 'Lease Contract';
-            document.getElementById('modalLeaseDate').textContent   = '';
-            content.innerHTML = '<div style="text-align:center;padding:3rem;color:var(--text-muted);">Loading contract details...</div>';
             modal.classList.remove('hidden');
+
+            let hasRendered = false;
+            if (!forceRefresh) {
+                const cached = window.landlordCache?.get('leases', String(leaseId));
+                if (cached) {
+                    renderContractDetails(cached);
+                    hasRendered = true;
+                }
+            }
+
+            if (!hasRendered) {
+                document.getElementById('modalLeaseNumber').textContent = 'Lease Contract';
+                document.getElementById('modalLeaseDate').textContent   = '';
+                content.innerHTML = '<div style="text-align:center;padding:3rem;color:var(--text-muted);">Loading contract details...</div>';
+            }
 
             try {
                 const res = await fetch(`/api/leases/${leaseId}`, { headers: { 'Authorization': `Bearer ${token}` } });
-                if (!res.ok) { content.innerHTML = `<div style="text-align:center;padding:2rem;color:#ef4444;">Failed to load lease. (${res.status})</div>`; return; }
+                if (!res.ok) {
+                    if (!hasRendered) {
+                        content.innerHTML = `<div style="text-align:center;padding:2rem;color:#ef4444;">Failed to load lease. (${res.status})</div>`;
+                    }
+                    return;
+                }
 
                 const { data: lease } = await res.json();
-
-                document.getElementById('modalLeaseNumber').textContent = `Agreement: ${lease.lease_number || 'DRAFT'}`;
-                document.getElementById('modalLeaseDate').textContent   = `Created ${fmtDateLong(lease.created_at)} · Status: ${lease.lease_status.replace(/_/g,' ').toUpperCase()}`;
-
-                const start   = fmtDateLong(lease.lease_start_date);
-                const end     = fmtDateLong(lease.lease_end_date);
-                const rent    = fmtMoney(lease.monthly_rent);
-                const deposit = fmtMoney(lease.security_deposit);
-                const advance = fmtMoney(lease.advance_payment || 0);
-                const months  = monthDiff(lease.lease_start_date, lease.lease_end_date);
-                const address = buildAddress(lease.properties);
-                const utilities = Array.isArray(lease.utilities_covered) ? lease.utilities_covered : [];
-                const utiltiesStr = utilities.length ? utilities.join(', ') + (lease.utilities_other ? `, ${lease.utilities_other}` : '') : 'None';
-
-                // landlord/tenant keys come from findLeaseById with named aliases
-                const landlord = lease.landlord || {};
-                const tenant   = lease.tenant   || {};
-                const prop     = lease.properties || {};
-
-                const sigStatusColor = lease.lease_status === 'active' ? '#10b981' : lease.lease_status === 'rejected' ? '#ef4444' : '#f59e0b';
-                const sigStatusLabel = lease.lease_status === 'active' ? 'ACCEPTED & SIGNED' : lease.lease_status === 'rejected' ? 'REJECTED BY TENANT' : 'PENDING TENANT SIGNATURE';
-
-                content.innerHTML = `
-                    <!-- Tenant Concern / Appeal Alert -->
-                    ${lease.lease_status === 'rejected' && lease.terms_and_conditions ? `
-                        <div style="background:rgba(239, 68, 68, 0.08);border:1px solid rgba(239, 68, 68, 0.25);border-radius:var(--radius-md);padding:1rem;margin-bottom:1.5rem;">
-                            <div style="font-weight:700;color:#ef4444;font-size:0.9rem;display:flex;align-items:center;gap:0.4rem;margin-bottom:0.35rem;">
-                                <svg class="svg-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
-                                Tenant Appeal & Rejection Concerns
-                            </div>
-                            <div style="font-size:0.85rem;color:var(--text-primary);white-space:pre-wrap;line-height:1.4;">${(lease.terms_and_conditions).replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div>
-                            <div style="font-size:0.75rem;color:var(--text-muted);margin-top:0.35rem;">Click 'Edit & Re-submit' to adjust contract terms for the tenant.</div>
-                        </div>
-                    ` : ''}
-
-                    <!-- Parties -->
-                    <div class="contract-section">
-                        <div class="contract-section-title">Contracting Parties</div>
-                        <div class="parties-grid">
-                            <div class="party-box">
-                                <div class="party-role">Landlord (Lessor)</div>
-                                <div class="party-name">${landlord.full_name || '—'}</div>
-                                <div class="party-detail">Phone: ${landlord.contact_number || '—'}<br>Email: ${landlord.email || '—'}</div>
-                            </div>
-                            <div class="party-box">
-                                <div class="party-role">Tenant (Lessee)</div>
-                                <div class="party-name">${tenant.full_name || '—'}</div>
-                                <div class="party-detail">Phone: ${tenant.contact_number || '—'}<br>Email: ${tenant.email || '—'}</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Property -->
-                    <div class="contract-section">
-                        <div class="contract-section-title">Leased Property</div>
-                        <div class="contract-grid">
-                            <div class="contract-item"><span class="contract-label">Property Name</span><span class="contract-value">${prop.property_name || '—'}</span></div>
-                            <div class="contract-item"><span class="contract-label">Unit Number</span><span class="contract-value" style="color:var(--landlord);">${
-                                lease.property_units ? `Room ${lease.property_units.unit_number}${lease.unit_beds ? ` (Bed Space: ${lease.unit_beds.bed_label})` : ''}` : 'N/A'
-                            }</span></div>
-                            <div class="contract-item"><span class="contract-label">Property Type</span><span class="contract-value">${(prop.property_type || '').replace(/_/g,' ').toUpperCase() || '—'}</span></div>
-                        </div>
-                        <div style="margin-top:0.75rem;">
-                            <span class="contract-label">Full Address</span>
-                            <div class="contract-value" style="font-weight:500;margin-top:0.2rem;">${address}</div>
-                        </div>
-                    </div>
-
-                    <!-- Financial & Duration -->
-                    <div class="contract-section">
-                        <div class="contract-section-title">Tenancy Period & Financial Terms</div>
-                        <div class="contract-grid">
-                            <div class="contract-item"><span class="contract-label">Lease Start</span><span class="contract-value">${start}</span></div>
-                            <div class="contract-item"><span class="contract-label">Lease End</span><span class="contract-value">${end}</span></div>
-                            <div class="contract-item"><span class="contract-label">Duration</span><span class="contract-value">${months} Month(s)</span></div>
-                            <div class="contract-item"><span class="contract-label">Monthly Rent</span><span class="contract-value" style="color:var(--landlord);">₱${rent}</span></div>
-                            <div class="contract-item"><span class="contract-label">Security Deposit</span><span class="contract-value">₱${deposit}</span></div>
-                            <div class="contract-item"><span class="contract-label">Advance Payment</span><span class="contract-value">₱${advance}</span></div>
-                            <div class="contract-item"><span class="contract-label">Payment Due</span><span class="contract-value">${lease.payment_due_day || 5}th of every month</span></div>
-                            <div class="contract-item"><span class="contract-label">Late Fee / Grace Period</span><span class="contract-value">${lease.late_fee_amount || 'None'} / ${lease.grace_period || 0} days</span></div>
-                        </div>
-                    </div>
-
-                    <!-- Utilities Configuration -->
-                    <div class="contract-section">
-                        <div class="contract-section-title">Utilities Configuration (Legal Arrangement)</div>
-                        ${renderUtilitiesConfigHTML(lease.utilities_covered)}
-                    </div>
-
-                    <!-- Included Property & Unit Amenities -->
-                    ${(() => {
-                        const amenList = (prop && prop.amenities) || [];
-                        if (!amenList.length) return '';
-                        return `
-                            <div class="contract-section">
-                                <div class="contract-section-title">Included Property Amenities & Facilities</div>
-                                <div style="display:flex;flex-wrap:wrap;gap:0.4rem;margin-top:0.5rem;">
-                                    ${amenList.map(a => `
-                                        <div style="background:var(--bg-primary);border:1px solid var(--border-color);border-radius:var(--radius-md);padding:0.4rem 0.75rem;font-size:0.8rem;font-weight:700;color:var(--text-primary);display:inline-flex;align-items:center;gap:0.35rem;">
-                                            <svg class="svg-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="color:var(--landlord);"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                                            <span>${a}</span>
-                                        </div>
-                                    `).join('')}
-                                </div>
-                            </div>
-                        `;
-                    })()}
-
-                    <!-- Rules & Policies -->
-                    <div class="contract-section">
-                        <div class="contract-section-title">Rules & Policies</div>
-                        <div class="contract-grid">
-                            <div class="contract-item"><span class="contract-label">Max Occupants</span><span class="contract-value">${lease.max_occupants || 1} person(s)</span></div>
-                            ${(() => {
-                                const uCov = typeof lease.utilities_covered === 'object' && lease.utilities_covered !== null ? lease.utilities_covered : {};
-                                const customPols = lease.custom_policies || uCov.custom_policies || [];
-                                if (!Array.isArray(customPols) || !customPols.length) {
-                                    return `
-                                        <div class="contract-item"><span class="contract-label">Pet Policy</span><span class="contract-value">${lease.pet_policy || '—'}${lease.pet_conditions ? ` — ${lease.pet_conditions}` : ''}</span></div>
-                                        <div class="contract-item"><span class="contract-label">Smoking Policy</span><span class="contract-value">${lease.smoking_policy || '—'}</span></div>
-                                    `;
-                                }
-                                return customPols.map(cp => {
-                                    if (!cp || !cp.name) return '';
-                                    const isAllowed = cp.value === 'Allowed';
-                                    const valColor = isAllowed ? '#10b981' : '#ef4444';
-                                    return `
-                                        <div class="contract-item">
-                                            <span class="contract-label">${(cp.name).replace(/</g,'&lt;').replace(/>/g,'&gt;')}</span>
-                                            <span class="contract-value" style="color:${valColor};font-weight:700;">${cp.value || 'Not Allowed'}</span>
-                                        </div>
-                                    `;
-                                }).join('');
-                            })()}
-                        </div>
-                        <div style="margin-top:0.85rem;padding-top:0.75rem;border-top:1px dashed var(--border-color);">
-                            <div class="contract-label" style="margin-bottom:0.35rem;font-weight:700;">Additional House Rules & Specific Premises Guidelines</div>
-                            <div class="contract-textarea">${lease.house_rules || 'No specific house rules outlined.'}</div>
-                        </div>
-                    </div>
-
-                    <!-- Maintenance -->
-                    <div class="contract-section">
-                        <div class="contract-section-title">Maintenance Responsibilities</div>
-                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
-                            <div><div class="contract-label" style="margin-bottom:0.4rem;">Landlord</div><div class="contract-textarea">${lease.landlord_responsibilities || '—'}</div></div>
-                            <div><div class="contract-label" style="margin-bottom:0.4rem;">Tenant</div><div class="contract-textarea">${lease.tenant_responsibilities || '—'}</div></div>
-                        </div>
-                    </div>
-
-                    <!-- Termination & Extra Terms -->
-                    <div class="contract-section">
-                        <div class="contract-section-title">Termination & Extra Terms</div>
-                        <div class="contract-label" style="margin-bottom:0.4rem;">Termination Policy</div>
-                        <div class="contract-textarea">${lease.termination_policy || '—'}</div>
-                        ${lease.additional_terms ? `<div class="contract-label" style="margin-top:1rem;margin-bottom:0.4rem;">Additional Terms</div><div class="contract-textarea">${lease.additional_terms}</div>` : ''}
-                    </div>
-
-                    <!-- Signatures -->
-                    <div class="contract-section">
-                        <div class="contract-section-title">Electronic Signatures</div>
-                        <div class="signature-sheet">
-                            <div>
-                                <div class="contract-label">Landlord (Lessor)</div>
-                                <div style="font-weight:700;color:#10b981;font-size:0.85rem;margin-bottom:0.5rem;">SIGNED & VERIFIED</div>
-                                <div class="signature-box">
-                                    <div class="signature-name">${lease.landlord_signature_name || '—'}</div>
-                                    <div class="sig-date">Signed on ${lease.landlord_signature_date ? fmtDateTimeLocal(lease.landlord_signature_date) : '—'}</div>
-                                </div>
-                            </div>
-                            <div>
-                                <div class="contract-label">Tenant (Lessee)</div>
-                                <div style="font-weight:700;color:${sigStatusColor};font-size:0.85rem;margin-bottom:0.5rem;">${sigStatusLabel}</div>
-                                <div class="signature-box">
-                                    <div class="signature-name" style="color:${lease.lease_status === 'rejected' ? '#ef4444' : 'var(--primary)'};">${lease.tenant_signature_name || '— Awaiting —'}</div>
-                                    <div class="sig-date">${lease.tenant_signature_date ? `Signed on ${fmtDateTimeLocal(lease.tenant_signature_date)}` : 'Not yet signed.'}</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                `;
-
+                if (lease) {
+                    window.landlordCache?.set('leases', String(leaseId), lease);
+                    renderContractDetails(lease);
+                }
             } catch (err) {
                 console.error('openContract error:', err);
-                content.innerHTML = `<div style="text-align:center;padding:2rem;color:#ef4444;">Unexpected error loading contract.</div>`;
+                if (!hasRendered) {
+                    content.innerHTML = `<div style="text-align:center;padding:2rem;color:#ef4444;">Unexpected error loading contract.</div>`;
+                }
             }
         }
 
@@ -545,84 +574,117 @@
             return parts.join(', ') || '—';
         }
 
-        async function fetchApprovedAppsQueue(existingLeases) {
+        let activeApplicationsQueuePromise = null;
+
+        function renderApprovedAppsQueue(allApps, existingLeases) {
+            const container = document.getElementById('approvedAppsContainer');
+            const apps = (allApps || []).filter(a => a.status === 'approved');
+
+            if (apps.length === 0) {
+                container.innerHTML = `
+                    <div style="text-align:center;padding:1.5rem;color:var(--text-muted);font-size:0.875rem;">
+                        No approved tenant applications currently in queue.
+                    </div>
+                `;
+                return;
+            }
+
+            const leasedAppMap = {};
+            (existingLeases || []).forEach(l => {
+                if (['active', 'pending_tenant_acceptance', 'accepted'].includes(l.lease_status)) {
+                    if (l.application_id) leasedAppMap[l.application_id] = l;
+                    if (l.tenant_id) leasedAppMap[l.tenant_id] = l;
+                    if (l.tenant_id && l.property_id) leasedAppMap[l.tenant_id + '_' + l.property_id] = l;
+                }
+            });
+
+            let html = `
+                <table style="width:100%;border-collapse:collapse;font-size:0.875rem;">
+                    <thead>
+                        <tr style="border-bottom:2px solid var(--border-color);text-transform:uppercase;font-size:0.72rem;letter-spacing:0.05em;color:var(--text-secondary);">
+                            <th style="padding:0.6rem 0.8rem;text-align:left;">Applicant</th>
+                            <th style="padding:0.6rem 0.8rem;text-align:left;">Property</th>
+                            <th style="padding:0.6rem 0.8rem;text-align:left;">Desired Move-in</th>
+                            <th style="padding:0.6rem 0.8rem;text-align:left;">Lease Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            apps.forEach(app => {
+                const tenantName = app.users?.full_name || 'Tenant';
+                const tenantEmail = app.users?.email || '';
+                const propName = app.properties?.property_name || 'Property';
+                const unitStr = app.properties?.unit_number ? ` (Unit ${app.properties.unit_number})` : '';
+                const moveIn = app.desired_move_in_date ? new Date(app.desired_move_in_date).toLocaleDateString('en-PH', { year:'numeric', month:'short', day:'numeric' }) : '—';
+                
+                const existingLease = leasedAppMap[app.id] || (app.tenant_id ? (leasedAppMap[app.tenant_id + '_' + app.property_id] || leasedAppMap[app.tenant_id]) : null);
+
+                let statusBadge = `<span class="status-badge status-active" style="font-size:0.72rem;background:#d1fae5;color:#065f46;">APPROVED - READY FOR LEASE</span>`;
+
+                if (existingLease) {
+                    statusBadge = `<span class="status-badge" style="font-size:0.72rem;background:#e0e7ff;color:#3730a3;">LEASE CREATED (${existingLease.lease_status.toUpperCase()})</span>`;
+                }
+
+                html += `
+                    <tr style="border-bottom:1px solid var(--border-color);">
+                        <td style="padding:0.75rem 0.8rem;text-align:left;">
+                            <div style="font-weight:700;">${tenantName}</div>
+                            <div style="font-size:0.75rem;color:var(--text-muted);">${tenantEmail}</div>
+                        </td>
+                        <td style="padding:0.75rem 0.8rem;text-align:left;">
+                            <div style="font-weight:600;">${propName}${unitStr}</div>
+                        </td>
+                        <td style="padding:0.75rem 0.8rem;text-align:left;font-weight:600;">${moveIn}</td>
+                        <td style="padding:0.75rem 0.8rem;text-align:left;">${statusBadge}</td>
+                    </tr>
+                `;
+            });
+
+            html += `</tbody></table>`;
+            container.innerHTML = html;
+        }
+
+        async function fetchApprovedAppsQueue(existingLeases, forceRefresh = false) {
             const container = document.getElementById('approvedAppsContainer');
             try {
-                const res = await fetch('/api/landlord/applications', { headers: { 'Authorization': `Bearer ${token}` } });
-                if (!res.ok) {
-                    container.innerHTML = `<div style="text-align:center;padding:1rem;color:var(--text-muted);">Unable to load applications queue.</div>`;
-                    return;
-                }
-                const json = await res.json();
-                const apps = (json.data || []).filter(a => a.status === 'approved');
-
-                if (apps.length === 0) {
-                    container.innerHTML = `
-                        <div style="text-align:center;padding:1.5rem;color:var(--text-muted);font-size:0.875rem;">
-                            No approved tenant applications currently in queue.
-                        </div>
-                    `;
-                    return;
+                let hasCachedData = false;
+                if (!forceRefresh) {
+                    const cached = window.landlordCache?.get('applications', 'list');
+                    if (cached && Array.isArray(cached)) {
+                        renderApprovedAppsQueue(cached, existingLeases);
+                        hasCachedData = true;
+                    }
                 }
 
-                const leasedAppMap = {};
-                (existingLeases || []).forEach(l => {
-                    if (['active', 'pending_tenant_acceptance', 'accepted'].includes(l.lease_status)) {
-                        if (l.application_id) leasedAppMap[l.application_id] = l;
-                        if (l.tenant_id) leasedAppMap[l.tenant_id] = l;
-                        if (l.tenant_id && l.property_id) leasedAppMap[l.tenant_id + '_' + l.property_id] = l;
+                if (!activeApplicationsQueuePromise || forceRefresh) {
+                    activeApplicationsQueuePromise = fetch('/api/landlord/applications', {
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    }).then(r => r.ok ? r.json() : null).catch(err => {
+                        console.error('fetchApprovedAppsQueue network error:', err);
+                        return null;
+                    });
+                }
+
+                const json = await activeApplicationsQueuePromise;
+                activeApplicationsQueuePromise = null;
+
+                if (!json || !json.data) {
+                    if (!hasCachedData && !container.querySelector('table')) {
+                        container.innerHTML = `<div style="text-align:center;padding:1rem;color:var(--text-muted);">Unable to load applications queue.</div>`;
                     }
-                });
+                    return;
+                }
 
-                let html = `
-                    <table style="width:100%;border-collapse:collapse;font-size:0.875rem;">
-                        <thead>
-                            <tr style="border-bottom:2px solid var(--border-color);text-transform:uppercase;font-size:0.72rem;letter-spacing:0.05em;color:var(--text-secondary);">
-                                <th style="padding:0.6rem 0.8rem;text-align:left;">Applicant</th>
-                                <th style="padding:0.6rem 0.8rem;text-align:left;">Property</th>
-                                <th style="padding:0.6rem 0.8rem;text-align:left;">Desired Move-in</th>
-                                <th style="padding:0.6rem 0.8rem;text-align:left;">Lease Status</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                `;
-
-                apps.forEach(app => {
-                    const tenantName = app.users?.full_name || 'Tenant';
-                    const tenantEmail = app.users?.email || '';
-                    const propName = app.properties?.property_name || 'Property';
-                    const unitStr = app.properties?.unit_number ? ` (Unit ${app.properties.unit_number})` : '';
-                    const moveIn = app.desired_move_in_date ? new Date(app.desired_move_in_date).toLocaleDateString('en-PH', { year:'numeric', month:'short', day:'numeric' }) : '—';
-                    
-                    const existingLease = leasedAppMap[app.id] || (app.tenant_id ? (leasedAppMap[app.tenant_id + '_' + app.property_id] || leasedAppMap[app.tenant_id]) : null);
-
-                    let statusBadge = `<span class="status-badge status-active" style="font-size:0.72rem;background:#d1fae5;color:#065f46;">APPROVED - READY FOR LEASE</span>`;
-
-                    if (existingLease) {
-                        statusBadge = `<span class="status-badge" style="font-size:0.72rem;background:#e0e7ff;color:#3730a3;">LEASE CREATED (${existingLease.lease_status.toUpperCase()})</span>`;
-                    }
-
-                    html += `
-                        <tr style="border-bottom:1px solid var(--border-color);">
-                            <td style="padding:0.75rem 0.8rem;text-align:left;">
-                                <div style="font-weight:700;">${tenantName}</div>
-                                <div style="font-size:0.75rem;color:var(--text-muted);">${tenantEmail}</div>
-                            </td>
-                            <td style="padding:0.75rem 0.8rem;text-align:left;">
-                                <div style="font-weight:600;">${propName}${unitStr}</div>
-                            </td>
-                            <td style="padding:0.75rem 0.8rem;text-align:left;font-weight:600;">${moveIn}</td>
-                            <td style="padding:0.75rem 0.8rem;text-align:left;">${statusBadge}</td>
-                        </tr>
-                    `;
-                });
-
-                html += `</tbody></table>`;
-                container.innerHTML = html;
+                const allApps = json.data || [];
+                window.landlordCache?.set('applications', 'list', allApps);
+                renderApprovedAppsQueue(allApps, existingLeases);
 
             } catch (err) {
                 console.error('fetchApprovedAppsQueue error:', err);
-                container.innerHTML = `<div style="text-align:center;padding:1rem;color:var(--text-muted);">Failed to load approved applications queue.</div>`;
+                if (!container.querySelector('table')) {
+                    container.innerHTML = `<div style="text-align:center;padding:1rem;color:var(--text-muted);">Failed to load approved applications queue.</div>`;
+                }
             }
         }
     </script>

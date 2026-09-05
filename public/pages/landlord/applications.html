@@ -191,11 +191,6 @@
                     `;
                     tableBody.appendChild(row);
                 });
-
-            } catch (err) {
-                console.error(err);
-                tableBody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: var(--error);">Error contacting database servers.</td></tr>`;
-            }
         }
     </script>
 </body>
