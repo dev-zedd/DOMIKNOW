@@ -558,10 +558,11 @@
 
         const intro = document.createElement('div');
         intro.className = 'landlord-module-intro';
-        intro.appendChild(createSummary(meta));
 
         const flow = createOperatingFlow(meta.step);
         if (flow) intro.appendChild(flow);
+
+        if (!intro.hasChildNodes()) return;
 
         const breadcrumbs = content.querySelector(':scope > [data-domiknow-breadcrumbs]');
         if (breadcrumbs) breadcrumbs.insertAdjacentElement('afterend', intro);

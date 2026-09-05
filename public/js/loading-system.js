@@ -111,6 +111,7 @@
             }
             button.disabled = true;
             button.classList.add('dk-button-loading');
+            button.classList.remove('dk-auto-button-loading');
             button.setAttribute('aria-busy', 'true');
             button.innerHTML = '';
             const content = document.createElement('span');
@@ -130,6 +131,7 @@
         button.innerHTML = previous.html;
         button.disabled = previous.disabled;
         button.classList.remove('dk-button-loading');
+        button.classList.remove('dk-auto-button-loading');
         button.removeAttribute('aria-busy');
         if (previous.ariaLabel === null) button.removeAttribute('aria-label');
         else button.setAttribute('aria-label', previous.ariaLabel);
@@ -215,6 +217,10 @@
         candidates.forEach(node => {
             if (node.closest('[data-domiknow-loading-ignore]')) return;
             if (node instanceof HTMLButtonElement) {
+                if (node.classList.contains('dk-button-loading') || (typeof node.querySelector === 'function' && node.querySelector('.dk-spinner'))) {
+                    node.classList.remove('dk-auto-button-loading');
+                    return;
+                }
                 const loadingButton = node.disabled && LEGACY_LOADING_PATTERN.test(node.textContent.trim());
                 node.classList.toggle('dk-auto-button-loading', loadingButton);
                 if (loadingButton) node.setAttribute('aria-busy', 'true');

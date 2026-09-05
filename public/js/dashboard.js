@@ -131,7 +131,9 @@ function populateDashboardUI(user) {
 
     const avatar = document.querySelector('.topbar-avatar');
     if (avatar) {
-        const initials = String(user.full_name || 'Tenant')
+        const fallbackInitial = (user && user.role === 'landlord') ? 'L' : 'T';
+        const fallbackName = (user && user.role === 'landlord') ? 'Landlord' : 'Tenant';
+        const initials = String(user.full_name || fallbackName)
             .trim()
             .split(/\s+/)
             .slice(0, 2)
@@ -139,7 +141,7 @@ function populateDashboardUI(user) {
             .join('');
         const profileImageUrl = user.profile_image_url ? domiknowSafeExternalUrl(user.profile_image_url) : '';
         const hasProfileImage = Boolean(profileImageUrl && profileImageUrl !== '#');
-        avatar.textContent = hasProfileImage ? '' : (initials || 'T');
+        avatar.textContent = hasProfileImage ? '' : (initials || fallbackInitial);
         avatar.style.backgroundImage = hasProfileImage ? `url("${profileImageUrl.replace(/"/g, '%22')}")` : '';
         avatar.style.backgroundSize = hasProfileImage ? 'cover' : '';
         avatar.style.backgroundPosition = hasProfileImage ? 'center' : '';
@@ -194,10 +196,11 @@ function loadTenantModuleAssets() {
 }
 
 function loadLandlordModuleAssets() {
+    document.documentElement.setAttribute('data-landlord-portal', 'true');
     if (!document.querySelector('link[data-landlord-module]')) {
         const stylesheet = document.createElement('link');
         stylesheet.rel = 'stylesheet';
-        stylesheet.href = '/css/landlord.css?v=20260827-4';
+        stylesheet.href = '/css/landlord.css?v=20260905-3';
         stylesheet.setAttribute('data-landlord-module', '');
         document.head.appendChild(stylesheet);
     }
@@ -206,7 +209,7 @@ function loadLandlordModuleAssets() {
 
     if (!document.querySelector('script[data-landlord-module]')) {
         const script = document.createElement('script');
-        script.src = '/js/landlord.js?v=20260827-4';
+        script.src = '/js/landlord.js?v=20260905-1';
         script.defer = true;
         script.setAttribute('data-landlord-module', '');
         document.head.appendChild(script);
@@ -626,19 +629,22 @@ function renderNewDashboardLayout(user) {
                 <div class="sidebar-logo-container">
                     <div class="app-brand" aria-label="DOMIKNOW">
                         <span class="app-brand-mark" aria-hidden="true">D</span>
-                        <span class="app-brand-name">DOMI<span class="app-brand-accent">KNOW</span></span>
+                        <span class="landlord-brand-copy">
+                            <span class="app-brand-name">DOMI<span class="app-brand-accent">KNOW</span></span>
+                        </span>
                     </div>
-                    <span class="role-badge navbar-badge ${roleBadgeClass}">Landlord console</span>
                 </div>
                 <nav class="sidebar-menu" aria-label="Primary navigation">
         `;
 
+        let landlordItemIndex = 0;
         landlordGroups.forEach(group => {
             sidebarHtml += `<div class="sidebar-section-title">${group.section}</div>`;
             group.items.forEach(item => {
                 const isActive = activeNavigationFilename === item.href;
+                landlordItemIndex++;
                 sidebarHtml += `
-                    <a href="${item.href}" class="sidebar-link ${isActive ? 'active' : ''}" ${isActive ? 'aria-current="page"' : ''}>
+                    <a href="${item.href}" class="sidebar-link ${isActive ? 'active' : ''}" ${isActive ? 'aria-current="page"' : ''} style="--sidebar-item-index: ${landlordItemIndex};">
                         ${getLinkIcon(item.icon)}
                         <span>${item.label}</span>
                     </a>
@@ -648,12 +654,6 @@ function renderNewDashboardLayout(user) {
 
         sidebarHtml += `
                 </nav>
-                <div class="sidebar-footer">
-                    <button type="button" id="newLogoutBtn" class="sidebar-link sidebar-logout" aria-label="Log out of DOMIKNOW">
-                        <svg class="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-                        <span>Log out</span>
-                    </button>
-                </div>
             </aside>
         `;
     } else if (role === 'maintenance') {
@@ -755,11 +755,11 @@ function renderNewDashboardLayout(user) {
                     <button type="button" id="menuToggleBtn" class="mobile-menu-toggle topbar-action" aria-label="Open navigation" aria-controls="domiknowSidebar" aria-expanded="false">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/></svg>
                     </button>
-                    ${role === 'tenant' ? `
+                    ${(role === 'tenant' || role === 'landlord') ? `
                     <h1 class="sr-only" id="appPageTitle">${pageTitle}</h1>
                     ` : `
                     <div class="topbar-heading">
-                        <span class="topbar-context">${role === 'landlord' ? 'Landlord console' : role === 'maintenance' ? 'Field operations' : role === 'admin' ? 'Platform control center' : `${roleLabel} workspace`}</span>
+                        <span class="topbar-context">${role === 'maintenance' ? 'Field operations' : role === 'admin' ? 'Platform control center' : `${roleLabel} workspace`}</span>
                         <h1 class="topbar-title" id="appPageTitle">${pageTitle}</h1>
                     </div>
                     `}
@@ -769,18 +769,18 @@ function renderNewDashboardLayout(user) {
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
                         <span class="notification-trigger__badge" data-notification-badge hidden>0</span>
                     </button>
-                    ${role !== 'tenant' ? `
+                    ${(role !== 'tenant' && role !== 'landlord') ? `
                     <button type="button" class="topbar-action theme-toggle" data-theme-toggle aria-label="Toggle color theme" aria-pressed="false" title="Toggle color theme">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.66 6.34l1.41-1.41"/></svg>
                     </button>
                     ` : ''}
-                    ${role === 'tenant' ? `
+                    ${(role === 'tenant' || role === 'landlord') ? `
                     <div class="topbar-account-dropdown" id="topbarAccountDropdown">
                         <button type="button" class="topbar-avatar-btn" id="profileDropdownBtn" aria-expanded="false" aria-haspopup="true" aria-label="Open account menu" title="Account menu">
-                            <span class="topbar-avatar" aria-hidden="true">${shellUserName.trim().charAt(0).toUpperCase() || 'T'}</span>
+                            <span class="topbar-avatar" aria-hidden="true">${shellUserName.trim().charAt(0).toUpperCase() || (role === 'landlord' ? 'L' : 'T')}</span>
                         </button>
                         <div class="topbar-dropdown-menu" id="profileDropdownMenu" role="menu" aria-labelledby="profileDropdownBtn" hidden>
-                            <a href="/pages/tenant/profile.html" class="topbar-dropdown-item ${activeNavigationFilename === 'profile.html' ? 'active' : ''}" id="dropdownProfileLink" role="menuitem">
+                            <a href="/pages/${role}/profile.html" class="topbar-dropdown-item ${activeNavigationFilename === 'profile.html' ? 'active' : ''}" id="dropdownProfileLink" role="menuitem">
                                 <span class="dropdown-item-icon" aria-hidden="true">
                                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
                                 </span>
@@ -1107,7 +1107,7 @@ function renderNewDashboardLayout(user) {
             e.stopPropagation();
             if (profileDropdownMenu) profileDropdownMenu.hidden = true;
             if (profileDropdownBtn) profileDropdownBtn.setAttribute('aria-expanded', 'false');
-            window.location.href = '/pages/tenant/profile.html';
+            window.location.href = dropdownProfileLink.getAttribute('href') || ('/pages/' + (role || 'tenant') + '/profile.html');
         });
     }
 

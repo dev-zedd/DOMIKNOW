@@ -180,6 +180,21 @@ td.dk-auto-skeleton { display: table-cell; width: auto; height: 52px; }
   vertical-align: -0.15em;
   animation: dk-spin 650ms linear infinite;
 }
+
+/* Prevent duplicate spinner pseudo-elements on loading buttons */
+.dk-button-loading::before,
+.dk-button-loading::after,
+.dk-button-loading.dk-auto-button-loading::before,
+.dk-button-loading.dk-auto-button-loading::after,
+button[aria-busy="true"].dk-button-loading::before,
+button[aria-busy="true"].dk-button-loading::after,
+button[aria-busy="true"]:has(.dk-spinner)::before,
+button[aria-busy="true"]:has(.dk-spinner)::after,
+.dk-auto-button-loading::after,
+button[aria-busy="true"].dk-auto-button-loading::after {
+  display: none !important;
+  content: none !important;
+}
 .dk-spinner {
   width: 1em;
   height: 1em;

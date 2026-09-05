@@ -1436,17 +1436,25 @@
   align-items: center;
 }
 
-.discovery-search-control > .ui-icon {
+.discovery-search-control > :is(.ui-icon, [data-icon]) {
   position: absolute;
   z-index: 1;
-  left: 13px;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
   width: 18px;
   height: 18px;
   color: var(--color-text-muted);
   pointer-events: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.discovery-search-control input { padding: 0 12px 0 40px; }
+.discovery-search-control input {
+  padding: 0.625rem 14px 0.625rem 42px !important;
+  padding-left: 42px !important;
+}
 
 .discovery-controls :where(input, select):focus-visible,
 .results-sort select:focus-visible {

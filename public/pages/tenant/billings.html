@@ -312,10 +312,11 @@
         }
 
         /* ── Modals ── */
+        /* ── Modern Statement & Payment Modals ── */
         .modal-overlay {
             position: fixed;
             inset: 0;
-            background-color: rgba(4, 36, 88, 0.45);
+            background-color: rgba(15, 23, 42, 0.45);
             backdrop-filter: blur(4px);
             display: flex;
             justify-content: center;
@@ -325,119 +326,320 @@
         }
         .modal-container {
             background-color: #ffffff;
-            border: 1px solid var(--color-border-default, #e2e8f0);
+            border: 1px solid #e2e8f0;
             border-radius: 16px;
             width: 100%;
-            max-width: 580px;
+            max-width: 560px;
             max-height: 90vh;
             overflow-y: auto;
-            box-shadow: 0 20px 50px rgba(4, 36, 88, 0.18);
+            box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.15);
             display: flex;
             flex-direction: column;
         }
         .modal-header {
             padding: 1.25rem 1.75rem;
-            border-bottom: 1px solid var(--color-border-default, #e2e8f0);
+            border-bottom: 1px solid #f1f5f9;
             display: flex;
             justify-content: space-between;
-            align-items: center;
+            align-items: flex-start;
             background-color: #ffffff;
             position: sticky;
             top: 0;
             z-index: 10;
         }
+        .modal-header-title {
+            font-size: 1.35rem;
+            font-weight: 800;
+            color: #0f172a;
+            margin: 0;
+            line-height: 1.2;
+        }
+        .modal-header-subtitle {
+            font-size: 0.875rem;
+            color: #64748b;
+            font-weight: 500;
+            margin-top: 4px;
+        }
         .modal-body {
-            padding: 1.75rem;
+            padding: 1.5rem 1.75rem;
             overflow-y: auto;
         }
         .modal-footer {
             padding: 1.25rem 1.75rem;
-            border-top: 1px solid var(--color-border-default, #e2e8f0);
+            border-top: 1px solid #f1f5f9;
             display: flex;
             justify-content: flex-end;
             align-items: center;
-            background-color: #f8fafc;
+            background-color: #ffffff;
             gap: 12px;
         }
         .modal-close-x {
             background: transparent;
             border: none;
             cursor: pointer;
-            color: var(--color-text-secondary, #64748b);
+            color: #64748b;
             display: flex;
             align-items: center;
+            justify-content: center;
             padding: 4px;
             border-radius: 6px;
             transition: background 0.15s ease, color 0.15s ease;
         }
         .modal-close-x:hover {
             background: #f1f5f9;
-            color: var(--color-text-primary, #042458);
+            color: #0f172a;
         }
 
-        .action-btn {
-            padding: 9px 18px;
+        /* Modal Action Buttons */
+        .btn-modal-cancel {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            color: #0f172a;
             font-size: 0.875rem;
+            font-weight: 600;
+            padding: 9px 22px;
             border-radius: 8px;
             cursor: pointer;
-            font-weight: 700;
-            border: 1px solid transparent;
             transition: all 0.15s ease;
             text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
         }
-        .btn-pay {
-            background-color: var(--color-action-primary, #0355f3);
-            color: white;
-        }
-        .btn-pay:hover {
-            background-color: var(--color-action-primary-hover, #0247d1);
-        }
-        .btn-detail {
-            background-color: #ffffff;
+        .btn-modal-cancel:hover {
+            background: #f8fafc;
             border-color: #cbd5e1;
-            color: var(--color-text-primary, #042458);
         }
-        .btn-detail:hover {
-            background-color: #f8fafc;
+        .btn-modal-primary {
+            background: #0052ea;
+            border: 1px solid #0052ea;
+            color: #ffffff;
+            font-size: 0.875rem;
+            font-weight: 600;
+            padding: 9px 22px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            text-decoration: none;
         }
-        .btn-close {
-            background-color: #f1f5f9;
-            color: #475569;
-            border-color: #e2e8f0;
-        }
-        .btn-close:hover {
-            background-color: #e2e8f0;
+        .btn-modal-primary:hover {
+            background: #0247d1;
+            border-color: #0247d1;
         }
 
-        /* Detail Breakdown system */
-        .breakdown-box {
-            background-color: #f8fafc;
-            border: 1px solid var(--color-border-default, #e2e8f0);
+        /* Statement Top Card */
+        .stmt-details-card {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 18px 24px;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
             border-radius: 12px;
-            padding: 1.25rem;
-            margin-bottom: 1.5rem;
+            padding: 18px 20px;
+            margin-bottom: 24px;
         }
-        .breakdown-row {
+        .stmt-card-item {
+            display: flex;
+            flex-direction: column;
+        }
+        .stmt-card-label {
+            font-size: 0.75rem;
+            color: #64748b;
+            font-weight: 500;
+            margin-bottom: 3px;
+        }
+        .stmt-card-value {
+            font-size: 0.875rem;
+            font-weight: 700;
+            color: #0f172a;
+        }
+        .stmt-status-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+        .stmt-status-badge.overdue {
+            background: #fef2f2;
+            color: #dc2626;
+            border: 1px solid #fee2e2;
+        }
+        .stmt-status-badge.paid {
+            background: #ecfdf5;
+            color: #059669;
+            border: 1px solid #a7f3d0;
+        }
+        .stmt-status-badge.pending,
+        .stmt-status-badge.waiting_verification {
+            background: #eff6ff;
+            color: #2563eb;
+            border: 1px solid #bfdbfe;
+        }
+
+        /* Billing Breakdown */
+        .stmt-section-title {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #0f172a;
+            margin: 0 0 6px 0;
+        }
+        .stmt-breakdown-list {
+            margin-bottom: 16px;
+        }
+        .stmt-breakdown-row {
             display: flex;
             justify-content: space-between;
-            padding: 0.6rem 0;
-            border-bottom: 1px solid #e2e8f0;
-            font-size: 0.88rem;
-            color: #475569;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #f1f5f9;
+            font-size: 0.875rem;
+            color: #0f172a;
         }
-        .breakdown-row:last-of-type {
-            border-bottom: none;
+        .stmt-breakdown-row span:first-child {
+            color: #0f172a;
+            font-weight: 500;
         }
-        .breakdown-row.total {
+        .stmt-row-val {
+            font-weight: 600;
+            color: #0f172a;
+        }
+        .stmt-breakdown-row.penalty {
+            color: #dc2626;
+        }
+        .stmt-breakdown-row.penalty span:first-child,
+        .stmt-breakdown-row.penalty .stmt-row-val {
+            color: #dc2626;
+            font-weight: 600;
+        }
+        .stmt-breakdown-sub {
+            color: #64748b;
+            font-size: 0.8125rem;
+            font-weight: normal;
+            margin-left: 2px;
+        }
+
+        /* Statement Total Box */
+        .stmt-total-box {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 16px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 14px;
+            margin-bottom: 20px;
+        }
+        .stmt-total-label {
+            font-size: 0.9375rem;
             font-weight: 800;
-            font-size: 1.1rem;
-            color: var(--color-text-primary, #042458);
-            border-top: 2px solid #cbd5e1;
-            margin-top: 0.5rem;
-            padding-top: 0.75rem;
+            color: #0f172a;
+            letter-spacing: 0.03em;
+        }
+        .stmt-total-amount {
+            font-size: 1.35rem;
+            font-weight: 800;
+            color: #0f172a;
+        }
+
+        /* Landlord Remarks */
+        .stmt-remarks-label {
+            font-size: 0.8125rem;
+            font-weight: 600;
+            color: #334155;
+            margin-bottom: 8px;
+        }
+        .stmt-remarks-box {
+            font-size: 0.8125rem;
+            color: #475569;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            padding: 12px 16px;
+            border-radius: 8px;
+            line-height: 1.5;
+        }
+
+        /* Submit Payment Form Elements */
+        .stmt-form-group {
+            margin-bottom: 18px;
+        }
+        .stmt-form-label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #0f172a;
+            margin-bottom: 8px;
+        }
+        .stmt-form-input {
+            width: 100%;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 10px 14px;
+            font-size: 0.9375rem;
+            color: #0f172a;
+            background: #ffffff;
+            outline: none;
+            box-sizing: border-box;
+            transition: border-color 0.15s ease, box-shadow 0.15s ease;
+        }
+        .stmt-form-input:focus {
+            border-color: #0052ea;
+            box-shadow: 0 0 0 2px rgba(0, 82, 234, 0.15);
+        }
+        .stmt-radio-group {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 6px;
+        }
+        .stmt-radio-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            font-size: 0.9375rem;
+            font-weight: 500;
+            color: #0f172a;
+            user-select: none;
+        }
+        .stmt-radio-item input[type="radio"] {
+            width: 18px;
+            height: 18px;
+            accent-color: #0052ea;
+            cursor: pointer;
+            margin: 0;
+        }
+        .stmt-file-wrapper {
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 6px 10px;
+            background: #ffffff;
+        }
+        .stmt-file-input {
+            width: 100%;
+            font-size: 0.875rem;
+            color: #475569;
+            cursor: pointer;
+        }
+        .stmt-file-input::file-selector-button {
+            border: 1px solid #e2e8f0;
+            background: #f8fafc;
+            border-radius: 6px;
+            padding: 6px 14px;
+            font-size: 0.8125rem;
+            font-weight: 600;
+            color: #0f172a;
+            cursor: pointer;
+            margin-right: 12px;
+            transition: background 0.15s ease;
+        }
+        .stmt-file-input::file-selector-button:hover {
+            background: #f1f5f9;
+        }
+        .stmt-file-hint {
+            font-size: 0.75rem;
+            color: #64748b;
+            margin-top: 6px;
         }
 
         /* Payments Details Grid */
@@ -445,8 +647,8 @@
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 1.25rem;
-            background-color: #f8fafc;
-            border: 1px solid var(--color-border-default, #e2e8f0);
+            background-color: #ffffff;
+            border: 1px solid #e2e8f0;
             border-radius: 12px;
             padding: 1.25rem;
             margin-bottom: 1.5rem;
@@ -465,14 +667,14 @@
         .details-val {
             font-size: 0.95rem;
             font-weight: 600;
-            color: var(--color-text-primary, #042458);
+            color: #0f172a;
             margin-top: 0.2rem;
         }
         .receipt-preview {
             max-width: 100%;
             max-height: 250px;
             object-fit: contain;
-            border: 1px solid var(--color-border-default, #e2e8f0);
+            border: 1px solid #e2e8f0;
             border-radius: 8px;
             margin-top: 0.5rem;
         }
@@ -601,13 +803,16 @@
         </div>
     </main>
 
-    <!-- Bill Details & Pay Modal -->
+    <!-- Bill Details & Pay Modal (Statement Modal) -->
     <div id="billDetailModal" class="modal-overlay hidden">
-        <div class="modal-container">
+        <div class="modal-container" style="max-width: 560px;">
             <div class="modal-header">
-                <h3 id="modalLeaseNumber" style="margin:0;color:var(--text-primary);">Billing statement</h3>
-                <button id="closeDetailModalBtn" class="modal-close-x" title="Close">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <div>
+                    <h3 class="modal-header-title">Statement</h3>
+                    <div id="modalLeaseNumber" class="modal-header-subtitle">LSE-STATEMENT</div>
+                </div>
+                <button id="closeDetailModalBtn" class="modal-close-x" title="Close" aria-label="Close modal">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <line x1="18" y1="6" x2="6" y2="18"></line>
                         <line x1="6" y1="6" x2="18" y2="18"></line>
                     </svg>
@@ -624,11 +829,11 @@
 
     <!-- Submit Manual Payment Modal -->
     <div id="submitPaymentModal" class="modal-overlay hidden">
-        <div class="modal-container" style="max-width: 500px;">
+        <div class="modal-container" style="max-width: 520px;">
             <div class="modal-header">
-                <h3 style="margin:0;color:var(--text-primary);">Submit Proof of Payment</h3>
-                <button id="closePaymentModalBtn" class="modal-close-x" title="Close">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <h3 class="modal-header-title" style="font-size: 1.25rem;">Submit Proof of Payment</h3>
+                <button id="closePaymentModalBtn" class="modal-close-x" title="Close" aria-label="Close modal">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <line x1="18" y1="6" x2="6" y2="18"></line>
                         <line x1="6" y1="6" x2="18" y2="18"></line>
                     </svg>
@@ -640,54 +845,56 @@
                     
                     <input type="hidden" id="formBillingId" name="billing_id">
 
-                    <div class="form-group">
-                        <label class="form-label">Total Amount Due</label>
-                        <div id="formTotalDue" style="font-size:1.3rem; font-weight:800; color:var(--tenant);">₱0.00</div>
+                    <div style="margin-bottom: 1.25rem;">
+                        <div style="font-size: 0.875rem; color: #64748b; font-weight: 500; margin-bottom: 4px;">Total Amount Due</div>
+                        <div id="formTotalDue" style="font-size: 1.625rem; font-weight: 800; color: #0052ea;">₱0.00 PHP</div>
                     </div>
 
-                    <div class="form-group">
-                        <label class="form-label" for="formAmountPaid">Amount Paid (₱ PHP)</label>
-                        <input type="number" id="formAmountPaid" class="form-input" required min="0.01" step="0.01">
+                    <div class="stmt-form-group">
+                        <label class="stmt-form-label" for="formAmountPaid">Amount Paid (₱ PHP)</label>
+                        <input type="number" id="formAmountPaid" class="stmt-form-input" required min="0.01" step="0.01">
                     </div>
 
-                    <div class="form-group">
-                        <label class="form-label">Payment Method</label>
-                        <div style="display:flex; flex-direction:column; gap:0.5rem; margin-top:0.4rem;">
-                            <label style="display:flex; align-items:center; gap:0.5rem; cursor:pointer; font-weight:600;">
+                    <div class="stmt-form-group">
+                        <label class="stmt-form-label">Payment Method</label>
+                        <div class="stmt-radio-group">
+                            <label class="stmt-radio-item">
                                 <input type="radio" name="payment_method" value="gcash" required>
                                 <span>GCash</span>
                             </label>
-                            <label style="display:flex; align-items:center; gap:0.5rem; cursor:pointer; font-weight:600;">
+                            <label class="stmt-radio-item">
                                 <input type="radio" name="payment_method" value="other" required>
                                 <span>Maya / E-Wallet</span>
                             </label>
-                            <label style="display:flex; align-items:center; gap:0.5rem; cursor:pointer; font-weight:600;">
+                            <label class="stmt-radio-item">
                                 <input type="radio" name="payment_method" value="bank_transfer" required>
                                 <span>Bank Transfer</span>
                             </label>
-                            <label style="display:flex; align-items:center; gap:0.5rem; cursor:pointer; font-weight:600;">
+                            <label class="stmt-radio-item">
                                 <input type="radio" name="payment_method" value="cash" required>
                                 <span>Cash / Over-The-Counter</span>
                             </label>
                         </div>
                     </div>
 
-                    <div class="form-group" style="margin-top: 1rem;">
-                        <label class="form-label" for="formReference">Transaction Reference Number</label>
-                        <input type="text" id="formReference" class="form-input" placeholder="e.g. Trace code / Ref #" required>
+                    <div class="stmt-form-group">
+                        <label class="stmt-form-label" for="formReference">Transaction Reference Number</label>
+                        <input type="text" id="formReference" class="stmt-form-input" placeholder="e.g. Trace code / Ref #" required>
                     </div>
 
-                    <div class="form-group">
-                        <label class="form-label" for="formProofFile">Upload Payment Receipt Proof</label>
-                        <input type="file" id="formProofFile" class="form-input" accept="image/jpeg,image/png,image/jpg,application/pdf" required style="padding:0.4rem;">
-                        <div style="font-size: 0.72rem; color: var(--text-muted); margin-top: 0.25rem;">
+                    <div class="stmt-form-group" style="margin-bottom: 0.5rem;">
+                        <label class="stmt-form-label" for="formProofFile">Upload Payment Receipt Proof</label>
+                        <div class="stmt-file-wrapper">
+                            <input type="file" id="formProofFile" class="stmt-file-input" accept="image/jpeg,image/png,image/jpg,application/pdf" required>
+                        </div>
+                        <div class="stmt-file-hint">
                             Accepted formats: JPG, JPEG, PNG, PDF. Max limit: 10MB.
                         </div>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" id="btnCancelPayment" class="action-btn btn-detail">Cancel</button>
-                    <button type="submit" id="btnSubmitPayment" class="action-btn btn-pay">Submit Payment</button>
+                    <button type="button" id="btnCancelPayment" class="btn-modal-cancel">Cancel</button>
+                    <button type="submit" id="btnSubmitPayment" class="btn-modal-primary">Submit Payment</button>
                 </div>
             </form>
         </div>
@@ -697,9 +904,9 @@
     <div id="paymentDetailModal" class="modal-overlay hidden">
         <div class="modal-container">
             <div class="modal-header">
-                <h3 style="margin:0;color:var(--text-primary);">Payment Details</h3>
-                <button id="closePaymentDetailModalBtn" class="modal-close-x" title="Close">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <h3 class="modal-header-title" style="font-size: 1.25rem;">Payment Details</h3>
+                <button id="closePaymentDetailModalBtn" class="modal-close-x" title="Close" aria-label="Close modal">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <line x1="18" y1="6" x2="6" y2="18"></line>
                         <line x1="6" y1="6" x2="18" y2="18"></line>
                     </svg>
@@ -709,7 +916,7 @@
                 <!-- Loaded dynamically -->
             </div>
             <div class="modal-footer">
-                <button id="closePaymentModalFooterBtn" class="action-btn btn-close">Close</button>
+                <button id="closePaymentModalFooterBtn" class="btn-modal-cancel">Close</button>
             </div>
         </div>
     </div>
@@ -1041,7 +1248,7 @@
             const content = document.getElementById('detailModalContent');
             const footer = document.getElementById('detailModalFooter');
 
-            document.getElementById('modalLeaseNumber').textContent = 'Billing details';
+            document.getElementById('modalLeaseNumber').textContent = 'Loading...';
             content.innerHTML = '<div style="text-align:center;padding:2rem;color:var(--text-muted);">Loading specifications...</div>';
             footer.innerHTML = '';
             modal.classList.remove('hidden');
@@ -1051,7 +1258,7 @@
                 const { data: bill } = await res.json();
                 selectedBill = bill;
 
-                document.getElementById('modalLeaseNumber').textContent = `Statement: ${bill.lease_records?.lease_number || 'DRAFT'}`;
+                document.getElementById('modalLeaseNumber').textContent = bill.lease_records?.lease_number || 'LSE-STATEMENT';
 
                 const landlord = bill.landlord || {};
                 const prop = bill.properties || {};
@@ -1066,15 +1273,24 @@
 
                 const today = new Date();
                 today.setHours(0,0,0,0);
-                let statusLabel = bill.billing_status;
-                let statusColor = '#f59e0b';
+                let statusBadgeClass = 'pending';
+                let statusDisplay = (bill.billing_status || 'PENDING').replace(/_/g, ' ').toUpperCase();
                 
-                if (statusLabel === 'paid') statusColor = '#10b981';
-                else if (statusLabel === 'cancelled') statusColor = '#ef4444';
-                else if (statusLabel === 'waiting_verification') statusColor = '#3b82f6';
-                else if (statusLabel === 'overdue' || (statusLabel === 'pending_payment' && new Date(bill.due_date) < today)) {
-                    statusLabel = 'overdue';
-                    statusColor = '#ef4444';
+                if (bill.billing_status === 'paid') {
+                    statusBadgeClass = 'paid';
+                    statusDisplay = 'PAID';
+                } else if (bill.billing_status === 'overdue' || (bill.billing_status === 'pending_payment' && new Date(bill.due_date) < today)) {
+                    statusBadgeClass = 'overdue';
+                    statusDisplay = 'OVERDUE';
+                } else if (bill.billing_status === 'waiting_verification') {
+                    statusBadgeClass = 'waiting_verification';
+                    statusDisplay = 'WAITING VERIFICATION';
+                }
+
+                let dueDateStr = '—';
+                if (bill.due_date) {
+                    const d = new Date(bill.due_date);
+                    dueDateStr = d.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
                 }
 
                 // Build dynamic breakdown rows matching lease terms
@@ -1091,83 +1307,134 @@
                 let breakdownRows = [];
 
                 // 1. Base Rent (Always)
-                breakdownRows.push(`<div class="breakdown-row"><span>Monthly Base Rent</span><span style="font-weight:700;">₱${rent.toLocaleString(undefined, {minimumFractionDigits:2})}</span></div>`);
+                breakdownRows.push(`
+                    <div class="stmt-breakdown-row">
+                        <span>Monthly Base Rent</span>
+                        <span class="stmt-row-val">₱${rent.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2})}</span>
+                    </div>
+                `);
 
                 // 2. Water
                 if (!isInc('water') || water > 0) {
-                    breakdownRows.push(`<div class="breakdown-row"><span>Water Utility Charge <small style="color:var(--tenant);font-weight:700;">(Billed Separately)</small></span><span>₱${water.toLocaleString(undefined, {minimumFractionDigits:2})}</span></div>`);
+                    breakdownRows.push(`
+                        <div class="stmt-breakdown-row">
+                            <span>Water Utility Charge <span class="stmt-breakdown-sub">(Billed Separately)</span></span>
+                            <span class="stmt-row-val">₱${water.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2})}</span>
+                        </div>
+                    `);
                 }
 
                 // 3. Electricity
                 if (!isInc('electricity') || elec > 0) {
-                    breakdownRows.push(`<div class="breakdown-row"><span>Electricity Utility Charge <small style="color:var(--tenant);font-weight:700;">(Billed Separately)</small></span><span>₱${elec.toLocaleString(undefined, {minimumFractionDigits:2})}</span></div>`);
+                    breakdownRows.push(`
+                        <div class="stmt-breakdown-row">
+                            <span>Electricity Utility Charge <span class="stmt-breakdown-sub">(Billed Separately)</span></span>
+                            <span class="stmt-row-val">₱${elec.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2})}</span>
+                        </div>
+                    `);
                 }
 
                 // 4. Internet
                 if (!isInc('internet') || internet > 0) {
-                    breakdownRows.push(`<div class="breakdown-row"><span>Internet Subscription Charge <small style="color:var(--tenant);font-weight:700;">(Billed Separately)</small></span><span>₱${internet.toLocaleString(undefined, {minimumFractionDigits:2})}</span></div>`);
+                    breakdownRows.push(`
+                        <div class="stmt-breakdown-row">
+                            <span>Internet Subscription Charge <span class="stmt-breakdown-sub">(Billed Separately)</span></span>
+                            <span class="stmt-row-val">₱${internet.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2})}</span>
+                        </div>
+                    `);
                 }
 
                 // 5. Parking
                 if (parking > 0) {
-                    breakdownRows.push(`<div class="breakdown-row"><span>Parking Slot Fee</span><span>₱${parking.toLocaleString(undefined, {minimumFractionDigits:2})}</span></div>`);
+                    breakdownRows.push(`
+                        <div class="stmt-breakdown-row">
+                            <span>Parking Slot Fee</span>
+                            <span class="stmt-row-val">₱${parking.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2})}</span>
+                        </div>
+                    `);
                 }
 
                 // 6. Security Deposit & Advance / Other Charges
                 if (isMoveInBill || (!isInc('association_fee') && (other > 0 || isMoveInBill))) {
                     const label = isMoveInBill ? 'Security Deposit & Advance Payment' : 'Other Charges / Association Fee';
-                    const spanClass = isMoveInBill ? 'class="movein-text"' : '';
-                    breakdownRows.push(`<div class="breakdown-row"><span ${spanClass}>${label}</span><span style="font-weight:700;">₱${other.toLocaleString(undefined, {minimumFractionDigits:2})}</span></div>`);
+                    breakdownRows.push(`
+                        <div class="stmt-breakdown-row">
+                            <span>${label}</span>
+                            <span class="stmt-row-val">₱${other.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2})}</span>
+                        </div>
+                    `);
                 }
 
                 // 7. Late Penalty
                 if (penalty > 0) {
-                    breakdownRows.push(`<div class="breakdown-row"><span style="color:#ef4444; font-weight:700;">Late Penalty Fine</span><span style="color:#ef4444; font-weight:700;">₱${penalty.toLocaleString(undefined, {minimumFractionDigits:2})}</span></div>`);
+                    breakdownRows.push(`
+                        <div class="stmt-breakdown-row penalty">
+                            <span>Late Penalty Fine</span>
+                            <span class="stmt-row-val">₱${penalty.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2})}</span>
+                        </div>
+                    `);
                 }
 
-                // 8. Total Amount Due
-                breakdownRows.push(`<div class="breakdown-row total"><span>TOTAL AMOUNT DUE:</span><span>₱${total.toLocaleString(undefined, {minimumFractionDigits:2})} PHP</span></div>`);
-
                 content.innerHTML = `
-                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:1.5rem; background-color:var(--bg-primary); border:1px solid var(--border-color); border-radius:var(--radius-md); padding:1rem;">
-                        <div class="detail-item"><span class="detail-label">Property Unit</span><span class="detail-value">${domiknowEscapeHtml(prop.property_name || '—')}</span></div>
-                        <div class="detail-item"><span class="detail-label">Landlord Name</span><span class="detail-value">${domiknowEscapeHtml(landlord.full_name || '—')}</span></div>
-                        <div class="detail-item"><span class="detail-label">Billing Cycle Month</span><span class="detail-value">${domiknowEscapeHtml(bill.billing_month || 'N/A')}</span></div>
-                        <div class="detail-item"><span class="detail-label">Payment Due Date</span><span class="detail-value">${new Date(bill.due_date).toLocaleDateString('en-PH', { year:'numeric', month:'long', day:'numeric' })}</span></div>
-                        <div class="detail-item" style="grid-column: span 2;"><span class="detail-label">Invoice Status</span><span class="detail-value" id="modalStatusText" style="font-weight:800;">${statusLabel.replace('_',' ').toUpperCase()}</span></div>
+                    <div class="stmt-details-card">
+                        <div class="stmt-card-item">
+                            <span class="stmt-card-label">Property</span>
+                            <span class="stmt-card-value">${domiknowEscapeHtml((prop.property_name || '—').toUpperCase())}</span>
+                        </div>
+                        <div class="stmt-card-item">
+                            <span class="stmt-card-label">Landlord</span>
+                            <span class="stmt-card-value">${domiknowEscapeHtml((landlord.full_name || '—').toUpperCase())}</span>
+                        </div>
+                        <div class="stmt-card-item">
+                            <span class="stmt-card-label">Billing Cycle</span>
+                            <span class="stmt-card-value">${domiknowEscapeHtml(bill.billing_month || 'N/A')}</span>
+                        </div>
+                        <div class="stmt-card-item">
+                            <span class="stmt-card-label">Payment Due Date</span>
+                            <span class="stmt-card-value">${dueDateStr}</span>
+                        </div>
+                        <div class="stmt-card-item">
+                            <span class="stmt-card-label">Invoice Status</span>
+                            <div><span class="stmt-status-badge ${statusBadgeClass}">${statusDisplay}</span></div>
+                        </div>
                     </div>
 
-                    <h4 style="border-bottom:1px solid var(--border-color); padding-bottom:0.4rem; margin-bottom:0.75rem;">Billing Computations Breakdown</h4>
-                    <div class="breakdown-box">
+                    <h4 class="stmt-section-title">Billing Breakdown</h4>
+                    <div class="stmt-breakdown-list">
                         ${breakdownRows.join('')}
                     </div>
 
-                    ${bill.remarks ? `<div style="margin-top:1rem;"><span class="detail-label">Landlord Remarks & Breakdown Details</span><div style="font-size:0.875rem; color:var(--text-secondary); background:var(--bg-primary); border:1px solid var(--border-color); padding:0.75rem; border-radius:4px; margin-top:0.25rem;">${domiknowEscapeHtml(bill.remarks)}</div></div>` : ''}
+                    <div class="stmt-total-box">
+                        <span class="stmt-total-label">TOTAL AMOUNT DUE</span>
+                        <span class="stmt-total-amount">₱${total.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2})} PHP</span>
+                    </div>
+
+                    ${bill.remarks ? `
+                        <div style="margin-top: 1.25rem;">
+                            <div class="stmt-remarks-label">Landlord Remarks & Breakdown Details</div>
+                            <div class="stmt-remarks-box">${domiknowEscapeHtml(bill.remarks)}</div>
+                        </div>
+                    ` : ''}
                 `;
 
-                const statusTxt = document.getElementById('modalStatusText');
-                if (statusTxt) statusTxt.style.color = statusColor;
-
                 // Handle footer button logic:
-                // Show Pay Now / Resubmit button if status allows it
-                const canPay = ['pending_payment', 'unpaid', 'overdue'].includes(bill.billing_status) || (bill.billing_status === 'pending_payment' && statusLabel === 'overdue');
+                const canPay = ['pending_payment', 'unpaid', 'overdue'].includes(bill.billing_status) || (bill.billing_status === 'pending_payment' && statusDisplay === 'OVERDUE');
                 
                 if (canPay) {
                     footer.innerHTML = `
-                        <button class="action-btn btn-close" data-action="close">Close</button>
-                        <button type="button" class="action-btn btn-pay" data-action="pay" data-bill-id="${domiknowEscapeHtml(bill.id || '')}">Pay Now</button>
+                        <button type="button" class="btn-modal-cancel" data-action="close">Close</button>
+                        <button type="button" class="btn-modal-primary" data-action="pay" data-bill-id="${domiknowEscapeHtml(bill.id || '')}">Pay Now</button>
                     `;
                 } else {
                     footer.innerHTML = `
-                        <div></div>
-                        <button class="action-btn btn-close" data-action="close">Close</button>
+                        <button type="button" class="btn-modal-cancel" data-action="close">Close</button>
                     `;
                 }
 
             } catch (err) {
                 console.error(err);
-                content.innerHTML = '<div style="text-align:center;padding:2rem;color:var(--error);">Failed to load details.</div>';
-                footer.innerHTML = `<div></div><button class="action-btn btn-close" data-action="close">Close</button>`;
+                content.innerHTML = '<div style="text-align:center;padding:2rem;color:#ef4444;">Failed to load details.</div>';
+                footer.innerHTML = `<button type="button" class="btn-modal-cancel" data-action="close">Close</button>`;
             }
         }
 
@@ -1181,7 +1448,7 @@
             if (!bill) return;
 
             document.getElementById('formBillingId').value = bill.id;
-            document.getElementById('formTotalDue').textContent = `₱${parseFloat(bill.total_amount).toLocaleString(undefined, { minimumFractionDigits: 2 })} PHP`;
+            document.getElementById('formTotalDue').textContent = `₱${parseFloat(bill.total_amount).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} PHP`;
             document.getElementById('formAmountPaid').value = bill.total_amount;
             document.getElementById('paymentErrorMsg').classList.add('hidden');
 

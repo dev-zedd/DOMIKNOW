@@ -193,17 +193,73 @@
         let filterRequestTimer = null;
         let recommendationMetadata = null;
 
-        document.addEventListener('DOMContentLoaded', () => {
-            // Initialize Leaflet Map centered in Siniloan, Laguna
-            mapInstance = L.map('map').setView([14.4172, 121.4475], 14);
-            if (window.DomiknowMap) DomiknowMap.addBasemap(mapInstance);
-            else L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '&copy; OpenStreetMap contributors' }).addTo(mapInstance);
-            
-            markersGroup = L.layerGroup().addTo(mapInstance);
+        function escapeHtml(value) {
+            if (typeof window.domiknowEscapeHtml === 'function') return window.domiknowEscapeHtml(value);
+            if (value === null || value === undefined) return '';
+            return String(value)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
 
+        function safeExternalUrl(value) {
+            if (typeof window.domiknowSafeExternalUrl === 'function') return window.domiknowSafeExternalUrl(value);
+            if (!value || typeof value !== 'string') return '';
+            const trimmed = value.trim();
+            if (trimmed.startsWith('/') || trimmed.startsWith('https://') || trimmed.startsWith('http://') || trimmed.startsWith('data:image/')) {
+                return trimmed;
+            }
+            return '';
+        }
+
+        function initMap() {
             const mapElement = document.getElementById('map');
-            if (window.DomiknowMap) DomiknowMap.observeContainer(mapInstance, mapElement);
-            else requestAnimationFrame(() => requestAnimationFrame(() => mapInstance.invalidateSize(false)));
+            if (!mapElement || typeof L === 'undefined') return;
+
+            if (mapInstance) {
+                try {
+                    mapInstance.remove();
+                } catch (e) {
+                    console.warn('Error removing previous map instance:', e);
+                }
+                mapInstance = null;
+                markersGroup = null;
+            }
+
+            if (mapElement._leaflet_id) {
+                try {
+                    delete mapElement._leaflet_id;
+                } catch (e) {
+                    mapElement._leaflet_id = undefined;
+                }
+            }
+
+            try {
+                mapInstance = L.map('map').setView([14.4172, 121.4475], 14);
+                if (window.DomiknowMap) {
+                    DomiknowMap.addBasemap(mapInstance);
+                } else {
+                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                        attribution: '&copy; OpenStreetMap contributors'
+                    }).addTo(mapInstance);
+                }
+
+                markersGroup = L.layerGroup().addTo(mapInstance);
+
+                if (window.DomiknowMap) {
+                    DomiknowMap.observeContainer(mapInstance, mapElement);
+                } else {
+                    requestAnimationFrame(() => requestAnimationFrame(() => mapInstance?.invalidateSize(false)));
+                }
+            } catch (err) {
+                console.warn('Error initializing map:', err);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            initMap();
 
             // Bind canonical recommendation inputs.
             document.querySelectorAll('.recommendation-controls input:not([type="hidden"]), .recommendation-controls select')
@@ -211,16 +267,18 @@
                     updateCriterionAvailability();
                     applyFilters();
                 }));
-            document.getElementById('useRecommendationLocation').addEventListener('click', requestRecommendationLocation);
+            document.getElementById('useRecommendationLocation')?.addEventListener('click', requestRecommendationLocation);
             document.addEventListener('domiknow:location-ready', event => applyRecommendationLocation(event.detail));
             document.addEventListener('domiknow:location-error', event => {
                 const status = document.getElementById('recommendationLocationStatus');
-                status.textContent = event.detail?.message || 'Your device location is unavailable.';
-                status.dataset.state = 'error';
+                if (status) {
+                    status.textContent = event.detail?.message || 'Your device location is unavailable.';
+                    status.dataset.state = 'error';
+                }
                 updateCriterionAvailability();
             });
             
-            document.getElementById('btnClearFilters').addEventListener('click', clearFilters);
+            document.getElementById('btnClearFilters')?.addEventListener('click', clearFilters);
             
             const storedLocation = window.DomiknowLocation?.read?.();
             if (storedLocation) applyRecommendationLocation(storedLocation, { refresh: false });
@@ -228,18 +286,48 @@
             fetchProperties();
         });
 
+        // BFCache (back/forward cache) and return navigation handler
+        window.addEventListener('pageshow', (event) => {
+            if (mapInstance) {
+                try {
+                    mapInstance.invalidateSize(false);
+                } catch (e) {}
+            }
+            const grid = document.getElementById('propertiesGrid');
+            const hasError = grid && grid.querySelector('[role="alert"]');
+            const isEmpty = !grid || grid.children.length === 0 || hasError;
+            if (event.persisted || isEmpty) {
+                if (!mapInstance || !markersGroup) {
+                    initMap();
+                }
+                fetchProperties();
+            }
+        });
+
+        window.addEventListener('pagehide', () => {
+            if (propertyRequestController) {
+                try {
+                    propertyRequestController.abort();
+                } catch (e) {}
+            }
+        });
+
         function applyRecommendationLocation(location, options = {}) {
             const lat = Number(location?.lat ?? location?.latitude);
             const lng = Number(location?.lng ?? location?.longitude);
             if (!Number.isFinite(lat) || !Number.isFinite(lng)) return;
-            document.getElementById('recommendationLatitude').value = String(lat);
-            document.getElementById('recommendationLongitude').value = String(lng);
+            const latEl = document.getElementById('recommendationLatitude');
+            const lngEl = document.getElementById('recommendationLongitude');
+            if (latEl) latEl.value = String(lat);
+            if (lngEl) lngEl.value = String(lng);
             const accuracy = Number(location?.accuracy);
             const status = document.getElementById('recommendationLocationStatus');
-            status.textContent = Number.isFinite(accuracy)
-                ? `Accurate device location ready (about ${Math.round(accuracy)} m accuracy).`
-                : 'Device location ready for distance scoring.';
-            status.dataset.state = 'ready';
+            if (status) {
+                status.textContent = Number.isFinite(accuracy)
+                    ? `Accurate device location ready (about ${Math.round(accuracy)} m accuracy).`
+                    : 'Device location ready for distance scoring.';
+                status.dataset.state = 'ready';
+            }
             updateCriterionAvailability();
             if (options.refresh !== false) applyFilters();
         }
@@ -247,39 +335,51 @@
         async function requestRecommendationLocation() {
             const button = document.getElementById('useRecommendationLocation');
             const status = document.getElementById('recommendationLocationStatus');
-            button.disabled = true;
-            button.textContent = 'Getting accurate location...';
-            status.textContent = 'Requesting a fresh high-accuracy device location.';
-            status.dataset.state = '';
+            if (button) {
+                button.disabled = true;
+                button.textContent = 'Getting accurate location...';
+            }
+            if (status) {
+                status.textContent = 'Requesting a fresh high-accuracy device location.';
+                status.dataset.state = '';
+            }
             try {
                 const location = await window.DomiknowLocation?.request?.({ userInitiated: true });
                 if (location) applyRecommendationLocation(location);
             } finally {
-                button.disabled = false;
-                button.textContent = 'Use my accurate device location';
+                if (button) {
+                    button.disabled = false;
+                    button.textContent = 'Use my accurate device location';
+                }
             }
         }
 
         function updateCriterionAvailability() {
-            const hasBudget = Boolean(document.getElementById('filterHardMaxBudget').value);
-            const selectedPropertyType = document.getElementById('filterType').value;
+            const hasBudget = Boolean(document.getElementById('filterHardMaxBudget')?.value);
+            const selectedPropertyType = document.getElementById('filterType')?.value || '';
             const hasSoftType = Boolean(selectedPropertyType)
-                && !document.getElementById('filterTypeRequired').checked;
-            const hasLocation = Boolean(document.getElementById('recommendationLatitude').value)
-                && Boolean(document.getElementById('recommendationLongitude').value)
-                && Boolean(document.getElementById('filterMaximumDistance').value);
+                && !document.getElementById('filterTypeRequired')?.checked;
+            const hasLocation = Boolean(document.getElementById('recommendationLatitude')?.value)
+                && Boolean(document.getElementById('recommendationLongitude')?.value)
+                && Boolean(document.getElementById('filterMaximumDistance')?.value);
             const hasDesiredAmenities = document.querySelectorAll('.amenity-filter:checked').length > 0
-                && !document.getElementById('filterAmenitiesRequired').checked;
+                && !document.getElementById('filterAmenitiesRequired')?.checked;
             const availability = { C1: hasBudget || hasSoftType, C2: hasLocation, C3: hasDesiredAmenities, C4: true, C5: true };
             const typeRequired = document.getElementById('filterTypeRequired');
             const distanceRequired = document.getElementById('filterDistanceRequired');
             const amenitiesRequired = document.getElementById('filterAmenitiesRequired');
-            typeRequired.disabled = !selectedPropertyType;
-            distanceRequired.disabled = !hasLocation;
-            amenitiesRequired.disabled = document.querySelectorAll('.amenity-filter:checked').length === 0;
-            if (typeRequired.disabled) typeRequired.checked = false;
-            if (distanceRequired.disabled) distanceRequired.checked = false;
-            if (amenitiesRequired.disabled) amenitiesRequired.checked = false;
+            if (typeRequired) {
+                typeRequired.disabled = !selectedPropertyType;
+                if (typeRequired.disabled) typeRequired.checked = false;
+            }
+            if (distanceRequired) {
+                distanceRequired.disabled = !hasLocation;
+                if (distanceRequired.disabled) distanceRequired.checked = false;
+            }
+            if (amenitiesRequired) {
+                amenitiesRequired.disabled = document.querySelectorAll('.amenity-filter:checked').length === 0;
+                if (amenitiesRequired.disabled) amenitiesRequired.checked = false;
+            }
             Object.entries(availability).forEach(([code, available]) => {
                 const wrapper = document.querySelector(`[data-criterion-control="${code}"]`);
                 const select = wrapper?.querySelector('select');
@@ -290,21 +390,31 @@
 
         function showRecommendationError(message) {
             const summary = document.getElementById('recommendationSummary');
-            summary.innerHTML = `<div><p class="recommendation-eyebrow">Check your priorities</p><h2>Recommendation settings need attention</h2><p role="alert">${domiknowEscapeHtml(message)}</p></div>`;
+            if (summary) {
+                summary.innerHTML = `<div><p class="recommendation-eyebrow">Check your priorities</p><h2>Recommendation settings need attention</h2><p role="alert">${escapeHtml(message)}</p></div>`;
+            }
         }
 
         // Fetch a reproducible MC-REC-v1.0 recommendation run.
         async function fetchProperties() {
-            propertyRequestController?.abort();
+            if (propertyRequestController) {
+                try {
+                    propertyRequestController.abort();
+                } catch (e) {}
+            }
             propertyRequestController = new AbortController();
+
+            let responseOk = false;
+            let result = null;
+
             try {
-                const comfortableBudget = document.getElementById('filterComfortableBudget').value;
-                const hardMaximumBudget = document.getElementById('filterHardMaxBudget').value;
+                const comfortableBudget = document.getElementById('filterComfortableBudget')?.value || '';
+                const hardMaximumBudget = document.getElementById('filterHardMaxBudget')?.value || '';
                 const type = document.getElementById('filterType')?.value || '';
-                const latitude = document.getElementById('recommendationLatitude').value;
-                const longitude = document.getElementById('recommendationLongitude').value;
-                const idealDistance = document.getElementById('filterIdealDistance').value;
-                const maximumDistance = document.getElementById('filterMaximumDistance').value;
+                const latitude = document.getElementById('recommendationLatitude')?.value || '';
+                const longitude = document.getElementById('recommendationLongitude')?.value || '';
+                const idealDistance = document.getElementById('filterIdealDistance')?.value || '';
+                const maximumDistance = document.getElementById('filterMaximumDistance')?.value || '';
 
                 if (comfortableBudget && !hardMaximumBudget) {
                     showRecommendationError('Add a hard maximum budget when using a comfortable budget.');
@@ -325,28 +435,29 @@
                 });
 
                 const queryParams = new URLSearchParams({
-                    occupant_count: document.getElementById('filterOccupants').value,
+                    occupant_count: document.getElementById('filterOccupants')?.value || '1',
                     comfortable_monthly_budget: comfortableBudget,
                     hard_maximum_monthly_budget: hardMaximumBudget,
                     preferred_property_type: type,
-                    property_type_required: String(document.getElementById('filterTypeRequired').checked),
+                    property_type_required: String(document.getElementById('filterTypeRequired')?.checked || false),
                     reference_latitude: latitude,
                     reference_longitude: longitude,
                     ideal_distance_km: latitude && longitude ? idealDistance : '',
                     maximum_distance_km: latitude && longitude ? maximumDistance : '',
-                    maximum_distance_is_required: String(document.getElementById('filterDistanceRequired').checked),
-                    amenities_required: String(document.getElementById('filterAmenitiesRequired').checked),
-                    importance_c1: document.getElementById('importanceC1').value,
-                    importance_c2: document.getElementById('importanceC2').value,
-                    importance_c3: document.getElementById('importanceC3').value,
-                    importance_c4: document.getElementById('importanceC4').value,
-                    importance_c5: document.getElementById('importanceC5').value
+                    maximum_distance_is_required: String(document.getElementById('filterDistanceRequired')?.checked || false),
+                    amenities_required: String(document.getElementById('filterAmenitiesRequired')?.checked || false),
+                    importance_c1: document.getElementById('importanceC1')?.value || '3',
+                    importance_c2: document.getElementById('importanceC2')?.value || '3',
+                    importance_c3: document.getElementById('importanceC3')?.value || '3',
+                    importance_c4: document.getElementById('importanceC4')?.value || '3',
+                    importance_c5: document.getElementById('importanceC5')?.value || '3'
                 });
                 activeAmenities.forEach(amenity => queryParams.append('amenities', amenity));
 
+                const currentToken = localStorage.getItem('domiknow_token') || token;
                 const headers = {};
-                if (token) {
-                    headers['Authorization'] = `Bearer ${token}`;
+                if (currentToken) {
+                    headers['Authorization'] = `Bearer ${currentToken}`;
                 }
 
                 const response = await fetch(`/api/properties/recommendations/ranked?${queryParams.toString()}`, {
@@ -354,29 +465,54 @@
                     signal: propertyRequestController.signal
                 });
 
-                const result = await response.json().catch(() => ({}));
-                if (!response.ok) {
+                responseOk = response.ok;
+                result = await response.json().catch(() => ({}));
+
+                if (!responseOk) {
                     showRecommendationError(result.message || 'Failed to calculate property recommendations.');
-                    document.getElementById('propertiesGrid').innerHTML = `<p role="alert" style="grid-column: 1/-1; text-align: center; color: var(--error);">${domiknowEscapeHtml(result.message || 'Failed to load recommendations. Please try again.')}</p>`;
+                    const grid = document.getElementById('propertiesGrid');
+                    if (grid) {
+                        grid.innerHTML = `<p role="alert" style="grid-column: 1/-1; text-align: center; color: var(--error);">${escapeHtml(result.message || 'Failed to load recommendations. Please try again.')}</p>`;
+                    }
                     return;
                 }
+            } catch (networkErr) {
+                // If the request was aborted, or user is navigating away/page is hidden, cleanly ignore
+                if (
+                    networkErr.name === 'AbortError' ||
+                    networkErr.message?.toLowerCase().includes('aborted') ||
+                    document.visibilityState === 'hidden'
+                ) {
+                    return;
+                }
+                console.error('Fetch properties network error:', networkErr);
+                const grid = document.getElementById('propertiesGrid');
+                if (grid) {
+                    grid.innerHTML = `<p role="alert" style="grid-column: 1/-1; text-align: center; color: var(--error);">Property listings could not be loaded. Please check your connection and try again.</p>`;
+                }
+                return;
+            }
 
-                recommendationMetadata = result.data || {};
+            // Separate UI Rendering from Network Fetch so rendering glitches never falsely show "connection error"
+            try {
+                recommendationMetadata = result?.data || {};
                 allProperties = Array.isArray(recommendationMetadata)
                     ? recommendationMetadata
                     : recommendationMetadata.recommendations || [];
                 renderRecommendationSummary(recommendationMetadata);
                 renderUI(allProperties);
-
-            } catch (err) {
-                if (err.name === 'AbortError') return;
-                console.error(err);
-                document.getElementById('propertiesGrid').innerHTML = `<p role="alert" style="grid-column: 1/-1; text-align: center; color: var(--error);">Property listings could not be loaded. Please check your connection and try again.</p>`;
+            } catch (renderErr) {
+                console.error('Error rendering recommendations UI:', renderErr);
+                const grid = document.getElementById('propertiesGrid');
+                if (grid && (!grid.children || grid.children.length === 0)) {
+                    grid.innerHTML = `<p role="alert" style="grid-column: 1/-1; text-align: center; color: var(--text-secondary);">Unable to display property cards. Please refresh the page.</p>`;
+                }
             }
         }
 
         function renderRecommendationSummary(metadata) {
             const summary = document.getElementById('recommendationSummary');
+            if (!summary) return;
             const recommendations = Array.isArray(metadata?.recommendations) ? metadata.recommendations : [];
             const labels = {
                 C1: 'Preferences', C2: 'Location', C3: 'Amenities',
@@ -409,13 +545,15 @@
             const exclusionHtml = exclusionEntries.length ? `
                 <details class="recommendation-exclusions">
                     <summary>Why some properties were excluded</summary>
-                    <div>${exclusionEntries.map(([code, count]) => `<span>${domiknowEscapeHtml(exclusionLabels[code] || code.replace(/_/g, ' ').toLowerCase())}<strong>${Number(count)}</strong></span>`).join('')}</div>
+                    <div>${exclusionEntries.map(([code, count]) => `<span>${escapeHtml(exclusionLabels[code] || code.replace(/_/g, ' ').toLowerCase())}<strong>${Number(count)}</strong></span>`).join('')}</div>
                 </details>` : '';
+            const safeFormulaVersion = escapeHtml(metadata?.formula_version || 'MC-REC-v1.0');
+            const safeAdvisoryNotice = escapeHtml(metadata?.advisory_notice || 'Suitability scores support comparison and are not probabilities or guarantees.');
             summary.innerHTML = `
                 <div>
-                    <p class="recommendation-eyebrow">Multi-Criteria Property Recommendation · ${domiknowEscapeHtml(metadata?.formula_version || 'MC-REC-v1.0')}</p>
+                    <p class="recommendation-eyebrow">Multi-Criteria Property Recommendation · ${safeFormulaVersion}</p>
                     <h2>${recommendations.length} eligible ${recommendations.length === 1 ? 'property' : 'properties'} ranked</h2>
-                    <p>${domiknowEscapeHtml(metadata?.advisory_notice || 'Suitability scores support comparison and are not probabilities or guarantees.')}</p>
+                    <p>${safeAdvisoryNotice}</p>
                 </div>
                 <div class="recommendation-summary__meta">
                     <span class="recommendation-summary__chip">Platform records checked<strong>${Number(metadata?.candidate_count || 0)}</strong></span>
@@ -428,10 +566,23 @@
 
         function renderUI(items) {
             const grid = document.getElementById('propertiesGrid');
+            if (!grid) return;
             grid.innerHTML = '';
             
-            // Clear prior markers
-            markersGroup.clearLayers();
+            // Clear prior markers safely
+            if (markersGroup) {
+                try {
+                    markersGroup.clearLayers();
+                } catch (e) {
+                    console.warn('Error clearing markersGroup:', e);
+                }
+            } else if (mapInstance && typeof L !== 'undefined') {
+                try {
+                    markersGroup = L.layerGroup().addTo(mapInstance);
+                } catch (e) {
+                    console.warn('Error creating markersGroup:', e);
+                }
+            }
 
             if (!items || items.length === 0) {
                 grid.innerHTML = `<p role="status" aria-live="polite" style="grid-column: 1/-1; text-align: center; color: var(--text-muted); padding: 3rem 0;">No properties passed the current eligibility requirements. Review your mandatory choices and the exclusion summary above; listings with incomplete verification, documents, inventory, or required data are not ranked.</p>`;
@@ -454,10 +605,10 @@
                 const breakdown = item.criterion_breakdown || {};
                 const propertyId = String(prop.id || '');
                 const safePropertyId = encodeURIComponent(propertyId);
-                const propertyName = domiknowEscapeHtml(prop.property_name || 'Unnamed property');
-                const propertyType = domiknowEscapeHtml(String(prop.property_type || 'Property').replace(/_/g, ' '));
-                const barangayName = domiknowEscapeHtml(prop.barangay || 'Location not specified');
-                const imageUrl = domiknowSafeExternalUrl(prop.main_image_url || 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&w=400&q=80');
+                const propertyName = escapeHtml(prop.property_name || 'Unnamed property');
+                const propertyType = escapeHtml(String(prop.property_type || 'Property').replace(/_/g, ' '));
+                const barangayName = escapeHtml(prop.barangay || 'Location not specified');
+                const imageUrl = safeExternalUrl(prop.main_image_url || 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&w=400&q=80');
                 const unitStats = prop.unit_stats || {};
                 const availableCount = Math.max(0, Number(unitStats.available_listing_count) || 0);
                 const minimumRent = readMetric(unitStats.min_available_monthly_rent, 0.01, Number.MAX_SAFE_INTEGER);
@@ -465,7 +616,7 @@
                     ? 'Not ranked'
                     : rank === 1 ? 'Rank #1 &middot; Highest suitability' : `Rank #${rank}`;
                 const criterionRows = Object.values(breakdown).map(criterion => `
-                    <div><dt title="${domiknowEscapeHtml(criterion.label || criterion.code)}">${domiknowEscapeHtml(criterion.label || criterion.code)}</dt><dd>${Number(criterion.display_score).toFixed(2)} / 100</dd></div>
+                    <div><dt title="${escapeHtml(criterion.label || criterion.code)}">${escapeHtml(criterion.label || criterion.code)}</dt><dd>${Number(criterion.display_score).toFixed(2)} / 100</dd></div>
                 `).join('');
                 const ratingCount = Math.max(0, Number(item.evidence?.rating?.review_count) || 0);
                 const limitedOperations = Object.values(item.evidence?.reliability?.fallback_flags || {}).some(Boolean);
@@ -484,7 +635,7 @@
                 const amenitiesList = prop.amenities || [];
                 const preview = amenitiesList.slice(0, 3);
                 preview.forEach(a => {
-                    amenHtml += `<span class="badge-amenity">${domiknowEscapeHtml(a)}</span>`;
+                    amenHtml += `<span class="badge-amenity">${escapeHtml(a)}</span>`;
                 });
                 if (amenitiesList.length > 3) {
                     amenHtml += `<span class="badge-amenity">+${amenitiesList.length - 3}</span>`;
@@ -540,40 +691,54 @@
                 // Add Custom Animated Leaflet Marker
                 const lat = Number(prop.latitude);
                 const lng = Number(prop.longitude);
-                if (Number.isFinite(lat) && Number.isFinite(lng) && Math.abs(lat) <= 90 && Math.abs(lng) <= 180) {
+                if (markersGroup && typeof L !== 'undefined' && Number.isFinite(lat) && Number.isFinite(lng) && Math.abs(lat) <= 90 && Math.abs(lng) <= 180) {
+                    try {
+                        const hasDomiknowMap = typeof window.DomiknowMap !== 'undefined';
+                        const markerIcon = hasDomiknowMap && typeof DomiknowMap.priceIcon === 'function'
+                            ? DomiknowMap.priceIcon(rank === null ? 'Unranked' : `#${rank}`, {
+                                selected: rank === 1,
+                                unavailable: rank === null
+                            })
+                            : undefined;
 
-                    const markerIcon = DomiknowMap.priceIcon(rank === null ? 'Unranked' : `#${rank}`, {
-                        selected: rank === 1,
-                        unavailable: rank === null
-                    });
-                    const popupRank = rank === null
-                        ? 'Not ranked'
-                        : `Rank #${rank} · ${suitabilityScore !== null ? suitabilityScore.toFixed(2) : '—'} / 100 suitability`;
-                    const popupAvailability = availableCount > 0 && minimumRent !== null
-                        ? `${availableCount} available · From ₱${minimumRent.toLocaleString('en-PH', { maximumFractionDigits: 0 })}`
-                        : 'No currently rentable units';
-                    const popupDistance = Number.isFinite(Number(item.distance_km))
-                        ? `${Number(item.distance_km).toFixed(2)} km from your reference location`
-                        : 'Location criterion not active';
+                        const popupRank = rank === null
+                            ? 'Not ranked'
+                            : `Rank #${rank} · ${suitabilityScore !== null ? suitabilityScore.toFixed(2) : '—'} / 100 suitability`;
+                        const popupAvailability = availableCount > 0 && minimumRent !== null
+                            ? `${availableCount} available · From ₱${minimumRent.toLocaleString('en-PH', { maximumFractionDigits: 0 })}`
+                            : 'No currently rentable units';
+                        const popupDistance = Number.isFinite(Number(item.distance_km))
+                            ? `${Number(item.distance_km).toFixed(2)} km from your reference location`
+                            : 'Location criterion not active';
 
-                    const marker = L.marker([lat, lng], {
-                        icon: markerIcon,
-                        keyboard: true,
-                        title: `${prop.property_name || 'Rental property'}, ${popupRank}`,
-                        alt: `${prop.property_name || 'Rental property'} recommendation marker`
-                    });
-                    DomiknowMap.bindPopup(marker, DomiknowMap.propertyPopupContent({
-                        eyebrow: popupRank,
-                        title: prop.property_name || 'Rental property',
-                        facts: [`Brgy. ${prop.barangay || 'Location not specified'}`, popupAvailability, popupDistance],
-                        price: minimumRent !== null ? `₱${minimumRent.toLocaleString('en-PH', { maximumFractionDigits: 0 })}` : '',
-                        actionHref: `property-details.html?id=${safePropertyId}`,
-                        actionLabel: 'Open details'
-                    }));
-                    
-                    markersGroup.addLayer(marker);
-                    markers.push(marker);
-                    markerMap[propertyId] = { marker, lat, lng };
+                        const markerOptions = {
+                            keyboard: true,
+                            title: `${prop.property_name || 'Rental property'}, ${popupRank}`,
+                            alt: `${prop.property_name || 'Rental property'} recommendation marker`
+                        };
+                        if (markerIcon) markerOptions.icon = markerIcon;
+
+                        const marker = L.marker([lat, lng], markerOptions);
+                        
+                        if (hasDomiknowMap && typeof DomiknowMap.bindPopup === 'function' && typeof DomiknowMap.propertyPopupContent === 'function') {
+                            DomiknowMap.bindPopup(marker, DomiknowMap.propertyPopupContent({
+                                eyebrow: popupRank,
+                                title: prop.property_name || 'Rental property',
+                                facts: [`Brgy. ${prop.barangay || 'Location not specified'}`, popupAvailability, popupDistance],
+                                price: minimumRent !== null ? `₱${minimumRent.toLocaleString('en-PH', { maximumFractionDigits: 0 })}` : '',
+                                actionHref: `property-details.html?id=${safePropertyId}`,
+                                actionLabel: 'Open details'
+                            }));
+                        } else {
+                            marker.bindPopup(`<strong>${propertyName}</strong><br>${popupAvailability}`);
+                        }
+                        
+                        markersGroup.addLayer(marker);
+                        markers.push(marker);
+                        markerMap[propertyId] = { marker, lat, lng };
+                    } catch (markerErr) {
+                        console.warn('Marker creation failed for property:', propertyId, markerErr);
+                    }
                 }
 
                 // Card Hover & Click Interactive Map Animations
@@ -603,25 +768,33 @@
                     // Avoid triggering when clicking View Details link
                     if (e.target.closest('a')) return;
                     const data = markerMap[propertyId];
-                    if (data && data.marker) {
-                        mapInstance.flyTo([data.lat, data.lng], 16, {
-                            animate: true,
-                            duration: 1.2,
-                            easeLinearity: 0.25
-                        });
-                        data.marker.openPopup();
+                    if (data && data.marker && mapInstance) {
+                        try {
+                            mapInstance.flyTo([data.lat, data.lng], 16, {
+                                animate: true,
+                                duration: 1.2,
+                                easeLinearity: 0.25
+                            });
+                            data.marker.openPopup();
+                        } catch (flyErr) {
+                            console.warn('FlyTo error:', flyErr);
+                        }
                     }
                 });
             });
 
             // Smooth animated camera transition to fit all property markers
-            if (markers.length > 0) {
-                const group = new L.featureGroup(markers);
-                mapInstance.flyToBounds(group.getBounds().pad(0.15), {
-                    animate: true,
-                    duration: 1.4,
-                    easeLinearity: 0.25
-                });
+            if (markers.length > 0 && mapInstance && typeof L !== 'undefined') {
+                try {
+                    const group = new L.featureGroup(markers);
+                    mapInstance.flyToBounds(group.getBounds().pad(0.15), {
+                        animate: true,
+                        duration: 1.4,
+                        easeLinearity: 0.25
+                    });
+                } catch (boundsErr) {
+                    console.warn('Map bounds transition warning:', boundsErr);
+                }
             }
         }
 
@@ -633,20 +806,34 @@
 
         function clearFilters() {
             clearTimeout(filterRequestTimer);
-            document.getElementById('filterOccupants').value = '1';
-            document.getElementById('filterComfortableBudget').value = '';
-            document.getElementById('filterHardMaxBudget').value = '';
-            document.getElementById('filterType').value = '';
-            document.getElementById('filterTypeRequired').checked = false;
-            document.getElementById('filterIdealDistance').value = '1';
-            document.getElementById('filterMaximumDistance').value = '5';
-            document.getElementById('filterDistanceRequired').checked = false;
-            document.getElementById('filterAmenitiesRequired').checked = false;
-            document.getElementById('recommendationLatitude').value = '';
-            document.getElementById('recommendationLongitude').value = '';
-            document.getElementById('recommendationLocationStatus').textContent = 'Location Suitability is inactive until a location is available.';
-            document.getElementById('recommendationLocationStatus').dataset.state = '';
-            document.querySelectorAll('.amenity-filter').forEach(cb => cb.checked = false);
+            const occupants = document.getElementById('filterOccupants');
+            if (occupants) occupants.value = '1';
+            const comfBudget = document.getElementById('filterComfortableBudget');
+            if (comfBudget) comfBudget.value = '';
+            const hardBudget = document.getElementById('filterHardMaxBudget');
+            if (hardBudget) hardBudget.value = '';
+            const propType = document.getElementById('filterType');
+            if (propType) propType.value = '';
+            const typeReq = document.getElementById('filterTypeRequired');
+            if (typeReq) typeReq.checked = false;
+            const idealDist = document.getElementById('filterIdealDistance');
+            if (idealDist) idealDist.value = '1';
+            const maxDist = document.getElementById('filterMaximumDistance');
+            if (maxDist) maxDist.value = '5';
+            const distReq = document.getElementById('filterDistanceRequired');
+            if (distReq) distReq.checked = false;
+            const amenReq = document.getElementById('filterAmenitiesRequired');
+            if (amenReq) amenReq.checked = false;
+            const recLat = document.getElementById('recommendationLatitude');
+            if (recLat) recLat.value = '';
+            const recLng = document.getElementById('recommendationLongitude');
+            if (recLng) recLng.value = '';
+            const recStatus = document.getElementById('recommendationLocationStatus');
+            if (recStatus) {
+                recStatus.textContent = 'Location Suitability is inactive until a location is available.';
+                recStatus.dataset.state = '';
+            }
+            document.querySelectorAll('.amenity-filter').forEach(cb => { cb.checked = false; });
             document.querySelectorAll('.recommendation-importance').forEach(select => { select.value = '3'; });
             window.DomiknowLocation?.clear?.();
             updateCriterionAvailability();

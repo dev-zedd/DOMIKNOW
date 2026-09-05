@@ -277,6 +277,16 @@ body.auth-page {
   transform: none !important;
 }
 
+.auth-page :where(.btn-primary, .btn-secondary)::before,
+.auth-page :where(.btn-primary, .btn-secondary)::after,
+.auth-page button.dk-button-loading::before,
+.auth-page button.dk-button-loading::after,
+.auth-page button:has(.dk-spinner)::before,
+.auth-page button:has(.dk-spinner)::after {
+  display: none !important;
+  content: none !important;
+}
+
 .auth-page :where(.alert-danger, .alert-success, #statusMessage) {
   display: flex;
   gap: 10px;

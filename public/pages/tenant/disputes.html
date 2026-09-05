@@ -4,572 +4,1086 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Disputes & Complaints - DomiKnow</title>
-    <meta name="description" content="File and track formal tenancy complaints and disputes with your landlord.">
+    <meta name="description" content="File and track formal tenancy complaints and disputes with your landlord on DomiKnow.">
     <link href="../../css/input.css" rel="stylesheet">
+    <link href="../../css/design-system.css?v=20260904-2" rel="stylesheet">
     <style>
-        /* ── Page Header & Action Bar ──────────────────────── */
-        .page-hero {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            gap: 1rem;
-            margin-bottom: 2rem;
-        }
-        .page-hero-text h2 {
-            font-size: 1.75rem;
-            font-weight: 800;
-            color: var(--text-primary);
-            margin-bottom: 0.25rem;
-        }
-        .page-hero-text p {
-            color: var(--text-secondary);
-            font-size: 0.9rem;
-        }
-
-        .btn-new-complaint {
+        /* ── Modern Disputes Page Styles (Matches maintenance.html) ── */
+        .btn-submit-request {
+            background: #ffffff;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            padding: 8px 18px;
+            font-weight: 700;
+            font-size: 0.875rem;
+            color: #0f172a;
             display: inline-flex;
             align-items: center;
-            gap: 0.5rem;
-            padding: 0.75rem 1.5rem;
-            font-size: 0.9rem;
-            font-weight: 800;
-            border: none;
-            border-radius: var(--radius-md);
-            background: linear-gradient(135deg, var(--tenant) 0%, #7c3aed 100%);
-            color: white;
+            gap: 8px;
             cursor: pointer;
-            transition: all 0.2s ease;
-            box-shadow: 0 4px 16px rgba(139, 92, 246, 0.3);
+            transition: all 0.15s ease;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+            white-space: nowrap;
         }
-        .btn-new-complaint:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 28px rgba(139, 92, 246, 0.4);
+        .btn-submit-request:hover {
+            background: #f8fafc;
+            border-color: #94a3b8;
         }
 
-        /* ── Stats Row ──────────────────────────────────────── */
-        .stats-row {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 1rem;
-            margin-bottom: 1.75rem;
+        /* ── Tabs & Action Header Row ── */
+        .maintenance-header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #e2e8f0;
+            margin-bottom: 16px;
+            gap: 16px;
+            flex-wrap: wrap;
         }
-        @media (max-width: 900px) { .stats-row { grid-template-columns: repeat(2, 1fr); } }
-        @media (max-width: 500px) { .stats-row { grid-template-columns: 1fr; } }
-
-        .stat-card {
-            background: var(--bg-secondary);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-md);
-            padding: 1.1rem 1.25rem;
+        .maintenance-tabs-bar {
             display: flex;
             align-items: center;
-            gap: 1rem;
+            gap: 22px;
+            overflow-x: auto;
+            scrollbar-width: none;
+            padding-bottom: 12px;
         }
-        .stat-icon {
-            width: 42px; height: 42px;
-            border-radius: var(--radius-sm);
-            display: flex; align-items: center; justify-content: center;
-            color: var(--tenant);
-            flex-shrink: 0;
+        .maintenance-tabs-bar::-webkit-scrollbar { display: none; }
+        .m-tab-btn {
+            background: none;
+            border: none;
+            padding: 4px 0;
+            font-size: 0.9375rem;
+            font-weight: 700;
+            color: #64748b;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            position: relative;
+            transition: color 0.15s ease;
+            white-space: nowrap;
         }
-        .stat-value { font-size: 1.5rem; font-weight: 800; color: var(--text-primary); line-height: 1; }
-        .stat-label { font-size: 0.75rem; font-weight: 600; color: var(--text-muted); margin-top: 0.2rem; text-transform: uppercase; letter-spacing: 0.05em; }
+        .m-tab-btn:hover {
+            color: #0052ea;
+        }
+        .m-tab-btn.active {
+            color: #0052ea;
+            font-weight: 800;
+        }
+        .m-tab-btn.active::after {
+            content: '';
+            position: absolute;
+            bottom: -13px;
+            left: 0;
+            right: 0;
+            height: 2.5px;
+            background: #0052ea;
+            border-radius: 2px;
+        }
+        .tab-count {
+            background: #e2e8f0;
+            color: #475569;
+            font-size: 0.6875rem;
+            font-weight: 700;
+            padding: 2px 7px;
+            border-radius: 999px;
+            line-height: 1.2;
+        }
+        .m-tab-btn.active .tab-count {
+            background: #eff6ff;
+            color: #0052ea;
+        }
 
-        /* ── History Ledger Panel ───────────────────────────── */
-        .ledger-panel {
-            background: var(--bg-secondary);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-lg);
-            box-shadow: var(--shadow-lg);
-            overflow: hidden;
+        /* ── Ledger Controls Bar ── */
+        .ledger-controls-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
         }
-        .ledger-header {
-            padding: 1.25rem 1.75rem;
-            border-bottom: 1px solid var(--border-color);
+        .ledger-search-box {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+        .ledger-search-box svg {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #94a3b8;
+            pointer-events: none;
+            z-index: 1;
+        }
+        .ledger-search-box input {
+            padding: 8px 14px 8px 40px !important;
+            padding-left: 40px !important;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            color: #0f172a;
+            width: 260px;
+            max-width: 100%;
+            background: #ffffff;
+            outline: none;
+            transition: border-color 0.15s ease, box-shadow 0.15s ease;
+        }
+        .ledger-search-box input:focus {
+            border-color: #0052ea;
+            box-shadow: 0 0 0 3px rgba(0, 82, 234, 0.08);
+        }
+        .ledger-filter-group {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .ledger-select-wrap {
+            position: relative;
+        }
+        .ledger-select {
+            padding: 8px 30px 8px 14px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font-size: 0.8125rem;
+            font-weight: 600;
+            color: #334155;
+            background: #ffffff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23475569' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E") no-repeat right 10px center;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            cursor: pointer;
+            outline: none;
+            transition: border-color 0.15s ease;
+        }
+        .ledger-select:focus {
+            border-color: #0052ea;
+        }
+        @media (max-width: 640px) {
+            .ledger-controls-bar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .ledger-search-box,
+            .ledger-search-box input {
+                width: 100%;
+            }
+            .ledger-filter-group {
+                justify-content: flex-end;
+            }
+        }
+
+        /* ── Clean Complaint Cards ── */
+        .requests-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 32px;
+        }
+        .request-card,
+        body .request-card,
+        div.request-card,
+        html body .request-card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0 !important;
+            border-left: 1px solid #e2e8f0 !important;
+            border-left-width: 1px !important;
+            border-left-style: solid !important;
+            border-left-color: #e2e8f0 !important;
+            border-radius: 12px;
+            padding: 16px 20px;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            flex-wrap: wrap;
-            gap: 0.75rem;
-        }
-        .ledger-header h3 { font-size: 1.05rem; font-weight: 800; color: var(--text-primary); margin: 0; }
-
-        /* Filter Tabs */
-        .filter-tabs {
-            display: flex;
-            gap: 0.3rem;
-            padding: 0.85rem 1.75rem;
-            border-bottom: 1px solid var(--border-color);
-            overflow-x: auto;
-            scrollbar-width: none;
-        }
-        .filter-tabs::-webkit-scrollbar { display: none; }
-        .filter-tab {
-            padding: 0.4rem 0.9rem;
-            font-size: 0.78rem;
-            font-weight: 700;
-            color: var(--text-muted);
-            background: var(--bg-primary);
-            border: 1px solid var(--border-color);
-            border-radius: 999px;
+            gap: 20px;
             cursor: pointer;
-            white-space: nowrap;
-            transition: all 0.15s;
+            transition: all 0.15s ease;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+            outline: none;
         }
-        .filter-tab:hover { color: var(--text-primary); border-color: var(--tenant); }
-        .filter-tab.active {
-            background: linear-gradient(135deg, var(--tenant), #7c3aed);
-            color: white; border-color: transparent;
-            box-shadow: 0 2px 8px rgba(139, 92, 246, 0.3);
+        .request-card:hover,
+        body .request-card:hover,
+        div.request-card:hover,
+        html body .request-card:hover {
+            border: 1px solid #cbd5e1 !important;
+            border-left: 1px solid #cbd5e1 !important;
+            border-left-width: 1px !important;
+            border-left-style: solid !important;
+            border-left-color: #cbd5e1 !important;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            transform: translateY(-1px);
         }
-
-        /* Complaint Cards */
-        .complaints-list {
-            padding: 1.25rem 1.75rem 1.75rem;
-            display: flex;
-            flex-direction: column;
-            gap: 0.75rem;
-        }
-        .complaint-card {
-            background: var(--bg-primary);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-md);
-            padding: 1.1rem 1.25rem;
+        .rc-left-group {
             display: flex;
             align-items: center;
-            gap: 1rem;
-            cursor: pointer;
-            transition: all 0.18s ease;
+            gap: 14px;
+            flex: 1.5;
+            min-width: 240px;
         }
-        .complaint-card:hover {
-            border-color: var(--tenant);
-            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-            transform: translateX(3px);
-        }
-        .complaint-card-icon {
-            width: 44px; height: 44px;
-            border-radius: var(--radius-md);
-            background: rgba(139, 92, 246, 0.1);
-            color: var(--tenant);
-            border: 1px solid rgba(139, 92, 246, 0.2);
-            display: flex; align-items: center; justify-content: center;
+        .rc-icon-box {
+            width: 44px;
+            height: 44px;
+            border-radius: 10px;
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            color: #0052ea;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
             flex-shrink: 0;
         }
-        .complaint-card-body { flex: 1; min-width: 0; }
-        .complaint-card-title { font-weight: 700; font-size: 0.9rem; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .complaint-card-meta { font-size: 0.75rem; color: var(--text-muted); margin-top: 0.2rem; }
-        .complaint-card-right { display: flex; flex-direction: column; align-items: flex-end; gap: 0.35rem; flex-shrink: 0; }
-
-        /* Status & Category Badges */
-        .badge {
-            font-size: 0.68rem; font-weight: 800;
-            padding: 0.22rem 0.65rem;
-            border-radius: 999px; text-transform: uppercase;
-            letter-spacing: 0.04em;
-            display: inline-flex; align-items: center; gap: 0.3rem;
+        .rc-text-box {
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
         }
-        .badge::before { content:''; width:5px; height:5px; border-radius:50%; background:currentColor; }
-        .badge-submitted    { background:rgba(99,102,241,.14); color:#6366f1; }
-        .badge-under_review { background:rgba(245,158,11,.14); color:#f59e0b; }
-        .badge-in_progress  { background:rgba(249,115,22,.14); color:#f97316; }
-        .badge-resolved     { background:rgba(16,185,129,.12); color:#10b981; }
-        .badge-closed       { background:rgba(107,114,128,.12);color:#6b7280; }
-        .badge-rejected     { background:rgba(239,68,68,.12);  color:#ef4444; }
+        .rc-title {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: #0f172a;
+            margin-bottom: 3px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .rc-subtitle {
+            font-size: 0.8125rem;
+            color: #64748b;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .rc-assigned-group {
+            min-width: 140px;
+            border-left: 1px solid #f1f5f9;
+            padding-left: 16px;
+        }
+        .rc-priority-group {
+            min-width: 130px;
+            border-left: 1px solid #f1f5f9;
+            padding-left: 16px;
+        }
+        .rc-col-label {
+            font-size: 0.75rem;
+            color: #64748b;
+            font-weight: 500;
+        }
+        .rc-col-label.uppercase {
+            font-size: 0.6875rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        .rc-col-val {
+            font-size: 0.9375rem;
+            font-weight: 700;
+            color: #0f172a;
+            margin-top: 2px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .rc-right-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-shrink: 0;
+        }
+        .rc-status-pill {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.6875rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+        .rc-status-pill.closed,
+        .rc-status-pill.resolved {
+            background: #ecfdf5;
+            color: #059669;
+            border: 1px solid #a7f3d0;
+        }
+        .rc-status-pill.submitted,
+        .rc-status-pill.pending {
+            background: #fefce8;
+            color: #854d0e;
+            border: 1px solid #fef08a;
+        }
+        .rc-status-pill.under_review,
+        .rc-status-pill.inprogress,
+        .rc-status-pill.in_progress {
+            background: #eff6ff;
+            color: #1e40af;
+            border: 1px solid #bfdbfe;
+        }
+        .rc-status-pill.rejected {
+            background: #fef2f2;
+            color: #991b1b;
+            border: 1px solid #fecaca;
+        }
+        .rc-tag-pill {
+            background: #f1f5f9;
+            color: #475569;
+            font-size: 0.6875rem;
+            font-weight: 600;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-family: inherit;
+        }
+        .rc-chevron {
+            color: #94a3b8;
+            display: flex;
+            align-items: center;
+            margin-left: 4px;
+        }
 
-        /* Empty State */
-        .empty-state { text-align:center; padding:3.5rem 1rem; color:var(--text-muted); }
-        .empty-state svg { margin-bottom:0.75rem; opacity:0.4; }
-        .empty-state p { font-size:0.875rem; margin:0; }
+        @media (max-width: 768px) {
+            .request-card {
+                flex-wrap: wrap;
+            }
+            .rc-assigned-group, .rc-priority-group {
+                border-left: none;
+                padding-left: 0;
+            }
+        }
+
+        /* ── Empty State ── */
+        .empty-state {
+            text-align: center;
+            padding: 3.5rem 1rem;
+            color: #64748b;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+        }
+        .empty-state .ei {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            display: flex;
+            justify-content: center;
+        }
+        .empty-state p {
+            font-size: 0.9375rem;
+            font-weight: 600;
+            color: #64748b;
+            margin: 0;
+        }
 
         /* ══════════════════════════════════════════════════════
-           MODAL OVERLAY & BOX
+           MODAL SYSTEM (Consistent & Minimalist)
         ══════════════════════════════════════════════════════ */
         .modal-overlay {
-            position: fixed; inset: 0;
-            background: rgba(8, 8, 20, 0.72);
-            backdrop-filter: blur(6px);
-            display: flex; align-items: center; justify-content: center;
-            z-index: 1000; padding: 1.25rem;
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.45);
+            backdrop-filter: blur(4px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            padding: 1.5rem;
         }
-
-        /* — Form Modal — */
-        .form-modal {
-            background: var(--bg-secondary);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-lg);
-            width: 100%; max-width: 720px;
-            max-height: 92vh;
-            display: flex; flex-direction: column;
-            box-shadow: 0 30px 90px rgba(0,0,0,0.5);
-            animation: modalIn 0.22s ease;
+        .modal-container {
+            background-color: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            width: 100%;
+            max-width: 580px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.15);
+            display: flex;
+            flex-direction: column;
+            animation: modalFadeIn 0.18s ease;
         }
-        @keyframes modalIn {
-            from { opacity:0; transform:translateY(12px) scale(0.98); }
-            to   { opacity:1; transform:none; }
+        @keyframes modalFadeIn {
+            from { opacity: 0; transform: translateY(8px) scale(0.99); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
         }
-        .form-modal-head {
+        .modal-header {
+            padding: 1.25rem 1.75rem;
+            border-bottom: 1px solid #f1f5f9;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            background-color: #ffffff;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        .modal-header-title {
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: #0f172a;
+            margin: 0;
+            line-height: 1.2;
+        }
+        .modal-header-subtitle {
+            font-size: 0.875rem;
+            color: #64748b;
+            font-weight: 500;
+            margin-top: 4px;
+        }
+        .modal-body {
             padding: 1.5rem 1.75rem;
-            border-bottom: 1px solid var(--border-color);
-            background: linear-gradient(135deg, var(--tenant) 0%, #7c3aed 100%);
-            border-radius: var(--radius-lg) var(--radius-lg) 0 0;
-            flex-shrink: 0;
-            display: flex; align-items: center; justify-content: space-between;
+            overflow-y: auto;
+            flex: 1;
         }
-        .form-modal-head h3 { color:white; font-size:1.1rem; font-weight:800; margin:0 0 0.2rem 0; }
-        .form-modal-head p  { color:rgba(255,255,255,0.75); font-size:0.8125rem; margin:0; }
-        .form-modal-close {
-            background: rgba(255,255,255,0.15);
-            border: 1px solid rgba(255,255,255,0.2);
-            border-radius: 8px; padding: 0.4rem;
-            cursor: pointer; color: white;
-            transition: background 0.15s;
-            display:flex; align-items:center; flex-shrink: 0;
+        .modal-footer {
+            padding: 1.25rem 1.75rem;
+            border-top: 1px solid #f1f5f9;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            background-color: #ffffff;
+            gap: 12px;
+            position: sticky;
+            bottom: 0;
+            z-index: 10;
         }
-        .form-modal-close:hover { background: rgba(255,255,255,0.25); }
+        .modal-close-x {
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            color: #64748b;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 4px;
+            border-radius: 6px;
+            transition: background 0.15s ease, color 0.15s ease;
+        }
+        .modal-close-x:hover {
+            background: #f1f5f9;
+            color: #0f172a;
+        }
 
-        .form-modal-body {
-            padding: 1.75rem;
-            overflow-y: auto; flex: 1;
+        /* Modal Action Buttons */
+        .btn-modal-cancel {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            color: #0f172a;
+            font-size: 0.875rem;
+            font-weight: 600;
+            padding: 9px 22px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            text-decoration: none;
+        }
+        .btn-modal-cancel:hover {
+            background: #f8fafc;
+            border-color: #cbd5e1;
+        }
+        .btn-modal-primary {
+            background: #0052ea;
+            border: 1px solid #0052ea;
+            color: #ffffff;
+            font-size: 0.875rem;
+            font-weight: 600;
+            padding: 9px 22px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn-modal-primary:hover:not(:disabled) {
+            background: #0247d1;
+            border-color: #0247d1;
+        }
+        .btn-modal-primary:disabled {
+            opacity: 0.65;
+            cursor: not-allowed;
         }
 
-        /* Form Controls */
-        .form-grid-2 {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1rem;
+        /* Form Structure */
+        .form-group {
+            margin-bottom: 1.15rem;
         }
-        @media (max-width: 600px) { .form-grid-2 { grid-template-columns: 1fr; } }
+        .form-group:last-child {
+            margin-bottom: 0;
+        }
+        .form-label {
+            display: block;
+            font-size: 0.8125rem;
+            font-weight: 700;
+            color: #334155;
+            margin-bottom: 6px;
+        }
+        .form-input {
+            width: 100%;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 9px 12px;
+            font-size: 0.875rem;
+            color: #0f172a;
+            background: #ffffff;
+            outline: none;
+            box-sizing: border-box;
+            transition: border-color 0.15s ease, box-shadow 0.15s ease;
+            font-family: inherit;
+        }
+        .form-input:focus {
+            border-color: #0052ea;
+            box-shadow: 0 0 0 2px rgba(0, 82, 234, 0.15);
+        }
+        .form-section-title {
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #64748b;
+            margin: 1.25rem 0 0.5rem 0;
+            border-left: none !important;
+            padding-left: 0 !important;
+        }
+        .form-section-title:first-child {
+            margin-top: 0;
+        }
 
-        .lease-info-bar {
-            display: flex; align-items: center; gap: 1rem;
-            background: var(--bg-primary);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-md);
-            padding: 0.9rem 1.1rem;
+        /* Lease Card */
+        .m-lease-card {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            padding: 12px 16px;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
             margin-bottom: 1.25rem;
         }
-        .lease-info-bar-icon {
-            width: 38px; height: 38px;
-            border-radius: var(--radius-sm);
-            background: linear-gradient(135deg, var(--tenant), #7c3aed);
-            display:flex; align-items:center; justify-content:center;
-            color: white; flex-shrink:0;
+        .m-lease-card-main {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
         }
-        .lib-name { font-weight:700; font-size:0.9rem; color:var(--text-primary); }
-        .lib-sub  { font-size:0.75rem; color:var(--text-muted); margin-top:0.1rem; }
+        .m-lease-card-label {
+            font-size: 0.6875rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #64748b;
+        }
+        .m-lease-card-val {
+            font-size: 0.9375rem;
+            font-weight: 700;
+            color: #0f172a;
+        }
+        .m-lease-card-sub {
+            font-size: 0.75rem;
+            color: #64748b;
+        }
+        .m-lease-meta {
+            display: flex;
+            gap: 16px;
+            align-items: center;
+        }
+        .m-lease-meta-col {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            text-align: right;
+        }
 
+        /* Category Chips */
+        .cat-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+        }
+        @media (max-width: 540px) {
+            .cat-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        .cat-card {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 9px 10px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            background: #ffffff;
+            color: #475569;
+            font-size: 0.8125rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            text-align: center;
+            user-select: none;
+        }
+        .cat-card:hover {
+            border-color: #cbd5e1;
+            background: #f8fafc;
+            color: #0f172a;
+        }
+        .cat-card.selected {
+            border-color: #0052ea !important;
+            background: #eff6ff !important;
+            color: #0052ea !important;
+            font-weight: 700 !important;
+        }
+
+        /* Upload Zone */
         .upload-zone {
-            border: 2px dashed var(--border-color);
-            border-radius: var(--radius-md);
-            padding: 1.25rem; text-align:center; cursor:pointer;
-            transition:all 0.18s; position:relative;
-            background: var(--bg-primary);
+            border: 1px dashed #cbd5e1;
+            border-radius: 8px;
+            padding: 16px;
+            background: #f8fafc;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            position: relative;
+            text-align: center;
         }
-        .upload-zone:hover, .upload-zone.dragover { border-color:var(--tenant); background:rgba(139,92,246,.03); }
-        .upload-zone input[type="file"] { position:absolute; inset:0; opacity:0; cursor:pointer; }
-        
+        .upload-zone:hover, .upload-zone.dragover {
+            border-color: #0052ea;
+            background: #eff6ff;
+        }
+        .upload-zone input[type="file"] {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            cursor: pointer;
+            width: 100%;
+            height: 100%;
+        }
+        .upload-zone-content {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            pointer-events: none;
+        }
+        .upload-zone-text {
+            display: flex;
+            flex-direction: column;
+            text-align: left;
+        }
+        .upload-zone-title {
+            font-size: 0.8125rem;
+            font-weight: 600;
+            color: #0f172a;
+        }
+        .upload-zone-hint {
+            font-size: 0.75rem;
+            color: #64748b;
+        }
         .upload-preview {
-            display:flex; align-items:center; gap:0.75rem;
-            background:var(--bg-primary); border:1px solid var(--border-color);
-            border-radius:var(--radius-sm); padding:0.6rem 0.75rem; margin-top:0.6rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 8px 12px;
+            margin-top: 8px;
         }
-        .upload-preview-name { font-size:0.8rem; font-weight:600; color:var(--text-primary); flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-        .upload-remove { background:none; border:none; cursor:pointer; color:var(--error); font-size:1rem; padding:0 0.2rem; }
+        .upload-preview-name {
+            font-size: 0.8125rem;
+            font-weight: 600;
+            color: #0f172a;
+            flex: 1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .upload-remove {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: #dc2626;
+            font-size: 1rem;
+            padding: 0 4px;
+        }
 
-        .form-modal-footer {
-            padding: 1.15rem 1.75rem;
-            border-top: 1px solid var(--border-color);
-            background: var(--bg-primary);
-            border-radius: 0 0 var(--radius-lg) var(--radius-lg);
-            display: flex; justify-content: flex-end; gap: 0.75rem; flex-shrink: 0;
-        }
-
-        .btn-cancel {
-            padding: 0.65rem 1.35rem; font-size:0.875rem; font-weight:700;
-            background: var(--bg-secondary); border:1px solid var(--border-color);
-            border-radius: var(--radius-sm); color:var(--text-secondary);
-            cursor:pointer; transition:all 0.15s;
-        }
-        .btn-cancel:hover { border-color:var(--tenant); color:var(--tenant); }
-        .btn-submit {
-            display:inline-flex; align-items:center; gap:0.5rem;
-            padding: 0.65rem 1.5rem; font-size:0.9rem; font-weight:800;
-            background: linear-gradient(135deg, var(--tenant), #7c3aed);
-            border: none; border-radius: var(--radius-sm);
-            color: white; cursor:pointer; transition:all 0.2s;
-        }
-        .btn-submit:hover:not(:disabled) { transform:translateY(-1px); box-shadow:0 6px 20px rgba(139,92,246,.35); }
-        .btn-submit:disabled { opacity:0.6; cursor:not-allowed; transform:none; }
-
+        /* Alerts & Validation */
         .form-alert {
-            border-radius: var(--radius-sm); padding:0.7rem 0.9rem;
-            font-size:0.825rem; font-weight:600; margin-bottom:1rem;
-            display:flex; align-items:center; gap:0.5rem;
+            border-radius: 8px;
+            padding: 10px 14px;
+            font-size: 0.8125rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
         }
-        .form-alert.err { background:rgba(239,68,68,.09); color:#ef4444; border:1px solid rgba(239,68,68,.22); }
-        .form-alert.ok  { background:rgba(16,185,129,.09); color:#10b981; border:1px solid rgba(16,185,129,.22); }
-
-        /* ── Details Modal ──────────────────────────────────── */
-        .details-modal {
-            background: var(--bg-secondary);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-lg);
-            width: 100%; max-width: 680px; max-height: 90vh;
-            display: flex; flex-direction: column;
-            box-shadow: 0 30px 80px rgba(0,0,0,0.45);
-            animation: modalIn 0.2s ease;
+        .form-alert.err {
+            background: #fef2f2;
+            color: #dc2626;
+            border: 1px solid #fecaca;
         }
-        .details-head {
-            padding: 1.25rem 1.75rem;
-            border-bottom: 1px solid var(--border-color);
-            display:flex; justify-content:space-between; align-items:center;
-            background: var(--bg-primary);
-            border-radius: var(--radius-lg) var(--radius-lg) 0 0;
-            flex-shrink: 0;
+        .form-alert.ok {
+            background: #f0fdf4;
+            color: #16a34a;
+            border: 1px solid #bbf7d0;
         }
-        .details-head-title { font-weight:800; font-size:1rem; color:var(--text-primary); }
-        .details-head-close {
-            background:none; border:none; cursor:pointer; color:var(--text-muted);
-            padding:0.25rem; border-radius:6px; transition:color 0.15s; line-height:1;
-        }
-        .details-head-close:hover { color:var(--text-primary); }
-        .details-body { padding:1.75rem; overflow-y:auto; flex:1; }
-        .details-foot {
-            padding: 1.1rem 1.75rem;
-            border-top: 1px solid var(--border-color);
-            display:flex; justify-content:flex-end; gap:0.75rem;
-            background: var(--bg-primary);
-            border-radius: 0 0 var(--radius-lg) var(--radius-lg);
-            flex-shrink: 0;
+        .val-hint {
+            font-size: 0.75rem;
+            color: #dc2626;
+            margin-top: 4px;
+            display: none;
+            font-weight: 500;
         }
 
-        .detail-grid {
-            display:grid; grid-template-columns:1fr 1fr;
-            gap:0.75rem; margin-bottom:1.25rem;
-            background:var(--bg-primary); border:1px solid var(--border-color);
-            border-radius:var(--radius-md); padding:1.1rem;
+        /* ── Detail Modal (Details and Resolution History) ── */
+        .detail-summary-card {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px 20px;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 16px 18px;
+            margin-bottom: 1.25rem;
         }
-        .dc-label { font-size:0.67rem; font-weight:800; text-transform:uppercase; letter-spacing:0.07em; color:var(--text-muted); margin-bottom:0.2rem; }
-        .dc-val   { font-weight:700; font-size:0.875rem; color:var(--text-primary); }
+        @media (max-width: 480px) {
+            .detail-summary-card {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+        }
+        .detail-card-item {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+        .dc-label {
+            font-size: 0.75rem;
+            color: #64748b;
+            font-weight: 500;
+        }
+        .dc-val {
+            font-size: 0.875rem;
+            font-weight: 700;
+            color: #0f172a;
+        }
+        .detail-section-title {
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #64748b;
+            margin: 1.25rem 0 0.5rem 0;
+            border-left: none !important;
+            padding-left: 0 !important;
+        }
+        .detail-section-title:first-child {
+            margin-top: 0;
+        }
+        .detail-box {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 12px 16px;
+            font-size: 0.875rem;
+            color: #334155;
+            line-height: 1.6;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+        .detail-alert-box {
+            border-radius: 10px;
+            padding: 12px 16px;
+            margin-bottom: 1.25rem;
+            font-size: 0.875rem;
+            line-height: 1.5;
+        }
+        .detail-alert-box.danger {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            color: #991b1b;
+        }
+        .detail-alert-box.info {
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            color: #1e40af;
+        }
+        .detail-alert-title {
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 4px;
+        }
+        .detail-photo-thumb {
+            display: inline-block;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid #e2e8f0;
+            background: #f8fafc;
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
+            max-width: 100%;
+        }
+        .detail-photo-thumb:hover {
+            transform: scale(1.01);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+        .detail-photo-thumb img {
+            max-width: 100%;
+            max-height: 220px;
+            object-fit: cover;
+            display: block;
+        }
+        .detail-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 3px 10px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+            width: fit-content;
+        }
+        .detail-pill.submitted,
+        .detail-pill.pending { background: #fffbeb; color: #b45309; border: 1px solid #fde68a; }
+        .detail-pill.under_review,
+        .detail-pill.inprogress,
+        .detail-pill.in_progress { background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; }
+        .detail-pill.resolved,
+        .detail-pill.completed { background: #f0fdf4; color: #15803d; border: 1px solid #bbf7d0; }
+        .detail-pill.closed { background: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; }
+        .detail-pill.rejected { background: #fef2f2; color: #b91c1c; border: 1px solid #fecaca; }
 
-        /* Timeline */
-        .timeline { border-left:2px solid var(--border-color); padding-left:1.25rem; margin-left:0.5rem; display:flex; flex-direction:column; gap:1rem; }
-        .tl-item { position:relative; }
-        .tl-item::before { content:''; position:absolute; left:-26px; top:4px; width:10px; height:10px; border-radius:50%; background:var(--border-color); border:2px solid var(--bg-secondary); }
-        .tl-item.tla::before { background:var(--tenant); }
-        .tl-item.tldone::before { background:#10b981; }
-        .tl-meta  { font-size:0.7rem; font-weight:700; text-transform:uppercase; color:var(--text-muted); }
-        .tl-notes { font-size:0.85rem; color:var(--text-primary); margin-top:0.15rem; }
-
-        /* Spinner animation */
-        @keyframes spin { to { transform: rotate(360deg); } }
-        .spin-icon { display:inline-block; width:14px; height:14px; border:2px solid white; border-top-color:transparent; border-radius:50%; animation:spin 0.65s linear infinite; }
+        .detail-timeline {
+            border-left: 2px solid #e2e8f0;
+            padding-left: 1.25rem;
+            margin-left: 0.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin-top: 0.5rem;
+        }
+        .detail-timeline-item {
+            position: relative;
+        }
+        .detail-timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -25px;
+            top: 4px;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #94a3b8;
+            border: 2px solid #ffffff;
+            box-shadow: 0 0 0 1px #e2e8f0;
+        }
+        .detail-timeline-item.active::before {
+            background: #0052ea;
+            box-shadow: 0 0 0 2px #bfdbfe;
+        }
+        .detail-timeline-item.done::before {
+            background: #10b981;
+        }
+        .detail-timeline-meta {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #64748b;
+            margin-bottom: 2px;
+        }
+        .detail-timeline-note {
+            font-size: 0.84375rem;
+            color: #0f172a;
+            line-height: 1.4;
+        }
     </style>
-    <link href="../../css/design-system.css?v=20260904-1" rel="stylesheet">
     <script src="../../js/ui.js?v=20260827-3" defer></script>
 </head>
 <body class="app-loading" data-role="tenant" data-page-title="Disputes & Complaints">
 
-    <!-- Main Content -->
+    <!-- ── Main Content ── -->
     <main class="dashboard-container">
 
-        <!-- Page Hero -->
-        <div class="page-hero" style="justify-content: flex-end;">
-            <button class="btn-new-complaint" id="openFormBtn">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                    <line x1="12" y1="5" x2="12" y2="19"></line>
-                    <line x1="5" y1="12" x2="19" y2="12"></line>
+        <!-- Filter tabs & Action Button Header Row -->
+        <div class="maintenance-header-row">
+            <div class="maintenance-tabs-bar" id="filterTabs">
+                <button class="m-tab-btn active" data-filter="all">All</button>
+                <button class="m-tab-btn" data-filter="submitted">Submitted <span class="tab-count" id="tabCountSubmitted">0</span></button>
+                <button class="m-tab-btn" data-filter="under_review">Under Review <span class="tab-count" id="tabCountReview">0</span></button>
+                <button class="m-tab-btn" data-filter="in_progress">In Progress <span class="tab-count" id="tabCountProgress">0</span></button>
+                <button class="m-tab-btn" data-filter="resolved">Resolved <span class="tab-count" id="tabCountResolved">0</span></button>
+                <button class="m-tab-btn" data-filter="closed">Closed <span class="tab-count" id="tabCountClosed">0</span></button>
+                <button class="m-tab-btn" data-filter="rejected">Rejected</button>
+            </div>
+            <button class="btn-submit-request" id="openFormBtn">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
                 </svg>
-                File a Complaint
+                <span>File a Complaint</span>
             </button>
         </div>
 
-        <!-- Stats Row -->
-        <div class="stats-row" id="statsRow">
-            <div class="stat-card">
-                <div class="stat-icon" style="background:rgba(99,102,241,.12);">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                </div>
-                <div>
-                    <div class="stat-value" id="statReview">—</div>
-                    <div class="stat-label">Under Review</div>
-                </div>
+        <!-- Ledger Controls Bar (Search & Filters) -->
+        <div class="ledger-controls-bar">
+            <div class="ledger-search-box">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+                <input type="text" id="complaintsSearchInput" placeholder="Search complaints..." autocomplete="off">
             </div>
-            <div class="stat-card">
-                <div class="stat-icon" style="background:rgba(249,115,22,.12);">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
-                </div>
-                <div>
-                    <div class="stat-value" id="statProgress">—</div>
-                    <div class="stat-label">In Progress</div>
-                </div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-icon" style="background:rgba(16,185,129,.12);">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-                </div>
-                <div>
-                    <div class="stat-value" id="statResolved">—</div>
-                    <div class="stat-label">Resolved</div>
-                </div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-icon" style="background:rgba(139,92,246,.12);">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-                </div>
-                <div>
-                    <div class="stat-value" id="statTotal">—</div>
-                    <div class="stat-label">Total Filed</div>
+            <div class="ledger-filter-group">
+                <div class="ledger-select-wrap">
+                    <select id="categoryFilterSelect" class="ledger-select">
+                        <option value="all">All Categories ⌵</option>
+                        <option value="billing_concern">Billing Concern</option>
+                        <option value="landlord_concern">Landlord Concern</option>
+                        <option value="safety_concern">Safety Concern</option>
+                        <option value="policy_violation">Policy Violation</option>
+                        <option value="utility_concern">Utility Concern</option>
+                        <option value="noise_complaint">Noise Complaint</option>
+                        <option value="other">Other Concern</option>
+                    </select>
                 </div>
             </div>
         </div>
 
-        <!-- Ledger Panel -->
-        <div class="ledger-panel">
-            <div class="ledger-header">
-                <h3>My Complaints Ledger</h3>
-                <span class="badge badge-submitted" id="countBadge">Loading...</span>
-            </div>
-            <div class="filter-tabs" id="filterTabs">
-                <button class="filter-tab active" data-filter="all">All</button>
-                <button class="filter-tab" data-filter="submitted">Submitted</button>
-                <button class="filter-tab" data-filter="under_review">Under Review</button>
-                <button class="filter-tab" data-filter="in_progress">In Progress</button>
-                <button class="filter-tab" data-filter="resolved">Resolved</button>
-                <button class="filter-tab" data-filter="rejected">Rejected</button>
-                <button class="filter-tab" data-filter="closed">Closed</button>
-            </div>
-            <div class="complaints-list" id="complaintsList">
-                <div class="empty-state">
-                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                    <p>Loading complaints ledger...</p>
-                </div>
-            </div>
-        </div>
+        <!-- Complaints Cards List -->
+        <div class="requests-list" id="complaintsList"></div>
     </main>
 
     <!-- ════════════════════════════════════════════
          NEW COMPLAINT FORM MODAL
     ════════════════════════════════════════════ -->
     <div class="modal-overlay" id="formModal" style="display:none;">
-        <div class="form-modal">
-            <!-- Head -->
-            <div class="form-modal-head">
+        <div class="modal-container" style="max-width: 580px;">
+            <!-- Header -->
+            <div class="modal-header">
                 <div>
-                    <h3>File a Formal Complaint</h3>
-                    <p>Submit your concern — your landlord will receive and process your complaint.</p>
+                    <h3 class="modal-header-title">File a Complaint</h3>
+                    <div class="modal-header-subtitle">Submit your concern to your landlord</div>
                 </div>
-                <button class="form-modal-close" id="closeFormBtn" title="Close">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                <button type="button" class="modal-close-x" id="closeFormBtn" title="Close" aria-label="Close modal">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
                 </button>
             </div>
 
             <!-- Body -->
-            <div class="form-modal-body">
+            <div class="modal-body">
                 <div id="formError"   class="form-alert err" style="display:none;"></div>
                 <div id="formSuccess" class="form-alert ok"  style="display:none;"></div>
 
                 <!-- No Lease Warning -->
-                <div id="noLeaseWarning" style="display:none; background:rgba(239,68,68,.08); border:1px solid rgba(239,68,68,.25); border-radius:var(--radius-md); padding:1.1rem; text-align:center; color:#ef4444; font-size:0.875rem; font-weight:600; margin-bottom:1rem;">
+                <div id="noLeaseWarning" style="display:none; background:#fef2f2; border:1px solid #fecaca; border-radius:8px; padding:1rem; text-align:center; color:#dc2626; font-size:0.875rem; font-weight:600; margin-bottom:1rem;">
                     No active or past lease contracts found. You need a lease contract to submit complaints.
                 </div>
 
                 <form id="complaintForm" style="display:none;">
-                    <!-- Lease Selector -->
-                    <div class="form-group">
-                        <label class="form-label" for="leaseSelector">Select Lease Contract <span style="color:var(--error)">*</span></label>
-                        <select id="leaseSelector" class="form-input" required>
-                            <option value="">-- Choose your lease contract --</option>
-                        </select>
-                    </div>
+                    <!-- Automatically selected lease contract -->
+                    <input type="hidden" id="leaseSelector">
 
-                    <!-- Lease Info Preview -->
-                    <div id="leaseInfoBar" class="lease-info-bar" style="display:none;">
-                        <div class="lease-info-bar-icon">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                    <!-- Auto-filled Lease Info Preview -->
+                    <div id="leaseInfoBar" class="m-lease-card" style="display:none;">
+                        <div class="m-lease-card-main">
+                            <span class="m-lease-card-label">Property</span>
+                            <span class="m-lease-card-val" id="libName">—</span>
+                            <span class="m-lease-card-sub" id="libSub">—</span>
                         </div>
-                        <div>
-                            <div class="lib-name" id="libName">—</div>
-                            <div class="lib-sub"  id="libSub">—</div>
-                        </div>
-                    </div>
-
-                    <!-- Category & Subject -->
-                    <div class="form-grid-2">
-                        <div class="form-group">
-                            <label class="form-label" for="complaintCategory">Complaint Category <span style="color:var(--error)">*</span></label>
-                            <select id="complaintCategory" class="form-input" required>
-                                <option value="">-- Select Category --</option>
-                                <option value="billing_concern">Billing Concern</option>
-                                <option value="landlord_concern">Landlord Concern</option>
-                                <option value="safety_concern">Safety Concern</option>
-                                <option value="policy_violation">Policy Violation</option>
-                                <option value="utility_concern">Utility Concern</option>
-                                <option value="noise_complaint">Noise Complaint</option>
-                                <option value="other">Other Concern</option>
-                            </select>
-                        </div>
-
-                        <div class="form-group">
-                            <label class="form-label" for="complaintSubject">Complaint Subject <span style="color:var(--error)">*</span></label>
-                            <input type="text" id="complaintSubject" class="form-input" placeholder="e.g. Unresolved Water Meter Overcharge" minlength="5" required>
-                        </div>
-                    </div>
-
-                    <!-- Details Description -->
-                    <div class="form-group">
-                        <label class="form-label" for="complaintDescription">Detailed Complaint Description <span style="color:var(--error)">*</span></label>
-                        <textarea id="complaintDescription" class="form-input" rows="4" style="resize:vertical; min-height:100px;" placeholder="Describe what happened in detail, including dates, frequency, and prior communication with your landlord..." minlength="20" required></textarea>
-                        <div style="font-size:0.72rem; color:var(--text-muted); text-align:right; margin-top:0.35rem;" id="descCharCount">Minimum 20 characters</div>
-                    </div>
-
-                    <!-- File Upload -->
-                    <div class="form-group">
-                        <label class="form-label">Supporting Attachment (Optional)</label>
-                        <div class="upload-zone" id="uploadZone">
-                            <input type="file" id="attachmentFile" accept="image/*,video/mp4,video/quicktime,application/pdf">
-                            <div style="color:var(--tenant); margin-bottom:0.3rem;">
-                                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                        <div class="m-lease-meta">
+                            <div class="m-lease-meta-col">
+                                <span class="m-lease-card-label">Contract</span>
+                                <span class="m-lease-card-val" id="chipContract" style="font-size: 0.8125rem;">—</span>
                             </div>
-                            <div style="font-size:0.825rem; font-weight:700; color:var(--text-primary);">Click or drag evidence attachment here</div>
-                            <div style="font-size:0.73rem; color:var(--text-muted); margin-top:0.1rem;">JPG, PNG, WEBP, PDF, MP4 — max 20 MB</div>
+                            <div class="m-lease-meta-col">
+                                <span class="m-lease-card-label">Landlord</span>
+                                <span class="m-lease-card-val" id="chipLandlord" style="font-size: 0.8125rem;">—</span>
+                            </div>
                         </div>
-                        <div id="uploadPreview" class="upload-preview" style="display:none;">
-                            <span class="upload-preview-name" id="previewName"></span>
-                            <button type="button" class="upload-remove" id="removeFileBtn" title="Remove">✕</button>
+                    </div>
+
+                    <!-- Category -->
+                    <div class="form-section-title">Complaint Category <span style="color:#dc2626;">*</span></div>
+                    <input type="hidden" id="complaintCategory" required>
+                    <div class="cat-grid" id="catGrid">
+                        <div class="cat-card" data-cat="billing_concern">Billing</div>
+                        <div class="cat-card" data-cat="landlord_concern">Landlord</div>
+                        <div class="cat-card" data-cat="safety_concern">Safety</div>
+                        <div class="cat-card" data-cat="policy_violation">Policy</div>
+                        <div class="cat-card" data-cat="utility_concern">Utility</div>
+                        <div class="cat-card" data-cat="noise_complaint">Noise</div>
+                        <div class="cat-card" data-cat="other">Other</div>
+                    </div>
+                    <div class="val-hint" id="catErr">Please choose a category.</div>
+
+                    <!-- Details -->
+                    <div class="form-section-title">Details</div>
+                    <div class="form-group">
+                        <label class="form-label" for="complaintSubject">Subject <span style="color:#dc2626;">*</span></label>
+                        <input type="text" id="complaintSubject" class="form-input" placeholder="e.g. Unresolved Water Meter Overcharge" minlength="5" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="complaintDescription">Description <span style="color:#dc2626;">*</span></label>
+                        <textarea id="complaintDescription" class="form-input" rows="3" placeholder="Describe what happened in detail, including dates and any prior discussions..." style="resize:vertical; min-height:80px;" minlength="20" required></textarea>
+                        <div style="font-size:0.75rem; color:#64748b; text-align:right; margin-top:4px;" id="descCharCount">Minimum 20 characters required</div>
+                    </div>
+
+                    <!-- Attachment Upload -->
+                    <div class="form-section-title">Attachment (Optional)</div>
+                    <div class="upload-zone" id="uploadZone">
+                        <input type="file" id="attachmentFile" accept="image/*,video/mp4,video/quicktime,application/pdf">
+                        <div class="upload-zone-content">
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path>
+                            </svg>
+                            <div class="upload-zone-text">
+                                <span class="upload-zone-title">Click or drag evidence attachment</span>
+                                <span class="upload-zone-hint">JPG, PNG, WEBP, PDF, MP4 up to 20 MB</span>
+                            </div>
                         </div>
+                    </div>
+                    <div id="uploadPreview" class="upload-preview" style="display:none;">
+                        <span class="upload-preview-name" id="previewName"></span>
+                        <button type="button" class="upload-remove" id="removeFileBtn" title="Remove file">✕</button>
                     </div>
                 </form>
             </div>
 
             <!-- Footer -->
-            <div class="form-modal-footer">
-                <button class="btn-cancel" id="cancelFormBtn">Cancel</button>
-                <button class="btn-submit" id="submitBtn" type="button">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m22 2-7 20-4-9-9-4 20-7z"/></svg>
-                    Submit Complaint
+            <div class="modal-footer">
+                <button type="button" class="btn-modal-cancel" id="cancelFormBtn">Cancel</button>
+                <button type="button" class="btn-modal-primary" id="submitBtn">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="m22 2-7 20-4-9-9-4 20-7z"></path>
+                    </svg>
+                    <span>Submit Complaint</span>
                 </button>
             </div>
         </div>
     </div>
 
     <!-- ════════════════════════════════════════════
-         DETAILS MODAL
+         DETAILS MODAL (Consistent & Minimalist)
     ════════════════════════════════════════════ -->
     <div class="modal-overlay" id="detailsModal" style="display:none;">
-        <div class="details-modal">
-            <div class="details-head">
-                <div class="details-head-title" id="detailsTitle">Complaint Details</div>
-                <button class="details-head-close" id="closeDetailsBtn" title="Close">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        <div class="modal-container" style="max-width: 600px;">
+            <div class="modal-header">
+                <div>
+                    <h3 class="modal-header-title" id="detailsTitle">Complaint Details</h3>
+                    <div class="modal-header-subtitle" id="detailsSubtitle">Status and resolution history</div>
+                </div>
+                <button type="button" class="modal-close-x" id="closeDetailsBtn" title="Close" aria-label="Close modal">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
                 </button>
             </div>
-            <div class="details-body" id="detailsBody">
-                <div class="empty-state"><p>Loading details...</p></div>
-            </div>
-            <div class="details-foot">
-                <button class="btn-cancel" id="closeDetailsFootBtn">Close</button>
+            <div class="modal-body" id="detailsBody"></div>
+            <div class="modal-footer" id="detailsFoot">
+                <button type="button" class="btn-modal-cancel" id="closeDetailsFootBtn">Close</button>
             </div>
         </div>
     </div>
@@ -578,9 +1092,11 @@
     <script src="../../js/dashboard.js?v=20260904-15"></script>
     <script>
         const token = localStorage.getItem('domiknow_token');
-        let leasesMap = new Map();
+        let leasesMap     = new Map();
         let allComplaints = [];
-        let activeFilter = 'all';
+        let activeFilter  = 'all';
+        let searchQuery   = '';
+        let categoryFilter = 'all';
 
         const CATEGORY_LABELS = {
             billing_concern: 'Billing Concern',
@@ -592,13 +1108,12 @@
             other: 'Other Concern'
         };
 
-        const STATUS_FLOW = ['submitted', 'under_review', 'in_progress', 'resolved', 'closed'];
-
         // ── Init ──────────────────────────────────────────────
         document.addEventListener('DOMContentLoaded', () => {
             if (!token) return;
             fetchLeases();
             fetchMyComplaints();
+            initCategoryPicker();
             initUpload();
             initEventDelegation();
         });
@@ -624,6 +1139,19 @@
             }
         }
 
+        // ── Category Picker ───────────────────────────────────
+        function initCategoryPicker() {
+            const grid = document.getElementById('catGrid');
+            grid.addEventListener('click', (e) => {
+                const card = e.target.closest('.cat-card');
+                if (!card) return;
+                grid.querySelectorAll('.cat-card').forEach(c => c.classList.remove('selected'));
+                card.classList.add('selected');
+                document.getElementById('complaintCategory').value = card.dataset.cat;
+                document.getElementById('catErr').style.display = 'none';
+            });
+        }
+
         // ── Event Delegation ──────────────────────────────────
         function initEventDelegation() {
             document.getElementById('openFormBtn').addEventListener('click', openFormModal);
@@ -643,30 +1171,30 @@
 
             // Filter tabs
             document.getElementById('filterTabs').addEventListener('click', (e) => {
-                const tab = e.target.closest('.filter-tab');
+                const tab = e.target.closest('.m-tab-btn');
                 if (!tab) return;
-                document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.m-tab-btn').forEach(t => t.classList.remove('active'));
                 tab.classList.add('active');
                 activeFilter = tab.dataset.filter;
                 renderComplaints();
             });
 
-            // Complaint list item click
+            // Search input
+            document.getElementById('complaintsSearchInput').addEventListener('input', (e) => {
+                searchQuery = (e.target.value || '').trim().toLowerCase();
+                renderComplaints();
+            });
+
+            // Category filter select
+            document.getElementById('categoryFilterSelect').addEventListener('change', (e) => {
+                categoryFilter = e.target.value;
+                renderComplaints();
+            });
+
+            // Complaint list card click
             document.getElementById('complaintsList').addEventListener('click', (e) => {
                 const card = e.target.closest('[data-complaint-id]');
                 if (card) loadComplaintDetails(card.dataset.complaintId);
-            });
-
-            // Lease selector
-            document.getElementById('leaseSelector').addEventListener('change', (e) => {
-                const lease = leasesMap.get(e.target.value);
-                if (lease) {
-                    document.getElementById('libName').textContent = lease.properties?.property_name || 'Property';
-                    document.getElementById('libSub').textContent  = `Landlord: ${lease.landlord?.full_name || 'N/A'} · Contract: ${lease.lease_number || 'N/A'}`;
-                    document.getElementById('leaseInfoBar').style.display = 'flex';
-                } else {
-                    document.getElementById('leaseInfoBar').style.display = 'none';
-                }
             });
 
             // Description character count
@@ -674,7 +1202,7 @@
                 const len = e.target.value.trim().length;
                 const el = document.getElementById('descCharCount');
                 el.textContent = len < 20 ? `${len}/20 — minimum 20 characters required` : `${len} characters`;
-                el.style.color = len < 20 ? 'var(--error)' : 'var(--text-muted)';
+                el.style.color = len < 20 ? '#dc2626' : '#64748b';
             });
 
             document.addEventListener('keydown', (e) => {
@@ -683,6 +1211,21 @@
                     closeFormModal();
                 }
             });
+        }
+
+        let currentActiveLease = null;
+
+        function applySelectedLease(leaseId) {
+            const lease = leasesMap.get(String(leaseId));
+            if (lease) {
+                document.getElementById('libName').textContent = lease.properties?.property_name || 'Rented Property';
+                document.getElementById('libSub').textContent  = lease.unit_number ? `Unit ${lease.unit_number}` : 'Leased Unit';
+                document.getElementById('chipContract').textContent = lease.lease_number || 'N/A';
+                document.getElementById('chipLandlord').textContent = lease.landlord?.full_name || 'Landlord';
+                document.getElementById('leaseInfoBar').style.display = 'flex';
+            } else {
+                document.getElementById('leaseInfoBar').style.display = 'none';
+            }
         }
 
         // ── Upload Zone ───────────────────────────────────────
@@ -719,9 +1262,20 @@
         // ── Fetch Data ────────────────────────────────────────
         async function fetchLeases() {
             try {
-                // Primary endpoint: /api/leases/my (fallback: /api/tenant/leases/my)
-                let res = await fetch('/api/leases/my', { headers: { Authorization: `Bearer ${token}` } });
-                if (!res.ok) res = await fetch('/api/tenant/leases/my', { headers: { Authorization: `Bearer ${token}` } });
+                let res = await fetch('/api/leases/my', {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                        'X-DOMIKNOW-SILENT': '1'
+                    },
+                    domiknowLoading: false
+                });
+                if (!res.ok) res = await fetch('/api/tenant/leases/my', {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                        'X-DOMIKNOW-SILENT': '1'
+                    },
+                    domiknowLoading: false
+                });
                 if (!res.ok) return;
 
                 const result = await res.json();
@@ -734,53 +1288,80 @@
                 }
                 document.getElementById('complaintForm').style.display = 'block';
 
-                const sel = document.getElementById('leaseSelector');
-                sel.innerHTML = '<option value="">-- Choose your lease contract --</option>';
                 leases.forEach(l => {
-                    leasesMap.set(l.id, l);
-                    const opt = document.createElement('option');
-                    opt.value = l.id;
-                    opt.textContent = `${l.properties?.property_name || 'Property'} — Contract #${l.lease_number || 'N/A'}`;
-                    sel.appendChild(opt);
+                    leasesMap.set(String(l.id), l);
                 });
+
+                // Automatically select the tenant's current active lease, or the latest contract
+                const currentLease = leases.find(l => l.lease_status === 'active') || leases[0];
+                currentActiveLease = currentLease;
+                if (currentLease) {
+                    document.getElementById('leaseSelector').value = currentLease.id;
+                    applySelectedLease(String(currentLease.id));
+                }
             } catch (err) { console.error(err); }
         }
 
         async function fetchMyComplaints() {
             try {
-                const res = await fetch('/api/tenant/complaints/my', { headers: { Authorization: `Bearer ${token}` } });
+                const res = await fetch('/api/tenant/complaints/my', {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                        'X-DOMIKNOW-SILENT': '1'
+                    },
+                    domiknowLoading: false
+                });
                 if (!res.ok) { showListError('Failed to load complaints ledger.'); return; }
                 const result = await res.json();
                 allComplaints = result.data || [];
                 updateStats();
                 renderComplaints();
-            } catch (err) { showListError('Network error.'); }
+            } catch (err) { showListError('Network error while loading complaints.'); }
         }
 
         function updateStats() {
-            const review   = allComplaints.filter(c => ['submitted','under_review'].includes(c.status)).length;
-            const progress = allComplaints.filter(c => c.status === 'in_progress').length;
-            const resolved = allComplaints.filter(c => c.status === 'resolved').length;
-            
-            document.getElementById('statReview').textContent   = review;
-            document.getElementById('statProgress').textContent = progress;
-            document.getElementById('statResolved').textContent = resolved;
-            document.getElementById('statTotal').textContent    = allComplaints.length;
-            document.getElementById('countBadge').textContent   = `${allComplaints.length} Filed`;
+            const submitted = allComplaints.filter(c => c.status === 'submitted').length;
+            const review    = allComplaints.filter(c => c.status === 'under_review').length;
+            const progress  = allComplaints.filter(c => c.status === 'in_progress').length;
+            const resolved  = allComplaints.filter(c => c.status === 'resolved').length;
+            const closed    = allComplaints.filter(c => c.status === 'closed').length;
+
+            const elSub = document.getElementById('tabCountSubmitted');
+            if (elSub) elSub.textContent = submitted;
+            const elRev = document.getElementById('tabCountReview');
+            if (elRev) elRev.textContent = review;
+            const elProg = document.getElementById('tabCountProgress');
+            if (elProg) elProg.textContent = progress;
+            const elRes = document.getElementById('tabCountResolved');
+            if (elRes) elRes.textContent = resolved;
+            const elCls = document.getElementById('tabCountClosed');
+            if (elCls) elCls.textContent = closed;
         }
 
         function renderComplaints() {
             const list = document.getElementById('complaintsList');
             const filtered = allComplaints.filter(c => {
-                if (activeFilter === 'all') return true;
-                return c.status === activeFilter;
+                // Tab filter
+                if (activeFilter !== 'all') {
+                    if (c.status !== activeFilter) return false;
+                }
+                // Category dropdown filter
+                if (categoryFilter !== 'all') {
+                    if (c.category !== categoryFilter) return false;
+                }
+                // Search query
+                if (searchQuery) {
+                    const text = `${c.subject || ''} ${c.description || ''} ${c.complaint_number || ''} ${c.properties?.property_name || ''} ${c.landlord?.full_name || ''}`.toLowerCase();
+                    if (!text.includes(searchQuery)) return false;
+                }
+                return true;
             });
 
             if (filtered.length === 0) {
                 list.innerHTML = `
                     <div class="empty-state">
-                        <svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-                        <p>No complaints match this filter.</p>
+                        <div class="ei">📋</div>
+                        <p>No complaints found matching your filter.</p>
                     </div>`;
                 return;
             }
@@ -789,21 +1370,55 @@
             filtered.forEach(c => {
                 const dateStr = new Date(c.submitted_at).toLocaleDateString('en-PH', { month:'short', day:'numeric', year:'numeric' });
                 const propName = c.properties?.property_name || 'Property';
+                const catLabel = CATEGORY_LABELS[c.category] || c.category || 'General Concern';
+                const landlordName = c.landlord?.full_name || 'Landlord';
+
+                let statusBadgeClass = 'pending';
+                let statusDisplay = (c.status || 'SUBMITTED').toUpperCase().replace(/_/g, ' ');
+                if (['resolved', 'completed'].includes(c.status)) {
+                    statusBadgeClass = 'resolved';
+                } else if (c.status === 'closed') {
+                    statusBadgeClass = 'closed';
+                } else if (['in_progress', 'under_review'].includes(c.status)) {
+                    statusBadgeClass = 'inprogress';
+                } else if (c.status === 'rejected') {
+                    statusBadgeClass = 'rejected';
+                }
 
                 const card = document.createElement('div');
-                card.className = 'complaint-card';
+                card.className = 'request-card';
                 card.dataset.complaintId = c.id;
                 card.innerHTML = `
-                    <div class="complaint-card-icon">
-                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21a9 9 0 1 0-9-9c0 1.48.36 2.88 1 4.11L3 21l4.89-1c1.23.64 2.63 1 4.11 1z"/><circle cx="8" cy="12" r="1" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1" fill="currentColor" stroke-none"/><circle cx="16" cy="12" r="1" fill="currentColor" stroke-none"/></svg>
+                    <div class="rc-left-group">
+                        <div class="rc-icon-box">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                            </svg>
+                        </div>
+                        <div class="rc-text-box">
+                            <div class="rc-title">${domiknowEscapeHtml(c.subject || 'Complaint')}</div>
+                            <div class="rc-subtitle">${domiknowEscapeHtml(propName)} · ${domiknowEscapeHtml(catLabel)} · ${domiknowEscapeHtml(dateStr)}</div>
+                        </div>
                     </div>
-                    <div class="complaint-card-body">
-                        <div class="complaint-card-title">${escHtml(c.subject)}</div>
-                        <div class="complaint-card-meta">${escHtml(propName)} &middot; ${escHtml(CATEGORY_LABELS[c.category] || c.category)} &middot; ${escHtml(dateStr)}</div>
+
+                    <div class="rc-assigned-group">
+                        <div class="rc-col-label">Landlord:</div>
+                        <div class="rc-col-val">${domiknowEscapeHtml(landlordName)}</div>
                     </div>
-                    <div class="complaint-card-right">
-                        ${statusBadge(c.status)}
-                        <span style="font-size:0.75rem; color:var(--text-muted); font-family:monospace;">${escHtml(c.complaint_number)}</span>
+
+                    <div class="rc-priority-group">
+                        <div class="rc-col-label uppercase">CATEGORY</div>
+                        <div class="rc-col-val" style="font-size:0.8125rem; text-transform:capitalize;">${domiknowEscapeHtml(catLabel)}</div>
+                    </div>
+
+                    <div class="rc-right-group">
+                        <span class="rc-status-pill ${statusBadgeClass}">${statusDisplay}</span>
+                        <span class="rc-tag-pill">${domiknowEscapeHtml(c.complaint_number || '—')}</span>
+                        <span class="rc-chevron">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="9 18 15 12 9 6"></polyline>
+                            </svg>
+                        </span>
                     </div>
                 `;
                 list.appendChild(card);
@@ -811,128 +1426,182 @@
         }
 
         function showListError(msg) {
-            document.getElementById('complaintsList').innerHTML = `<div class="empty-state"><p>${escHtml(msg)}</p></div>`;
+            document.getElementById('complaintsList').innerHTML = `<div class="empty-state"><div class="ei">⚠️</div><p>${domiknowEscapeHtml(msg)}</p></div>`;
         }
 
-        function statusBadge(status) {
-            const safeStatus = String(status || 'submitted').toLowerCase();
-            const label = safeStatus.replace(/_/g,' ');
-            return `<span class="badge badge-${safeStatus.replace(/[^a-z0-9_-]/g, '')}">${escHtml(label)}</span>`;
+        // ── Render Details Content (Zero Loading Animation) ───
+        function renderDetailsContent(c) {
+            if (!c) return;
+            const dateStr = new Date(c.submitted_at || Date.now()).toLocaleDateString('en-PH', { month:'short', day:'numeric', year:'numeric' });
+            const catLabel = CATEGORY_LABELS[c.category] || c.category || 'General Concern';
+
+            let statusCls = 'pending';
+            let statusText = (c.status || 'SUBMITTED').toUpperCase().replace(/_/g, ' ');
+            if (['resolved', 'completed'].includes(c.status)) statusCls = 'resolved';
+            else if (c.status === 'closed') statusCls = 'closed';
+            else if (['in_progress', 'under_review'].includes(c.status)) statusCls = 'inprogress';
+            else if (c.status === 'rejected') statusCls = 'rejected';
+
+            const statusMarkup = `<span class="detail-pill ${statusCls}">${statusText}</span>`;
+
+            let html = `
+                <div class="detail-summary-card">
+                    <div class="detail-card-item">
+                        <span class="dc-label">Status</span>
+                        <div>${statusMarkup}</div>
+                    </div>
+                    <div class="detail-card-item">
+                        <span class="dc-label">Complaint Number</span>
+                        <div class="dc-val" style="font-family:inherit;">${domiknowEscapeHtml(c.complaint_number || '—')}</div>
+                    </div>
+                    <div class="detail-card-item">
+                        <span class="dc-label">Category</span>
+                        <div class="dc-val" style="text-transform:capitalize;">${domiknowEscapeHtml(catLabel)}</div>
+                    </div>
+                    <div class="detail-card-item">
+                        <span class="dc-label">Date Filed</span>
+                        <div class="dc-val">${domiknowEscapeHtml(dateStr)}</div>
+                    </div>
+                    <div class="detail-card-item">
+                        <span class="dc-label">Property & Unit</span>
+                        <div class="dc-val">${domiknowEscapeHtml(c.properties?.property_name || '—')}${c.unit_number ? ` · Unit ${domiknowEscapeHtml(c.unit_number)}` : ''}</div>
+                    </div>
+                    <div class="detail-card-item">
+                        <span class="dc-label">Landlord</span>
+                        <div class="dc-val">${domiknowEscapeHtml(c.landlord?.full_name || '—')}</div>
+                    </div>
+                </div>
+
+                <div style="margin-bottom:1.25rem;">
+                    <div class="detail-section-title">Complaint</div>
+                    <div style="font-size:0.9375rem; font-weight:700; color:#0f172a; margin-bottom:6px;">${domiknowEscapeHtml(c.subject || 'Complaint')}</div>
+                    <div class="detail-box">${domiknowEscapeHtml(c.description || 'No description provided.')}</div>
+                </div>
+            `;
+
+            if (c.attachment_url) {
+                const safeUrl = domiknowSafeExternalUrl(c.attachment_url);
+                const isImg = /\.(jpg|jpeg|png|webp|gif)(\?.*)?$/i.test(c.attachment_url);
+                html += `
+                    <div style="margin-bottom:1.25rem;">
+                        <div class="detail-section-title">Attachment</div>
+                        ${isImg ? `
+                            <a href="${safeUrl}" target="_blank" rel="noopener noreferrer" class="detail-photo-thumb">
+                                <img src="${safeUrl}" alt="Attachment">
+                            </a>
+                        ` : `
+                            <a href="${safeUrl}" target="_blank" rel="noopener noreferrer" class="btn-modal-cancel" style="display:inline-flex; align-items:center; gap:8px; text-decoration:none; font-size:0.8125rem;">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path>
+                                </svg>
+                                <span>View Attachment File</span>
+                            </a>
+                        `}
+                    </div>
+                `;
+            }
+
+            if (c.rejection_reason) {
+                html += `
+                    <div class="detail-alert-box danger">
+                        <div class="detail-alert-title">Reason for Rejection</div>
+                        <div>${domiknowEscapeHtml(c.rejection_reason)}</div>
+                    </div>
+                `;
+            }
+
+            if (c.resolution_notes) {
+                html += `
+                    <div class="detail-alert-box info">
+                        <div class="detail-alert-title">Resolution Notes</div>
+                        <div>${domiknowEscapeHtml(c.resolution_notes)}</div>
+                    </div>
+                `;
+            }
+
+            // Timeline logs
+            const logs = c.status_logs || [];
+            if (c.status === 'rejected') {
+                html += `
+                    <div style="margin-top:1.25rem;">
+                        <div class="detail-section-title">History</div>
+                        <div class="detail-timeline">
+                            <div class="detail-timeline-item done">
+                                <div class="detail-timeline-meta">${domiknowEscapeHtml(dateStr)} &middot; <span style="font-weight:700; color:#0f172a;">Submitted</span></div>
+                                <div class="detail-timeline-note">Complaint filed by tenant.</div>
+                            </div>
+                            <div class="detail-timeline-item active">
+                                <div class="detail-timeline-meta" style="color:#dc2626;"><span style="font-weight:700;">Rejected</span></div>
+                                <div class="detail-timeline-note">${domiknowEscapeHtml(c.rejection_reason || 'Complaint rejected.')}</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else {
+                const flow = (c.status === 'closed') 
+                    ? ['submitted', 'under_review', 'in_progress', 'resolved', 'closed'] 
+                    : ['submitted', 'under_review', 'in_progress', 'resolved'];
+
+                html += `
+                    <div style="margin-top:1.25rem;">
+                        <div class="detail-section-title">History</div>
+                        <div class="detail-timeline">
+                `;
+                flow.forEach(step => {
+                    const past = flow.slice(0, flow.indexOf(c.status) + 1);
+                    const isDone   = past.includes(step);
+                    const isActive = (step === c.status);
+                    const cls = isActive ? 'active' : (isDone ? 'done' : '');
+                    const log = logs.find(l => l.new_status === step);
+                    const timeText = log ? new Date(log.updated_at).toLocaleString('en-PH', { month:'short', day:'numeric', hour:'2-digit', minute:'2-digit' }) : (step === 'submitted' ? dateStr : 'Pending');
+
+                    html += `
+                        <div class="detail-timeline-item ${cls}">
+                            <div class="detail-timeline-meta">${domiknowEscapeHtml(timeText)} &middot; <span style="text-transform:capitalize; font-weight:700; color:#0f172a;">${domiknowEscapeHtml(step.replace(/_/g, ' '))}</span></div>
+                            <div class="detail-timeline-note">${log?.notes ? domiknowEscapeHtml(log.notes) : (isActive ? 'Currently at this stage.' : (isDone ? 'Completed.' : 'Awaiting next steps.'))}</div>
+                        </div>
+                    `;
+                });
+                html += `</div></div>`;
+            }
+
+            document.getElementById('detailsBody').innerHTML = html;
         }
 
-        // ── Load Complaint Details ────────────────────────────
+        // ── Load Complaint Details (Instant with 0ms Delay) ───
         async function loadComplaintDetails(complaintId) {
-            document.getElementById('detailsBody').innerHTML = `<div class="empty-state"><p>Loading complaint details...</p></div>`;
+            const elTitle = document.getElementById('detailsTitle');
+            if (elTitle) elTitle.textContent = 'Complaint Details';
+            const elSub = document.getElementById('detailsSubtitle');
+            if (elSub) elSub.textContent = 'Status and resolution history';
+
+            // Instant render from memory cache
+            const cached = allComplaints.find(c => String(c.id) === String(complaintId));
+            if (cached) {
+                renderDetailsContent(cached);
+            } else {
+                document.getElementById('detailsBody').innerHTML = '';
+            }
             openDetailsModal();
 
             try {
-                const res = await fetch(`/api/tenant/complaints/${complaintId}`, { headers: { Authorization: `Bearer ${token}` } });
+                const res = await fetch(`/api/tenant/complaints/${complaintId}`, {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                        'X-DOMIKNOW-SILENT': '1'
+                    },
+                    domiknowLoading: false
+                });
+                if (!res.ok) return;
                 const result = await res.json();
-                if (!res.ok) { document.getElementById('detailsBody').innerHTML = `<div class="form-alert err">${escHtml(result.message || 'Failed to load details.')}</div>`; return; }
-
-                const c = result.data;
-                const logs = c.status_logs || [];
-                const dateStr = new Date(c.submitted_at).toLocaleDateString('en-PH', { month:'short', day:'numeric', year:'numeric' });
-
-                document.getElementById('detailsTitle').textContent = `${c.complaint_number} — ${c.subject}`;
-
-                // Timeline
-                let timelineHtml = '';
-                if (c.status === 'rejected') {
-                    timelineHtml = `
-                        <div class="tl-item tldone">
-                            <div class="tl-meta">Submitted</div>
-                            <div class="tl-notes">Complaint filed by tenant.</div>
-                        </div>
-                        <div class="tl-item tla">
-                            <div class="tl-meta" style="color:var(--error);">Rejected</div>
-                            <div class="tl-notes">${c.rejection_reason ? escHtml(c.rejection_reason) : 'Complaint rejected.'}</div>
-                        </div>`;
-                } else {
-                    const flow = (c.status === 'closed') 
-                        ? ['submitted', 'under_review', 'in_progress', 'resolved', 'closed'] 
-                        : ['submitted', 'under_review', 'in_progress', 'resolved'];
-
-                    flow.forEach(step => {
-                        const past = flow.slice(0, flow.indexOf(c.status) + 1);
-                        const isDone   = past.includes(step);
-                        const isActive = (step === c.status);
-                        const cls = isActive ? 'tla' : (isDone ? 'tldone' : '');
-                        const log = logs.find(l => l.new_status === step);
-
-                        timelineHtml += `
-                            <div class="tl-item ${cls}">
-                                <div class="tl-meta">${step.replace(/_/g,' ')}</div>
-                                ${log ? `<div class="tl-notes">${new Date(log.updated_at).toLocaleString('en-PH', {month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'})}</div>` : ''}
-                            </div>`;
-                    });
+                if (result.data) {
+                    renderDetailsContent(result.data);
                 }
-
-                let html = `
-                    <div class="detail-grid">
-                        <div>
-                            <div class="dc-label">Complaint Number</div>
-                            <div class="dc-val" style="font-family:monospace;">${escHtml(c.complaint_number)}</div>
-                        </div>
-                        <div>
-                            <div class="dc-label">Category</div>
-                            <div class="dc-val">${escHtml(CATEGORY_LABELS[c.category] || c.category)}</div>
-                        </div>
-                        <div>
-                            <div class="dc-label">Property</div>
-                            <div class="dc-val">${escHtml(c.properties?.property_name || '—')}</div>
-                        </div>
-                        <div>
-                            <div class="dc-label">Landlord</div>
-                            <div class="dc-val">${escHtml(c.landlord?.full_name || '—')}</div>
-                        </div>
-                        <div>
-                            <div class="dc-label">Contract Number</div>
-                            <div class="dc-val" style="font-family:monospace;">${escHtml(c.lease_records?.lease_number || 'N/A')}</div>
-                        </div>
-                        <div>
-                            <div class="dc-label">Status</div>
-                            <div class="dc-val">${statusBadge(c.status)}</div>
-                        </div>
-                    </div>
-
-                    <div style="margin-bottom:1.25rem;">
-                        <div class="dc-label" style="margin-bottom:0.4rem;">Subject & Description</div>
-                        <div style="font-weight:700; font-size:0.95rem; color:var(--text-primary); margin-bottom:0.35rem;">${escHtml(c.subject)}</div>
-                        <div style="background:var(--bg-primary); border:1px solid var(--border-color); border-radius:var(--radius-sm); padding:0.85rem; font-size:0.875rem; color:var(--text-secondary); white-space:pre-wrap; line-height:1.6;">${escHtml(c.description)}</div>
-                    </div>
-                `;
-
-                if (c.attachment_url) {
-                    const safeAttachmentUrl = domiknowSafeExternalUrl(c.attachment_url);
-                    html += `
-                        <div style="margin-bottom:1.25rem;">
-                            <div class="dc-label" style="margin-bottom:0.4rem;">Attachment</div>
-                            <a href="${safeAttachmentUrl}" target="_blank" rel="noopener noreferrer" class="btn-cancel" style="display:inline-flex; align-items:center; gap:0.4rem; font-size:0.8rem; text-decoration:none;">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
-                                View Attachment File
-                            </a>
-                        </div>`;
-                }
-
-                if (c.resolution_notes) {
-                    html += `
-                        <div style="background:rgba(16,185,129,.08); border:1px solid rgba(16,185,129,.25); border-radius:var(--radius-sm); padding:0.85rem; margin-bottom:1.25rem;">
-                            <div style="font-size:0.68rem; font-weight:800; text-transform:uppercase; color:#10b981; margin-bottom:0.3rem;">Resolution Notes</div>
-                            <div style="font-size:0.875rem; color:var(--text-primary); white-space:pre-wrap;">${escHtml(c.resolution_notes)}</div>
-                        </div>`;
-                }
-
-                html += `
-                    <div style="border-top:1px solid var(--border-color); padding-top:1.25rem;">
-                        <div style="font-weight:800; font-size:0.875rem; color:var(--text-primary); margin-bottom:0.75rem;">Status Timeline</div>
-                        <div class="timeline">${timelineHtml}</div>
-                    </div>`;
-
-                document.getElementById('detailsBody').innerHTML = html;
             } catch (err) {
                 console.error(err);
-                document.getElementById('detailsBody').innerHTML = `<div class="form-alert err">Failed to load complaint details.</div>`;
+                if (!cached) {
+                    document.getElementById('detailsBody').innerHTML = `<div class="empty-state"><div class="ei">⚠️</div><p>Failed to load complaint details.</p></div>`;
+                }
             }
         }
 
@@ -945,14 +1614,27 @@
             const subject     = document.getElementById('complaintSubject').value.trim();
             const description = document.getElementById('complaintDescription').value.trim();
 
-            if (!leaseId)     { showError('Please select a lease contract.'); return; }
-            if (!category)    { showError('Please select a complaint category.'); return; }
-            if (!subject)     { showError('Complaint subject is required.'); return; }
-            if (description.length < 20) { showError('Description must be at least 20 characters long.'); return; }
+            if (!leaseId) {
+                showError('Please select a lease contract.');
+                return;
+            }
+            if (!category) {
+                document.getElementById('catErr').style.display = 'block';
+                showError('Please select a complaint category.');
+                return;
+            }
+            if (!subject) {
+                showError('Complaint subject is required.');
+                return;
+            }
+            if (description.length < 20) {
+                showError('Description must be at least 20 characters long.');
+                return;
+            }
 
             const submitBtn = document.getElementById('submitBtn');
             submitBtn.disabled = true;
-            submitBtn.innerHTML = `<span class="spin-icon"></span> Submitting...`;
+            submitBtn.innerHTML = `<span>Submitting...</span>`;
 
             const bodyData = { lease_id: leaseId, category, subject, description };
             const fileInput = document.getElementById('attachmentFile');
@@ -986,7 +1668,7 @@
                     setTimeout(() => {
                         closeFormModal();
                         clearAlerts();
-                    }, 1800);
+                    }, 1500);
                 } else {
                     showError(result.message || 'Failed to submit complaint.');
                 }
@@ -999,20 +1681,32 @@
 
         function resetForm() {
             document.getElementById('complaintForm').reset();
-            document.getElementById('leaseInfoBar').style.display = 'none';
+            document.getElementById('complaintCategory').value = '';
+            document.querySelectorAll('#catGrid .cat-card').forEach(c => c.classList.remove('selected'));
             document.getElementById('uploadPreview').style.display = 'none';
             document.getElementById('uploadZone').style.display = 'block';
-            document.getElementById('descCharCount').textContent = 'Minimum 20 characters';
+            document.getElementById('descCharCount').textContent = 'Minimum 20 characters required';
+            document.getElementById('descCharCount').style.color = '#64748b';
+            document.getElementById('catErr').style.display = 'none';
+            if (currentActiveLease) {
+                document.getElementById('leaseSelector').value = currentActiveLease.id;
+                applySelectedLease(String(currentActiveLease.id));
+            }
         }
 
         function resetSubmitBtn() {
             const btn = document.getElementById('submitBtn');
             btn.disabled = false;
-            btn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m22 2-7 20-4-9-9-4 20-7z"/></svg> Submit Complaint`;
+            btn.innerHTML = `
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="m22 2-7 20-4-9-9-4 20-7z"></path>
+                </svg>
+                <span>Submit Complaint</span>
+            `;
         }
 
-        function showError(msg)   { const el = document.getElementById('formError');   el.textContent = '⚠️ ' + msg; el.style.display = 'flex'; }
-        function showSuccess(msg) { const el = document.getElementById('formSuccess'); el.textContent = '✓ ' + msg;  el.style.display = 'flex'; }
+        function showError(msg)   { const el = document.getElementById('formError');   el.textContent = '⚠️ ' + msg; el.style.display = 'block'; }
+        function showSuccess(msg) { const el = document.getElementById('formSuccess'); el.textContent = '✓ ' + msg;  el.style.display = 'block'; }
         function clearAlerts()    { document.getElementById('formError').style.display = 'none'; document.getElementById('formSuccess').style.display = 'none'; }
 
         function fileToBase64(file) {
@@ -1022,11 +1716,6 @@
                 r.onload = () => resolve(r.result);
                 r.onerror = reject;
             });
-        }
-
-        function escHtml(str) {
-            if (!str) return '';
-            return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');
         }
     </script>
 </body>

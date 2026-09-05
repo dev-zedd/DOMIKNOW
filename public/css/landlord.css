@@ -1,14 +1,14 @@
 /* DOMIKNOW landlord module — portfolio and rental operations workspace. */
 
 .dashboard-layout-landlord {
-  --landlord-sidebar-width: 276px;
+  --landlord-sidebar-width: 272px;
   --landlord-content-width: 1420px;
 }
 
 .dashboard-layout-landlord .sidebar-landlord {
   width: var(--landlord-sidebar-width) !important;
   min-width: var(--landlord-sidebar-width) !important;
-  padding: 20px 16px !important;
+  padding: 0 !important;
   background: var(--color-bg-surface) !important;
 }
 
@@ -17,15 +17,38 @@
 }
 
 .dashboard-layout-landlord .sidebar-logo-container {
-  align-items: flex-start !important;
-  gap: 12px !important;
-  margin-bottom: 14px !important;
-  padding: 2px 8px 18px !important;
+  height: 72px !important;
+  min-height: 72px !important;
+  max-height: 72px !important;
+  box-sizing: border-box !important;
+  display: flex !important;
+  align-items: center !important;
+  margin: 0 !important;
+  margin-bottom: 0 !important;
+  padding: 0 16px !important;
+  border-bottom: 1px solid var(--color-border-default) !important;
+}
+
+.dashboard-layout-landlord .sidebar-logo-container .app-brand {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  gap: 12px;
+}
+
+.dashboard-layout-landlord .landlord-brand-copy {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 5px;
 }
 
 .dashboard-layout-landlord .sidebar-logo-container .role-badge {
-  margin-top: -8px;
-  margin-left: 52px;
+  display: inline-flex;
+  width: max-content;
+  margin: 0;
+  align-items: center;
   border: 0 !important;
   background: var(--color-action-primary-subtle) !important;
   color: var(--color-action-primary) !important;
@@ -35,9 +58,74 @@
   text-transform: uppercase;
 }
 
+.dashboard-layout-landlord .sidebar-landlord.collapsed .landlord-brand-copy {
+  display: none !important;
+}
+
+.dashboard-layout-landlord .sidebar-landlord.collapsed .sidebar-logo-container .app-brand {
+  justify-content: center;
+}
+
+/* Completely hide all scrollbars on the landlord portal side for a clean, sleek look */
+html[data-landlord-portal],
+html:has(body[data-role="landlord"]),
+body[data-role="landlord"],
+body[data-role="landlord"] *,
+.dashboard-layout-landlord,
+.dashboard-layout-landlord *,
+.dashboard-layout-landlord .sidebar,
+.dashboard-layout-landlord .sidebar-landlord,
+.dashboard-layout-landlord #domiknowSidebar,
+.sidebar-landlord,
+.sidebar-landlord .sidebar-menu {
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+}
+
+html[data-landlord-portal]::-webkit-scrollbar,
+html:has(body[data-role="landlord"])::-webkit-scrollbar,
+body[data-role="landlord"]::-webkit-scrollbar,
+body[data-role="landlord"] *::-webkit-scrollbar,
+.dashboard-layout-landlord::-webkit-scrollbar,
+.dashboard-layout-landlord *::-webkit-scrollbar,
+.dashboard-layout-landlord .sidebar::-webkit-scrollbar,
+.dashboard-layout-landlord .sidebar *::-webkit-scrollbar,
+.dashboard-layout-landlord .sidebar-landlord::-webkit-scrollbar,
+.dashboard-layout-landlord #domiknowSidebar::-webkit-scrollbar,
+.sidebar-landlord::-webkit-scrollbar,
+.sidebar-landlord .sidebar-menu::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+  background: transparent !important;
+}
+
+html[data-landlord-portal]::-webkit-scrollbar-thumb,
+html:has(body[data-role="landlord"])::-webkit-scrollbar-thumb,
+body[data-role="landlord"]::-webkit-scrollbar-thumb,
+body[data-role="landlord"] *::-webkit-scrollbar-thumb,
+.dashboard-layout-landlord::-webkit-scrollbar-thumb,
+.dashboard-layout-landlord *::-webkit-scrollbar-thumb,
+.dashboard-layout-landlord .sidebar::-webkit-scrollbar-thumb,
+.dashboard-layout-landlord .sidebar *::-webkit-scrollbar-thumb {
+  display: none !important;
+  background: transparent !important;
+  border: none !important;
+}
+
+html[data-landlord-portal]::-webkit-scrollbar-track,
+html:has(body[data-role="landlord"])::-webkit-scrollbar-track,
+body[data-role="landlord"]::-webkit-scrollbar-track,
+body[data-role="landlord"] *::-webkit-scrollbar-track,
+.dashboard-layout-landlord::-webkit-scrollbar-track,
+.dashboard-layout-landlord *::-webkit-scrollbar-track {
+  display: none !important;
+  background: transparent !important;
+}
+
 .dashboard-layout-landlord .sidebar-menu {
   gap: 2px !important;
-  padding-right: 2px;
+  padding: 16px 14px !important;
 }
 
 .dashboard-layout-landlord .sidebar-section-title {
@@ -54,42 +142,77 @@
 
 .dashboard-layout-landlord .sidebar-link {
   position: relative;
-  min-height: 42px;
-  padding: 9px 12px !important;
+  min-height: 40px;
+  padding: 9px 14px !important;
   border: 1px solid transparent !important;
   border-radius: 10px !important;
-  color: var(--color-text-secondary) !important;
-  font-weight: 600 !important;
   box-shadow: none !important;
+  color: #64748b !important;
+  font-weight: 600 !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 12px !important;
+  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1) !important;
 }
 
-.dashboard-layout-landlord .sidebar-link .nav-icon {
+@keyframes landlordSidebarSlideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .dashboard-layout-landlord .sidebar-link {
+    animation: landlordSidebarSlideIn 0.32s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+    animation-delay: calc(var(--sidebar-item-index, 1) * 18ms);
+  }
+}
+
+.dashboard-layout-landlord .sidebar-link .nav-icon,
+.dashboard-layout-landlord .sidebar-link svg {
   width: 18px;
   height: 18px;
   flex: 0 0 18px;
+  color: #94a3b8;
+  transition: transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1), color 0.2s ease;
 }
 
 .dashboard-layout-landlord .sidebar-link:hover {
-  border-color: var(--color-border-default) !important;
-  background: var(--color-bg-hover) !important;
+  border-color: #e2e8f0 !important;
+  background: #f8fafc !important;
+  color: #0f172a !important;
+  transform: translateX(4px) !important;
+}
+
+.dashboard-layout-landlord .sidebar-link:hover .nav-icon,
+.dashboard-layout-landlord .sidebar-link:hover svg {
+  transform: scale(1.15);
+  color: #0052ea;
 }
 
 .dashboard-layout-landlord .sidebar-link.active {
-  border-color: color-mix(in srgb, var(--color-action-primary) 18%, var(--color-border-default)) !important;
-  background: var(--color-action-primary-subtle) !important;
-  color: var(--color-action-primary) !important;
-  box-shadow: none !important;
+  border-color: rgba(0, 82, 234, 0.16) !important;
+  background: #eff6ff !important;
+  color: #0052ea !important;
+  font-weight: 700 !important;
+  box-shadow: 0 1px 3px rgba(0, 82, 234, 0.06) !important;
 }
 
-.dashboard-layout-landlord .sidebar-link.active::before {
-  position: absolute;
-  top: 9px;
-  bottom: 9px;
-  left: -5px;
-  width: 3px;
-  border-radius: 999px;
-  background: var(--color-action-primary);
-  content: "";
+.dashboard-layout-landlord .sidebar-link.active .nav-icon,
+.dashboard-layout-landlord .sidebar-link.active svg {
+  color: #0052ea !important;
+  transform: scale(1.06);
+}
+
+.dashboard-layout-landlord .sidebar-link.active::before,
+.dashboard-layout-landlord .sidebar-link::before {
+  display: none !important;
+  content: none !important;
 }
 
 .dashboard-layout-landlord .sidebar-footer {
@@ -105,12 +228,21 @@
 }
 
 .dashboard-layout-landlord .topbar {
-  min-height: 76px;
+  height: 72px !important;
+  min-height: 72px !important;
+  max-height: 72px !important;
+  box-sizing: border-box !important;
+  border-bottom: 1px solid var(--color-border-default) !important;
   background: color-mix(in srgb, var(--color-bg-surface) 94%, transparent) !important;
+  position: sticky;
+  top: 0;
+  z-index: 110 !important;
+  display: flex !important;
+  align-items: center !important;
 }
 
 .dashboard-layout-landlord .topbar-title {
-  max-width: min(58vw, 760px);
+  max-width: min(58vw, 720px);
   overflow: hidden;
   font-size: 1.125rem !important;
   line-height: 1.45 !important;
@@ -121,6 +253,7 @@
 .dashboard-layout-landlord .topbar-account {
   display: grid;
   grid-template-columns: 36px minmax(0, auto);
+  grid-template-rows: auto;
   gap: 10px;
   padding-left: 14px;
   text-align: left;
@@ -128,21 +261,179 @@
 
 .dashboard-layout-landlord .topbar-avatar {
   display: grid;
-  width: 36px;
-  height: 36px;
+  width: 38px;
+  height: 38px;
   place-items: center;
-  border: 1px solid color-mix(in srgb, var(--color-action-primary) 22%, var(--color-border-default));
-  border-radius: 11px;
+  border: 2px solid color-mix(in srgb, var(--color-action-primary) 35%, var(--color-border-default));
+  border-radius: 50% !important;
   background: var(--color-action-primary-subtle);
   color: var(--color-action-primary);
-  font-size: 0.75rem;
+  font-size: 0.8125rem;
   font-weight: 800;
+  letter-spacing: 0.02em;
+  overflow: hidden;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+}
+
+.dashboard-layout-landlord .topbar-account-dropdown {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.dashboard-layout-landlord .topbar-avatar-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px;
+  background: transparent;
+  border: 2px solid transparent;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: transform var(--transition-fast), border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.dashboard-layout-landlord .topbar-avatar-btn:hover {
+  transform: scale(1.05);
+  border-color: var(--color-action-primary);
+}
+
+.dashboard-layout-landlord .topbar-avatar-btn:focus-visible {
+  outline: none;
+  border-color: var(--color-action-primary);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-action-primary) 28%, transparent);
+}
+
+.dashboard-layout-landlord .topbar-right > .dk-tour-replay,
+.dashboard-layout-landlord .topbar-right > .theme-toggle {
+  display: none !important;
+}
+
+.dashboard-layout-landlord .topbar-dropdown-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  min-width: 190px;
+  width: max-content;
+  background: var(--color-bg-surface);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-lg, 12px);
+  box-shadow: var(--shadow-dropdown);
+  padding: 6px;
+  z-index: 1100;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  animation: landlordDropdownFadeIn 0.16s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.dashboard-layout-landlord .topbar-dropdown-menu[hidden] {
+  display: none !important;
+}
+
+@keyframes landlordDropdownFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-6px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.dashboard-layout-landlord .topbar-dropdown-item,
+.dashboard-layout-landlord .topbar-dropdown-menu .topbar-dropdown-item,
+.dashboard-layout-landlord .topbar-dropdown-menu [data-theme-toggle] {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  gap: 12px !important;
+  width: 100% !important;
+  min-width: 100% !important;
+  height: auto !important;
+  min-height: 40px !important;
+  padding: 9px 12px !important;
+  border: none !important;
+  border-radius: var(--radius-md, 8px) !important;
+  background: transparent !important;
+  color: var(--color-text-primary) !important;
+  box-shadow: none !important;
+  text-decoration: none !important;
+  font-size: 0.875rem !important;
+  font-weight: 500 !important;
+  cursor: pointer !important;
+  text-align: left !important;
+  white-space: nowrap !important;
+  transition: background-color var(--transition-fast), color var(--transition-fast) !important;
+}
+
+.dashboard-layout-landlord .topbar-dropdown-item .dropdown-item-icon {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 20px !important;
+  height: 20px !important;
+  flex-shrink: 0 !important;
+  color: var(--color-text-secondary) !important;
+  transition: color var(--transition-fast) !important;
+}
+
+.dashboard-layout-landlord .topbar-dropdown-item svg {
+  width: 18px !important;
+  height: 18px !important;
+  flex-shrink: 0 !important;
+  color: inherit !important;
+}
+
+.dashboard-layout-landlord .topbar-dropdown-item:hover,
+.dashboard-layout-landlord .topbar-dropdown-item:focus-visible,
+.dashboard-layout-landlord .topbar-dropdown-item.active {
+  background: var(--color-bg-subtle, rgba(0, 0, 0, 0.05)) !important;
+  color: var(--color-action-primary) !important;
+  outline: none !important;
+}
+
+.dashboard-layout-landlord .topbar-dropdown-item:hover .dropdown-item-icon,
+.dashboard-layout-landlord .topbar-dropdown-item:focus-visible .dropdown-item-icon,
+.dashboard-layout-landlord .topbar-dropdown-item.active .dropdown-item-icon {
+  color: var(--color-action-primary) !important;
+}
+
+.dashboard-layout-landlord .topbar-dropdown-divider {
+  height: 1px;
+  background: var(--color-divider, var(--color-border-default));
+  margin: 4px 4px;
+}
+
+.dashboard-layout-landlord .topbar-dropdown-logout,
+.dashboard-layout-landlord .topbar-dropdown-menu .topbar-dropdown-logout {
+  color: var(--color-error-text, #ef4444) !important;
+}
+
+.dashboard-layout-landlord .topbar-dropdown-logout .dropdown-item-icon {
+  color: var(--color-error-text, #ef4444) !important;
+}
+
+.dashboard-layout-landlord .topbar-dropdown-logout:hover,
+.dashboard-layout-landlord .topbar-dropdown-logout:focus-visible {
+  background: color-mix(in srgb, var(--color-error-text, #ef4444) 10%, transparent) !important;
+  color: var(--color-error-text, #ef4444) !important;
+}
+
+.dashboard-layout-landlord .topbar-dropdown-logout:hover .dropdown-item-icon,
+.dashboard-layout-landlord .topbar-dropdown-logout:focus-visible .dropdown-item-icon {
+  color: var(--color-error-text, #ef4444) !important;
 }
 
 .dashboard-layout-landlord .topbar-account-copy {
   display: flex;
   min-width: 0;
   flex-direction: column;
+}
+
+.dashboard-layout-landlord .topbar-account .user-name {
+  max-width: 180px;
 }
 
 .dashboard-layout-landlord .main-content-inner {
@@ -156,12 +447,14 @@
   margin-bottom: 24px;
 }
 
+.landlord-module-intro:empty {
+  display: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
 .landlord-page-summary {
-  display: flex;
-  min-width: 0;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: 24px;
+  display: none !important;
 }
 
 .landlord-page-summary-copy {

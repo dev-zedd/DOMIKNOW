@@ -9,7 +9,27 @@
     <link href="../../css/public-refinement.css" rel="stylesheet">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <link href="../../css/public-module.css?v=20260827-1" rel="stylesheet">
+    <link href="../../css/public-module.css?v=20260905-1" rel="stylesheet">
+    <style>
+        .discovery-search-control > :is(.ui-icon, [data-icon]) {
+            position: absolute;
+            z-index: 1;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 18px;
+            height: 18px;
+            color: var(--color-text-muted);
+            pointer-events: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .discovery-search-control input {
+            padding: 0.625rem 14px 0.625rem 42px !important;
+            padding-left: 42px !important;
+        }
+    </style>
     <link href="../../css/map-system.css?v=20260817-9" rel="stylesheet">
     <link href="../../css/mobile-first.css?v=20260817-1" rel="stylesheet">
     <link href="../../css/loading-system.css?v=20260827-1" rel="stylesheet" data-domiknow-loading-system>

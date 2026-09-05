@@ -4,308 +4,308 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ratings & Feedback - DomiKnow</title>
-    <meta name="description" content="Rate your landlord and rental experience. Authenticated ratings shape property listings and help future tenants make informed decisions.">
+    <meta name="description" content="Rate your rental property and landlord on DomiKnow.">
     <link href="../../css/input.css" rel="stylesheet">
+    <link href="../../css/design-system.css?v=20260904-2" rel="stylesheet">
     <style>
-        /* ── Page Layout ─────────────────────────────────────── */
-        .ratings-layout {
-            display: grid;
-            grid-template-columns: 1fr 1.6fr;
-            gap: 2rem;
-            margin-top: 1.5rem;
-            align-items: start;
+        /* ── Action Button ── */
+        .btn-submit-request {
+            background: #ffffff;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            padding: 8px 18px;
+            font-weight: 700;
+            font-size: 0.875rem;
+            color: #0f172a;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+            white-space: nowrap;
         }
-        @media (max-width: 1100px) {
-            .ratings-layout { grid-template-columns: 1fr; }
+        .btn-submit-request:hover {
+            background: #f8fafc;
+            border-color: #94a3b8;
         }
 
-        /* ── Tabs Styling ─────────────────────────────────────── */
-        .tabs-header {
+        /* ── Tabs & Header Row ── */
+        .maintenance-header-row {
             display: flex;
-            border-bottom: 2px solid var(--border-color);
-            margin-bottom: 1.5rem;
-            gap: 1rem;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #e2e8f0;
+            margin-bottom: 16px;
+            gap: 16px;
+            flex-wrap: wrap;
         }
-        .tab-btn {
+        .maintenance-tabs-bar {
+            display: flex;
+            align-items: center;
+            gap: 22px;
+            overflow-x: auto;
+            scrollbar-width: none;
+            padding-bottom: 12px;
+        }
+        .maintenance-tabs-bar::-webkit-scrollbar { display: none; }
+        .m-tab-btn {
             background: none;
             border: none;
-            padding: 0.75rem 1.25rem;
-            font-size: 0.95rem;
+            padding: 4px 0;
+            font-size: 0.9375rem;
             font-weight: 700;
-            color: var(--text-muted);
+            color: #64748b;
             cursor: pointer;
-            border-bottom: 3px solid transparent;
-            transition: color var(--transition-fast), border-color var(--transition-fast);
-            display: flex;
+            display: inline-flex;
             align-items: center;
-            gap: 0.5rem;
+            gap: 6px;
+            position: relative;
+            transition: color 0.15s ease;
+            white-space: nowrap;
         }
-        .tab-btn:hover {
-            color: var(--tenant);
+        .m-tab-btn:hover {
+            color: #0052ea;
         }
-        .tab-btn.active {
-            color: var(--tenant);
-            border-bottom-color: var(--tenant);
+        .m-tab-btn.active {
+            color: #0052ea;
+            font-weight: 800;
+        }
+        .m-tab-btn.active::after {
+            content: '';
+            position: absolute;
+            bottom: -13px;
+            left: 0;
+            right: 0;
+            height: 2.5px;
+            background: #0052ea;
+            border-radius: 2px;
+        }
+        .tab-count {
+            background: #e2e8f0;
+            color: #475569;
+            font-size: 0.6875rem;
+            font-weight: 700;
+            padding: 2px 7px;
+            border-radius: 999px;
+            line-height: 1.2;
+        }
+        .m-tab-btn.active .tab-count {
+            background: #eff6ff;
+            color: #0052ea;
         }
 
-        /* ── Cards ───────────────────────────────────────────── */
-        .panel {
-            background: var(--bg-secondary);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-lg);
-            padding: 2rem;
-            box-shadow: var(--shadow-lg);
+        /* ── Controls Bar (Search) ── */
+        .ledger-controls-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
         }
-        .panel-title {
-            font-size: 1.05rem;
-            font-weight: 700;
-            color: var(--text-primary);
-            margin-bottom: 1.5rem;
+        .ledger-search-box {
+            position: relative;
             display: flex;
             align-items: center;
-            gap: 0.6rem;
         }
-        .panel-title svg {
-            color: var(--tenant);
-            flex-shrink: 0;
+        .ledger-search-box svg {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #94a3b8;
+            pointer-events: none;
+            z-index: 1;
+        }
+        .ledger-search-box input {
+            padding: 8px 14px 8px 40px !important;
+            padding-left: 40px !important;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            color: #0f172a;
+            width: 280px;
+            max-width: 100%;
+            background: #ffffff;
+            outline: none;
+            transition: border-color 0.15s ease, box-shadow 0.15s ease;
+        }
+        .ledger-search-box input:focus {
+            border-color: #0052ea;
+            box-shadow: 0 0 0 3px rgba(0, 82, 234, 0.08);
         }
 
-        /* ── Lease Eligibility Cards ──────────────────────────── */
-        .lease-card {
-            border: 1.5px solid var(--border-color);
-            border-radius: var(--radius-md);
-            padding: 1rem 1.25rem;
-            margin-bottom: 0.75rem;
-            cursor: pointer;
-            transition: border-color var(--transition-fast), background var(--transition-fast), box-shadow var(--transition-fast);
+        /* ── Reviews Card List ── */
+        .requests-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 32px;
+        }
+        .request-card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0 !important;
+            border-radius: 12px;
+            padding: 16px 20px;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            gap: 1rem;
+            gap: 20px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+            outline: none;
         }
-        .lease-card:hover:not(.rated) {
-            border-color: var(--tenant);
-            background: var(--tenant-bg);
-            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.08);
+        .request-card:hover {
+            border: 1px solid #cbd5e1 !important;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            transform: translateY(-1px);
         }
-        .lease-card.active-selection {
-            border-color: var(--tenant);
-            background: var(--tenant-bg);
-            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.12);
+        .rc-left-group {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            flex: 1.5;
+            min-width: 240px;
         }
-        .lease-card.rated {
-            cursor: default;
-            opacity: 0.65;
+        .rc-icon-box {
+            width: 44px;
+            height: 44px;
+            border-radius: 10px;
+            background: #fffbeb;
+            border: 1px solid #fde68a;
+            color: #d97706;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            flex-shrink: 0;
         }
-        .lease-card-info {
-            flex: 1;
+        .rc-text-box {
+            display: flex;
+            flex-direction: column;
             min-width: 0;
         }
-        .lease-property-name {
+        .rc-title {
+            font-size: 0.95rem;
             font-weight: 700;
-            font-size: 0.9rem;
-            color: var(--text-primary);
+            color: #0f172a;
+            margin-bottom: 3px;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
         }
-        .lease-landlord-name {
-            font-size: 0.78rem;
-            color: var(--text-secondary);
-            margin-top: 0.2rem;
+        .rc-subtitle {
+            font-size: 0.8125rem;
+            color: #64748b;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
-        .lease-contract-number {
-            font-size: 0.72rem;
-            color: var(--text-muted);
-            margin-top: 0.15rem;
-            font-family: monospace;
+        .rc-col-label {
+            font-size: 0.75rem;
+            color: #64748b;
+            font-weight: 500;
         }
-        .lease-rating-badge {
-            flex-shrink: 0;
-            font-size: 0.7rem;
+        .rc-col-label.uppercase {
+            font-size: 0.6875rem;
             font-weight: 700;
-            padding: 0.25rem 0.65rem;
-            border-radius: var(--radius-full);
             text-transform: uppercase;
-            letter-spacing: 0.04em;
-        }
-        .badge-not-rated {
-            background: var(--warning-bg);
-            color: var(--warning);
-        }
-        .badge-submitted {
-            background: var(--success-bg);
-            color: var(--success);
-        }
-        .badge-status {
-            font-size: 0.7rem;
-            font-weight: 600;
-            padding: 0.2rem 0.55rem;
-            border-radius: var(--radius-full);
-            background: #e0e7ff;
-            color: var(--tenant);
-            text-transform: capitalize;
-            margin-right: 0.4rem;
-        }
-
-        /* ── Multi-criteria Star Widget Grid ──────────────────────── */
-        .criteria-grid {
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-            margin-bottom: 1.5rem;
-            background: var(--bg-primary);
-            padding: 1.25rem;
-            border-radius: var(--radius-md);
-            border: 1px solid var(--border-color);
-        }
-        .criterion-row {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 1rem;
-            border-bottom: 1px dashed var(--border-color);
-            padding-bottom: 0.75rem;
-        }
-        .criterion-row:last-child {
-            border-bottom: none;
-            padding-bottom: 0;
-        }
-        .criterion-info {
-            flex: 1;
-        }
-        .criterion-name {
-            font-weight: 600;
-            font-size: 0.88rem;
-            color: var(--text-primary);
-            text-transform: capitalize;
-        }
-        .criterion-desc {
-            font-size: 0.73rem;
-            color: var(--text-muted);
-            margin-top: 0.1rem;
-        }
-        .criterion-stars {
-            display: flex;
-            align-items: center;
-            gap: 0.25rem;
-        }
-        .criteria-star-btn {
-            background: none;
-            border: none;
-            padding: 0;
-            cursor: pointer;
-            font-size: 1.4rem;
-            line-height: 1;
-            color: #d1d5db;
-            transition: color var(--transition-fast), transform var(--transition-fast);
-        }
-        .criteria-star-btn:hover,
-        .criteria-star-btn.active {
-            color: #f59e0b;
-            transform: scale(1.15);
-        }
-        .edit-star {
-            background: none;
-            border: none;
-            padding: 0;
-            cursor: pointer;
-            font-size: 1.3rem;
-            line-height: 1;
-            color: #d1d5db;
-            transition: color var(--transition-fast), transform var(--transition-fast);
-        }
-        .edit-star:hover,
-        .edit-star.active {
-            color: #f59e0b;
-            transform: scale(1.15);
-        }
-        .criterion-label {
-            font-size: 0.78rem;
-            font-weight: 700;
-            color: var(--text-muted);
-            min-width: 75px;
-            text-align: right;
-        }
-        .criterion-label.active-label {
-            color: #f59e0b;
-        }
-
-        /* ── Table ───────────────────────────────────────────── */
-        .history-scroll { overflow-x: auto; margin-top: 1rem; }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.88rem;
-        }
-        th {
-            font-weight: 700;
-            color: var(--text-secondary);
-            padding: 0.7rem 1rem;
-            border-bottom: 2px solid var(--border-color);
-            text-transform: uppercase;
-            font-size: 0.72rem;
             letter-spacing: 0.05em;
         }
-        td {
-            padding: 1rem;
-            border-bottom: 1px solid var(--border-color);
-            color: var(--text-primary);
+        .rc-col-val {
+            font-size: 0.9375rem;
+            font-weight: 700;
+            color: #0f172a;
+            margin-top: 2px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
-        tr:hover td { background: var(--bg-primary); }
+        .rc-assigned-group {
+            min-width: 140px;
+            border-left: 1px solid #f1f5f9;
+            padding-left: 16px;
+        }
+        .rc-rating-group {
+            min-width: 130px;
+            border-left: 1px solid #f1f5f9;
+            padding-left: 16px;
+        }
+        .rc-right-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-shrink: 0;
+        }
+        .rc-actions {
+            display: flex;
+            gap: 8px;
+        }
+        .btn-table-action {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            color: #0f172a;
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 5px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+        .btn-table-action:hover {
+            background: #f8fafc;
+            border-color: #cbd5e1;
+        }
+        .btn-table-action.primary {
+            background: #eff6ff;
+            border-color: #bfdbfe;
+            color: #0052ea;
+        }
+        .btn-table-action.primary:hover {
+            background: #dbeafe;
+        }
 
+        /* ── Stars & Badges ── */
         .star-display {
             color: #f59e0b;
-            font-size: 1rem;
+            font-size: 0.95rem;
             letter-spacing: 0.05em;
         }
-        .star-display-muted { color: #d1d5db; }
-
-        .action-btn {
-            font-size: 0.78rem;
-            padding: 0.35rem 0.85rem;
-            border-radius: var(--radius-sm);
-            border: none;
-            cursor: pointer;
-            font-weight: 600;
-            transition: background var(--transition-fast), transform var(--transition-fast);
+        .star-empty {
+            color: #d1d5db;
         }
-        .action-btn:hover { transform: translateY(-1px); }
-        .btn-view { background: var(--primary-light); color: var(--primary); }
-        .btn-edit { background: var(--warning-bg); color: var(--warning); }
-        .btn-view:hover { background: var(--primary); color: #fff; }
-        .btn-edit:hover { background: var(--warning); color: #fff; }
 
-        /* ── Placeholder State ────────────────────────────────── */
+        /* ── Empty State ── */
         .empty-state {
             text-align: center;
-            padding: 3rem 1rem;
-            color: var(--text-muted);
+            padding: 3.5rem 1rem;
+            color: #64748b;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+        }
+        .empty-state .ei {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
             display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 0.75rem;
+            justify-content: center;
         }
-        .empty-state svg { opacity: 0.3; }
-
-        /* ── Form Alert Messages ──────────────────────────────── */
-        .alert-bar {
-            border-radius: var(--radius-sm);
-            padding: 0.75rem 1rem;
-            font-size: 0.85rem;
-            font-weight: 500;
-            margin-bottom: 1rem;
-            display: none;
+        .empty-state p {
+            font-size: 0.9375rem;
+            font-weight: 600;
+            color: #64748b;
+            margin: 0;
         }
-        .alert-bar.visible { display: block; }
-        .alert-error { background: var(--error-bg); color: var(--error); border: 1px solid #fca5a5; }
-        .alert-success { background: var(--success-bg); color: var(--success); border: 1px solid #6ee7b7; }
 
-        /* ── Modal ────────────────────────────────────────────── */
+        /* ══════════════════════════════════════════════════════
+           MODAL SYSTEM (Consistent & Minimalist)
+        ══════════════════════════════════════════════════════ */
         .modal-overlay {
             position: fixed;
             inset: 0;
-            background: rgba(15, 23, 42, 0.6);
+            background: rgba(15, 23, 42, 0.45);
             backdrop-filter: blur(4px);
             display: flex;
             justify-content: center;
@@ -313,301 +313,433 @@
             z-index: 1000;
             padding: 1.5rem;
         }
-        .modal-overlay.hidden { display: none; }
-        .modal-box {
-            background: var(--bg-secondary);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-lg);
-            padding: 2rem;
-            max-width: 580px;
+        .modal-container {
+            background-color: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
             width: 100%;
+            max-width: 600px;
             max-height: 90vh;
             overflow-y: auto;
-            box-shadow: var(--shadow-premium);
-            animation: modalIn 0.2s ease;
+            box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.15);
+            display: flex;
+            flex-direction: column;
+            animation: modalFadeIn 0.18s ease;
         }
-        @keyframes modalIn {
-            from { opacity: 0; transform: translateY(12px) scale(0.97); }
-            to   { opacity: 1; transform: translateY(0) scale(1); }
+        @keyframes modalFadeIn {
+            from { opacity: 0; transform: translateY(8px) scale(0.99); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
         }
         .modal-header {
+            padding: 1.25rem 1.75rem;
+            border-bottom: 1px solid #f1f5f9;
             display: flex;
-            align-items: center;
             justify-content: space-between;
-            margin-bottom: 1.5rem;
+            align-items: flex-start;
+            background-color: #ffffff;
+            position: sticky;
+            top: 0;
+            z-index: 10;
         }
-        .modal-close-x {
-            background: none;
-            border: none;
-            cursor: pointer;
-            color: var(--text-muted);
-            padding: 0.25rem;
-            border-radius: var(--radius-sm);
-            transition: color var(--transition-fast);
+        .modal-header-title {
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: #0f172a;
+            margin: 0;
+            line-height: 1.2;
         }
-        .modal-close-x:hover { color: var(--text-primary); }
-        
-        /* ── Details breakdown styling ── */
-        .detail-row {
-            display: grid;
-            grid-template-columns: 160px 1fr;
-            gap: 0.5rem 1rem;
-            margin-bottom: 0.8rem;
-            align-items: start;
+        .modal-header-subtitle {
+            font-size: 0.875rem;
+            color: #64748b;
+            font-weight: 500;
+            margin-top: 4px;
         }
-        .detail-label {
-            font-size: 0.78rem;
-            font-weight: 700;
-            color: var(--text-secondary);
-            text-transform: uppercase;
-            letter-spacing: 0.04em;
-            padding-top: 0.05rem;
-        }
-        .detail-value {
-            font-size: 0.9rem;
-            color: var(--text-primary);
-            word-break: break-word;
-        }
-        .detail-divider {
-            border: none;
-            border-top: 1px solid var(--border-color);
-            margin: 1rem 0;
+        .modal-body {
+            padding: 1.5rem 1.75rem;
+            overflow-y: auto;
+            flex: 1;
         }
         .modal-footer {
+            padding: 1.25rem 1.75rem;
+            border-top: 1px solid #f1f5f9;
             display: flex;
-            gap: 0.75rem;
             justify-content: flex-end;
-            margin-top: 1.5rem;
+            align-items: center;
+            background-color: #ffffff;
+            gap: 12px;
+            position: sticky;
+            bottom: 0;
+            z-index: 10;
+        }
+        .modal-close-x {
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            color: #64748b;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 4px;
+            border-radius: 6px;
+            transition: background 0.15s ease, color 0.15s ease;
+        }
+        .modal-close-x:hover {
+            background: #f1f5f9;
+            color: #0f172a;
         }
 
-        .modal-breakdown-card {
-            background: var(--bg-primary);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-md);
-            padding: 1rem;
-            margin-top: 1rem;
+        /* Modal Action Buttons */
+        .btn-modal-cancel {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            color: #0f172a;
+            font-size: 0.875rem;
+            font-weight: 600;
+            padding: 9px 22px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            text-decoration: none;
         }
-        .modal-breakdown-title {
-            font-size: 0.82rem;
+        .btn-modal-cancel:hover {
+            background: #f8fafc;
+            border-color: #cbd5e1;
+        }
+        .btn-modal-primary {
+            background: #0052ea;
+            border: 1px solid #0052ea;
+            color: #ffffff;
+            font-size: 0.875rem;
+            font-weight: 600;
+            padding: 9px 22px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn-modal-primary:hover:not(:disabled) {
+            background: #0247d1;
+            border-color: #0247d1;
+        }
+        .btn-modal-primary:disabled {
+            opacity: 0.65;
+            cursor: not-allowed;
+        }
+
+        /* Form Structure */
+        .form-group {
+            margin-bottom: 1.15rem;
+        }
+        .form-label {
+            display: block;
+            font-size: 0.8125rem;
             font-weight: 700;
-            color: var(--text-primary);
-            margin-bottom: 0.75rem;
-            text-transform: uppercase;
-            letter-spacing: 0.03em;
+            color: #334155;
+            margin-bottom: 6px;
         }
-        .modal-breakdown-row {
+        .form-input {
+            width: 100%;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 9px 12px;
+            font-size: 0.875rem;
+            color: #0f172a;
+            background: #ffffff;
+            outline: none;
+            box-sizing: border-box;
+            transition: border-color 0.15s ease, box-shadow 0.15s ease;
+            font-family: inherit;
+        }
+        .form-input:focus {
+            border-color: #0052ea;
+            box-shadow: 0 0 0 2px rgba(0, 82, 234, 0.15);
+        }
+        .form-section-title {
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #64748b;
+            margin: 1.25rem 0 0.5rem 0;
+            border-left: none !important;
+            padding-left: 0 !important;
+        }
+        .form-section-title:first-child {
+            margin-top: 0;
+        }
+
+        /* ── Star Criteria Widget (Clean Minimalist) ── */
+        .criteria-box {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 12px 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            max-height: 280px;
+            overflow-y: auto;
+        }
+        .crit-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding-bottom: 10px;
+            border-bottom: 1px dashed #e2e8f0;
+        }
+        .crit-row:last-child {
+            padding-bottom: 0;
+            border-bottom: none;
+        }
+        .crit-text {
+            flex: 1;
+            min-width: 0;
+        }
+        .crit-name {
+            font-size: 0.84375rem;
+            font-weight: 700;
+            color: #0f172a;
+        }
+        .crit-desc {
+            font-size: 0.72rem;
+            color: #64748b;
+            margin-top: 1px;
+        }
+        .crit-stars {
+            display: flex;
+            align-items: center;
+            gap: 3px;
+        }
+        .crit-star-btn {
+            background: none;
+            border: none;
+            padding: 0;
+            cursor: pointer;
+            font-size: 1.3rem;
+            line-height: 1;
+            color: #d1d5db;
+            transition: color 0.12s ease, transform 0.12s ease;
+        }
+        .crit-star-btn:hover,
+        .crit-star-btn.active {
+            color: #f59e0b;
+            transform: scale(1.15);
+        }
+        .crit-score-label {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: #94a3b8;
+            min-width: 65px;
+            text-align: right;
+            user-select: none;
+        }
+        .crit-score-label.active {
+            color: #f59e0b;
+        }
+
+        /* ── Detail Breakdown & Summary ── */
+        .detail-summary-card {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px 20px;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 16px 18px;
+            margin-bottom: 1.25rem;
+        }
+        @media (max-width: 480px) {
+            .detail-summary-card {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+        }
+        .detail-card-item {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+        .dc-label {
+            font-size: 0.75rem;
+            color: #64748b;
+            font-weight: 500;
+        }
+        .dc-val {
+            font-size: 0.875rem;
+            font-weight: 700;
+            color: #0f172a;
+        }
+        .detail-box {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 12px 16px;
+            font-size: 0.875rem;
+            color: #334155;
+            line-height: 1.6;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+        .breakdown-row {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            font-size: 0.82rem;
-            padding: 0.35rem 0;
-            border-bottom: 1px dashed var(--border-color);
+            padding: 7px 0;
+            border-bottom: 1px dashed #e2e8f0;
+            font-size: 0.8125rem;
         }
-        .modal-breakdown-row:last-child {
+        .breakdown-row:last-child {
             border-bottom: none;
         }
-        .modal-breakdown-val {
-            font-weight: 600;
-            color: var(--text-primary);
-        }
 
-        /* ── Info banner ──────────────────────────────────── */
-        .info-banner {
-            background: var(--primary-light);
-            color: var(--tenant);
-            border-radius: var(--radius-md);
-            padding: 0.9rem 1.2rem;
-            font-size: 0.85rem;
-            font-weight: 500;
+        /* Alerts */
+        .form-alert {
+            border-radius: 8px;
+            padding: 10px 14px;
+            font-size: 0.8125rem;
+            font-weight: 600;
             margin-bottom: 1rem;
-            display: none;
         }
-        .info-banner.visible { display: block; }
-
-        /* ── Edit window pill ─────────────────────────────────── */
-        .edit-window-pill {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.35rem;
-            font-size: 0.72rem;
-            font-weight: 600;
-            padding: 0.2rem 0.6rem;
-            border-radius: var(--radius-full);
-            background: var(--warning-bg);
-            color: var(--warning);
+        .form-alert.err {
+            background: #fef2f2;
+            color: #dc2626;
+            border: 1px solid #fecaca;
+        }
+        .form-alert.ok {
+            background: #f0fdf4;
+            color: #16a34a;
+            border: 1px solid #bbf7d0;
         }
     </style>
-    <link href="../../css/design-system.css?v=20260904-1" rel="stylesheet">
     <script src="../../js/ui.js?v=20260827-3" defer></script>
 </head>
 <body class="app-loading" data-role="tenant" data-page-title="Ratings &amp; Feedback">
-    <!-- Navbar -->
-    <nav class="navbar navbar-tenant">
-        <div class="navbar-container">
-            <div class="navbar-brand-group">
-                <a href="dashboard.html" style="text-decoration: none;"><span class="navbar-logo">DomiKnow</span></a>
-                <span class="navbar-badge navbar-badge-tenant">Tenant</span>
-            </div>
-            <div class="navbar-menu" style="flex-wrap: wrap; gap: 0.5rem 1rem;">
-                <a href="dashboard.html" class="navbar-menu-link">Dashboard</a>
-                <a href="properties.html" class="navbar-menu-link">Discovery</a>
-                <a href="applications.html" class="navbar-menu-link">My Applications</a>
-                <a href="leases.html" class="navbar-menu-link">My Lease</a>
-                <a href="billings.html" class="navbar-menu-link">My Billings</a>
-                <a href="maintenance.html" class="navbar-menu-link">Maintenance</a>
-                <a href="reports.html" class="navbar-menu-link">Reports</a>
-                <a href="tenant-reports.html" class="navbar-menu-link">Reports Against Me</a>
-                <a href="disputes.html" class="navbar-menu-link">Disputes</a>
-                <a href="policy-violations.html" class="navbar-menu-link">Violations</a>
-                <a href="feedback.html" class="navbar-menu-link active">Feedback</a>
-            </div>
-            <div class="navbar-right">
-                <span class="navbar-user-welcome">Welcome, <span class="user-name">User</span></span>
-                <button id="logoutBtn" class="navbar-btn">Logout</button>
-            </div>
-        </div>
-    </nav>
 
-    <!-- Main -->
+    <!-- ── Main Content ── -->
     <main class="dashboard-container">
 
-
-        <!-- Navigation Tabs -->
-        <div class="tabs-header">
-            <button class="tab-btn active" id="tabPropertyBtn">
-                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>
+        <!-- Header Row: Tabs & Write Review Button -->
+        <div class="maintenance-header-row">
+            <div class="maintenance-tabs-bar" id="moduleTabs">
+                <button class="m-tab-btn active" data-module="property">
+                    Property Reviews
+                    <span class="tab-count" id="tabCountProperty">0</span>
+                </button>
+                <button class="m-tab-btn" data-module="landlord">
+                    Landlord Reviews
+                    <span class="tab-count" id="tabCountLandlord">0</span>
+                </button>
+            </div>
+            <button class="btn-submit-request" id="openRatingBtn">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
                 </svg>
-                Module A: Property Rating
-            </button>
-            <button class="tab-btn" id="tabLandlordBtn">
-                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
-                </svg>
-                Module B: Landlord Rating
+                <span id="btnActionText">Write a Review</span>
             </button>
         </div>
 
-        <div class="ratings-layout">
-            <!-- LEFT: Submit Panel -->
-            <div>
-                <!-- Lease Eligibility Selector -->
-                <div class="panel" style="margin-bottom: 1.5rem;">
-                    <div class="panel-title">
-                        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                            <rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/>
-                            <line x1="9" y1="21" x2="9" y2="9"/>
-                        </svg>
-                        Eligible Lease Contracts
-                    </div>
-                    <div class="info-banner" id="noLeasesBanner">
-                        No eligible lease contracts found. You can submit a rating if you are currently renting (active lease whose start date has passed) or have a previously completed, ended, or terminated lease.
-                    </div>
-                    <div id="leaseCardsList">
-                        <div class="empty-state" style="padding: 1.5rem;">
-                            <span style="color:var(--text-muted); font-size:0.85rem;">Loading your leases...</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Rating Form Panel -->
-                <div class="panel" id="ratingFormPanel" style="display:none;">
-                    <div class="panel-title" style="margin-bottom:0.5rem;">
-                        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
-                        </svg>
-                        <span id="formPanelTitle">Leave Your Property Rating</span>
-                    </div>
-
-                    <!-- Selected Lease Info -->
-                    <div style="background:var(--bg-primary); border-radius:var(--radius-md); padding:0.9rem 1.1rem; margin-bottom:1.25rem; border:1px solid var(--border-color);">
-                        <div style="font-size:0.78rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.05em; font-weight:700; margin-bottom:0.5rem;">Selected Contract</div>
-                        <div id="selectedPropertyDisplay" style="font-weight:700; font-size:0.95rem; color:var(--text-primary);"></div>
-                        <div id="selectedLandlordDisplay" style="font-size:0.8rem; color:var(--text-secondary); margin-top:0.2rem;"></div>
-                        <div id="selectedLeaseNumDisplay" style="font-size:0.72rem; color:var(--text-muted); margin-top:0.15rem; font-family:monospace;"></div>
-                    </div>
-
-                    <div id="formAlertError" class="alert-bar alert-error"></div>
-                    <div id="formAlertSuccess" class="alert-bar alert-success"></div>
-
-                    <form id="ratingForm">
-                        <input type="hidden" id="selectedLeaseId">
-
-                        <!-- Rating Criteria Container (Populated Dynamically) -->
-                        <div class="star-widget">
-                            <label class="form-label" style="margin-bottom:0.5rem;" id="starGridLabel">Rate by Criteria</label>
-                            <div class="criteria-grid" id="criteriaGrid">
-                                <!-- Populated dynamically based on tab -->
-                            </div>
-                        </div>
-
-                        <!-- Feedback Text -->
-                        <div class="form-group">
-                            <label class="form-label" for="feedbackText" id="feedbackFieldLabel">Your Property Written Review</label>
-                            <textarea
-                                id="feedbackText"
-                                class="form-input"
-                                placeholder="Write your review here..."
-                                style="height: 110px;"
-                                minlength="10"
-                                required
-                            ></textarea>
-                            <small style="color:var(--text-muted); font-size:0.72rem;">Minimum 10 characters. Your review helps support decision support system analytics.</small>
-                        </div>
-
-                        <button type="submit" id="submitRatingBtn" class="btn-primary" style="background:var(--tenant); border-color:var(--tenant); width:100%;">
-                            Submit Rating
-                        </button>
-                    </form>
-                </div>
-            </div>
-
-            <!-- RIGHT: Submitted Ratings History -->
-            <div class="panel">
-                <div class="panel-title">
-                    <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                        <polyline points="14 2 14 8 20 8"/>
-                        <line x1="16" y1="13" x2="8" y2="13"/>
-                        <line x1="16" y1="17" x2="8" y2="17"/>
-                    </svg>
-                    <span id="historyPanelTitle">My Submitted Property Ratings</span>
-                </div>
-                <div class="history-scroll">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Details</th>
-                                <th id="tableTargetHeader">Landlord</th>
-                                <th>Overall Avg</th>
-                                <th>Date</th>
-                                <th>Action</th>
-                            </tr>
-                        </thead>
-                        <tbody id="ratingsTableBody">
-                            <tr><td colspan="5" style="text-align:center; color:var(--text-muted); padding:2rem;">Loading ratings...</td></tr>
-                        </tbody>
-                    </table>
-                </div>
+        <!-- Controls Bar (Search) -->
+        <div class="ledger-controls-bar">
+            <div class="ledger-search-box">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+                <input type="text" id="reviewsSearchInput" placeholder="Search your reviews..." autocomplete="off">
             </div>
         </div>
+
+        <!-- Reviews Cards List (Zero Loading Placeholder) -->
+        <div class="requests-list" id="reviewsList"></div>
     </main>
 
-    <!-- Details / Edit Modal -->
-    <div class="modal-overlay hidden" id="detailsModal">
-        <div class="modal-box">
+    <!-- ════════════════════════════════════════════
+         NEW RATING MODAL (Minimalist & Clean)
+    ════════════════════════════════════════════ -->
+    <div class="modal-overlay" id="ratingModal" style="display:none;">
+        <div class="modal-container" style="max-width: 580px;">
+            <!-- Header -->
             <div class="modal-header">
-                <h3 style="margin:0; font-size:1.05rem; color:var(--text-primary);" id="modalTitle">Rating Details</h3>
-                <button class="modal-close-x" id="closeModalBtn" title="Close">
+                <div>
+                    <h3 class="modal-header-title" id="ratingModalTitle">Write a Review</h3>
+                    <div class="modal-header-subtitle" id="ratingModalSubtitle">Share your feedback to help future tenants</div>
+                </div>
+                <button type="button" class="modal-close-x" id="closeRatingModalBtn" title="Close" aria-label="Close modal">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
                     </svg>
                 </button>
             </div>
-            <div id="modalBody">
-                <!-- Populated dynamically -->
+
+            <!-- Body -->
+            <div class="modal-body">
+                <div id="formAlertError" class="form-alert err" style="display:none;"></div>
+                <div id="formAlertSuccess" class="form-alert ok" style="display:none;"></div>
+
+                <!-- No eligible lease notice -->
+                <div id="noLeaseNotice" style="display:none; background:#fef2f2; border:1px solid #fecaca; border-radius:8px; padding:1rem; text-align:center; color:#dc2626; font-size:0.875rem; font-weight:600; margin-bottom:1rem;">
+                    No eligible lease contracts found to review. You can review properties or landlords after your lease starts or once completed.
+                </div>
+
+                <form id="ratingForm">
+                    <!-- Eligible Lease Contract as Dropdown -->
+                    <div class="form-group">
+                        <label class="form-label" for="leaseSelector">Select Lease Contract <span style="color:#dc2626;">*</span></label>
+                        <select id="leaseSelector" class="form-input" required>
+                            <option value="">-- Choose your lease contract --</option>
+                        </select>
+                    </div>
+
+                    <!-- Criteria Rating Section -->
+                    <div class="form-section-title">Rate by Criteria</div>
+                    <div class="criteria-box" id="criteriaBox"></div>
+
+                    <!-- Written Review Textarea -->
+                    <div class="form-section-title">Your Written Review</div>
+                    <div class="form-group">
+                        <textarea id="feedbackText" class="form-input" rows="3" placeholder="Share your experience (condition, responsiveness, amenities, etc.)..." style="resize:vertical; min-height:75px;" minlength="10" required></textarea>
+                        <div style="font-size:0.75rem; color:#64748b; text-align:right; margin-top:4px;" id="feedbackCharHint">Minimum 10 characters required</div>
+                    </div>
+                </form>
             </div>
-            <div class="modal-footer" id="modalFooter"></div>
+
+            <!-- Footer -->
+            <div class="modal-footer">
+                <button type="button" class="btn-modal-cancel" id="cancelRatingBtn">Cancel</button>
+                <button type="button" class="btn-modal-primary" id="submitRatingBtn">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                    </svg>
+                    <span>Submit Review</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ════════════════════════════════════════════
+         DETAILS / EDIT MODAL
+    ════════════════════════════════════════════ -->
+    <div class="modal-overlay" id="detailsModal" style="display:none;">
+        <div class="modal-container" style="max-width: 580px;">
+            <div class="modal-header">
+                <div>
+                    <h3 class="modal-header-title" id="detailsModalTitle">Review Details</h3>
+                    <div class="modal-header-subtitle" id="detailsModalSubtitle">Rating breakdown and feedback</div>
+                </div>
+                <button type="button" class="modal-close-x" id="closeDetailsModalBtn" title="Close" aria-label="Close modal">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body" id="detailsModalBody"></div>
+            <div class="modal-footer" id="detailsModalFoot"></div>
         </div>
     </div>
 
@@ -616,416 +748,414 @@
     <script>
         const token = localStorage.getItem('domiknow_token');
 
-        // Module mode: 'property' or 'landlord'
-        let currentTab = 'property'; 
+        // Current module: 'property' or 'landlord'
+        let currentTab = 'property';
 
         // State
-        let currentSelectedLeaseId = null;
-        let currentSelectedLease = null;
-        let eligibleLeases = [];
-        let submittedRatings = [];
-        let currentRatingValues = {}; // stores rating values for criteria
-        let currentViewRating = null;  // rating record open in modal
-        let editMode = false;
-        let editRatingValues = {};
+        let eligibleLeases     = [];
+        let submittedRatings   = [];
+        let currentRatingValues = {};
+        let currentViewRating   = null;
+        let editRatingValues   = {};
+        let searchQuery        = '';
 
         const STAR_LABELS = {
-            1: 'Very Poor',
-            2: 'Poor',
-            3: 'Fair',
-            4: 'Good',
+            1: 'Poor',
+            2: 'Fair',
+            3: 'Good',
+            4: 'Very Good',
             5: 'Excellent'
         };
 
-        // Criteria details
         const PROPERTY_CRITERIA = [
-            { id: 'cleanliness', name: 'Cleanliness', desc: 'Hygiene and physical cleanliness of the property' },
-            { id: 'safety', name: 'Safety', desc: 'Secure locks, lighting, hazard-free structure' },
-            { id: 'comfort', name: 'Comfort', desc: 'Ventilation, space, heat/cool comfort levels' },
-            { id: 'amenities', name: 'Amenities', desc: 'Functionality of kitchen, laundry, shared spaces' },
-            { id: 'location', name: 'Location', desc: 'Convenience, security, neighborhood safety' },
-            { id: 'internet_availability', name: 'Internet Availability', desc: 'WiFi/Fiber speed and uptime' },
-            { id: 'water_supply', name: 'Water Supply', desc: 'Consistent pressure and availability' },
-            { id: 'electricity_reliability', name: 'Electricity Reliability', desc: 'Power stability, minimal outages' },
-            { id: 'noise_level', name: 'Noise Level', desc: 'Silence and quietness of area (5 = very quiet)' },
-            { id: 'overall_satisfaction', name: 'Overall Property Satisfaction', desc: 'Your final overall evaluation of the rental property itself' }
+            { id: 'cleanliness', name: 'Cleanliness', desc: 'Hygiene and condition of property' },
+            { id: 'safety', name: 'Safety', desc: 'Locks, lighting, and security' },
+            { id: 'comfort', name: 'Comfort', desc: 'Ventilation, space, and temperature' },
+            { id: 'amenities', name: 'Amenities', desc: 'Kitchen, laundry, and shared facilities' },
+            { id: 'location', name: 'Location', desc: 'Accessibility and neighborhood safety' },
+            { id: 'internet_availability', name: 'Internet', desc: 'WiFi/Fiber speed and stability' },
+            { id: 'water_supply', name: 'Water Supply', desc: 'Water pressure and reliability' },
+            { id: 'electricity_reliability', name: 'Electricity', desc: 'Power stability and minimal outages' },
+            { id: 'noise_level', name: 'Quietness', desc: 'Peace and quiet of the area' },
+            { id: 'overall_satisfaction', name: 'Overall Property', desc: 'Overall satisfaction with property' }
         ];
 
         const LANDLORD_CRITERIA = [
-            { id: 'communication', name: 'Communication', desc: 'Clear guidelines, polite and professional messaging' },
-            { id: 'responsiveness', name: 'Responsiveness', desc: 'Answering queries, calls, messages fast' },
-            { id: 'professionalism', name: 'Professionalism', desc: 'Business etiquette, punctuality, contract execution' },
-            { id: 'fairness', name: 'Fairness', desc: 'Reasonable rules, deposit security, issue mediation' },
-            { id: 'maintenance_response', name: 'Maintenance Response', desc: 'Speed and quality of repairing reported problems' },
-            { id: 'respectfulness', name: 'Respectfulness', desc: 'Respecting privacy, giving notices before entry' },
-            { id: 'reliability', name: 'Reliability', desc: 'Trustworthiness, keeping promises and lease terms' },
-            { id: 'overall_satisfaction', name: 'Overall Landlord Satisfaction', desc: 'Your overall rating of the landlord\'s management' }
+            { id: 'communication', name: 'Communication', desc: 'Clarity, politeness, and responsiveness' },
+            { id: 'responsiveness', name: 'Responsiveness', desc: 'Answering calls, messages, and questions' },
+            { id: 'professionalism', name: 'Professionalism', desc: 'Business etiquette and contracts' },
+            { id: 'fairness', name: 'Fairness', desc: 'Reasonable rules and deposit handling' },
+            { id: 'maintenance_response', name: 'Repairs Response', desc: 'Speed and quality of repairing issues' },
+            { id: 'respectfulness', name: 'Respects Privacy', desc: 'Respects boundaries and gives advance notices' },
+            { id: 'reliability', name: 'Reliability', desc: 'Keeping promises and lease terms' },
+            { id: 'overall_satisfaction', name: 'Overall Landlord', desc: 'Overall satisfaction with landlord' }
         ];
 
+        // ── Init ──────────────────────────────────────────────
         document.addEventListener('DOMContentLoaded', () => {
             if (!token) return;
-            
-            // Add click listeners to tabs to bypass inline CSP restriction
-            const tabPropertyBtn = document.getElementById('tabPropertyBtn');
-            const tabLandlordBtn = document.getElementById('tabLandlordBtn');
-            if (tabPropertyBtn) {
-                tabPropertyBtn.addEventListener('click', () => switchModuleTab('property'));
-            }
-            if (tabLandlordBtn) {
-                tabLandlordBtn.addEventListener('click', () => switchModuleTab('landlord'));
-            }
-
-            switchModuleTab('property');
-            bindFormEvents();
+            initEventDelegation();
+            switchTab('property');
         });
 
-        // ── Navigation Tabs ────────────────────────────────────────────────
-        function switchModuleTab(moduleName) {
-            currentTab = moduleName;
-            
-            // Toggle active tabs buttons
-            document.getElementById('tabPropertyBtn').classList.toggle('active', moduleName === 'property');
-            document.getElementById('tabLandlordBtn').classList.toggle('active', moduleName === 'landlord');
+        // ── Tab Switch ────────────────────────────────────────
+        function switchTab(tab) {
+            currentTab = tab;
 
-            // Reset selection and form
-            currentSelectedLeaseId = null;
-            currentSelectedLease = null;
-            document.getElementById('ratingFormPanel').style.display = 'none';
+            document.querySelectorAll('.m-tab-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.module === tab);
+            });
 
-            // Update Titles & Labels
-            if (moduleName === 'property') {
-                document.getElementById('formPanelTitle').textContent = 'Leave Your Property Rating';
-                document.getElementById('feedbackFieldLabel').textContent = 'Your Property Written Review';
-                document.getElementById('feedbackText').placeholder = 'Describe the property condition, internet quality, water/electric reliability...';
-                document.getElementById('historyPanelTitle').textContent = 'My Submitted Property Ratings';
-                document.getElementById('tableTargetHeader').textContent = 'Property';
-            } else {
-                document.getElementById('formPanelTitle').textContent = 'Leave Your Landlord Rating';
-                document.getElementById('feedbackFieldLabel').textContent = 'Your Landlord Written Review';
-                document.getElementById('feedbackText').placeholder = 'Describe the landlord\'s communication style, response speed to repairs, fairness...';
-                document.getElementById('historyPanelTitle').textContent = 'My Submitted Landlord Ratings';
-                document.getElementById('tableTargetHeader').textContent = 'Landlord';
+            // Update action button text and modal titles
+            const btnText = document.getElementById('btnActionText');
+            if (btnText) {
+                btnText.textContent = tab === 'property' ? 'Rate Property' : 'Rate Landlord';
+            }
+            const modalTitle = document.getElementById('ratingModalTitle');
+            if (modalTitle) {
+                modalTitle.textContent = tab === 'property' ? 'Rate Property' : 'Rate Landlord';
             }
 
-            // Reload Data
+            // Refresh data silently
             fetchEligibleLeases();
             fetchMyRatings();
         }
 
-        // ── Data Fetchers ──────────────────────────────────────────────────
+        // ── Open / Close Modals ───────────────────────────────
+        function openRatingModal() {
+            clearAlerts();
+            renderCriteriaForm();
+            populateLeaseDropdown();
+            document.getElementById('ratingModal').style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+        function closeRatingModal() {
+            document.getElementById('ratingModal').style.display = 'none';
+            document.body.style.overflow = '';
+        }
+        function openDetailsModal() {
+            document.getElementById('detailsModal').style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+        function closeDetailsModal() {
+            document.getElementById('detailsModal').style.display = 'none';
+            document.body.style.overflow = '';
+            currentViewRating = null;
+        }
+
+        // ── Event Delegation ──────────────────────────────────
+        function initEventDelegation() {
+            document.getElementById('moduleTabs').addEventListener('click', (e) => {
+                const btn = e.target.closest('.m-tab-btn');
+                if (!btn) return;
+                switchTab(btn.dataset.module);
+            });
+
+            document.getElementById('openRatingBtn').addEventListener('click', openRatingModal);
+            document.getElementById('closeRatingModalBtn').addEventListener('click', closeRatingModal);
+            document.getElementById('cancelRatingBtn').addEventListener('click', closeRatingModal);
+            document.getElementById('submitRatingBtn').addEventListener('click', handleRatingSubmit);
+
+            document.getElementById('closeDetailsModalBtn').addEventListener('click', closeDetailsModal);
+
+            document.getElementById('ratingModal').addEventListener('click', (e) => {
+                if (e.target === document.getElementById('ratingModal')) closeRatingModal();
+            });
+            document.getElementById('detailsModal').addEventListener('click', (e) => {
+                if (e.target === document.getElementById('detailsModal')) closeDetailsModal();
+            });
+
+            // Search input
+            document.getElementById('reviewsSearchInput').addEventListener('input', (e) => {
+                searchQuery = (e.target.value || '').trim().toLowerCase();
+                renderRatingsList();
+            });
+
+            // Reviews list actions (Details / Edit)
+            document.getElementById('reviewsList').addEventListener('click', (e) => {
+                const actionBtn = e.target.closest('[data-action]');
+                if (!actionBtn) return;
+                const action = actionBtn.dataset.action;
+                const id = actionBtn.dataset.ratingId;
+                if (action === 'view') loadRatingDetails(id, false);
+                if (action === 'edit') loadRatingDetails(id, true);
+            });
+
+            // Details modal footer actions
+            document.getElementById('detailsModalFoot').addEventListener('click', (e) => {
+                const btn = e.target.closest('[data-action]');
+                if (!btn) return;
+                const action = btn.dataset.action;
+                if (action === 'close') closeDetailsModal();
+                if (action === 'start-edit') renderDetailsModalView(true);
+                if (action === 'save-edit') handleSaveEdit();
+            });
+
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    closeRatingModal();
+                    closeDetailsModal();
+                }
+            });
+        }
+
+        // ── Populate Eligible Leases Dropdown ─────────────────
+        function populateLeaseDropdown() {
+            const sel = document.getElementById('leaseSelector');
+            const notice = document.getElementById('noLeaseNotice');
+            const submitBtn = document.getElementById('submitRatingBtn');
+
+            sel.innerHTML = '<option value="">-- Choose your lease contract --</option>';
+
+            const unratedLeases = eligibleLeases.filter(l => !l.is_rated);
+
+            if (unratedLeases.length === 0) {
+                notice.style.display = 'block';
+                sel.disabled = true;
+                submitBtn.disabled = true;
+                return;
+            }
+
+            notice.style.display = 'none';
+            sel.disabled = false;
+            submitBtn.disabled = false;
+
+            unratedLeases.forEach(l => {
+                const opt = document.createElement('option');
+                opt.value = l.id;
+                const prop = l.properties?.property_name || 'Property';
+                const unit = l.unit_number ? ` · Unit ${l.unit_number}` : '';
+                const contract = l.lease_number ? ` (Contract #${l.lease_number})` : '';
+                opt.textContent = `${prop}${unit}${contract}`;
+                sel.appendChild(opt);
+            });
+
+            if (unratedLeases.length === 1) {
+                sel.value = unratedLeases[0].id;
+            }
+        }
+
+        // ── Render Criteria Star Inputs in Modal ──────────────
+        function renderCriteriaForm() {
+            const container = document.getElementById('criteriaBox');
+            container.innerHTML = '';
+            currentRatingValues = {};
+
+            const criteriaList = currentTab === 'property' ? PROPERTY_CRITERIA : LANDLORD_CRITERIA;
+
+            criteriaList.forEach(crit => {
+                currentRatingValues[crit.id] = 0;
+
+                const row = document.createElement('div');
+                row.className = 'crit-row';
+                row.dataset.critId = crit.id;
+                row.innerHTML = `
+                    <div class="crit-text">
+                        <div class="crit-name">${domiknowEscapeHtml(crit.name)}</div>
+                        <div class="crit-desc">${domiknowEscapeHtml(crit.desc)}</div>
+                    </div>
+                    <div class="crit-stars" id="starGroup-${crit.id}">
+                        <button type="button" class="crit-star-btn" data-val="1" aria-label="${domiknowEscapeHtml(crit.name)}: 1 star">&#9733;</button>
+                        <button type="button" class="crit-star-btn" data-val="2" aria-label="${domiknowEscapeHtml(crit.name)}: 2 stars">&#9733;</button>
+                        <button type="button" class="crit-star-btn" data-val="3" aria-label="${domiknowEscapeHtml(crit.name)}: 3 stars">&#9733;</button>
+                        <button type="button" class="crit-star-btn" data-val="4" aria-label="${domiknowEscapeHtml(crit.name)}: 4 stars">&#9733;</button>
+                        <button type="button" class="crit-star-btn" data-val="5" aria-label="${domiknowEscapeHtml(crit.name)}: 5 stars">&#9733;</button>
+                        <span class="crit-score-label" id="critLabel-${crit.id}">Select</span>
+                    </div>
+                `;
+
+                const btns = row.querySelectorAll('.crit-star-btn');
+                const label = row.querySelector(`#critLabel-${crit.id}`);
+
+                const updateStars = (val, persist) => {
+                    btns.forEach(b => {
+                        const bVal = parseInt(b.dataset.val);
+                        if (persist) {
+                            b.classList.toggle('active', bVal <= val);
+                            b.style.color = '';
+                        } else {
+                            b.style.color = bVal <= val ? '#f59e0b' : '#d1d5db';
+                        }
+                    });
+                };
+
+                btns.forEach(b => {
+                    b.addEventListener('click', () => {
+                        const val = parseInt(b.dataset.val);
+                        currentRatingValues[crit.id] = val;
+                        updateStars(val, true);
+                        label.textContent = STAR_LABELS[val];
+                        label.classList.add('active');
+                    });
+                    b.addEventListener('mouseover', () => {
+                        const val = parseInt(b.dataset.val);
+                        updateStars(val, false);
+                    });
+                });
+
+                row.querySelector('.crit-stars').addEventListener('mouseleave', () => {
+                    updateStars(currentRatingValues[crit.id], true);
+                });
+
+                container.appendChild(row);
+            });
+        }
+
+        // ── Fetch Data (Silent) ───────────────────────────────
         async function fetchEligibleLeases() {
             const url = currentTab === 'property' 
                 ? '/api/tenant/property-ratings/eligible' 
                 : '/api/tenant/landlord-ratings/eligible';
-            
             try {
                 const res = await fetch(url, {
-                    headers: { 'Authorization': `Bearer ${token}` }
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                        'X-DOMIKNOW-SILENT': '1'
+                    },
+                    domiknowLoading: false
                 });
                 if (!res.ok) return;
                 const result = await res.json();
                 eligibleLeases = result.data || [];
-                renderLeaseCards();
             } catch (err) {
                 console.error(err);
             }
         }
 
         async function fetchMyRatings() {
-            const tbody = document.getElementById('ratingsTableBody');
             const url = currentTab === 'property' 
                 ? '/api/tenant/property-ratings/my' 
                 : '/api/tenant/landlord-ratings/my';
-
             try {
                 const res = await fetch(url, {
-                    headers: { 'Authorization': `Bearer ${token}` }
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                        'X-DOMIKNOW-SILENT': '1'
+                    },
+                    domiknowLoading: false
                 });
-                if (!res.ok) {
-                    tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;color:var(--error);">Failed to load ratings.</td></tr>`;
-                    return;
-                }
+                if (!res.ok) return;
                 const result = await res.json();
                 submittedRatings = result.data || [];
-                renderRatingsTable();
+
+                // Update counter badge
+                const countBadge = document.getElementById(currentTab === 'property' ? 'tabCountProperty' : 'tabCountLandlord');
+                if (countBadge) countBadge.textContent = submittedRatings.length;
+
+                renderRatingsList();
             } catch (err) {
                 console.error(err);
-                tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;color:var(--error);">Network error.</td></tr>`;
             }
         }
 
-        // ── Render Functions ───────────────────────────────────────────────
-        function renderLeaseCards() {
-            const container = document.getElementById('leaseCardsList');
-            const noLeaseBanner = document.getElementById('noLeasesBanner');
+        // ── Render Ratings List ───────────────────────────────
+        function renderRatingsList() {
+            const list = document.getElementById('reviewsList');
 
-            if (eligibleLeases.length === 0) {
-                noLeaseBanner.classList.add('visible');
-                container.innerHTML = '';
-                return;
-            }
-
-            noLeaseBanner.classList.remove('visible');
-            container.innerHTML = '';
-
-            eligibleLeases.forEach(lease => {
-                const card = document.createElement('div');
-                card.className = `lease-card ${lease.is_rated ? 'rated' : ''}`;
-                card.dataset.leaseId = lease.id;
-
-                const statusLabel = String(lease.lease_status || 'active').replace(/_/g, ' ');
-                const ratedBadge = lease.is_rated
-                    ? `<span class="lease-rating-badge badge-submitted">Submitted</span>`
-                    : `<span class="lease-rating-badge badge-not-rated">Not Yet Rated</span>`;
-
-                card.innerHTML = `
-                    <div class="lease-card-info">
-                        <div class="lease-property-name">${domiknowEscapeHtml(lease.properties?.property_name || 'Property')}</div>
-                        <div class="lease-landlord-name">Landlord: ${domiknowEscapeHtml(lease.landlord?.full_name || 'N/A')}</div>
-                        <div class="lease-contract-number">
-                            <span class="badge-status">${domiknowEscapeHtml(statusLabel)}</span>
-                            ${domiknowEscapeHtml(lease.lease_number || 'No contract number')}
-                        </div>
-                    </div>
-                    <div style="flex-shrink:0; display:flex; align-items:center;">
-                        ${ratedBadge}
-                    </div>
-                `;
-
-                if (!lease.is_rated) {
-                    card.addEventListener('click', () => selectLease(lease));
-                }
-
-                container.appendChild(card);
+            const filtered = submittedRatings.filter(rat => {
+                if (!searchQuery) return true;
+                const target = (currentTab === 'property' ? rat.properties?.property_name : rat.landlord?.full_name) || '';
+                const contract = rat.lease_records?.lease_number || '';
+                const feedback = rat.feedback || '';
+                const text = `${target} ${contract} ${feedback}`.toLowerCase();
+                return text.includes(searchQuery);
             });
-        }
 
-        function renderRatingsTable() {
-            const tbody = document.getElementById('ratingsTableBody');
-
-            if (submittedRatings.length === 0) {
-                tbody.innerHTML = `
-                    <tr><td colspan="5">
-                        <div class="empty-state">
-                            <svg width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
-                            </svg>
-                            <span>No reviews submitted in this module yet.</span>
-                            <span style="font-size:0.78rem;">Select a lease on the left to submit a feedback.</span>
-                        </div>
-                    </td></tr>`;
+            if (filtered.length === 0) {
+                list.innerHTML = `
+                    <div class="empty-state">
+                        <div class="ei">★</div>
+                        <p>No ${currentTab} reviews found.</p>
+                    </div>`;
                 return;
             }
 
-            tbody.innerHTML = '';
-            submittedRatings.forEach(rat => {
+            list.innerHTML = '';
+            filtered.forEach(rat => {
                 const targetName = currentTab === 'property' 
-                    ? (rat.properties?.property_name || 'Property')
+                    ? (rat.properties?.property_name || 'Rented Property')
                     : (rat.landlord?.full_name || 'Landlord');
+
+                const secondaryName = currentTab === 'property'
+                    ? `Landlord: ${rat.landlord?.full_name || 'N/A'}`
+                    : `Property: ${rat.properties?.property_name || 'N/A'}`;
 
                 const overallVal = parseFloat(rat.overall_computed_avg || 0);
                 const starsHtml = buildStarDisplay(Math.round(overallVal));
-                const dateStr = new Date(rat.submitted_at).toLocaleDateString('en-PH', { year: 'numeric', month: 'long', day: 'numeric' });
-                const isEditable = isWithinEditWindow(rat.submitted_at);
+                const dateStr = new Date(rat.submitted_at).toLocaleDateString('en-PH', { month: 'short', day: 'numeric', year: 'numeric' });
+                const contractStr = rat.lease_records?.lease_number ? `Contract #${rat.lease_records.lease_number}` : 'Lease Contract';
 
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td>
-                        <div style="font-weight:700; color:var(--text-primary);">${domiknowEscapeHtml(targetName)}</div>
-                        <div style="font-size:0.72rem; color:var(--text-muted); font-family:monospace;">${domiknowEscapeHtml(rat.lease_records?.lease_number || '')}</div>
-                    </td>
-                    <td style="color:var(--text-secondary); font-size:0.85rem;">
-                        ${domiknowEscapeHtml(currentTab === 'property' ? (rat.landlord?.full_name || 'N/A') : (rat.properties?.property_name || 'N/A'))}
-                    </td>
-                    <td>
-                        ${starsHtml}
-                        <div style="font-size:0.7rem; color:var(--text-muted); margin-top:0.15rem;">${overallVal.toFixed(2)} Avg</div>
-                    </td>
-                    <td style="font-size:0.82rem; color:var(--text-secondary); white-space:nowrap;">${dateStr}</td>
-                    <td>
-                        <div style="display:flex; gap:0.4rem; flex-wrap:wrap;">
-                            <button type="button" class="action-btn btn-view" data-action="view" data-rating-id="${domiknowEscapeHtml(rat.id || '')}">Details</button>
-                            ${isEditable ? `<button type="button" class="action-btn btn-edit" data-action="edit" data-rating-id="${domiknowEscapeHtml(rat.id || '')}">Edit</button>` : ''}
+                const card = document.createElement('div');
+                card.className = 'request-card';
+                card.dataset.ratingId = rat.id;
+                card.innerHTML = `
+                    <div class="rc-left-group">
+                        <div class="rc-icon-box">★</div>
+                        <div class="rc-text-box">
+                            <div class="rc-title">${domiknowEscapeHtml(targetName)}</div>
+                            <div class="rc-subtitle">${domiknowEscapeHtml(secondaryName)} · ${domiknowEscapeHtml(contractStr)}</div>
                         </div>
-                    </td>
+                    </div>
+
+                    <div class="rc-assigned-group">
+                        <div class="rc-col-label">Date Reviewed:</div>
+                        <div class="rc-col-val">${domiknowEscapeHtml(dateStr)}</div>
+                    </div>
+
+                    <div class="rc-rating-group">
+                        <div class="rc-col-label uppercase">AVERAGE RATING</div>
+                        <div class="rc-col-val" style="display:flex; align-items:center; gap:6px;">
+                            ${starsHtml}
+                            <span style="font-size:0.875rem; color:#0f172a; font-weight:800;">${overallVal.toFixed(2)}</span>
+                        </div>
+                    </div>
+
+                    <div class="rc-right-group">
+                        <div class="rc-actions">
+                            <button type="button" class="btn-table-action" data-action="view" data-rating-id="${domiknowEscapeHtml(rat.id)}">Details</button>
+                            <button type="button" class="btn-table-action primary" data-action="edit" data-rating-id="${domiknowEscapeHtml(rat.id)}">Edit</button>
+                        </div>
+                    </div>
                 `;
-                tbody.appendChild(tr);
+                list.appendChild(card);
             });
         }
 
         function buildStarDisplay(rating) {
             const filled = '&#9733;'.repeat(rating);
-            const empty = '<span style="color:#d1d5db;">&#9733;</span>'.repeat(Math.max(0, 5 - rating));
-            return `<span class="star-display">${filled}</span>${empty}`;
+            const empty = '<span class="star-empty">&#9733;</span>'.repeat(Math.max(0, 5 - rating));
+            return `<span class="star-display">${filled}${empty}</span>`;
         }
 
-        function isWithinEditWindow(submittedAt) {
-            return true; // Ratings and feedback can be edited anytime by the tenant
-        }
+        // ── Submit Rating ─────────────────────────────────────
+        async function handleRatingSubmit() {
+            clearAlerts();
+            const leaseId = document.getElementById('leaseSelector').value;
+            if (!leaseId) {
+                showAlert('Please select an eligible lease contract.');
+                return;
+            }
 
-        // ── Lease Selection ────────────────────────────────────────────────
-        function selectLease(lease) {
-            currentSelectedLeaseId = lease.id;
-            currentSelectedLease = lease;
-
-            // Highlight card
-            document.querySelectorAll('.lease-card').forEach(c => c.classList.remove('active-selection'));
-            const targetCard = document.querySelector(`.lease-card[data-lease-id="${lease.id}"]`);
-            if (targetCard) targetCard.classList.add('active-selection');
-
-            // Fill display
-            document.getElementById('selectedPropertyDisplay').textContent = lease.properties?.property_name || 'Property';
-            document.getElementById('selectedLandlordDisplay').textContent = `Landlord: ${lease.landlord?.full_name || 'N/A'}`;
-            document.getElementById('selectedLeaseNumDisplay').textContent = lease.lease_number || 'No contract number';
-            document.getElementById('selectedLeaseId').value = lease.id;
-
-            // Initialize star criteria grid
-            initCriteriaGrid();
-            
-            // Reset form alerts & input fields
-            document.getElementById('feedbackText').value = '';
-            document.getElementById('formAlertError').classList.remove('visible');
-            document.getElementById('formAlertSuccess').classList.remove('visible');
-
-            // Show form panel
-            document.getElementById('ratingFormPanel').style.display = 'block';
-            document.getElementById('ratingFormPanel').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-        }
-
-        // Initialize stars criteria form fields
-        function initCriteriaGrid() {
-            const grid = document.getElementById('criteriaGrid');
-            grid.innerHTML = '';
-            currentRatingValues = {};
-
-            const criteriaList = currentTab === 'property' ? PROPERTY_CRITERIA : LANDLORD_CRITERIA;
-
-            criteriaList.forEach(crit => {
-                currentRatingValues[crit.id] = 0; // initialize value to 0
-
-                const row = document.createElement('div');
-                row.className = 'criterion-row';
-                row.dataset.criterionId = crit.id;
-
-                row.innerHTML = `
-                    <div class="criterion-info">
-                        <div class="criterion-name">${crit.name}</div>
-                        <div class="criterion-desc">${crit.desc}</div>
-                    </div>
-                    <div class="criterion-stars" id="starGroup-${crit.id}">
-                        <button type="button" class="criteria-star-btn" data-val="1" aria-label="${domiknowEscapeHtml(crit.name)}: 1 out of 5" aria-pressed="false">&#9733;</button>
-                        <button type="button" class="criteria-star-btn" data-val="2" aria-label="${domiknowEscapeHtml(crit.name)}: 2 out of 5" aria-pressed="false">&#9733;</button>
-                        <button type="button" class="criteria-star-btn" data-val="3" aria-label="${domiknowEscapeHtml(crit.name)}: 3 out of 5" aria-pressed="false">&#9733;</button>
-                        <button type="button" class="criteria-star-btn" data-val="4" aria-label="${domiknowEscapeHtml(crit.name)}: 4 out of 5" aria-pressed="false">&#9733;</button>
-                        <button type="button" class="criteria-star-btn" data-val="5" aria-label="${domiknowEscapeHtml(crit.name)}: 5 out of 5" aria-pressed="false">&#9733;</button>
-                        <span class="criterion-label" id="critLabel-${crit.id}">Select</span>
-                    </div>
-                `;
-
-                // Add event listeners for hover and click on stars
-                const starBtns = row.querySelectorAll('.criteria-star-btn');
-                const label = row.querySelector(`#critLabel-${crit.id}`);
-
-                const updateStars = (val, persist) => {
-                    starBtns.forEach(btn => {
-                        const btnVal = parseInt(btn.dataset.val);
-                        if (persist) {
-                            btn.classList.toggle('active', btnVal <= val);
-                            btn.setAttribute('aria-pressed', btnVal === val ? 'true' : 'false');
-                            btn.style.color = '';
-                        } else {
-                            btn.style.color = btnVal <= val ? '#f59e0b' : '#d1d5db';
-                        }
-                    });
-                };
-
-                starBtns.forEach(btn => {
-                    btn.addEventListener('click', () => {
-                        const val = parseInt(btn.dataset.val);
-                        currentRatingValues[crit.id] = val;
-                        updateStars(val, true);
-                        label.textContent = STAR_LABELS[val];
-                        label.classList.add('active-label');
-                    });
-
-                    btn.addEventListener('mouseover', () => {
-                        const val = parseInt(btn.dataset.val);
-                        updateStars(val, false);
-                    });
-                });
-
-                row.querySelector(`.criterion-stars`).addEventListener('mouseleave', () => {
-                    updateStars(currentRatingValues[crit.id], true);
-                });
-
-                grid.appendChild(row);
-            });
-        }
-
-        // ── Form Events Binding ─────────────────────────────────────────────
-        function bindFormEvents() {
-            // Form submit
-            document.getElementById('ratingForm').addEventListener('submit', handleSubmit);
-
-            // Modal events
-            document.getElementById('closeModalBtn').addEventListener('click', closeModal);
-            document.getElementById('detailsModal').addEventListener('click', (e) => {
-                if (e.target === document.getElementById('detailsModal')) closeModal();
-            });
-
-            // Table event delegation
-            document.getElementById('ratingsTableBody').addEventListener('click', (e) => {
-                const btn = e.target.closest('[data-action]');
-                if (!btn) return;
-                const action = btn.dataset.action;
-                const id = btn.dataset.ratingId;
-                if (action === 'view') openDetailsModal(id, false);
-                if (action === 'edit') openDetailsModal(id, true);
-            });
-
-            // Modal footer delegation
-            document.getElementById('modalFooter').addEventListener('click', (e) => {
-                const btn = e.target.closest('[data-action]');
-                if (!btn) return;
-                const action = btn.dataset.action;
-                if (action === 'close') closeModal();
-                if (action === 'save-edit') handleSaveEdit();
-                if (action === 'start-edit') switchToEditMode();
-            });
-        }
-
-        // ── Submit Handling ───────────────────────────────────────────────
-        async function handleSubmit(e) {
-            e.preventDefault();
-            const errorEl = document.getElementById('formAlertError');
-            const successEl = document.getElementById('formAlertSuccess');
-            const submitBtn = document.getElementById('submitRatingBtn');
-
-            errorEl.classList.remove('visible');
-            successEl.classList.remove('visible');
-
-            // Validate that all criteria are filled
             const criteriaList = currentTab === 'property' ? PROPERTY_CRITERIA : LANDLORD_CRITERIA;
             for (const crit of criteriaList) {
                 if (!currentRatingValues[crit.id]) {
-                    errorEl.textContent = `Please complete your rating for: ${crit.name}`;
-                    errorEl.classList.add('visible');
+                    showAlert(`Please complete your rating for: ${crit.name}`);
                     return;
                 }
             }
 
             const feedback = document.getElementById('feedbackText').value.trim();
             if (feedback.length < 10) {
-                errorEl.textContent = 'Feedback must be at least 10 characters.';
-                errorEl.classList.add('visible');
+                showAlert('Your review must be at least 10 characters.');
                 return;
             }
 
+            const submitBtn = document.getElementById('submitRatingBtn');
             submitBtn.disabled = true;
-            submitBtn.textContent = 'Submitting...';
+            submitBtn.innerHTML = `<span>Submitting...</span>`;
 
             const payload = {
-                lease_id: currentSelectedLeaseId,
+                lease_id: leaseId,
                 feedback,
                 ...currentRatingValues
             };
@@ -1037,43 +1167,50 @@
             try {
                 const res = await fetch(url, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `Bearer ${token}`
+                    },
                     body: JSON.stringify(payload)
                 });
                 const result = await res.json();
                 if (res.ok) {
-                    successEl.textContent = result.message || 'Rating submitted successfully!';
-                    successEl.classList.add('visible');
+                    showSuccess('Review submitted successfully!');
                     document.getElementById('ratingForm').reset();
-                    currentSelectedLeaseId = null;
-                    currentSelectedLease = null;
-                    document.getElementById('ratingFormPanel').style.display = 'none';
                     await fetchEligibleLeases();
                     await fetchMyRatings();
+                    setTimeout(() => {
+                        closeRatingModal();
+                        clearAlerts();
+                    }, 1200);
                 } else {
-                    errorEl.textContent = result.message || 'Submission failed.';
-                    errorEl.classList.add('visible');
+                    showAlert(result.message || 'Failed to submit review.');
                 }
             } catch (err) {
-                console.error(err);
-                errorEl.textContent = 'Network error. Please try again.';
-                errorEl.classList.add('visible');
+                showAlert('Network error. Please try again.');
             } finally {
                 submitBtn.disabled = false;
-                submitBtn.textContent = 'Submit Rating';
+                submitBtn.innerHTML = `
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                    </svg>
+                    <span>Submit Review</span>
+                `;
             }
         }
 
-        // ── Details / Edit Modal ──────────────────────────────────────────
-        async function openDetailsModal(ratingId, startEdit = false) {
-            const modal = document.getElementById('detailsModal');
-            const body = document.getElementById('modalBody');
-            const footer = document.getElementById('modalFooter');
-            const titleEl = document.getElementById('modalTitle');
-
-            modal.classList.remove('hidden');
-            body.innerHTML = '<div style="text-align:center; padding:2rem; color:var(--text-muted);">Loading details...</div>';
-            footer.innerHTML = '';
+        // ── Load Rating Details (Instant) ─────────────────────
+        async function loadRatingDetails(ratingId, startEdit = false) {
+            // Find in cache
+            const cached = submittedRatings.find(r => String(r.id) === String(ratingId));
+            if (cached) {
+                currentViewRating = cached;
+                initEditValues(cached);
+                renderDetailsModalView(startEdit);
+            } else {
+                document.getElementById('detailsModalBody').innerHTML = '';
+            }
+            openDetailsModal();
 
             const url = currentTab === 'property' 
                 ? `/api/tenant/property-ratings/${ratingId}` 
@@ -1081,204 +1218,200 @@
 
             try {
                 const res = await fetch(url, {
-                    headers: { 'Authorization': `Bearer ${token}` }
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                        'X-DOMIKNOW-SILENT': '1'
+                    },
+                    domiknowLoading: false
                 });
+                if (!res.ok) return;
                 const result = await res.json();
-                if (!res.ok) {
-                    body.innerHTML = `<div role="alert" style="color:var(--error);">${domiknowEscapeHtml(result.message || 'Failed to load details.')}</div>`;
-                    return;
+                if (result.data) {
+                    currentViewRating = result.data;
+                    initEditValues(result.data);
+                    renderDetailsModalView(startEdit);
                 }
-                currentViewRating = result.data;
-                editMode = false;
-                
-                // Initialize edit values
-                editRatingValues = {};
-                const criteriaList = currentTab === 'property' ? PROPERTY_CRITERIA : LANDLORD_CRITERIA;
-                criteriaList.forEach(crit => {
-                    editRatingValues[crit.id] = currentViewRating[crit.id];
-                });
-
-                renderModalView(startEdit);
-                titleEl.textContent = startEdit ? 'Edit Rating' : 'Rating Details';
             } catch (err) {
                 console.error(err);
-                body.innerHTML = `<div style="color:var(--error);">Network error.</div>`;
             }
         }
 
-        function renderModalView(inEditMode) {
-            const body = document.getElementById('modalBody');
-            const footer = document.getElementById('modalFooter');
-            const rat = currentViewRating;
-            const dateStr = new Date(rat.submitted_at).toLocaleDateString('en-PH', { year: 'numeric', month: 'long', day: 'numeric' });
-            const editable = isWithinEditWindow(rat.submitted_at);
-            const daysLeft = Math.max(0, 7 - Math.floor((Date.now() - new Date(rat.submitted_at)) / (1000 * 60 * 60 * 24)));
+        function initEditValues(rat) {
+            editRatingValues = {};
+            const criteriaList = currentTab === 'property' ? PROPERTY_CRITERIA : LANDLORD_CRITERIA;
+            criteriaList.forEach(crit => {
+                editRatingValues[crit.id] = rat[crit.id] || 0;
+            });
+        }
 
+        // ── Render Details Modal View ─────────────────────────
+        function renderDetailsModalView(inEditMode) {
+            const body = document.getElementById('detailsModalBody');
+            const foot = document.getElementById('detailsModalFoot');
+            const rat = currentViewRating;
+            if (!rat) return;
+
+            const dateStr = new Date(rat.submitted_at).toLocaleDateString('en-PH', { month: 'short', day: 'numeric', year: 'numeric' });
             const criteriaList = currentTab === 'property' ? PROPERTY_CRITERIA : LANDLORD_CRITERIA;
 
-            if (inEditMode && editable) {
-                editMode = true;
-                
+            document.getElementById('detailsModalTitle').textContent = inEditMode ? 'Edit Review' : 'Review Details';
+            document.getElementById('detailsModalSubtitle').textContent = inEditMode ? 'Update your ratings and written review' : 'Rating breakdown and feedback';
+
+            if (inEditMode) {
                 let criteriaHtml = '';
                 criteriaList.forEach(crit => {
-                    const currentVal = editRatingValues[crit.id];
+                    const currentVal = editRatingValues[crit.id] || 0;
                     criteriaHtml += `
-                        <div style="margin-bottom:0.75rem; border-bottom:1px dashed var(--border-color); padding-bottom:0.5rem;">
-                            <div style="font-weight:600; font-size:0.85rem; color:var(--text-primary);">${crit.name}</div>
-                            <div class="edit-star-row" id="editStarRow-${crit.id}" data-crit="${crit.id}">
-                                <button type="button" class="edit-star ${currentVal >= 1 ? 'active' : ''}" data-eval="1" aria-label="${domiknowEscapeHtml(crit.name)}: 1 out of 5" aria-pressed="${currentVal === 1}">&#9733;</button>
-                                <button type="button" class="edit-star ${currentVal >= 2 ? 'active' : ''}" data-eval="2" aria-label="${domiknowEscapeHtml(crit.name)}: 2 out of 5" aria-pressed="${currentVal === 2}">&#9733;</button>
-                                <button type="button" class="edit-star ${currentVal >= 3 ? 'active' : ''}" data-eval="3" aria-label="${domiknowEscapeHtml(crit.name)}: 3 out of 5" aria-pressed="${currentVal === 3}">&#9733;</button>
-                                <button type="button" class="edit-star ${currentVal >= 4 ? 'active' : ''}" data-eval="4" aria-label="${domiknowEscapeHtml(crit.name)}: 4 out of 5" aria-pressed="${currentVal === 4}">&#9733;</button>
-                                <button type="button" class="edit-star ${currentVal >= 5 ? 'active' : ''}" data-eval="5" aria-label="${domiknowEscapeHtml(crit.name)}: 5 out of 5" aria-pressed="${currentVal === 5}">&#9733;</button>
-                                <span id="editStarLabel-${crit.id}" style="font-size:0.78rem; color:var(--text-secondary); margin-left:0.4rem;">${STAR_LABELS[currentVal]}</span>
+                        <div class="crit-row" style="padding:8px 0;">
+                            <div class="crit-text">
+                                <div class="crit-name">${domiknowEscapeHtml(crit.name)}</div>
+                            </div>
+                            <div class="crit-stars" id="editStarRow-${crit.id}" data-crit="${crit.id}">
+                                <button type="button" class="crit-star-btn ${currentVal >= 1 ? 'active' : ''}" data-val="1">&#9733;</button>
+                                <button type="button" class="crit-star-btn ${currentVal >= 2 ? 'active' : ''}" data-val="2">&#9733;</button>
+                                <button type="button" class="crit-star-btn ${currentVal >= 3 ? 'active' : ''}" data-val="3">&#9733;</button>
+                                <button type="button" class="crit-star-btn ${currentVal >= 4 ? 'active' : ''}" data-val="4">&#9733;</button>
+                                <button type="button" class="crit-star-btn ${currentVal >= 5 ? 'active' : ''}" data-val="5">&#9733;</button>
+                                <span class="crit-score-label ${currentVal > 0 ? 'active' : ''}" id="editLabel-${crit.id}">${STAR_LABELS[currentVal] || 'Select'}</span>
                             </div>
                         </div>
                     `;
                 });
 
                 body.innerHTML = `
-                    <div class="detail-row">
-                        <span class="detail-label">Lease</span>
-                        <span class="detail-value" style="font-family:monospace;">${domiknowEscapeHtml(rat.lease_records?.lease_number || 'N/A')}</span>
+                    <div class="detail-summary-card" style="margin-bottom:1rem;">
+                        <div class="detail-card-item">
+                            <span class="dc-label">${currentTab === 'property' ? 'Property' : 'Landlord'}</span>
+                            <div class="dc-val">${domiknowEscapeHtml(currentTab === 'property' ? rat.properties?.property_name : rat.landlord?.full_name || '—')}</div>
+                        </div>
+                        <div class="detail-card-item">
+                            <span class="dc-label">Contract</span>
+                            <div class="dc-val">${domiknowEscapeHtml(rat.lease_records?.lease_number || '—')}</div>
+                        </div>
                     </div>
-                    <div class="detail-row">
-                        <span class="detail-label">Property</span>
-                        <span class="detail-value" style="font-weight:700;">${domiknowEscapeHtml(rat.properties?.property_name || 'N/A')}</span>
-                    </div>
-                    <div class="detail-row">
-                        <span class="detail-label">Landlord</span>
-                        <span class="detail-value">${domiknowEscapeHtml(rat.landlord?.full_name || 'N/A')}</span>
-                    </div>
-                    <hr class="detail-divider">
-                    
-                    <div style="max-height: 250px; overflow-y: auto; padding-right: 0.5rem; margin-bottom: 1.25rem;">
+
+                    <div class="form-section-title">Update Criteria</div>
+                    <div class="criteria-box" style="margin-bottom:1rem;">
                         ${criteriaHtml}
                     </div>
 
+                    <div class="form-section-title">Update Written Review</div>
                     <div class="form-group">
-                        <label class="form-label" for="editFeedbackText">Updated Feedback</label>
-                        <textarea id="editFeedbackText" class="form-input" style="height:100px;" minlength="10" required>${domiknowEscapeHtml(rat.feedback || '')}</textarea>
+                        <textarea id="editFeedbackText" class="form-input" rows="3" minlength="10" required>${domiknowEscapeHtml(rat.feedback || '')}</textarea>
                     </div>
                 `;
 
-                // Bind edit star triggers
+                // Bind edit star handlers
                 criteriaList.forEach(crit => {
-                    const group = document.getElementById(`editStarRow-${crit.id}`);
-                    const editStarBtns = group.querySelectorAll('.edit-star');
-                    const label = document.getElementById(`editStarLabel-${crit.id}`);
+                    const row = document.getElementById(`editStarRow-${crit.id}`);
+                    const btns = row.querySelectorAll('.crit-star-btn');
+                    const label = document.getElementById(`editLabel-${crit.id}`);
 
                     const updateEditStars = (val, persist) => {
-                        editStarBtns.forEach(btn => {
-                            const btnVal = parseInt(btn.dataset.eval);
+                        btns.forEach(b => {
+                            const bVal = parseInt(b.dataset.val);
                             if (persist) {
-                                btn.classList.toggle('active', btnVal <= val);
-                                btn.setAttribute('aria-pressed', btnVal === val ? 'true' : 'false');
-                                btn.style.color = '';
+                                b.classList.toggle('active', bVal <= val);
+                                b.style.color = '';
                             } else {
-                                btn.style.color = btnVal <= val ? '#f59e0b' : '#d1d5db';
+                                b.style.color = bVal <= val ? '#f59e0b' : '#d1d5db';
                             }
                         });
                     };
 
-                    editStarBtns.forEach(btn => {
-                        btn.addEventListener('click', () => {
-                            const val = parseInt(btn.dataset.eval);
+                    btns.forEach(b => {
+                        b.addEventListener('click', () => {
+                            const val = parseInt(b.dataset.val);
                             editRatingValues[crit.id] = val;
                             updateEditStars(val, true);
                             label.textContent = STAR_LABELS[val];
+                            label.classList.add('active');
                         });
-
-                        btn.addEventListener('mouseover', () => {
-                            const val = parseInt(btn.dataset.eval);
+                        b.addEventListener('mouseover', () => {
+                            const val = parseInt(b.dataset.val);
                             updateEditStars(val, false);
                         });
                     });
 
-                    group.addEventListener('mouseleave', () => {
+                    row.addEventListener('mouseleave', () => {
                         updateEditStars(editRatingValues[crit.id], true);
                     });
                 });
 
-                footer.innerHTML = `
-                    <button class="btn-secondary action-btn" data-action="close" style="padding:0.5rem 1.1rem;">Cancel</button>
-                    <button class="btn-primary action-btn" data-action="save-edit" style="background:var(--tenant); border-color:var(--tenant); padding:0.5rem 1.1rem;">Save Changes</button>
+                foot.innerHTML = `
+                    <button type="button" class="btn-modal-cancel" data-action="close">Cancel</button>
+                    <button type="button" class="btn-modal-primary" data-action="save-edit">Save Changes</button>
                 `;
             } else {
                 // View Mode
-                editMode = false;
-                
-                let criteriaBreakdownHtml = '';
+                let breakdownHtml = '';
                 criteriaList.forEach(crit => {
-                    const score = rat[crit.id];
-                    criteriaBreakdownHtml += `
-                        <div class="modal-breakdown-row">
-                            <span style="color:var(--text-secondary); text-transform:capitalize;">${crit.name}</span>
-                            <div style="display:flex; align-items:center; gap:0.5rem;">
+                    const score = rat[crit.id] || 0;
+                    breakdownHtml += `
+                        <div class="breakdown-row">
+                            <span style="color:#475569; font-weight:500;">${domiknowEscapeHtml(crit.name)}</span>
+                            <div style="display:flex; align-items:center; gap:8px;">
                                 ${buildStarDisplay(score)}
-                                <span class="modal-breakdown-val">${score}</span>
+                                <span style="font-weight:700; color:#0f172a; min-width:24px; text-align:right;">${score}</span>
                             </div>
                         </div>
                     `;
                 });
 
+                const overallVal = parseFloat(rat.overall_computed_avg || 0);
+
                 body.innerHTML = `
-                    <div class="detail-row">
-                        <span class="detail-label">Property</span>
-                        <span class="detail-value" style="font-weight:700;">${domiknowEscapeHtml(rat.properties?.property_name || 'N/A')}</span>
-                    </div>
-                    <div class="detail-row">
-                        <span class="detail-label">Landlord</span>
-                        <span class="detail-value">${domiknowEscapeHtml(rat.landlord?.full_name || 'N/A')}</span>
-                    </div>
-                    <div class="detail-row">
-                        <span class="detail-label">Lease</span>
-                        <span class="detail-value" style="font-family:monospace;">${domiknowEscapeHtml(rat.lease_records?.lease_number || 'N/A')}</span>
-                    </div>
-                    
-                    <div class="modal-breakdown-card">
-                        <div class="modal-breakdown-title">Evaluation Breakdown</div>
-                        ${criteriaBreakdownHtml}
+                    <div class="detail-summary-card">
+                        <div class="detail-card-item">
+                            <span class="dc-label">${currentTab === 'property' ? 'Property' : 'Landlord'}</span>
+                            <div class="dc-val">${domiknowEscapeHtml(currentTab === 'property' ? rat.properties?.property_name : rat.landlord?.full_name || '—')}</div>
+                        </div>
+                        <div class="detail-card-item">
+                            <span class="dc-label">Contract Number</span>
+                            <div class="dc-val">${domiknowEscapeHtml(rat.lease_records?.lease_number || '—')}</div>
+                        </div>
+                        <div class="detail-card-item">
+                            <span class="dc-label">Overall Average</span>
+                            <div class="dc-val" style="color:#d97706; font-size:1rem; display:flex; align-items:center; gap:6px;">
+                                ${buildStarDisplay(Math.round(overallVal))}
+                                <span>${overallVal.toFixed(2)}</span>
+                            </div>
+                        </div>
+                        <div class="detail-card-item">
+                            <span class="dc-label">Date Submitted</span>
+                            <div class="dc-val">${domiknowEscapeHtml(dateStr)}</div>
+                        </div>
                     </div>
 
-                    <hr class="detail-divider">
-                    <div class="detail-row">
-                        <span class="detail-label">Overall Average</span>
-                        <span class="detail-value" style="font-weight:800; font-size:1.1rem; color:#f59e0b;">
-                            ${parseFloat(rat.overall_computed_avg).toFixed(2)} / 5.00
-                        </span>
+                    <div class="form-section-title">Evaluation Breakdown</div>
+                    <div class="criteria-box" style="margin-bottom:1.25rem;">
+                        ${breakdownHtml}
                     </div>
-                    <div class="detail-row" style="align-items:start;">
-                        <span class="detail-label">Feedback Review</span>
-                        <span class="detail-value" style="white-space:pre-wrap; background:var(--bg-primary); padding:0.75rem 1rem; border-radius:var(--radius-md); border:1px solid var(--border-color);">${domiknowEscapeHtml(rat.feedback || '')}</span>
-                    </div>
-                    <div class="detail-row">
-                        <span class="detail-label">Submitted</span>
-                        <span class="detail-value">${dateStr}</span>
-                    </div>
+
+                    <div class="form-section-title">Written Review</div>
+                    <div class="detail-box">${domiknowEscapeHtml(rat.feedback || 'No written review provided.')}</div>
                 `;
 
-                footer.innerHTML = `
-                    <button class="btn-primary action-btn" data-action="start-edit" style="background:var(--warning);border-color:var(--warning);padding:0.5rem 1.1rem;">Edit Review</button>
-                    <button class="btn-secondary action-btn" data-action="close" style="padding:0.5rem 1.1rem;">Close</button>
+                foot.innerHTML = `
+                    <button type="button" class="btn-modal-cancel" data-action="close">Close</button>
+                    <button type="button" class="btn-modal-primary" data-action="start-edit">Edit Review</button>
                 `;
             }
         }
 
-        function switchToEditMode() {
-            renderModalView(true);
-            document.getElementById('modalTitle').textContent = 'Edit Review';
-        }
-
+        // ── Save Edit ─────────────────────────────────────────
         async function handleSaveEdit() {
             const feedbackText = document.getElementById('editFeedbackText')?.value?.trim();
             if (!feedbackText || feedbackText.length < 10) {
-                window.tenantNotice('Feedback must be at least 10 characters.');
+                window.tenantNotice ? window.tenantNotice('Feedback must be at least 10 characters.') : alert('Feedback must be at least 10 characters.');
                 return;
             }
 
             const saveBtn = document.querySelector('[data-action="save-edit"]');
-            if (saveBtn) { saveBtn.disabled = true; saveBtn.textContent = 'Saving...'; }
+            if (saveBtn) {
+                saveBtn.disabled = true;
+                saveBtn.textContent = 'Saving...';
+            }
 
             const payload = {
                 feedback: feedbackText,
@@ -1292,29 +1425,29 @@
             try {
                 const res = await fetch(url, {
                     method: 'PUT',
-                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `Bearer ${token}`
+                    },
                     body: JSON.stringify(payload)
                 });
                 const result = await res.json();
                 if (res.ok) {
-                    closeModal();
+                    closeDetailsModal();
                     await fetchMyRatings();
                 } else {
-                    window.tenantNotice(result.message || 'Update failed.');
+                    alert(result.message || 'Update failed.');
                     if (saveBtn) { saveBtn.disabled = false; saveBtn.textContent = 'Save Changes'; }
                 }
             } catch (err) {
-                console.error(err);
-                window.tenantNotice('Network error.');
+                alert('Network error.');
                 if (saveBtn) { saveBtn.disabled = false; saveBtn.textContent = 'Save Changes'; }
             }
         }
 
-        function closeModal() {
-            document.getElementById('detailsModal').classList.add('hidden');
-            currentViewRating = null;
-            editMode = false;
-        }
+        function showAlert(msg)   { const el = document.getElementById('formAlertError'); el.textContent = '⚠️ ' + msg; el.style.display = 'block'; }
+        function showSuccess(msg) { const el = document.getElementById('formAlertSuccess'); el.textContent = '✓ ' + msg; el.style.display = 'block'; }
+        function clearAlerts()    { document.getElementById('formAlertError').style.display = 'none'; document.getElementById('formAlertSuccess').style.display = 'none'; }
     </script>
 </body>
 </html>

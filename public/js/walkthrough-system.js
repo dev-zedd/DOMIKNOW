@@ -23,7 +23,7 @@
             steps: [
                 ['.app-brand', 'Welcome to your landlord console', 'Manage your portfolio, applicants, leases, revenue, maintenance, and compliance workflows here.'],
                 [() => mobileTarget('.bottom-nav-bar', '.sidebar-menu'), 'Your operating navigation', 'Move between property and tenancy workflows here. Additional tools are available under More on mobile.'],
-                ['.landlord-module-intro, .landlord-page-summary', 'Follow the operating flow', 'Page guidance connects the current task to the broader portfolio-to-revenue workflow.'],
+                ['.landlord-flow, .landlord-module-intro, .main-content-inner', 'Follow the operating flow', 'Page guidance connects the current task to the broader portfolio-to-revenue workflow.'],
                 ['.main-content-inner', 'Manage the current operation', 'Review records, complete forms, make decisions, and monitor status changes in this area.'],
                 ['.topbar-right', 'Theme and account tools', 'Change the theme, replay this guide, verify the signed-in account, or log out safely.']
             ]

@@ -12,7 +12,7 @@
 .dashboard-layout-tenant .sidebar-tenant {
   width: var(--tenant-sidebar-width) !important;
   min-width: var(--tenant-sidebar-width) !important;
-  padding: 20px 16px !important;
+  padding: 0 !important;
   background: var(--color-bg-surface) !important;
 }
 
@@ -21,9 +21,16 @@
 }
 
 .dashboard-layout-tenant .sidebar-logo-container {
-  display: block !important;
-  margin-bottom: 14px !important;
-  padding: 2px 8px 18px !important;
+  height: 72px !important;
+  min-height: 72px !important;
+  max-height: 72px !important;
+  box-sizing: border-box !important;
+  display: flex !important;
+  align-items: center !important;
+  margin: 0 !important;
+  margin-bottom: 0 !important;
+  padding: 0 16px !important;
+  border-bottom: 1px solid var(--color-border-default) !important;
 }
 
 .dashboard-layout-tenant .sidebar-logo-container .app-brand {
@@ -124,7 +131,7 @@ body[data-role="tenant"] *::-webkit-scrollbar-track,
 
 .dashboard-layout-tenant .sidebar-menu {
   gap: 2px !important;
-  padding-right: 2px;
+  padding: 16px 14px !important;
 }
 
 .dashboard-layout-tenant .sidebar-section-title {
@@ -141,42 +148,59 @@ body[data-role="tenant"] *::-webkit-scrollbar-track,
 
 .dashboard-layout-tenant .sidebar-link {
   position: relative;
-  min-height: 42px;
-  padding: 9px 12px !important;
+  min-height: 40px;
+  padding: 9px 14px !important;
   border: 1px solid transparent !important;
   border-radius: 10px !important;
   box-shadow: none !important;
-  color: var(--color-text-secondary) !important;
+  color: #64748b !important;
   font-weight: 600 !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 12px !important;
+  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1) !important;
 }
 
-.dashboard-layout-tenant .sidebar-link .nav-icon {
+.dashboard-layout-tenant .sidebar-link .nav-icon,
+.dashboard-layout-tenant .sidebar-link svg {
   width: 18px;
   height: 18px;
   flex: 0 0 18px;
+  color: #94a3b8;
+  transition: transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1), color 0.2s ease;
 }
 
 .dashboard-layout-tenant .sidebar-link:hover {
-  border-color: var(--color-border-default) !important;
-  background: var(--color-bg-hover) !important;
+  border-color: #e2e8f0 !important;
+  background: #f8fafc !important;
+  color: #0f172a !important;
+  transform: translateX(4px) !important;
+}
+
+.dashboard-layout-tenant .sidebar-link:hover .nav-icon,
+.dashboard-layout-tenant .sidebar-link:hover svg {
+  transform: scale(1.15);
+  color: #0052ea;
 }
 
 .dashboard-layout-tenant .sidebar-link.active {
-  border-color: color-mix(in srgb, var(--color-action-primary) 18%, var(--color-border-default)) !important;
-  background: var(--color-action-primary-subtle) !important;
-  color: var(--color-action-primary) !important;
-  box-shadow: none !important;
+  border-color: rgba(0, 82, 234, 0.16) !important;
+  background: #eff6ff !important;
+  color: #0052ea !important;
+  font-weight: 700 !important;
+  box-shadow: 0 1px 3px rgba(0, 82, 234, 0.06) !important;
 }
 
-.dashboard-layout-tenant .sidebar-link.active::before {
-  position: absolute;
-  top: 9px;
-  bottom: 9px;
-  left: -5px;
-  width: 3px;
-  border-radius: 999px;
-  background: var(--color-action-primary);
-  content: "";
+.dashboard-layout-tenant .sidebar-link.active .nav-icon,
+.dashboard-layout-tenant .sidebar-link.active svg {
+  color: #0052ea !important;
+  transform: scale(1.06);
+}
+
+.dashboard-layout-tenant .sidebar-link.active::before,
+.dashboard-layout-tenant .sidebar-link::before {
+  display: none !important;
+  content: none !important;
 }
 
 .dashboard-layout-tenant .sidebar-footer {
@@ -192,11 +216,17 @@ body[data-role="tenant"] *::-webkit-scrollbar-track,
 }
 
 .dashboard-layout-tenant .topbar {
-  min-height: 76px;
+  height: 72px !important;
+  min-height: 72px !important;
+  max-height: 72px !important;
+  box-sizing: border-box !important;
+  border-bottom: 1px solid var(--color-border-default) !important;
   background: color-mix(in srgb, var(--color-bg-surface) 94%, transparent) !important;
   position: sticky;
   top: 0;
   z-index: 110 !important;
+  display: flex !important;
+  align-items: center !important;
 }
 
 /* Ensure all modals and overlays always appear in front of topbar and all content */

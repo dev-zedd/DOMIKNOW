@@ -8,7 +8,7 @@
 .dashboard-layout-maintenance .sidebar-maintenance {
   width: var(--maintenance-sidebar-width) !important;
   min-width: var(--maintenance-sidebar-width) !important;
-  padding: 20px 16px !important;
+  padding: 0 !important;
   background: var(--color-bg-surface) !important;
 }
 
@@ -17,14 +17,22 @@
 }
 
 .dashboard-layout-maintenance .sidebar-logo-container {
+  height: 72px !important;
+  min-height: 72px !important;
+  max-height: 72px !important;
+  box-sizing: border-box !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
   align-items: flex-start !important;
-  gap: 12px !important;
-  margin-bottom: 14px !important;
-  padding: 2px 8px 18px !important;
+  margin: 0 !important;
+  margin-bottom: 0 !important;
+  padding: 0 16px !important;
+  border-bottom: 1px solid var(--color-border-default) !important;
 }
 
 .dashboard-layout-maintenance .sidebar-logo-container .role-badge {
-  margin-top: -8px;
+  margin-top: -6px;
   margin-left: 52px;
   border: 0 !important;
   background: var(--color-action-primary-subtle) !important;
@@ -33,6 +41,11 @@
   font-weight: 700 !important;
   letter-spacing: 0.04em;
   text-transform: uppercase;
+}
+
+.dashboard-layout-maintenance .sidebar-menu {
+  gap: 2px !important;
+  padding: 16px 14px !important;
 }
 
 .dashboard-layout-maintenance .sidebar-section-title {
@@ -46,35 +59,39 @@
 .dashboard-layout-maintenance .sidebar-link {
   position: relative;
   min-height: 44px;
-  padding: 10px 12px !important;
+  padding: 10px 14px !important;
   border: 1px solid transparent !important;
-  border-radius: 10px !important;
-  color: var(--color-text-secondary) !important;
-  font-weight: 650 !important;
+  border-radius: 12px !important;
+  color: #475467 !important;
+  font-weight: 600 !important;
   box-shadow: none !important;
+  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1) !important;
 }
 
 .dashboard-layout-maintenance .sidebar-link:hover {
-  border-color: var(--color-border-default) !important;
-  background: var(--color-bg-hover) !important;
+  border-color: rgba(226, 232, 240, 0.9) !important;
+  background: #f8fafc !important;
+  color: #0f172a !important;
+  transform: translateX(3px);
+}
+
+.dashboard-layout-maintenance .sidebar-link:hover i,
+.dashboard-layout-maintenance .sidebar-link:hover svg {
+  transform: scale(1.12);
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 .dashboard-layout-maintenance .sidebar-link.active {
-  border-color: color-mix(in srgb, var(--color-action-primary) 18%, var(--color-border-default)) !important;
-  background: var(--color-action-primary-subtle) !important;
-  color: var(--color-action-primary) !important;
-  box-shadow: none !important;
+  border-color: rgba(0, 82, 234, 0.16) !important;
+  background: #eff6ff !important;
+  color: #0052ea !important;
+  box-shadow: 0 1px 3px rgba(0, 82, 234, 0.06) !important;
 }
 
-.dashboard-layout-maintenance .sidebar-link.active::before {
-  position: absolute;
-  top: 9px;
-  bottom: 9px;
-  left: -5px;
-  width: 3px;
-  border-radius: 999px;
-  background: var(--color-action-primary);
-  content: "";
+.dashboard-layout-maintenance .sidebar-link.active::before,
+.dashboard-layout-maintenance .sidebar-link::before {
+  display: none !important;
+  content: none !important;
 }
 
 .maintenance-sidebar-note {
@@ -117,8 +134,14 @@
 }
 
 .dashboard-layout-maintenance .topbar {
-  min-height: 76px;
+  height: 72px !important;
+  min-height: 72px !important;
+  max-height: 72px !important;
+  box-sizing: border-box !important;
+  border-bottom: 1px solid var(--color-border-default) !important;
   background: color-mix(in srgb, var(--color-bg-surface) 94%, transparent) !important;
+  display: flex !important;
+  align-items: center !important;
 }
 
 .dashboard-layout-maintenance .topbar-title {

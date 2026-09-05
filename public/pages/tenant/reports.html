@@ -4,265 +4,629 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tenant Reports Center - DomiKnow</title>
+    <meta name="description" content="File and track incident reports regarding landlords or tenancies on DomiKnow.">
     <link href="../../css/input.css" rel="stylesheet">
+    <link href="../../css/design-system.css?v=20260904-2" rel="stylesheet">
     <style>
-        .header-action-bar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 1rem;
-            margin-bottom: 1.75rem;
-        }
-
-        /* ── Tabs Bar ── */
-        .tab-bar {
-            display: flex;
-            gap: 0.5rem;
-            border-bottom: 2px solid var(--border-color);
-            margin-bottom: 1.5rem;
-        }
-        .tab-btn {
-            padding: 0.75rem 1.25rem;
+        /* ── Modern Action Button ── */
+        .btn-submit-request {
+            background: #ffffff;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            padding: 8px 18px;
             font-weight: 700;
-            font-size: 0.9rem;
-            color: var(--text-muted);
-            background: transparent;
-            border: none;
-            border-bottom: 3px solid transparent;
-            cursor: pointer;
-            transition: all 0.18s ease;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-        .tab-btn:hover {
-            color: var(--primary);
-        }
-        .tab-btn.active {
-            color: var(--primary);
-            border-bottom-color: var(--primary);
-        }
-        .tab-badge {
-            background: rgba(239, 68, 68, 0.15);
-            color: #ef4444;
-            padding: 0.15rem 0.5rem;
-            border-radius: 999px;
-            font-size: 0.75rem;
-            font-weight: 700;
-        }
-
-        /* ── Cards & Tables ── */
-        .list-card {
-            background: var(--bg-secondary);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-lg);
-            padding: 1.5rem;
-            box-shadow: var(--shadow-lg);
-        }
-
-        .report-item-card {
-            background: var(--bg-primary);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-md);
-            padding: 1.25rem 1.5rem;
-            margin-bottom: 1rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            cursor: pointer;
-            transition: all 0.18s ease;
-        }
-        .report-item-card:hover {
-            border-color: var(--primary);
-            transform: translateY(-1px);
-            box-shadow: var(--shadow-md);
-        }
-
-        .report-category { font-weight: 700; font-size: 1.05rem; color: var(--text-primary); }
-        .report-meta { font-size: 0.82rem; color: var(--text-secondary); margin-top: 0.35rem; display: flex; gap: 1.25rem; flex-wrap: wrap; }
-        .meta-item { display: inline-flex; align-items: center; gap: 0.35rem; }
-
-        .sev-minor    { background:rgba(16,185,129,.12);color:#10b981;border:1px solid rgba(16,185,129,.25); }
-        .sev-moderate { background:rgba(245,158,11,.12);color:#d97706;border:1px solid rgba(245,158,11,.25); }
-        .sev-major    { background:rgba(249,115,22,.12);color:#ea580c;border:1px solid rgba(249,115,22,.25); }
-        .sev-critical { background:rgba(239,68,68,.12); color:#ef4444;border:1px solid rgba(239,68,68,.25); }
-
-        .empty-state { text-align: center; padding: 3.5rem 2rem; color: var(--text-muted); }
-        .empty-state .empty-icon { font-size: 2.5rem; margin-bottom: 1rem; color: var(--text-muted); display: flex; justify-content: center; }
-
-        /* ── Modern Report Details Modal ── */
-        .modal-overlay {
-            position: fixed; inset: 0;
-            background: rgba(15, 23, 42, 0.72);
-            backdrop-filter: blur(6px);
-            display: flex; justify-content: center; align-items: center;
-            z-index: 1000; padding: 1.5rem;
-            animation: fadeIn 0.2s ease-out;
-        }
-        .modal-overlay.hidden { display: none !important; }
-        
-        .modal-container {
-            background: var(--bg-card, #ffffff);
-            border: 1px solid var(--border-color, #e2e8f0);
-            border-radius: var(--radius-lg, 16px);
-            width: 100%; max-width: 780px;
-            max-height: 88vh;
-            display: flex; flex-direction: column;
-            box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.25);
-            margin: auto; overflow: hidden;
-            animation: modalSlideUp 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-        @keyframes modalSlideUp {
-            from { transform: translateY(16px) scale(0.98); opacity: 0; }
-            to { transform: translateY(0) scale(1); opacity: 1; }
-        }
-
-        .modal-header {
-            padding: 1.25rem 1.75rem;
-            border-bottom: 1px solid var(--border-color, #e2e8f0);
-            display: flex; justify-content: space-between; align-items: center;
-            background: var(--bg-secondary, #f8fafc); flex-shrink: 0;
-        }
-
-        .modal-header-info {
-            display: flex;
-            flex-direction: column;
-            gap: 0.2rem;
-        }
-        .modal-header-title {
-            margin: 0;
-            font-size: 1.25rem;
-            font-weight: 800;
-            color: var(--text-primary, #0f172a);
-        }
-        .modal-header-sub {
-            font-size: 0.8rem;
-            color: var(--text-muted, #64748b);
-            display: flex;
-            align-items: center;
-            gap: 0.6rem;
-            flex-wrap: wrap;
-        }
-
-        .modal-body { 
-            padding: 1.5rem 1.75rem; 
-            overflow-y: auto; 
-            flex: 1 1 auto; 
-            display: flex; 
-            flex-direction: column; 
-            gap: 1.25rem; 
-        }
-
-        .modal-footer {
-            padding: 1rem 1.75rem;
-            border-top: 1px solid var(--border-color, #e2e8f0);
-            background: var(--bg-secondary, #f8fafc); 
-            flex-shrink: 0;
-            display: flex;
-            justify-content: flex-end;
-            gap: 0.75rem;
-        }
-
-        .modal-close-btn {
-            background: transparent; 
-            border: 1px solid transparent;
-            cursor: pointer; 
-            color: var(--text-muted, #64748b);
-            padding: 0.45rem; 
-            border-radius: var(--radius-md, 8px); 
+            font-size: 0.875rem;
+            color: #0f172a;
             display: inline-flex;
             align-items: center;
-            justify-content: center;
-            transition: all 0.2s ease;
+            gap: 8px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+            white-space: nowrap;
         }
-        .modal-close-btn:hover { 
-            background: var(--bg-primary, #ffffff); 
-            border-color: var(--border-color, #cbd5e1);
-            color: var(--text-primary, #0f172a);
-        }
-
-        /* ── Detail Card Sections ── */
-        .detail-card {
-            background: var(--bg-primary, #ffffff);
-            border: 1px solid var(--border-color, #e2e8f0);
-            border-radius: var(--radius-md, 12px);
-            padding: 1.25rem 1.5rem;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
-            transition: border-color 0.2s ease;
-        }
-        .detail-card:hover {
-            border-color: var(--border-strong, #cbd5e1);
+        .btn-submit-request:hover {
+            background: #f8fafc;
+            border-color: #94a3b8;
         }
 
-        .detail-card-title {
-            font-size: 0.78rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.06em;
-            color: var(--primary, #0355f3);
-            margin-bottom: 1rem;
-            padding-bottom: 0.4rem;
-            border-bottom: 1px solid var(--border-color, #e2e8f0);
+        /* ── Tabs & Action Header Row ── */
+        .maintenance-header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #e2e8f0;
+            margin-bottom: 16px;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+        .maintenance-tabs-bar {
             display: flex;
             align-items: center;
-            gap: 0.45rem;
+            gap: 22px;
+            overflow-x: auto;
+            scrollbar-width: none;
+            padding-bottom: 12px;
+        }
+        .maintenance-tabs-bar::-webkit-scrollbar { display: none; }
+        .m-tab-btn {
+            background: none;
+            border: none;
+            padding: 4px 0;
+            font-size: 0.9375rem;
+            font-weight: 700;
+            color: #64748b;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            position: relative;
+            transition: color 0.15s ease;
+            white-space: nowrap;
+        }
+        .m-tab-btn:hover {
+            color: #0052ea;
+        }
+        .m-tab-btn.active {
+            color: #0052ea;
+            font-weight: 800;
+        }
+        .m-tab-btn.active::after {
+            content: '';
+            position: absolute;
+            bottom: -13px;
+            left: 0;
+            right: 0;
+            height: 2.5px;
+            background: #0052ea;
+            border-radius: 2px;
+        }
+        .tab-count {
+            background: #e2e8f0;
+            color: #475569;
+            font-size: 0.6875rem;
+            font-weight: 700;
+            padding: 2px 7px;
+            border-radius: 999px;
+            line-height: 1.2;
+        }
+        .m-tab-btn.active .tab-count {
+            background: #eff6ff;
+            color: #0052ea;
         }
 
-        .detail-grid { 
-            display: grid; 
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); 
-            gap: 1rem 1.25rem; 
+        /* ── Ledger Controls Bar ── */
+        .ledger-controls-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
         }
-
-        .detail-item { 
-            display: flex; 
-            flex-direction: column; 
-            gap: 0.25rem;
+        .ledger-search-box {
+            position: relative;
+            display: flex;
+            align-items: center;
+            flex: 1;
+            min-width: 320px;
+            max-width: 500px;
         }
-
-        .detail-label { 
-            font-size: 0.72rem;
-            color: var(--text-muted, #64748b);
-            text-transform: uppercase;
+        .ledger-search-box svg {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #94a3b8;
+            pointer-events: none;
+            z-index: 1;
+        }
+        .ledger-search-box input {
+            padding: 8px 14px 8px 40px !important;
+            padding-left: 40px !important;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            color: #0f172a;
+            width: 100%;
+            max-width: 100%;
+            background: #ffffff;
+            outline: none;
+            transition: border-color 0.15s ease, box-shadow 0.15s ease;
+        }
+        .ledger-search-box input:focus {
+            border-color: #0052ea;
+            box-shadow: 0 0 0 3px rgba(0, 82, 234, 0.08);
+        }
+        .ledger-filter-group {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .ledger-select-wrap {
+            position: relative;
+        }
+        .ledger-select {
+            padding: 8px 30px 8px 14px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font-size: 0.8125rem;
             font-weight: 600;
+            color: #334155;
+            background: #ffffff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23475569' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E") no-repeat right 10px center;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            cursor: pointer;
+            outline: none;
+            transition: border-color 0.15s ease;
+        }
+        .ledger-select:focus {
+            border-color: #0052ea;
+        }
+        @media (max-width: 640px) {
+            .ledger-controls-bar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .ledger-search-box,
+            .ledger-search-box input {
+                width: 100%;
+            }
+            .ledger-filter-group {
+                justify-content: flex-end;
+            }
+        }
+
+        /* ── Report Cards List (Strictly NO left accent border) ── */
+        .requests-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 32px;
+        }
+        .request-card,
+        body .request-card,
+        div.request-card,
+        html body .request-card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0 !important;
+            border-left: 1px solid #e2e8f0 !important;
+            border-left-width: 1px !important;
+            border-left-style: solid !important;
+            border-left-color: #e2e8f0 !important;
+            border-radius: 12px;
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+            outline: none;
+        }
+        .request-card:hover,
+        body .request-card:hover,
+        div.request-card:hover,
+        html body .request-card:hover {
+            border: 1px solid #cbd5e1 !important;
+            border-left: 1px solid #cbd5e1 !important;
+            border-left-width: 1px !important;
+            border-left-style: solid !important;
+            border-left-color: #cbd5e1 !important;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            transform: translateY(-1px);
+        }
+        .rc-left-group {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            flex: 1.5;
+            min-width: 240px;
+        }
+        .rc-icon-box {
+            width: 44px;
+            height: 44px;
+            border-radius: 10px;
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            color: #0052ea;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            flex-shrink: 0;
+        }
+        .rc-text-box {
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+        }
+        .rc-title {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: #0f172a;
+            margin-bottom: 3px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .rc-subtitle {
+            font-size: 0.8125rem;
+            color: #64748b;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .rc-assigned-group {
+            min-width: 140px;
+            border-left: 1px solid #f1f5f9;
+            padding-left: 16px;
+        }
+        .rc-priority-group {
+            min-width: 120px;
+            border-left: 1px solid #f1f5f9;
+            padding-left: 16px;
+        }
+        .rc-col-label {
+            font-size: 0.75rem;
+            color: #64748b;
+            font-weight: 500;
+        }
+        .rc-col-label.uppercase {
+            font-size: 0.6875rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        .rc-col-val {
+            font-size: 0.9375rem;
+            font-weight: 700;
+            color: #0f172a;
+            margin-top: 2px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .rc-col-val-prio {
+            margin-top: 2px;
+            font-size: 0.8125rem;
+        }
+        .rc-right-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-shrink: 0;
+        }
+        .rc-status-pill {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.6875rem;
+            font-weight: 700;
+            text-transform: uppercase;
             letter-spacing: 0.04em;
         }
-
-        .detail-value { 
-            font-size: 0.9rem;
+        .rc-status-pill.resolved,
+        .rc-status-pill.approved {
+            background: #ecfdf5;
+            color: #059669;
+            border: 1px solid #a7f3d0;
+        }
+        .rc-status-pill.pending,
+        .rc-status-pill.pending_admin_review {
+            background: #fefce8;
+            color: #854d0e;
+            border: 1px solid #fef08a;
+        }
+        .rc-status-pill.in_review {
+            background: #eff6ff;
+            color: #1e40af;
+            border: 1px solid #bfdbfe;
+        }
+        .rc-status-pill.dismissed,
+        .rc-status-pill.rejected {
+            background: #f1f5f9;
+            color: #475569;
+            border: 1px solid #e2e8f0;
+        }
+        .rc-status-pill.needs_more_evidence {
+            background: #faf5ff;
+            color: #7e22ce;
+            border: 1px solid #e9d5ff;
+        }
+        .rc-tag-pill {
+            background: #f1f5f9;
+            color: #475569;
+            font-size: 0.6875rem;
             font-weight: 600;
-            color: var(--text-primary, #0f172a);
+            padding: 3px 8px;
+            border-radius: 6px;
+            text-transform: capitalize;
+            display: inline-block;
+        }
+        .rc-tag-pill.minor {
+            background: #ecfdf5;
+            color: #059669;
+            border: 1px solid #a7f3d0;
+        }
+        .rc-tag-pill.moderate {
+            background: #fffbeb;
+            color: #b45309;
+            border: 1px solid #fde68a;
+        }
+        .rc-tag-pill.major {
+            background: #fff7ed;
+            color: #c2410c;
+            border: 1px solid #fed7aa;
+        }
+        .rc-tag-pill.critical {
+            background: #fef2f2;
+            color: #b91c1c;
+            border: 1px solid #fecaca;
+        }
+        .rc-chevron {
+            color: #94a3b8;
+            display: flex;
+            align-items: center;
+            margin-left: 4px;
+        }
+
+        @media (max-width: 768px) {
+            .request-card {
+                flex-wrap: wrap;
+            }
+            .rc-assigned-group, .rc-priority-group {
+                border-left: none;
+                padding-left: 0;
+            }
+        }
+
+        /* ══════════════════════════════════════════════════════
+           MODAL SYSTEM (Consistent & Minimalist)
+        ══════════════════════════════════════════════════════ */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.45);
+            backdrop-filter: blur(4px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            padding: 1.5rem;
+        }
+        .modal-overlay.hidden { display: none !important; }
+
+        .modal-container {
+            background-color: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            width: 100%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.15);
+            display: flex;
+            flex-direction: column;
+            animation: modalFadeIn 0.18s ease;
+        }
+        @keyframes modalFadeIn {
+            from { opacity: 0; transform: translateY(8px) scale(0.99); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        .modal-header {
+            padding: 1.25rem 1.75rem;
+            border-bottom: 1px solid #f1f5f9;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            background-color: #ffffff;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        .modal-header-title {
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: #0f172a;
+            margin: 0;
+            line-height: 1.2;
+        }
+        .modal-header-subtitle {
+            font-size: 0.875rem;
+            color: #64748b;
+            font-weight: 500;
+            margin-top: 4px;
+        }
+        .modal-body {
+            padding: 1.5rem 1.75rem;
+            overflow-y: auto;
+            flex: 1;
+        }
+        .modal-footer {
+            padding: 1.25rem 1.75rem;
+            border-top: 1px solid #f1f5f9;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            background-color: #ffffff;
+            gap: 12px;
+            position: sticky;
+            bottom: 0;
+            z-index: 10;
+        }
+        .modal-close-x {
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            color: #64748b;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 4px;
+            border-radius: 6px;
+            transition: background 0.15s ease, color 0.15s ease;
+        }
+        .modal-close-x:hover {
+            background: #f1f5f9;
+            color: #0f172a;
+        }
+
+        /* Modal Action Buttons */
+        .btn-modal-cancel {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            color: #0f172a;
+            font-size: 0.875rem;
+            font-weight: 600;
+            padding: 9px 22px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            text-decoration: none;
+        }
+        .btn-modal-cancel:hover {
+            background: #f8fafc;
+            border-color: #cbd5e1;
+        }
+        .btn-modal-primary {
+            background: #0052ea;
+            border: 1px solid #0052ea;
+            color: #ffffff;
+            font-size: 0.875rem;
+            font-weight: 600;
+            padding: 9px 22px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn-modal-primary:hover:not(:disabled) {
+            background: #0247d1;
+            border-color: #0247d1;
+        }
+        .btn-modal-primary:disabled {
+            opacity: 0.65;
+            cursor: not-allowed;
+        }
+
+        /* ── Detail Card & Sections (Strictly NO left accent border) ── */
+        .detail-summary-card {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px 20px;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 16px 18px;
+            margin-bottom: 1.25rem;
+        }
+        @media (max-width: 480px) {
+            .detail-summary-card {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+        }
+        .detail-card-item {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+        .dc-label {
+            font-size: 0.75rem;
+            color: #64748b;
+            font-weight: 500;
+        }
+        .dc-val {
+            font-size: 0.875rem;
+            font-weight: 700;
+            color: #0f172a;
             word-break: break-word;
         }
-
-        .description-box {
-            background: var(--bg-secondary, #f8fafc);
-            border: 1px solid var(--border-color, #e2e8f0);
-            border-radius: var(--radius-md, 8px);
-            padding: 1rem 1.25rem;
+        .detail-section-title {
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #64748b;
+            margin: 1.25rem 0 0.5rem 0;
+            border-left: none !important;
+            padding-left: 0 !important;
+        }
+        .detail-section-title:first-child {
+            margin-top: 0;
+        }
+        .detail-box {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 12px 16px;
             font-size: 0.875rem;
-            color: var(--text-secondary, #334155);
+            color: #334155;
             line-height: 1.6;
-            margin-top: 0.5rem;
             white-space: pre-wrap;
+            word-break: break-word;
+        }
+        .detail-alert-box {
+            border-radius: 10px;
+            padding: 12px 16px;
+            margin-bottom: 1.25rem;
+            font-size: 0.875rem;
+            line-height: 1.5;
+        }
+        .detail-alert-box.success {
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            color: #166534;
+        }
+        .detail-alert-box.warning {
+            background: #fffbeb;
+            border: 1px solid #fde68a;
+            color: #92400e;
+        }
+        .detail-alert-box.danger {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            color: #991b1b;
+        }
+        .detail-alert-box.info {
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            color: #1e40af;
+        }
+        .detail-alert-box.purple {
+            background: #faf5ff;
+            border: 1px solid #e9d5ff;
+            color: #6b21a8;
+        }
+        .detail-alert-title {
+            font-size: 0.8125rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
         }
 
+        /* Evidence Attachments */
         .evidence-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
             gap: 0.75rem;
         }
         .ev-thumb {
-            border: 1px solid var(--border-color, #e2e8f0); 
-            border-radius: var(--radius-md, 8px);
+            border: 1px solid #e2e8f0; 
+            border-radius: 8px;
             overflow: hidden; 
-            background: var(--bg-primary, #ffffff); 
+            background: #ffffff; 
             text-decoration: none;
             transition: all 0.2s ease;
             display: flex;
@@ -272,12 +636,12 @@
         .ev-thumb .ev-label { 
             font-size: 0.7rem;
             padding: 0.4rem 0.5rem;
-            color: var(--text-secondary, #475569);
+            color: #475569;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-            background: var(--bg-secondary, #f8fafc);
-            border-top: 1px solid var(--border-color, #e2e8f0);
+            background: #f8fafc;
+            border-top: 1px solid #e2e8f0;
             font-weight: 500;
         }
         .ev-thumb .ev-icon-box { 
@@ -285,22 +649,63 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            background: rgba(3, 85, 243, 0.05);
-            color: var(--primary, #0355f3);
+            background: #eff6ff;
+            color: #0052ea;
         }
         .ev-thumb:hover { 
-            border-color: var(--primary, #0355f3); 
+            border-color: #0052ea; 
             transform: translateY(-2px);
             box-shadow: 0 4px 12px rgba(0,0,0,0.08);
         }
 
-        .explanation-panel {
-            background: rgba(99, 102, 241, 0.05);
-            border: 1px solid rgba(99, 102, 241, 0.2);
-            border-radius: var(--radius-md, 12px);
-            padding: 1.25rem 1.5rem;
+        /* Forms */
+        .form-label {
+            display: block;
+            font-size: 0.8125rem;
+            font-weight: 700;
+            color: #334155;
+            margin-bottom: 6px;
+        }
+        .form-input {
+            width: 100%;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 9px 12px;
+            font-size: 0.875rem;
+            color: #0f172a;
+            background: #ffffff;
+            outline: none;
+            box-sizing: border-box;
+            transition: border-color 0.15s ease, box-shadow 0.15s ease;
+            font-family: inherit;
+        }
+        .form-input:focus {
+            border-color: #0052ea;
+            box-shadow: 0 0 0 2px rgba(0, 82, 234, 0.15);
         }
 
+        /* Lease Card in Lease Selection Modal */
+        .m-lease-card-btn {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 14px 16px;
+            width: 100%;
+            text-align: left;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+        .m-lease-card-btn:hover {
+            border-color: #0052ea;
+            background: #f8fafc;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+        }
+
+        /* Toast Notification */
         .toast {
             position: fixed; bottom: 2rem; right: 2rem;
             padding: 1rem 1.5rem; border-radius: 0.75rem;
@@ -335,26 +740,22 @@
             min-height: 56px !important;
             max-height: 56px !important;
             border-radius: 50% !important;
-            background: linear-gradient(135deg, #0355f3 0%, #1d4ed8 100%) !important;
+            background: linear-gradient(135deg, #0052ea 0%, #1d4ed8 100%) !important;
             color: #ffffff !important;
             border: none !important;
             padding: 0 !important;
             display: flex !important;
             align-items: center !important;
             justify-content: center !important;
-            box-shadow: 0 10px 25px -5px rgba(3, 85, 243, 0.45) !important;
+            box-shadow: 0 10px 25px -5px rgba(0, 82, 234, 0.45) !important;
             cursor: pointer !important;
             transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
         }
-
         .chat-head-fab:hover {
             transform: translateY(-3px) scale(1.08) !important;
-            box-shadow: 0 14px 30px -5px rgba(3, 85, 243, 0.6) !important;
+            box-shadow: 0 14px 30px -5px rgba(0, 82, 234, 0.6) !important;
         }
-
-        .chat-head-fab.hidden {
-            display: none !important;
-        }
+        .chat-head-fab.hidden { display: none !important; }
 
         .chat-head-modal {
             position: fixed !important;
@@ -374,14 +775,11 @@
             overflow: hidden !important;
             transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
         }
-
         .chat-head-modal.hidden {
             display: none !important;
             opacity: 0 !important;
             pointer-events: none !important;
         }
-
-        /* Modal Header - Dark Navy Gradient */
         .chat-head-modal-header {
             padding: 0.9rem 1.2rem !important;
             background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%) !important;
@@ -394,54 +792,12 @@
             flex-shrink: 0 !important;
             min-height: 60px !important;
         }
-
-        .chat-head-header-title {
-            display: flex !important;
-            align-items: center !important;
-            gap: 0.5rem !important;
-            flex: 1 !important;
-            min-width: 0 !important;
-            overflow: hidden !important;
-            font-weight: 800 !important;
-            font-size: 0.9rem !important;
-            color: #ffffff !important;
-            white-space: nowrap !important;
-            text-overflow: ellipsis !important;
-        }
-
-        /* Pill Switch Button - Light Cream Pill with Accent Text */
-        .chat-head-switch-btn {
-            background: #fef3c7 !important;
-            color: #0f766e !important;
-            border: none !important;
-            font-size: 0.78rem !important;
-            font-weight: 800 !important;
-            padding: 0.4rem 0.85rem !important;
-            border-radius: 9999px !important;
-            cursor: pointer !important;
-            display: inline-flex !important;
-            align-items: center !important;
-            gap: 0.35rem !important;
-            white-space: nowrap !important;
-            transition: all 0.2s ease !important;
-            flex-shrink: 0 !important;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1) !important;
-        }
-
-        .chat-head-switch-btn:hover {
-            background: #fde68a !important;
-            transform: translateY(-1px) !important;
-        }
-
-        /* Close Button */
         .chat-head-close-btn {
             background: #334155 !important;
             border: none !important;
             color: #ffffff !important;
             width: 32px !important;
             height: 32px !important;
-            min-width: 32px !important;
-            min-height: 32px !important;
             border-radius: 50% !important;
             cursor: pointer !important;
             display: flex !important;
@@ -450,11 +806,7 @@
             flex-shrink: 0 !important;
             transition: background 0.2s ease !important;
         }
-
-        .chat-head-close-btn:hover {
-            background: #475569 !important;
-        }
-
+        .chat-head-close-btn:hover { background: #475569 !important; }
         .chat-head-modal-body {
             display: flex !important;
             flex-direction: column !important;
@@ -464,7 +816,6 @@
             background: #f8fafc !important;
             padding: 0 !important;
         }
-
         .chat-head-feed {
             flex: 1 !important;
             overflow-y: auto !important;
@@ -473,10 +824,7 @@
             gap: 0.85rem !important;
             padding: 0.85rem !important;
             background: #f8fafc !important;
-            border-radius: 12px !important;
         }
-
-        /* Date Separator */
         .chat-date-separator {
             display: flex !important;
             align-items: center !important;
@@ -505,8 +853,6 @@
             letter-spacing: 0.05em !important;
             text-transform: uppercase !important;
         }
-
-        /* ── Message Rows & Avatars ── */
         .chat-msg-row {
             display: flex !important;
             align-items: flex-end !important;
@@ -514,22 +860,17 @@
             max-width: 86% !important;
             margin-bottom: 0.25rem !important;
         }
-
         .chat-msg-row.me {
             align-self: flex-end !important;
             flex-direction: row-reverse !important;
         }
-
         .chat-msg-row.other {
             align-self: flex-start !important;
             flex-direction: row !important;
         }
-
         .chat-avatar {
             width: 32px !important;
             height: 32px !important;
-            min-width: 32px !important;
-            min-height: 32px !important;
             border-radius: 50% !important;
             display: flex !important;
             align-items: center !important;
@@ -537,35 +878,23 @@
             font-size: 0.78rem !important;
             font-weight: 800 !important;
             flex-shrink: 0 !important;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.08) !important;
         }
-
         .chat-msg-row.other .chat-avatar {
             background: #e2e8f0 !important;
             color: #475569 !important;
             border: 1px solid #cbd5e1 !important;
         }
-
         .chat-msg-row.me .chat-avatar {
-            background: #0f766e !important;
+            background: #0052ea !important;
             color: #ffffff !important;
         }
-
         .chat-msg-content-wrapper {
             display: inline-flex !important;
             flex-direction: column !important;
-            width: fit-content !important;
             max-width: 100% !important;
         }
-
-        .chat-msg-row.me .chat-msg-content-wrapper {
-            align-items: flex-end !important;
-        }
-
-        .chat-msg-row.other .chat-msg-content-wrapper {
-            align-items: flex-start !important;
-        }
-
+        .chat-msg-row.me .chat-msg-content-wrapper { align-items: flex-end !important; }
+        .chat-msg-row.other .chat-msg-content-wrapper { align-items: flex-start !important; }
         .chat-msg-meta {
             font-size: 0.7rem !important;
             font-weight: 600 !important;
@@ -577,17 +906,8 @@
             padding: 0 0.2rem !important;
             white-space: nowrap !important;
         }
-
-        .chat-msg-meta strong {
-            color: #334155 !important;
-        }
-
-        /* Speech Bubbles */
         .chat-msg-bubble {
             display: inline-block !important;
-            position: relative !important;
-            width: auto !important;
-            max-width: 100% !important;
             padding: 0.6rem 0.85rem !important;
             font-size: 0.84rem !important;
             line-height: 1.45 !important;
@@ -595,142 +915,173 @@
             white-space: pre-wrap !important;
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05) !important;
         }
-
         .chat-msg-row.me .chat-msg-bubble {
-            background: #0f766e !important;
+            background: #0052ea !important;
             color: #ffffff !important;
             border-radius: 16px 16px 4px 16px !important;
         }
-
         .chat-msg-row.other .chat-msg-bubble {
             background: #ffffff !important;
             color: #0f172a !important;
             border: 1px solid #cbd5e1 !important;
             border-radius: 16px 16px 16px 4px !important;
         }
-
         .chat-msg-time-inline {
             font-size: 0.65rem !important;
             margin-top: 0.25rem !important;
             opacity: 0.75 !important;
             text-align: right !important;
         }
-
-        /* File Attachment Card (Mockup Style) */
         .chat-file-card {
             display: flex !important;
             align-items: center !important;
             gap: 0.75rem !important;
             padding: 0.6rem 0.85rem !important;
             background: #ffffff !important;
-            border: 1.5px solid #0f766e !important;
+            border: 1.5px solid #0052ea !important;
             border-radius: 12px !important;
             margin-top: 0.4rem !important;
             text-decoration: none !important;
-            flex: 1;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 0.65rem;
-            padding: 0.75rem;
-            background: var(--bg-primary, #ffffff);
-            border-radius: var(--radius-md, 10px);
-            border: 1px solid var(--border-color, #e2e8f0);
         }
         .chat-head-form {
-            margin-top: 0.5rem;
+            padding: 0.75rem;
+            background: #ffffff;
+            border-top: 1px solid #e2e8f0;
         }
-        .typing-indicator-box {
-            display: inline-flex;
+        .chat-head-form-row {
+            display: flex;
             align-items: center;
-            gap: 0.5rem;
-            padding: 0.35rem 0.75rem;
-            background: rgba(147, 51, 234, 0.1);
-            border: 1px solid rgba(147, 51, 234, 0.2);
-            border-radius: 16px;
-            font-size: 0.76rem;
-            color: #7e22ce;
-            font-weight: 600;
+            gap: 8px;
         }
-        .messenger-dots {
-            display: inline-flex;
+        .chat-input-wrapper {
+            position: relative;
+            display: flex;
             align-items: center;
-            gap: 3px;
+            flex: 1;
         }
-        .messenger-dots span {
-            width: 5px;
-            height: 5px;
-            background-color: #9333ea;
-            border-radius: 50%;
-            display: inline-block;
-            animation: messengerWave 1.2s infinite ease-in-out;
+        .chat-attach-btn {
+            position: absolute;
+            left: 10px;
+            cursor: pointer;
+            color: #64748b;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
-        .messenger-dots span:nth-child(1) { animation-delay: 0s; }
-        .messenger-dots span:nth-child(2) { animation-delay: 0.2s; }
-        .messenger-dots span:nth-child(3) { animation-delay: 0.4s; }
-        @keyframes messengerWave {
-            0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
-            30% { transform: translateY(-4px); opacity: 1; }
+        .chat-attach-btn:hover { color: #0052ea; }
+        .chat-input-field {
+            width: 100%;
+            padding: 8px 12px 8px 38px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            outline: none;
+        }
+        .chat-input-field:focus { border-color: #0052ea; }
+        .chat-send-btn {
+            background: #0052ea;
+            border: none;
+            color: #ffffff;
+            font-size: 0.8125rem;
+            font-weight: 700;
+            padding: 8px 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .chat-send-btn:hover { background: #0247d1; }
+        .chat-head-attach-preview {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+            background: #f1f5f9;
+            padding: 4px 8px;
+            border-radius: 6px;
+        }
+        .chat-head-attach-preview img {
+            width: 32px;
+            height: 32px;
+            object-fit: cover;
+            border-radius: 4px;
+        }
+        .chat-head-attach-remove {
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            color: #ef4444;
+            display: flex;
+            align-items: center;
+            margin-left: auto;
         }
     </style>
-    <link href="../../css/design-system.css?v=20260904-1" rel="stylesheet">
     <script src="../../js/ui.js?v=20260827-3" defer></script>
 </head>
 <body class="app-loading" data-role="tenant" data-page-title="Tenant Reports Center">
 
     <main class="dashboard-container">
-        <!-- Header & Top Action -->
-        <div class="header-action-bar" style="justify-content: flex-end;">
-            <button type="button" id="btnReportLandlord" class="btn-primary" style="width:auto;padding:0.65rem 1.5rem;background:#ef4444;border-color:#ef4444;display:inline-flex;align-items:center;gap:0.4rem;">
-                <svg class="svg-icon" width="16" height="16" viewBox="0 0 24 24"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"></path><line x1="4" y1="22" x2="4" y2="15"></line></svg>
+        <!-- ── Tabs & Action Header Row ── -->
+        <div class="maintenance-header-row">
+            <div class="maintenance-tabs-bar">
+                <button type="button" class="m-tab-btn active" id="tabFiledBtn" onclick="switchTab('filed')">
+                    <svg class="svg-icon" width="16" height="16" viewBox="0 0 24 24"><path d="M22 2L11 13"></path><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                    Reports Filed By Me
+                    <span class="tab-count" id="filedCountBadge" style="display:none;">0</span>
+                </button>
+                <button type="button" class="m-tab-btn" id="tabAgainstBtn" onclick="switchTab('against')">
+                    <svg class="svg-icon" width="16" height="16" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                    Reports Against Me
+                    <span class="tab-count" id="againstCountBadge" style="display:none;">0</span>
+                </button>
+            </div>
+            <button type="button" id="btnReportLandlord" class="btn-submit-request">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"></path><line x1="4" y1="22" x2="4" y2="15"></line></svg>
                 Report Landlord
             </button>
         </div>
 
-        <!-- ── TAB BAR ── -->
-        <div class="tab-bar">
-            <button type="button" class="tab-btn active" id="tabFiledBtn" onclick="switchTab('filed')">
-                <svg class="svg-icon" width="16" height="16" viewBox="0 0 24 24"><path d="M22 2L11 13"></path><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
-                Reports Filed By Me
-            </button>
-            <button type="button" class="tab-btn" id="tabAgainstBtn" onclick="switchTab('against')">
-                <svg class="svg-icon" width="16" height="16" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-                Reports Against Me
-                <span class="tab-badge" id="againstCountBadge" style="display:none;">0</span>
-            </button>
+        <!-- ── Ledger Controls Bar (Search & Filter) ── -->
+        <div class="ledger-controls-bar">
+            <div class="ledger-search-box">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+                <input type="text" id="reportsSearchInput" placeholder="Search reports by category, landlord, property..." autocomplete="off">
+            </div>
+            <div class="ledger-filter-group">
+                <div class="ledger-select-wrap">
+                    <select id="statusFilter" class="ledger-select">
+                        <option value="all">All Statuses</option>
+                        <option value="pending_admin_review">Pending Review</option>
+                        <option value="in_review">In Review</option>
+                        <option value="approved">Action Enforced</option>
+                        <option value="dismissed">Dismissed</option>
+                        <option value="needs_more_evidence">Needs Evidence</option>
+                    </select>
+                </div>
+            </div>
         </div>
 
         <!-- ── TAB 1: Reports Filed By Me ── -->
-        <div id="tabFiledContent" class="list-card">
-            <div class="empty-state">
-                <div class="empty-icon">
-                    <svg class="svg-icon" width="40" height="40" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
-                </div>
-                <div>Loading your filed reports...</div>
-            </div>
-        </div>
+        <div id="tabFiledContent" class="requests-list"></div>
 
         <!-- ── TAB 2: Reports Against Me ── -->
-        <div id="tabAgainstContent" class="list-card" style="display:none;">
-            <div class="empty-state">
-                <div class="empty-icon">
-                    <svg class="svg-icon" width="40" height="40" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
-                </div>
-                <div>Loading reports against you...</div>
-            </div>
-        </div>
+        <div id="tabAgainstContent" class="requests-list" style="display:none;"></div>
     </main>
 
     <!-- ── Report Detail Modal (For Reports Filed By Me) ── -->
     <div id="filedReportModal" class="modal-overlay hidden" style="display:none;">
         <div class="modal-container">
             <div class="modal-header">
-                <div class="modal-header-info">
-                    <h3 class="modal-header-title" id="fTitle">Report Detail</h3>
-                    <div class="modal-header-sub" id="fSubtitle"></div>
+                <div>
+                    <h3 class="modal-header-title" id="fTitle">Report Details</h3>
+                    <div class="modal-header-subtitle" id="fSubtitle">—</div>
                 </div>
-                <button type="button" class="modal-close-btn" id="filedModalCloseBtn" onclick="closeFiledModal()" title="Close" aria-label="Close modal">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                <button type="button" class="modal-close-x" id="filedModalCloseBtn" onclick="closeFiledModal()" title="Close" aria-label="Close modal">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
                 </button>
             </div>
 
@@ -738,84 +1089,54 @@
                 <!-- Status Banner -->
                 <div id="fStatusBanner"></div>
 
-                <!-- Landlord Info -->
-                <div class="detail-card">
-                    <div class="detail-card-title">
-                        <svg class="svg-icon" width="16" height="16" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-                        Landlord Information
-                    </div>
-                    <div class="detail-grid">
-                        <div class="detail-item"><span class="detail-label">Landlord Name</span><span class="detail-value" id="fLandlordName">—</span></div>
-                        <div class="detail-item"><span class="detail-label">Email Address</span><span class="detail-value" id="fLandlordEmail">—</span></div>
-                        <div class="detail-item"><span class="detail-label">Contact Number</span><span class="detail-value" id="fLandlordContact">—</span></div>
-                        <div class="detail-item"><span class="detail-label">Current Account Trust Score</span><span class="detail-value" id="fLandlordTrustScore">Not available</span></div>
-                    </div>
-                </div>
-
-                <!-- Lease & Property Info -->
-                <div class="detail-card">
-                    <div class="detail-card-title">
-                        <svg class="svg-icon" width="16" height="16" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
-                        Property & Tenancy Details
-                    </div>
-                    <div class="detail-grid">
-                        <div class="detail-item"><span class="detail-label">Lease Number</span><span class="detail-value" id="fLeaseNumber">—</span></div>
-                        <div class="detail-item"><span class="detail-label">Lease Status</span><span class="detail-value" id="fLeaseStatus">—</span></div>
-                        <div class="detail-item"><span class="detail-label">Property Name</span><span class="detail-value" id="fProperty">—</span></div>
-                        <div class="detail-item"><span class="detail-label">Unit Number</span><span class="detail-value" id="fUnit">—</span></div>
-                        <div class="detail-item"><span class="detail-label">Lease Period</span><span class="detail-value" id="fLeasePeriod">—</span></div>
-                        <div class="detail-item" style="grid-column: 1 / -1;"><span class="detail-label">Address</span><span class="detail-value" id="fAddress">—</span></div>
-                    </div>
+                <!-- Landlord & Tenancy Information -->
+                <div class="detail-section-title">Landlord & Tenancy Details</div>
+                <div class="detail-summary-card">
+                    <div class="detail-card-item"><span class="dc-label">Landlord Name</span><span class="dc-val" id="fLandlordName">—</span></div>
+                    <div class="detail-card-item"><span class="dc-label">Email Address</span><span class="dc-val" id="fLandlordEmail">—</span></div>
+                    <div class="detail-card-item"><span class="dc-label">Contact Number</span><span class="dc-val" id="fLandlordContact">—</span></div>
+                    <div class="detail-card-item"><span class="dc-label">Trust Score</span><span class="dc-val" id="fLandlordTrustScore">Not available</span></div>
+                    <div class="detail-card-item"><span class="dc-label">Property</span><span class="dc-val" id="fProperty">—</span></div>
+                    <div class="detail-card-item"><span class="dc-label">Unit</span><span class="dc-val" id="fUnit">—</span></div>
+                    <div class="detail-card-item"><span class="dc-label">Lease Number</span><span class="dc-val" id="fLeaseNumber">—</span></div>
+                    <div class="detail-card-item"><span class="dc-label">Lease Period</span><span class="dc-val" id="fLeasePeriod">—</span></div>
+                    <div class="detail-card-item" style="grid-column: 1 / -1;"><span class="dc-label">Address</span><span class="dc-val" id="fAddress">—</span></div>
+                    <div class="detail-card-item" style="display:none;" id="fLeaseStatusWrap"><span class="dc-label">Lease Status</span><span class="dc-val" id="fLeaseStatus">—</span></div>
                 </div>
 
                 <!-- Incident Details -->
-                <div class="detail-card">
-                    <div class="detail-card-title">
-                        <svg class="svg-icon" width="16" height="16" viewBox="0 0 24 24"><polygon points="7.86 2 16.14 2 22 7.86 22 16.14 16.14 22 7.86 22 2 16.14 2 7.86 7.86 2"></polygon><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
-                        Incident Summary & Description
-                    </div>
-                    <div class="detail-grid" style="margin-bottom:0.75rem;">
-                        <div class="detail-item"><span class="detail-label">Report Category</span><span class="detail-value" id="fCategory">—</span></div>
-                        <div class="detail-item"><span class="detail-label">Incident Date</span><span class="detail-value" id="fIncidentDate">—</span></div>
-                        <div class="detail-item"><span class="detail-label">Severity Level</span><span class="detail-value" id="fSeverity">—</span></div>
-                    </div>
-                    <div class="detail-label" style="margin-top:0.5rem;">Incident Statement</div>
-                    <div class="description-box" id="fDescription"></div>
+                <div class="detail-section-title">Incident Information</div>
+                <div class="detail-summary-card" style="margin-bottom: 0.75rem;">
+                    <div class="detail-card-item"><span class="dc-label">Report Category</span><span class="dc-val" id="fCategory">—</span></div>
+                    <div class="detail-card-item"><span class="dc-label">Incident Date</span><span class="dc-val" id="fIncidentDate">—</span></div>
+                    <div class="detail-card-item" style="grid-column: 1 / -1;"><span class="dc-label">Severity Level</span><span class="dc-val" id="fSeverity">—</span></div>
                 </div>
+                <div class="detail-section-title">Incident Statement</div>
+                <div class="detail-box" id="fDescription">—</div>
 
                 <!-- Uploaded Evidence -->
-                <div class="detail-card" id="fEvidenceSection" style="display:none;">
-                    <div class="detail-card-title">
-                        <svg class="svg-icon" width="16" height="16" viewBox="0 0 24 24"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path></svg>
-                        Uploaded Evidence Attachments
-                    </div>
+                <div id="fEvidenceSection" style="display:none; margin-top: 1.25rem;">
+                    <div class="detail-section-title">Evidence Attachments</div>
                     <div id="fEvidenceGrid"></div>
                 </div>
 
                 <!-- Landlord Explanation (if any) -->
-                <div class="detail-card" id="fLandlordExpSection" style="display:none; border-color: rgba(99,102,241,0.25);">
-                    <div class="detail-card-title" style="color:#6366f1;">
-                        <svg class="svg-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21a9 9 0 1 0-9-9c0 1.48.36 2.88 1 4.11L3 21l4.89-1c1.23.64 2.63 1 4.11 1z"/><circle cx="8" cy="12" r="1" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1" fill="currentColor" stroke-none"/><circle cx="16" cy="12" r="1" fill="currentColor" stroke-none"/></svg>
-                        Landlord Explanation Response
-                    </div>
-                    <div class="description-box" id="fLandlordExpText" style="background:rgba(99,102,241,0.04);"></div>
-                    <div id="fLandlordExpDate" style="font-size:.75rem;color:var(--text-muted);margin-top:.5rem;text-align:right;"></div>
+                <div id="fLandlordExpSection" style="display:none; margin-top: 1.25rem;">
+                    <div class="detail-section-title">Landlord Explanation Response</div>
+                    <div class="detail-box" id="fLandlordExpText"></div>
+                    <div id="fLandlordExpDate" style="font-size:0.75rem; color:#64748b; margin-top:0.4rem; text-align:right;"></div>
                 </div>
 
                 <!-- Admin Remarks & Resolution -->
-                <div class="detail-card" id="fAdminRemarksSection" style="display:none; border-color: rgba(16,185,129,0.25);">
-                    <div class="detail-card-title" style="color:#10b981;">
-                        <svg class="svg-icon" width="16" height="16" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><path d="m9 12 2 2 4-4"></path></svg>
-                        Admin Decision & Resolution Remarks
-                    </div>
-                    <div class="description-box" id="fAdminRemarksText" style="background:rgba(16,185,129,0.04);"></div>
-                    <div id="fAdminRemarksDate" style="font-size:.75rem;color:var(--text-muted);margin-top:.5rem;text-align:right;"></div>
+                <div id="fAdminRemarksSection" style="display:none; margin-top: 1.25rem;">
+                    <div class="detail-section-title">Admin Decision & Resolution Remarks</div>
+                    <div class="detail-box" id="fAdminRemarksText" style="background:#f0fdf4; border-color:#bbf7d0; color:#166534;"></div>
+                    <div id="fAdminRemarksDate" style="font-size:0.75rem; color:#64748b; margin-top:0.4rem; text-align:right;"></div>
                 </div>
-
             </div>
 
             <div class="modal-footer">
-                <button type="button" id="filedModalFooterCloseBtn" onclick="closeFiledModal()" class="navbar-btn" style="width:auto;padding:.5rem 1.5rem;">Close</button>
+                <button type="button" id="filedModalFooterCloseBtn" onclick="closeFiledModal()" class="btn-modal-cancel">Close</button>
             </div>
         </div>
     </div>
@@ -824,12 +1145,12 @@
     <div id="reportModal" class="modal-overlay hidden" style="display:none;">
         <div class="modal-container">
             <div class="modal-header">
-                <div class="modal-header-info">
-                    <h3 class="modal-header-title" id="mTitle">Report Detail</h3>
-                    <div class="modal-header-sub" id="mSubtitle"></div>
+                <div>
+                    <h3 class="modal-header-title" id="mTitle">Report Details</h3>
+                    <div class="modal-header-subtitle" id="mSubtitle">—</div>
                 </div>
-                <button type="button" class="modal-close-btn" id="modalCloseBtn" onclick="closeModal()" title="Close" aria-label="Close modal">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                <button type="button" class="modal-close-x" id="modalCloseBtn" onclick="closeModal()" title="Close" aria-label="Close modal">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
                 </button>
             </div>
 
@@ -837,137 +1158,107 @@
                 <!-- Status Banner -->
                 <div id="mStatusBanner"></div>
 
-                <!-- Landlord / Complainant Info -->
-                <div class="detail-card">
-                    <div class="detail-card-title">
-                        <svg class="svg-icon" width="16" height="16" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-                        Reporting Party (Landlord)
-                    </div>
-                    <div class="detail-grid">
-                        <div class="detail-item"><span class="detail-label">Landlord Name</span><span class="detail-value" id="mLandlordName">—</span></div>
-                        <div class="detail-item"><span class="detail-label">Email Address</span><span class="detail-value" id="mLandlordEmail">—</span></div>
-                        <div class="detail-item"><span class="detail-label">Contact Number</span><span class="detail-value" id="mLandlordContact">—</span></div>
-                    </div>
-                </div>
-
-                <!-- Property & Lease Details -->
-                <div class="detail-card">
-                    <div class="detail-card-title">
-                        <svg class="svg-icon" width="16" height="16" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg>
-                        Property & Lease Information
-                    </div>
-                    <div class="detail-grid">
-                        <div class="detail-item"><span class="detail-label">Lease Number</span><span class="detail-value" id="mLeaseNumber">—</span></div>
-                        <div class="detail-item"><span class="detail-label">Property Name</span><span class="detail-value" id="mProperty">—</span></div>
-                        <div class="detail-item"><span class="detail-label">Unit Number</span><span class="detail-value" id="mUnit">—</span></div>
-                        <div class="detail-item" style="grid-column: 1 / -1;"><span class="detail-label">Address</span><span class="detail-value" id="mAddress">—</span></div>
-                    </div>
+                <!-- Reporting Party & Tenancy Info -->
+                <div class="detail-section-title">Reporting Party & Tenancy</div>
+                <div class="detail-summary-card">
+                    <div class="detail-card-item"><span class="dc-label">Landlord (Complainant)</span><span class="dc-val" id="mLandlordName">—</span></div>
+                    <div class="detail-card-item"><span class="dc-label">Email Address</span><span class="dc-val" id="mLandlordEmail">—</span></div>
+                    <div class="detail-card-item"><span class="dc-label">Contact Number</span><span class="dc-val" id="mLandlordContact">—</span></div>
+                    <div class="detail-card-item"><span class="dc-label">Lease Contract</span><span class="dc-val" id="mLeaseNumber">—</span></div>
+                    <div class="detail-card-item"><span class="dc-label">Property</span><span class="dc-val" id="mProperty">—</span></div>
+                    <div class="detail-card-item"><span class="dc-label">Unit</span><span class="dc-val" id="mUnit">—</span></div>
+                    <div class="detail-card-item" style="grid-column: 1 / -1;"><span class="dc-label">Address</span><span class="dc-val" id="mAddress">—</span></div>
                 </div>
 
                 <!-- Incident Details -->
-                <div class="detail-card">
-                    <div class="detail-card-title">
-                        <svg class="svg-icon" width="16" height="16" viewBox="0 0 24 24"><polygon points="7.86 2 16.14 2 22 7.86 22 16.14 16.14 22 7.86 22 2 16.14 2 7.86 7.86 2"></polygon><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
-                        Incident Summary
-                    </div>
-                    <div class="detail-grid" style="margin-bottom:0.75rem;">
-                        <div class="detail-item"><span class="detail-label">Category</span><span class="detail-value" id="mCategory">—</span></div>
-                        <div class="detail-item"><span class="detail-label">Incident Date</span><span class="detail-value" id="mIncidentDate">—</span></div>
-                        <div class="detail-item"><span class="detail-label">Severity Level</span><span class="detail-value" id="mSeverity">—</span></div>
-                    </div>
-                    <div class="detail-label" style="margin-top:0.5rem;">Report Statement</div>
-                    <div class="description-box" id="mDescription"></div>
+                <div class="detail-section-title">Incident Information</div>
+                <div class="detail-summary-card" style="margin-bottom: 0.75rem;">
+                    <div class="detail-card-item"><span class="dc-label">Category</span><span class="dc-val" id="mCategory">—</span></div>
+                    <div class="detail-card-item"><span class="dc-label">Incident Date</span><span class="dc-val" id="mIncidentDate">—</span></div>
+                    <div class="detail-card-item" style="grid-column: 1 / -1;"><span class="dc-label">Severity Level</span><span class="dc-val" id="mSeverity">—</span></div>
                 </div>
+                <div class="detail-section-title">Report Statement</div>
+                <div class="detail-box" id="mDescription">—</div>
 
                 <!-- Evidence (only shown after admin review) -->
-                <div class="detail-card" id="mEvidenceSection">
-                    <div class="detail-card-title">
-                        <svg class="svg-icon" width="16" height="16" viewBox="0 0 24 24"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path></svg>
-                        Evidence Attachments
-                    </div>
+                <div id="mEvidenceSection" style="display:none; margin-top: 1.25rem;">
+                    <div class="detail-section-title">Evidence Attachments</div>
                     <div id="mEvidence"></div>
                 </div>
 
                 <!-- Your Explanation -->
-                <div class="detail-card" id="mExplanationSection">
-                    <div class="detail-card-title">
-                        <svg class="svg-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21a9 9 0 1 0-9-9c0 1.48.36 2.88 1 4.11L3 21l4.89-1c1.23.64 2.63 1 4.11 1z"/><circle cx="8" cy="12" r="1" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1" fill="currentColor" stroke-none"/><circle cx="16" cy="12" r="1" fill="currentColor" stroke-none"/></svg>
-                        Your Counter-Statement / Explanation
-                    </div>
+                <div id="mExplanationSection" style="margin-top: 1.25rem;">
+                    <div class="detail-section-title">Your Counter-Statement / Explanation</div>
 
                     <!-- Already submitted -->
-                    <div id="mExplanationSubmitted" style="display:none;background:rgba(16,185,129,0.06);border:1px solid rgba(16,185,129,0.25);border-radius:var(--radius-md);padding:1rem;">
-                        <div style="font-size:.72rem;font-weight:700;color:#10b981;margin-bottom:.5rem;display:flex;align-items:center;gap:0.35rem;">
-                            <svg class="svg-icon" width="14" height="14" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                            YOUR STATEMENT HAS BEEN SUBMITTED
+                    <div id="mExplanationSubmitted" style="display:none;" class="detail-alert-box success">
+                        <div class="detail-alert-title">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                            Your Statement Has Been Submitted
                         </div>
-                        <div class="description-box" id="mExplanationText" style="background:rgba(16,185,129,0.03);"></div>
-                        <div id="mExplanationDate" style="font-size:.72rem;color:var(--text-muted);margin-top:.5rem;text-align:right;"></div>
+                        <div class="detail-box" id="mExplanationText" style="background:#ffffff; margin-top: 8px;"></div>
+                        <div id="mExplanationDate" style="font-size:0.75rem; color:#166534; margin-top:0.4rem; text-align:right;"></div>
                     </div>
 
                     <!-- Can still submit -->
-                    <div id="mExplanationForm" style="display:none;" class="explanation-panel">
-                        <p style="font-size:.85rem;color:var(--text-secondary);margin-bottom:1rem;line-height:1.5;">
-                            Share your side of the story. This statement will be reviewed by the safety administrator evaluating this case. You may submit <strong>once</strong>.
+                    <div id="mExplanationForm" style="display:none;">
+                        <p style="font-size:0.84rem; color:#64748b; margin-bottom:0.75rem; line-height:1.5;">
+                            Share your perspective. This statement will be reviewed by the safety administrator handling this case. You may submit <strong>once</strong>.
                         </p>
-                        <div id="explanationError" style="display:none;background:rgba(239,68,68,0.1);color:#ef4444;border:1px solid rgba(239,68,68,0.25);border-radius:var(--radius-md);padding:.7rem 1rem;font-size:.85rem;margin-bottom:.75rem;"></div>
-                        <label class="form-label" for="explanationText" style="font-weight:600;font-size:0.84rem;">Your Explanation <span style="color:#ef4444;">*</span></label>
-                        <textarea id="explanationText" class="form-input" style="height:120px;resize:vertical;" placeholder="Explain what happened from your perspective..."></textarea>
-                        <button type="button" id="submitExplanationBtn" class="btn-primary" style="margin-top:0.75rem;">
-                            Submit My Explanation
-                        </button>
+                        <div id="explanationError" style="display:none; background:#fef2f2; color:#dc2626; border:1px solid #fecaca; border-radius:8px; padding:0.6rem 0.9rem; font-size:0.8125rem; margin-bottom:0.75rem;"></div>
+                        <label class="form-label" for="explanationText">Your Explanation <span style="color:#ef4444;">*</span></label>
+                        <textarea id="explanationText" class="form-input" style="height:110px; resize:vertical;" placeholder="Explain what happened from your perspective..."></textarea>
+                        <div style="margin-top: 0.75rem; display: flex; justify-content: flex-end;">
+                            <button type="button" id="submitExplanationBtn" class="btn-modal-primary">
+                                Submit My Explanation
+                            </button>
+                        </div>
                     </div>
 
                     <!-- Not pending anymore -->
-                    <div id="mExplanationClosed" style="display:none;color:var(--text-muted);font-style:italic;font-size:.875rem;">
-                        The window to submit an explanation has passed (report is no longer pending review).
+                    <div id="mExplanationClosed" style="display:none; color:#64748b; font-style:italic; font-size:0.84rem; padding: 8px 0;">
+                        The window to submit an explanation has closed (this report is no longer pending review).
                     </div>
                 </div>
 
                 <!-- Admin Remarks & Resolution -->
-                <div class="detail-card" id="mAdminRemarksSection" style="display:none; border-color: rgba(16,185,129,0.25);">
-                    <div class="detail-card-title" style="color:#10b981;">
-                        <svg class="svg-icon" width="16" height="16" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><path d="m9 12 2 2 4-4"></path></svg>
-                        Admin Review & Decision Notes
-                    </div>
-                    <div class="description-box" id="mAdminRemarksText" style="background:rgba(16,185,129,0.04);"></div>
-                    <div id="mAdminRemarksDate" style="font-size:.75rem;color:var(--text-muted);margin-top:.5rem;text-align:right;"></div>
+                <div id="mAdminRemarksSection" style="display:none; margin-top: 1.25rem;">
+                    <div class="detail-section-title">Admin Review & Decision Notes</div>
+                    <div class="detail-box" id="mAdminRemarksText" style="background:#f0fdf4; border-color:#bbf7d0; color:#166534;"></div>
+                    <div id="mAdminRemarksDate" style="font-size:0.75rem; color:#64748b; margin-top:0.4rem; text-align:right;"></div>
                 </div>
-
             </div>
 
             <div class="modal-footer">
-                <button type="button" id="modalFooterCloseBtn" onclick="closeModal()" class="navbar-btn" style="width:auto;padding:.5rem 1.5rem;">Close</button>
+                <button type="button" id="modalFooterCloseBtn" onclick="closeModal()" class="btn-modal-cancel">Close</button>
             </div>
         </div>
     </div>
 
     <!-- ── Lease Select Modal (For Report Landlord) ── -->
     <div id="leaseSelectModal" class="modal-overlay hidden" style="display:none;">
-        <div class="modal-container" style="max-width:550px;">
+        <div class="modal-container" style="max-width: 520px;">
             <div class="modal-header">
-                <h3 style="margin:0;font-size:1.15rem;font-weight:700;">Select Lease for Report</h3>
-                <button type="button" class="modal-close-btn" id="leaseModalCloseBtn" aria-label="Close lease selection" onclick="closeLeaseModal()">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                <div>
+                    <h3 class="modal-header-title">Select Lease Contract</h3>
+                    <div class="modal-header-subtitle">Choose the lease contract associated with the landlord:</div>
+                </div>
+                <button type="button" class="modal-close-x" id="leaseModalCloseBtn" aria-label="Close lease selection" onclick="closeLeaseModal()">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
                 </button>
             </div>
             <div class="modal-body">
-                <p style="color:var(--text-secondary);font-size:.875rem;margin-bottom:1.25rem;">
-                    Select the active or past tenancy lease associated with the landlord you wish to report:
-                </p>
-                <div id="leaseSelectList" style="display:flex;flex-direction:column;gap:0.75rem;">
-                    <div style="color:var(--text-muted);text-align:center;padding:1.5rem;">Loading leases...</div>
-                </div>
+                <div id="leaseSelectList" style="display:flex; flex-direction:column; gap:0.75rem;"></div>
             </div>
             <div class="modal-footer">
-                <button type="button" id="leaseModalFooterCloseBtn" onclick="closeLeaseModal()" class="navbar-btn" style="width:auto;">Cancel</button>
+                <button type="button" id="leaseModalFooterCloseBtn" onclick="closeLeaseModal()" class="btn-modal-cancel">Cancel</button>
             </div>
         </div>
     </div>
 
     <!-- Floating Chat Head FAB Button (Enabled ONLY when status === 'needs_more_evidence') -->
     <button id="chatHeadFab" class="chat-head-fab hidden" title="Open Admin Inquiry Thread" aria-label="Open Admin Inquiry Thread">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21a9 9 0 1 0-9-9c0 1.48.36 2.88 1 4.11L3 21l4.89-1c1.23.64 2.63 1 4.11 1z"/><circle cx="8" cy="12" r="1" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1" fill="currentColor" stroke-none"/><circle cx="16" cy="12" r="1" fill="currentColor" stroke-none"/></svg>
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21a9 9 0 1 0-9-9c0 1.48.36 2.88 1 4.11L3 21l4.89-1c1.23.64 2.63 1 4.11 1z"/><circle cx="8" cy="12" r="1" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1" fill="currentColor" stroke="none"/><circle cx="16" cy="12" r="1" fill="currentColor" stroke-none"/></svg>
     </button>
 
     <!-- Floating Chat Head Drawer Modal -->
@@ -986,10 +1277,10 @@
         <div class="chat-head-modal-body">
             <!-- Messages Feed -->
             <div id="chatHeadMessagesFeed" class="chat-head-feed">
-                <div style="font-size:0.8rem; color:var(--text-muted); font-style:italic;">No inquiry messages posted yet in this thread.</div>
+                <div style="font-size:0.8rem; color:#64748b; font-style:italic; text-align:center; padding:1.5rem;">No inquiry messages posted yet in this thread.</div>
             </div>
             <!-- Typing Indicator Container -->
-            <div id="chatHeadTypingContainer" style="margin-bottom:0.4rem;"></div>
+            <div id="chatHeadTypingContainer" style="margin-bottom:0.4rem; padding: 0 0.85rem;"></div>
             <!-- Inquiry Form -->
             <form id="chatHeadPostForm" class="chat-head-form">
                 <!-- Image preview (shown when file is selected) -->
@@ -1023,15 +1314,14 @@
         const token = localStorage.getItem('domiknow_token');
         let currentReportId = null;
         let tenantLeases = [];
+        let currentTab = 'filed';
+        let rawFiledReports = [];
+        let rawAgainstReports = [];
 
         const $ = id => document.getElementById(id);
         const fmtDate  = d => d ? new Date(d).toLocaleDateString('en-PH', { year:'numeric', month:'short', day:'numeric' }) : '—';
         const fmtDT    = d => d ? new Date(d).toLocaleString('en-PH',  { year:'numeric', month:'short', day:'numeric', hour:'2-digit', minute:'2-digit' }) : '—';
         const capWords = s => s ? s.replace(/_/g,' ').replace(/\b\w/g, c => c.toUpperCase()) : '—';
-
-        const svgCalendar = `<svg class="svg-icon" width="14" height="14" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>`;
-        const svgHome     = `<svg class="svg-icon" width="14" height="14" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg>`;
-        const svgUser     = `<svg class="svg-icon" width="14" height="14" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>`;
 
         const svgIcons = {
             clock: `<svg class="svg-icon" width="18" height="18" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>`,
@@ -1040,8 +1330,7 @@
             shieldCheck: `<svg class="svg-icon" width="18" height="18" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><path d="m9 12 2 2 4-4"></path></svg>`,
             shieldAlert: `<svg class="svg-icon" width="18" height="18" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>`,
             paperclip: `<svg class="svg-icon" width="18" height="18" viewBox="0 0 24 24"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path></svg>`,
-            chat: `<svg class="svg-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21a9 9 0 1 0-9-9c0 1.48.36 2.88 1 4.11L3 21l4.89-1c1.23.64 2.63 1 4.11 1z"/><circle cx="8" cy="12" r="1" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1" fill="currentColor" stroke-none"/><circle cx="16" cy="12" r="1" fill="currentColor" stroke-none"/></svg>`,
-            star: `<svg class="svg-icon" width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>`
+            chevronRight: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>`
         };
 
         function renderStatusBanner(containerId, status, isFiledByMe) {
@@ -1049,9 +1338,7 @@
             if (!banner) return;
 
             let config = {
-                bg: 'rgba(245,158,11,0.08)',
-                border: 'rgba(245,158,11,0.25)',
-                color: '#d97706',
+                type: 'warning',
                 icon: svgIcons.clock,
                 title: 'Pending Admin Review',
                 desc: isFiledByMe 
@@ -1061,9 +1348,7 @@
 
             if (status === 'in_review') {
                 config = {
-                    bg: 'rgba(59,130,246,0.08)',
-                    border: 'rgba(59,130,246,0.25)',
-                    color: '#2563eb',
+                    type: 'info',
                     icon: svgIcons.search,
                     title: 'Investigation Ongoing',
                     desc: isFiledByMe 
@@ -1072,31 +1357,25 @@
                 };
             } else if (status === 'approved') {
                 config = {
-                    bg: isFiledByMe ? 'rgba(16,185,129,0.08)' : 'rgba(239,68,68,0.08)',
-                    border: isFiledByMe ? 'rgba(16,185,129,0.25)' : 'rgba(239,68,68,0.25)',
-                    color: isFiledByMe ? '#10b981' : '#ef4444',
+                    type: isFiledByMe ? 'success' : 'danger',
                     icon: isFiledByMe ? svgIcons.checkCircle : svgIcons.shieldAlert,
                     title: isFiledByMe ? 'Action Enforced / Resolved' : 'Disciplinary Sanction Enforced',
                     desc: isFiledByMe 
                         ? 'Your report was investigated and validated by admin. Disciplinary action/warning has been enforced.'
-                        : 'The admin investigated this report, confirmed TOS policy grounds, and enforced administrative action/warning against your account.'
+                        : 'The admin investigated this report, confirmed policy grounds, and enforced administrative action against your account.'
                 };
             } else if (status === 'rejected' || status === 'dismissed') {
                 config = {
-                    bg: 'rgba(16,185,129,0.08)',
-                    border: 'rgba(16,185,129,0.25)',
-                    color: '#10b981',
+                    type: 'info',
                     icon: svgIcons.shieldCheck,
                     title: 'Case Dismissed',
                     desc: isFiledByMe
-                        ? 'Your report was reviewed and dismissed by admin (insufficient evidence or no TOS policy violation found).'
+                        ? 'Your report was reviewed and dismissed by admin (insufficient evidence or no policy violation found).'
                         : 'The report filed against you was reviewed and dismissed by admin. No disciplinary action will be taken.'
                 };
             } else if (status === 'needs_more_evidence') {
                 config = {
-                    bg: 'rgba(147,51,234,0.08)',
-                    border: 'rgba(147,51,234,0.25)',
-                    color: '#9333ea',
+                    type: 'purple',
                     icon: svgIcons.paperclip,
                     title: 'Evidence / Statement Requested',
                     desc: isFiledByMe
@@ -1105,34 +1384,73 @@
                 };
             }
 
-            banner.style.cssText = `background:${config.bg}; border:1px solid ${config.border}; border-radius:var(--radius-md, 10px); padding:1rem 1.25rem; margin-bottom:1.25rem; display:flex; align-items:flex-start; gap:0.85rem;`;
+            banner.className = `detail-alert-box ${config.type}`;
             banner.innerHTML = `
-                <div style="color:${config.color}; margin-top:2px; flex-shrink:0;">${config.icon}</div>
-                <div>
-                    <div style="font-weight:700; font-size:0.92rem; color:${config.color}; margin-bottom:0.15rem;">${domiknowEscapeHtml(config.title)}</div>
-                    <div style="font-size:0.84rem; color:var(--text-secondary); line-height:1.5;">${domiknowEscapeHtml(config.desc)}</div>
+                <div class="detail-alert-title">
+                    ${config.icon}
+                    <span>${domiknowEscapeHtml(config.title)}</span>
                 </div>
+                <div style="font-size:0.84rem; line-height:1.5; margin-top:3px;">${domiknowEscapeHtml(config.desc)}</div>
             `;
         }
 
-        function sevClass(s) {
-            return { minor:'sev-minor', moderate:'sev-moderate', major:'sev-major', critical:'sev-critical' }[s] || '';
+        function statusPillClass(s) {
+            if (s === 'approved') return 'approved';
+            if (s === 'rejected' || s === 'dismissed') return 'dismissed';
+            if (s === 'needs_more_evidence') return 'needs_more_evidence';
+            if (s === 'in_review') return 'in_review';
+            return 'pending';
         }
-        function statusClass(s) {
-            if (s === 'approved')            return 'status-active';
-            if (s === 'rejected')            return 'status-rejected';
-            if (s === 'needs_more_evidence') return 'status-pending';
-            return 'status-pending';
-        }
+
         function statusLabel(s) {
             return {
-                pending_admin_review: 'Pending Admin Review',
-                in_review: 'In Review (Staff Assigned)',
-                approved: 'Action Enforced / Resolved',
+                pending_admin_review: 'Pending Review',
+                in_review: 'In Review',
+                approved: 'Resolved',
                 rejected: 'Dismissed',
                 dismissed: 'Dismissed',
-                needs_more_evidence: 'Needs Evidence / Response'
+                needs_more_evidence: 'Needs Evidence'
             }[s] || capWords(s);
+        }
+
+        // ── Search & Status Filtering ──
+        function getFilteredReports(list) {
+            const query = ($('reportsSearchInput')?.value || '').trim().toLowerCase();
+            const statusVal = $('statusFilter')?.value || 'all';
+
+            return list.filter(r => {
+                // Status Filter
+                if (statusVal !== 'all') {
+                    if (statusVal === 'pending_admin_review' && r.status !== 'pending_admin_review') return false;
+                    if (statusVal === 'in_review' && r.status !== 'in_review') return false;
+                    if (statusVal === 'approved' && r.status !== 'approved') return false;
+                    if (statusVal === 'dismissed' && (r.status !== 'dismissed' && r.status !== 'rejected')) return false;
+                    if (statusVal === 'needs_more_evidence' && r.status !== 'needs_more_evidence') return false;
+                }
+
+                // Text Query Filter
+                if (!query) return true;
+
+                const category = (r.report_category || '').toLowerCase();
+                const property = (r.properties?.property_name || '').toLowerCase();
+                const landlord = (r.landlord?.full_name || '').toLowerCase();
+                const description = (r.incident_description || '').toLowerCase();
+                const ref = String(r.id || '').toLowerCase();
+
+                return category.includes(query) ||
+                       property.includes(query) ||
+                       landlord.includes(query) ||
+                       description.includes(query) ||
+                       ref.includes(query);
+            });
+        }
+
+        function renderCurrentTabList() {
+            if (currentTab === 'filed') {
+                renderFiledList(getFilteredReports(rawFiledReports));
+            } else {
+                renderAgainstList(getFilteredReports(rawAgainstReports));
+            }
         }
 
         document.addEventListener('DOMContentLoaded', () => {
@@ -1146,6 +1464,17 @@
                 switchTab('against');
             }
 
+            // Search input listener
+            $('reportsSearchInput')?.addEventListener('input', () => {
+                renderCurrentTabList();
+            });
+
+            // Status filter listener
+            $('statusFilter')?.addEventListener('change', () => {
+                renderCurrentTabList();
+            });
+
+            // Floating inquiry chat head setup
             const fab = $('chatHeadFab');
             const chatModal = $('chatHeadModal');
             const closeBtn = $('closeChatHeadModalBtn');
@@ -1164,17 +1493,6 @@
                 closeBtn.addEventListener('click', () => {
                     chatModal.classList.add('hidden');
                     stopChatHeadPolling();
-                });
-            }
-
-            const switchBtn = $('switchConvoBtn');
-            if (switchBtn) {
-                switchBtn.addEventListener('click', () => {
-                    activeChatThread = activeChatThread === 'reporter' ? 'target' : 'reporter';
-                    chatLastMessageCount = -1;
-                    const titleEl = $('chatHeaderTitle');
-                    if (titleEl) titleEl.textContent = activeChatThread === 'reporter' ? 'Reporter Inquiry Thread' : 'Target Inquiry Thread';
-                    pollChatHeadThread();
                 });
             }
 
@@ -1260,7 +1578,12 @@
                         }
                         const res = await fetch(`/api/reports/messages/${activeChatReportType}/${activeChatReportId}`, {
                             method: 'POST',
-                            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                            headers: { 
+                                'Content-Type': 'application/json', 
+                                'Authorization': `Bearer ${token}`,
+                                'X-DOMIKNOW-SILENT': '1'
+                            },
+                            domiknowLoading: false,
                             body: JSON.stringify(payload)
                         });
                         if (res.ok) {
@@ -1334,7 +1657,6 @@
         async function pollChatHeadThread() {
             if (!activeChatReportId || !activeChatReportType) return;
             try {
-                // 1. Fetch messages
                 const res = await fetch(`/api/reports/messages/${activeChatReportType}/${activeChatReportId}`, {
                     headers: { 'Authorization': `Bearer ${token}`, 'X-DOMIKNOW-SILENT': '1' },
                     domiknowLoading: false
@@ -1353,7 +1675,6 @@
                     }
                 }
 
-                // 2. Fetch active typers
                 const typingRes = await fetch(`/api/reports/messages/${activeChatReportType}/${activeChatReportId}/typing?thread=${activeChatThread}`, {
                     headers: { 'Authorization': `Bearer ${token}`, 'X-DOMIKNOW-SILENT': '1' },
                     domiknowLoading: false
@@ -1369,15 +1690,15 @@
             const feed = $('chatHeadMessagesFeed');
             if (!feed) return;
             if (!data || data.length === 0) {
-                feed.innerHTML = '<div style="font-size:0.8rem; color:var(--text-muted); font-style:italic; text-align:center; padding:1.5rem;">No inquiry messages posted yet in this thread.</div>';
+                feed.innerHTML = '<div style="font-size:0.8rem; color:#64748b; font-style:italic; text-align:center; padding:1.5rem;">No inquiry messages posted yet in this thread.</div>';
                 return;
             }
 
             const myUserId = (function() {
                 try {
-                    const token = localStorage.getItem('domiknow_token');
-                    if (!token) return null;
-                    const p = JSON.parse(atob(token.split('.')[1]));
+                    const t = localStorage.getItem('domiknow_token');
+                    if (!t) return null;
+                    const p = JSON.parse(atob(t.split('.')[1]));
                     return p.id || p.userId || p.sub || null;
                 } catch(e) { return null; }
             })();
@@ -1403,7 +1724,6 @@
                 const senderName = isMe ? 'You (Tenant)' : (m.sender?.full_name || (m.sender_role === 'admin' ? 'System Admin' : capWords(m.sender_role)));
                 const timeStr = msgDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
                 const fullDateStr = msgDate.toLocaleString();
-
                 const initialName = senderName.replace(/^You \([^)]+\)/, 'You');
                 const initial = (initialName.charAt(0) || 'U').toUpperCase();
 
@@ -1415,18 +1735,13 @@
                     const safeUrl = domiknowSafeExternalUrl(m.attachment_url);
                     const isImg = /\.(jpg|jpeg|png|gif|webp|svg)(\?|$)/i.test(m.attachment_url) || (m.attachment_path || '').match(/\.(jpg|jpeg|png|gif|webp|svg)$/i);
                     if (isImg) {
-                        attachmentHtml = `<div class="chat-msg-attachment"><a href="${safeUrl}" target="_blank" rel="noopener noreferrer"><img src="${safeUrl}" alt="Attachment"></a></div>`;
+                        attachmentHtml = `<div style="margin-top:0.35rem;"><a href="${safeUrl}" target="_blank" rel="noopener noreferrer"><img src="${safeUrl}" alt="Attachment" style="max-width:180px; max-height:140px; border-radius:8px; object-fit:cover;"></a></div>`;
                     } else {
                         const fileName = m.attachment_path ? m.attachment_path.split('/').pop() : 'Attachment';
                         attachmentHtml = `
                             <a href="${safeUrl}" target="_blank" rel="noopener noreferrer" class="chat-file-card">
-                                <div class="chat-file-icon">
-                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
-                                </div>
-                                <div class="chat-file-info">
-                                    <div class="chat-file-name">${domiknowEscapeHtml(fileName)}</div>
-                                    <div class="chat-file-actions">Download &bull; View</div>
-                                </div>
+                                <div><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg></div>
+                                <div><div style="font-size:0.75rem; font-weight:700; color:#0f172a;">${domiknowEscapeHtml(fileName)}</div><div style="font-size:0.68rem; color:#0052ea;">Download &bull; View</div></div>
                             </a>
                         `;
                     }
@@ -1455,16 +1770,7 @@
             }
             const roleLabels = typers.map(t => t.userRole === 'admin' ? 'System Admin' : t.userRole).join(', ');
             const verb = typers.length > 1 ? 'are' : 'is';
-            container.innerHTML = `
-                <div class="typing-indicator-box">
-                    <span><strong>${domiknowEscapeHtml(roleLabels)}</strong> ${verb} typing</span>
-                    <div class="messenger-dots">
-                        <span></span>
-                        <span></span>
-                        <span></span>
-                    </div>
-                </div>
-            `;
+            container.innerHTML = `<span style="font-size:0.75rem; color:#6b21a8; font-weight:600;">${domiknowEscapeHtml(roleLabels)} ${verb} typing...</span>`;
         }
 
         async function sendChatHeadTypingPulse(isTyping) {
@@ -1481,25 +1787,28 @@
 
         // ── Tab Switching ──────────────────────────────────────────────────────
         function switchTab(tab) {
+            currentTab = tab;
             if (tab === 'filed') {
                 $('tabFiledBtn').classList.add('active');
                 $('tabAgainstBtn').classList.remove('active');
-                $('tabFiledContent').style.display   = 'block';
+                $('tabFiledContent').style.display   = 'flex';
                 $('tabAgainstContent').style.display = 'none';
-                loadFiledReports();
             } else {
                 $('tabAgainstBtn').classList.add('active');
                 $('tabFiledBtn').classList.remove('active');
-                $('tabAgainstContent').style.display = 'block';
+                $('tabAgainstContent').style.display = 'flex';
                 $('tabFiledContent').style.display   = 'none';
-                loadReportsAgainstMe();
             }
+            renderCurrentTabList();
         }
 
         // ── Fetch Tenant Leases for "Report Landlord" Button ─────────────────
         async function loadTenantLeases() {
             try {
-                const res  = await fetch('/api/leases/my', { headers: { 'Authorization': `Bearer ${token}` } });
+                const res  = await fetch('/api/leases/my', { 
+                    headers: { 'Authorization': `Bearer ${token}`, 'X-DOMIKNOW-SILENT': '1' },
+                    domiknowLoading: false
+                });
                 const json = await res.json();
                 tenantLeases = json.data || [];
             } catch (err) {
@@ -1522,15 +1831,16 @@
             listEl.innerHTML = '';
             tenantLeases.forEach(l => {
                 const btn = document.createElement('button');
-                btn.className = 'navbar-btn';
-                btn.style.cssText = 'text-align:left;padding:1rem;width:100%;display:flex;justify-content:space-between;align-items:center;border-radius:var(--radius-md);';
+                btn.className = 'm-lease-card-btn';
                 btn.innerHTML = `
                     <div>
-                        <div style="font-weight:700;color:var(--text-primary);">Lease: ${l.lease_number || 'DRAFT'}</div>
-                        <div style="font-size:.8rem;color:var(--text-muted);">${l.properties?.property_name || '—'} · Unit ${l.properties?.unit_number || '—'}</div>
-                        <div style="font-size:.75rem;color:var(--primary);margin-top:.2rem;">Landlord: ${l.landlord?.full_name || '—'}</div>
+                        <div style="font-weight:700; font-size:0.95rem; color:#0f172a;">${domiknowEscapeHtml(l.properties?.property_name || 'Property')}</div>
+                        <div style="font-size:0.8125rem; color:#64748b; margin-top:2px;">Unit ${domiknowEscapeHtml(l.properties?.unit_number || '—')} &bull; Contract: ${domiknowEscapeHtml(l.lease_number || 'DRAFT')}</div>
+                        <div style="font-size:0.75rem; color:#0052ea; font-weight:600; margin-top:3px;">Landlord: ${domiknowEscapeHtml(l.landlord?.full_name || '—')}</div>
                     </div>
-                    <span style="font-size:.85rem;font-weight:600;color:var(--primary);">Select →</span>
+                    <div style="color:#0052ea; display:flex; align-items:center;">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                    </div>
                 `;
                 btn.onclick = () => {
                     window.location.href = `landlord-report-form.html?lease_id=${l.id}`;
@@ -1554,59 +1864,88 @@
 
         // ── Tab 1: Load Reports Filed By Me ──────────────────────────────────
         async function loadFiledReports() {
-            const container = $('tabFiledContent');
             try {
-                const res  = await fetch('/api/landlord-reports/my-filed', { headers: { 'Authorization': `Bearer ${token}` } });
+                const res  = await fetch('/api/landlord-reports/my-filed', { 
+                    headers: { 'Authorization': `Bearer ${token}`, 'X-DOMIKNOW-SILENT': '1' },
+                    domiknowLoading: false
+                });
                 const json = await res.json();
 
                 if (!res.ok) {
-                    container.innerHTML = `<div role="alert" style="padding:2rem;text-align:center;color:#ef4444;">${domiknowEscapeHtml(json.message || 'Failed to load filed reports.')}</div>`;
+                    $('tabFiledContent').innerHTML = `<div role="alert" style="padding:2rem;text-align:center;color:#ef4444;">${domiknowEscapeHtml(json.message || 'Failed to load filed reports.')}</div>`;
                     return;
                 }
 
-                const reports = json.data || [];
-
-                if (reports.length === 0) {
-                    container.innerHTML = `
-                        <div class="empty-state">
-                            <div class="empty-icon">
-                                <svg class="svg-icon" width="40" height="40" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
-                            </div>
-                            <div style="font-weight:700;font-size:1.1rem;color:var(--text-primary);">No Reports Filed Yet</div>
-                            <div style="font-size:.85rem;margin-top:.4rem;">You haven't filed any incident reports against your landlord.</div>
-                        </div>
-                    `;
-                    return;
+                rawFiledReports = json.data || [];
+                const badge = $('filedCountBadge');
+                if (badge) {
+                    badge.textContent = rawFiledReports.length;
+                    badge.style.display = rawFiledReports.length > 0 ? 'inline-block' : 'none';
                 }
 
-                container.innerHTML = '';
-                reports.forEach(r => {
-                    const card = document.createElement('div');
-                    card.className = 'report-item-card';
-                    card.onclick   = () => openFiledModal(r.id);
-
-                    card.innerHTML = `
-                        <div>
-                            <div class="report-category">${domiknowEscapeHtml(capWords(r.report_category))}</div>
-                            <div class="report-meta">
-                                <span class="meta-item">${svgCalendar} Incident: ${fmtDate(r.incident_date)}</span>
-                                <span class="meta-item">${svgHome} ${domiknowEscapeHtml(r.properties?.property_name || '—')} (Unit ${domiknowEscapeHtml(r.properties?.unit_number || '—')})</span>
-                                <span class="meta-item">${svgUser} Landlord: ${domiknowEscapeHtml(r.landlord?.full_name || '—')}</span>
-                                <span class="meta-item">${svgCalendar} Filed: ${fmtDate(r.created_at)}</span>
-                            </div>
-                        </div>
-                        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:.4rem;">
-                            <span class="status-badge ${statusClass(r.status)}">${domiknowEscapeHtml(statusLabel(r.status))}</span>
-                            <span class="status-badge ${sevClass(r.severity)}" style="font-size:.72rem;text-transform:capitalize;">${domiknowEscapeHtml(r.severity || 'normal')}</span>
-                        </div>
-                    `;
-                    container.appendChild(card);
-                });
-
+                if (currentTab === 'filed') {
+                    renderFiledList(getFilteredReports(rawFiledReports));
+                }
             } catch (err) {
                 console.error(err);
-                container.innerHTML = `<div style="padding:2rem;text-align:center;color:#ef4444;">Failed to load filed reports.</div>`;
+                $('tabFiledContent').innerHTML = `<div style="padding:2rem;text-align:center;color:#ef4444;">Failed to load filed reports.</div>`;
             }
+        }
+
+        function renderFiledList(reports) {
+            const container = $('tabFiledContent');
+            if (!container) return;
+
+            if (reports.length === 0) {
+                container.innerHTML = `
+                    <div style="background:#ffffff; border:1px solid #e2e8f0; border-radius:12px; padding:48px 24px; text-align:center;">
+                        <div style="width:48px; height:48px; border-radius:12px; background:#f8fafc; border:1px solid #e2e8f0; color:#94a3b8; display:inline-flex; align-items:center; justify-content:center; margin-bottom:12px;">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"></path><line x1="4" y1="22" x2="4" y2="15"></line></svg>
+                        </div>
+                        <div style="font-size:1rem; font-weight:700; color:#0f172a; margin-bottom:4px;">No Reports Found</div>
+                        <div style="font-size:0.875rem; color:#64748b;">You haven't filed any reports matching this criteria.</div>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = '';
+            reports.forEach(r => {
+                const card = document.createElement('div');
+                card.className = 'request-card';
+                card.onclick   = () => openFiledModal(r.id);
+
+                const sev = (r.severity || 'minor').toLowerCase();
+                const unitStr = r.properties?.unit_number ? `Unit ${r.properties.unit_number}` : 'Unit —';
+                const propStr = r.properties?.property_name || 'Property';
+
+                card.innerHTML = `
+                    <div class="rc-left-group">
+                        <div class="rc-icon-box" style="background:#eff6ff; border-color:#bfdbfe; color:#0052ea;">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"></path><line x1="4" y1="22" x2="4" y2="15"></line></svg>
+                        </div>
+                        <div class="rc-text-box">
+                            <div class="rc-title">${domiknowEscapeHtml(capWords(r.report_category))}</div>
+                            <div class="rc-subtitle">${domiknowEscapeHtml(propStr)} &bull; ${domiknowEscapeHtml(unitStr)} &bull; Incident: ${fmtDate(r.incident_date)}</div>
+                        </div>
+                    </div>
+                    <div class="rc-assigned-group">
+                        <div class="rc-col-label uppercase">LANDLORD</div>
+                        <div class="rc-col-val">${domiknowEscapeHtml(r.landlord?.full_name || '—')}</div>
+                    </div>
+                    <div class="rc-priority-group">
+                        <div class="rc-col-label uppercase">SEVERITY</div>
+                        <div class="rc-col-val rc-col-val-prio">
+                            <span class="rc-tag-pill ${sev}">${domiknowEscapeHtml(sev)}</span>
+                        </div>
+                    </div>
+                    <div class="rc-right-group">
+                        <span class="rc-status-pill ${statusPillClass(r.status)}">${domiknowEscapeHtml(statusLabel(r.status))}</span>
+                        <span class="rc-chevron">${svgIcons.chevronRight}</span>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
         }
 
         // ── Modal for Tenant's Own Filed Landlord Report Detail ────────────
@@ -1626,7 +1965,10 @@
             $('fStatusBanner').innerHTML = '';
 
             try {
-                const res  = await fetch(`/api/landlord-reports/${reportId}/detail-filed`, { headers: { 'Authorization': `Bearer ${token}` } });
+                const res  = await fetch(`/api/landlord-reports/${reportId}/detail-filed`, { 
+                    headers: { 'Authorization': `Bearer ${token}`, 'X-DOMIKNOW-SILENT': '1' },
+                    domiknowLoading: false
+                });
                 const json = await res.json();
                 if (!res.ok) {
                     window.tenantNotice(json.message || 'Failed to load report details.');
@@ -1637,7 +1979,7 @@
                 if (!r) { window.tenantNotice('Failed to load report details.'); return; }
 
                 $('fTitle').textContent = capWords(r.report_category);
-                $('fSubtitle').innerHTML = `<span>Filed ${fmtDate(r.created_at)}</span> &bull; <span>Ref: #${String(r.id).substring(0,8)}</span>`;
+                $('fSubtitle').textContent = `Filed ${fmtDate(r.created_at)} • Ref: #${String(r.id).substring(0,8)}`;
 
                 renderStatusBanner('fStatusBanner', r.status, true);
 
@@ -1670,7 +2012,8 @@
                 $('fCategory').textContent     = capWords(r.report_category);
                 $('fIncidentDate').textContent = fmtDate(r.incident_date);
                 $('fDescription').textContent  = r.incident_description || '—';
-                $('fSeverity').innerHTML        = `<span class="status-badge ${sevClass(r.severity)}" style="text-transform:capitalize;">${domiknowEscapeHtml(r.severity || 'normal')}</span>`;
+                const sev = (r.severity || 'minor').toLowerCase();
+                $('fSeverity').innerHTML       = `<span class="rc-tag-pill ${sev}">${domiknowEscapeHtml(sev)}</span>`;
 
                 if (r.evidence?.length) {
                     $('fEvidenceSection').style.display = 'block';
@@ -1740,64 +2083,88 @@
 
         // ── Tab 2: Load Reports Against Me ───────────────────────────────────
         async function loadReportsAgainstMe() {
-            const container = $('tabAgainstContent');
             try {
-                const res  = await fetch('/api/tenant-reports/against-me', { headers: { 'Authorization': `Bearer ${token}` } });
+                const res  = await fetch('/api/tenant-reports/against-me', { 
+                    headers: { 'Authorization': `Bearer ${token}`, 'X-DOMIKNOW-SILENT': '1' },
+                    domiknowLoading: false
+                });
                 const json = await res.json();
 
                 if (!res.ok) {
-                    container.innerHTML = `<div role="alert" style="padding:2rem;text-align:center;color:#ef4444;">${domiknowEscapeHtml(json.message || 'Failed to load reports against you.')}</div>`;
+                    $('tabAgainstContent').innerHTML = `<div role="alert" style="padding:2rem;text-align:center;color:#ef4444;">${domiknowEscapeHtml(json.message || 'Failed to load reports against you.')}</div>`;
                     return;
                 }
 
-                const reports = json.data || [];
-
-                if (reports.length === 0) {
-                    container.innerHTML = `
-                        <div class="empty-state">
-                            <div class="empty-icon">
-                                <svg class="svg-icon" width="40" height="40" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
-                            </div>
-                            <div style="font-weight:700;font-size:1.1rem;color:var(--text-primary);">No Reports Against You</div>
-                            <div style="font-size:.85rem;margin-top:.4rem;">You currently have clean records with no formal landlord complaints against you.</div>
-                        </div>
-                    `;
-                    $('againstCountBadge').style.display = 'none';
-                    return;
+                rawAgainstReports = json.data || [];
+                const badge = $('againstCountBadge');
+                if (badge) {
+                    badge.textContent = rawAgainstReports.length;
+                    badge.style.display = rawAgainstReports.length > 0 ? 'inline-block' : 'none';
                 }
 
-                // Show badge count
-                $('againstCountBadge').textContent = reports.length;
-                $('againstCountBadge').style.display = 'inline-block';
-
-                container.innerHTML = '';
-                reports.forEach(r => {
-                    const card = document.createElement('div');
-                    card.className = 'report-item-card';
-                    card.onclick   = () => openModal(r.id);
-
-                    card.innerHTML = `
-                        <div>
-                            <div class="report-category">${domiknowEscapeHtml(capWords(r.report_category))}</div>
-                            <div class="report-meta">
-                                <span class="meta-item">${svgCalendar} Incident: ${fmtDate(r.incident_date)}</span>
-                                <span class="meta-item">${svgHome} ${domiknowEscapeHtml(r.properties?.property_name || '—')} &middot; Unit ${domiknowEscapeHtml(r.properties?.unit_number || '—')}</span>
-                                <span class="meta-item">${svgUser} Filed By: ${domiknowEscapeHtml(r.landlord?.full_name || '—')}</span>
-                                <span class="meta-item">${svgCalendar} Filed: ${fmtDate(r.created_at)}</span>
-                            </div>
-                        </div>
-                        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:.4rem;">
-                            <span class="status-badge ${statusClass(r.status)}">${domiknowEscapeHtml(statusLabel(r.status))}</span>
-                            <span class="status-badge ${sevClass(r.severity)}" style="font-size:.72rem;text-transform:capitalize;">${domiknowEscapeHtml(r.severity || 'normal')}</span>
-                        </div>
-                    `;
-                    container.appendChild(card);
-                });
-
+                if (currentTab === 'against') {
+                    renderAgainstList(getFilteredReports(rawAgainstReports));
+                }
             } catch (err) {
                 console.error(err);
-                container.innerHTML = `<div style="padding:2rem;text-align:center;color:#ef4444;">Failed to load reports against you.</div>`;
+                $('tabAgainstContent').innerHTML = `<div style="padding:2rem;text-align:center;color:#ef4444;">Failed to load reports against you.</div>`;
             }
+        }
+
+        function renderAgainstList(reports) {
+            const container = $('tabAgainstContent');
+            if (!container) return;
+
+            if (reports.length === 0) {
+                container.innerHTML = `
+                    <div style="background:#ffffff; border:1px solid #e2e8f0; border-radius:12px; padding:48px 24px; text-align:center;">
+                        <div style="width:48px; height:48px; border-radius:12px; background:#f8fafc; border:1px solid #e2e8f0; color:#10b981; display:inline-flex; align-items:center; justify-content:center; margin-bottom:12px;">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><path d="m9 12 2 2 4-4"></path></svg>
+                        </div>
+                        <div style="font-size:1rem; font-weight:700; color:#0f172a; margin-bottom:4px;">No Reports Against You</div>
+                        <div style="font-size:0.875rem; color:#64748b;">You currently have clean records with no active complaints filed against you.</div>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = '';
+            reports.forEach(r => {
+                const card = document.createElement('div');
+                card.className = 'request-card';
+                card.onclick   = () => openModal(r.id);
+
+                const sev = (r.severity || 'minor').toLowerCase();
+                const unitStr = r.properties?.unit_number ? `Unit ${r.properties.unit_number}` : 'Unit —';
+                const propStr = r.properties?.property_name || 'Property';
+
+                card.innerHTML = `
+                    <div class="rc-left-group">
+                        <div class="rc-icon-box" style="background:#fef2f2; border-color:#fecaca; color:#dc2626;">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="7.86 2 16.14 2 22 7.86 22 16.14 16.14 22 7.86 22 2 16.14 2 7.86 7.86 2"></polygon><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                        </div>
+                        <div class="rc-text-box">
+                            <div class="rc-title">${domiknowEscapeHtml(capWords(r.report_category))}</div>
+                            <div class="rc-subtitle">${domiknowEscapeHtml(propStr)} &bull; ${domiknowEscapeHtml(unitStr)} &bull; Incident: ${fmtDate(r.incident_date)}</div>
+                        </div>
+                    </div>
+                    <div class="rc-assigned-group">
+                        <div class="rc-col-label uppercase">REPORTED BY</div>
+                        <div class="rc-col-val">${domiknowEscapeHtml(r.landlord?.full_name || '—')}</div>
+                    </div>
+                    <div class="rc-priority-group">
+                        <div class="rc-col-label uppercase">SEVERITY</div>
+                        <div class="rc-col-val rc-col-val-prio">
+                            <span class="rc-tag-pill ${sev}">${domiknowEscapeHtml(sev)}</span>
+                        </div>
+                    </div>
+                    <div class="rc-right-group">
+                        <span class="rc-status-pill ${statusPillClass(r.status)}">${domiknowEscapeHtml(statusLabel(r.status))}</span>
+                        <span class="rc-chevron">${svgIcons.chevronRight}</span>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
         }
 
         // ── Modal for Reports Against Me Details & Explanation ─────────────
@@ -1818,13 +2185,16 @@
             $('mStatusBanner').innerHTML = '';
 
             try {
-                const res  = await fetch(`/api/tenant-reports/${reportId}/detail-tenant`, { headers:{ 'Authorization': `Bearer ${token}` } });
+                const res  = await fetch(`/api/tenant-reports/${reportId}/detail-tenant`, { 
+                    headers:{ 'Authorization': `Bearer ${token}`, 'X-DOMIKNOW-SILENT': '1' },
+                    domiknowLoading: false
+                });
                 const json = await res.json();
                 const r    = json.data;
                 if (!r) { window.tenantNotice('Failed to load report details.'); return; }
 
                 $('mTitle').textContent    = capWords(r.report_category);
-                $('mSubtitle').innerHTML   = `<span>Filed ${fmtDate(r.created_at)}</span> &bull; <span>Ref: #${String(r.id).substring(0,8)}</span>`;
+                $('mSubtitle').textContent = `Filed ${fmtDate(r.created_at)} • Ref: #${String(r.id).substring(0,8)}`;
 
                 renderStatusBanner('mStatusBanner', r.status, false);
 
@@ -1841,7 +2211,8 @@
                 $('mCategory').textContent     = capWords(r.report_category);
                 $('mIncidentDate').textContent = fmtDate(r.incident_date);
                 $('mDescription').textContent  = r.incident_description || '—';
-                $('mSeverity').innerHTML       = `<span class="status-badge ${sevClass(r.severity)}" style="text-transform:capitalize;">${domiknowEscapeHtml(r.severity || 'normal')}</span>`;
+                const sev = (r.severity || 'minor').toLowerCase();
+                $('mSeverity').innerHTML       = `<span class="rc-tag-pill ${sev}">${domiknowEscapeHtml(sev)}</span>`;
 
                 if (r.status !== 'pending_admin_review' && r.evidence?.length) {
                     $('mEvidenceSection').style.display = 'block';
@@ -1870,46 +2241,6 @@
             } catch (err) {
                 console.error(err);
                 window.tenantNotice('Error fetching details.');
-            }
-        }
-
-        async function loadInvestigationMessages(type, id, feedElementId) {
-            const feed = $(feedElementId);
-            if (!feed) return;
-            feed.innerHTML = '<div style="font-size:0.78rem; color:var(--text-muted); font-style:italic;">Loading inquiry thread...</div>';
-            try {
-                const res = await fetch(`/api/reports/messages/${type}/${id}`, { headers: { 'Authorization': `Bearer ${token}` } });
-                if (!res.ok) {
-                    feed.innerHTML = '<div style="font-size:0.78rem; color:var(--text-muted); font-style:italic;">No inquiry messages in this case thread yet.</div>';
-                    return;
-                }
-                const { data } = await res.json();
-                if (!data || data.length === 0) {
-                    feed.innerHTML = '<div style="font-size:0.78rem; color:var(--text-muted); font-style:italic;">No inquiry messages in this case thread yet.</div>';
-                    return;
-                }
-
-                feed.innerHTML = '';
-                data.forEach(m => {
-                    const isMe = m.sender_role === 'tenant';
-                    const senderName = m.sender?.full_name || (m.sender_role === 'admin' ? 'System Admin' : m.sender_role);
-                    const dateStr = new Date(m.created_at).toLocaleString();
-
-                    const item = document.createElement('div');
-                    item.style.cssText = `background:${isMe ? 'rgba(59,130,246,0.1)' : 'var(--bg-secondary)'}; border:1px solid var(--border-color); padding:0.5rem 0.75rem; border-radius:6px; font-size:0.8rem;`;
-                    item.innerHTML = `
-                        <div style="display:flex; justify-content:space-between; margin-bottom:0.15rem; font-size:0.7rem;">
-                            <span style="font-weight:800; color:${isMe ? 'var(--primary)' : 'var(--text-primary)'};">${domiknowEscapeHtml(senderName)} (${domiknowEscapeHtml(String(m.sender_role || '').toUpperCase())})</span>
-                            <span style="color:var(--text-muted);">${domiknowEscapeHtml(dateStr)}</span>
-                        </div>
-                        <div style="color:var(--text-primary); white-space:pre-wrap;">${domiknowEscapeHtml(m.message_text)}</div>
-                    `;
-                    feed.appendChild(item);
-                });
-                feed.scrollTop = feed.scrollHeight;
-            } catch (e) {
-                console.error(e);
-                feed.innerHTML = '<div style="font-size:0.78rem; color:var(--text-muted); font-style:italic;">No inquiry messages in this case thread yet.</div>';
             }
         }
 
@@ -1967,7 +2298,12 @@
             try {
                 const res = await fetch(`/api/tenant-reports/${currentReportId}/explain`, {
                     method:  'PUT',
-                    headers: { 'Content-Type':'application/json', 'Authorization': `Bearer ${token}` },
+                    headers: { 
+                        'Content-Type':'application/json', 
+                        'Authorization': `Bearer ${token}`,
+                        'X-DOMIKNOW-SILENT': '1'
+                    },
+                    domiknowLoading: false,
                     body:    JSON.stringify({ explanation })
                 });
                 const json = await res.json();
