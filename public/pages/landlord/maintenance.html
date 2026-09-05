@@ -349,6 +349,45 @@
             }
         }
 
+        function formatCategory(cat) {
+            if (!cat) return 'General';
+            const map = {
+                plumbing:    'Plumbing',
+                electrical:  'Electrical',
+                aircon:      'Air Conditioning',
+                hvac:        'Air Conditioning',
+                door:        'Door / Window',
+                doors:       'Door / Window',
+                window:      'Door / Window',
+                windows:     'Door / Window',
+                carpentry:   'Carpentry',
+                carpenter:   'Carpentry',
+                roof:        'Roofing',
+                roofing:     'Roofing',
+                internet:    'Internet / Network',
+                wifi:        'Internet / Network',
+                network:     'Internet / Network',
+                appliance:   'Appliance',
+                appliances:  'Appliance',
+                structural:  'Structural',
+                structure:   'Structural',
+                cleanliness: 'Cleanliness',
+                cleaning:    'Cleanliness',
+                sanitation:  'Cleanliness',
+                security:    'Security',
+                lock:        'Lock & Security',
+                locks:       'Lock & Security',
+                locksmith:   'Lock & Security',
+                painting:    'Painting',
+                painter:     'Painting',
+                other:       'General / Other',
+                others:      'General / Other',
+                general:     'General Maintenance',
+            };
+            const key = String(cat).trim().toLowerCase().replace(/[\s-]+/g, '_');
+            return map[key] || String(cat).replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+        }
+
         function renderQueueTable() {
             const tableBody = document.getElementById('maintenanceQueueBody');
             
@@ -392,7 +431,7 @@
                         <div style="font-weight:700; color:var(--primary);">${req.issue_title}</div>
                         <div style="font-size:0.72rem; color:var(--text-secondary); max-width: 180px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">Pref. Sch: ${req.preferred_schedule || '—'}</div>
                     </td>
-                    <td style="text-transform: capitalize;">${req.issue_category}</td>
+                    <td>${formatCategory(req.issue_category)}</td>
                     <td><span class="status-badge ${priorityBadgeClass}" style="text-transform:capitalize;">${req.priority_level}</span></td>
                     <td><span class="status-badge ${statusBadgeClass}" style="text-transform:capitalize;">${req.status.replace('_', ' ')}</span></td>
                     <td style="font-weight:600; color:var(--text-secondary);">${technicianName}</td>

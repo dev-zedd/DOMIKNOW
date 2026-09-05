@@ -356,27 +356,27 @@
                         <div class="info-grid" id="infoGrid">
                             <div>
                                 <div class="info-cell-label">Property</div>
-                                <div class="info-cell-value" id="propertyName">Loading…</div>
+                                <div class="info-cell-value" id="propertyName">—</div>
                             </div>
                             <div>
                                 <div class="info-cell-label">Unit / Room</div>
-                                <div class="info-cell-value" id="unitNumber">Loading…</div>
+                                <div class="info-cell-value" id="unitNumber">—</div>
                             </div>
                             <div>
                                 <div class="info-cell-label">Tenant</div>
-                                <div class="info-cell-value" id="tenantName">Loading…</div>
+                                <div class="info-cell-value" id="tenantName">—</div>
                             </div>
                             <div>
                                 <div class="info-cell-label">Preferred Entry Schedule</div>
-                                <div class="info-cell-value" id="preferredSchedule">Loading…</div>
+                                <div class="info-cell-value" id="preferredSchedule">—</div>
                             </div>
                             <div>
                                 <div class="info-cell-label">Issue Category</div>
-                                <div class="info-cell-value" id="issueCategory">Loading…</div>
+                                <div class="info-cell-value" id="issueCategory">—</div>
                             </div>
                             <div>
                                 <div class="info-cell-label">Urgency Priority</div>
-                                <div class="info-cell-value" id="priorityLevel">Loading…</div>
+                                <div class="info-cell-value" id="priorityLevel">—</div>
                             </div>
                             <div id="workerInfoCell" class="hidden">
                                 <div class="info-cell-label" id="workerLabel">Assigned Worker</div>
@@ -547,17 +547,65 @@
         const requestId = new URLSearchParams(window.location.search).get('id');
         let _req = null; // cached request object
 
-        // ── Category → trade name + icon map ─────────────────
-        const TRADE_MAP = {
-            plumbing:   { trade: 'Plumber',               icon: 'water' },
-            electrical: { trade: 'Electrician',           icon: 'bolt' },
-            aircon:     { trade: 'Aircon Technician',     icon: 'snowflake' },
-            door:       { trade: 'Carpenter / Locksmith', icon: 'door' },
-            roof:       { trade: 'Roofer',                icon: 'roof' },
-            internet:   { trade: 'Network Technician',    icon: 'signal' },
-            appliance:  { trade: 'Appliance Technician',  icon: 'plug' },
-            others:     { trade: 'Maintenance Worker',    icon: 'wrench' },
+        // ── Category → trade name + icon + display label map ─────────────────
+        const CATEGORY_MAP = {
+            plumbing:    { trade: 'Plumber',                     icon: 'water',     label: 'Plumbing' },
+            electrical:  { trade: 'Electrician',                 icon: 'bolt',      label: 'Electrical' },
+            aircon:      { trade: 'Aircon Technician',           icon: 'snowflake', label: 'Air Conditioning' },
+            hvac:        { trade: 'Aircon Technician',           icon: 'snowflake', label: 'Air Conditioning' },
+            door:        { trade: 'Carpenter / Locksmith',       icon: 'door',      label: 'Door / Window' },
+            doors:       { trade: 'Carpenter / Locksmith',       icon: 'door',      label: 'Door / Window' },
+            window:      { trade: 'Carpenter / Locksmith',       icon: 'door',      label: 'Door / Window' },
+            windows:     { trade: 'Carpenter / Locksmith',       icon: 'door',      label: 'Door / Window' },
+            carpentry:   { trade: 'Carpenter',                   icon: 'door',      label: 'Carpentry' },
+            carpenter:   { trade: 'Carpenter',                   icon: 'door',      label: 'Carpentry' },
+            roof:        { trade: 'Roofer',                      icon: 'roof',      label: 'Roofing' },
+            roofing:     { trade: 'Roofer',                      icon: 'roof',      label: 'Roofing' },
+            internet:    { trade: 'Network Technician',          icon: 'signal',    label: 'Internet / Network' },
+            wifi:        { trade: 'Network Technician',          icon: 'signal',    label: 'Internet / Network' },
+            network:     { trade: 'Network Technician',          icon: 'signal',    label: 'Internet / Network' },
+            appliance:   { trade: 'Appliance Technician',        icon: 'plug',      label: 'Appliance' },
+            appliances:  { trade: 'Appliance Technician',        icon: 'plug',      label: 'Appliance' },
+            structural:  { trade: 'Civil / Structural Worker',   icon: 'building',  label: 'Structural' },
+            structure:   { trade: 'Civil / Structural Worker',   icon: 'building',  label: 'Structural' },
+            cleanliness: { trade: 'Cleaning / Sanitation Staff', icon: 'trash',     label: 'Cleanliness' },
+            cleaning:    { trade: 'Cleaning / Sanitation Staff', icon: 'trash',     label: 'Cleanliness' },
+            sanitation:  { trade: 'Cleaning / Sanitation Staff', icon: 'trash',     label: 'Cleanliness' },
+            security:    { trade: 'Locksmith / Security Tech',   icon: 'lock',      label: 'Security' },
+            lock:        { trade: 'Locksmith / Security Tech',   icon: 'lock',      label: 'Lock & Security' },
+            locks:       { trade: 'Locksmith / Security Tech',   icon: 'lock',      label: 'Lock & Security' },
+            locksmith:   { trade: 'Locksmith / Security Tech',   icon: 'lock',      label: 'Lock & Security' },
+            painting:    { trade: 'Painter',                     icon: 'edit',      label: 'Painting' },
+            painter:     { trade: 'Painter',                     icon: 'edit',      label: 'Painting' },
+            other:       { trade: 'Maintenance Worker',          icon: 'wrench',    label: 'General / Other' },
+            others:      { trade: 'Maintenance Worker',          icon: 'wrench',    label: 'General / Other' },
+            general:     { trade: 'Maintenance Worker',          icon: 'wrench',    label: 'General Maintenance' },
         };
+
+        function resolveCategory(cat) {
+            const raw = String(cat || '').trim();
+            const key = raw.toLowerCase().replace(/[\s-]+/g, '_');
+            if (CATEGORY_MAP[key]) return CATEGORY_MAP[key];
+
+            const pretty = raw ? raw.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase()) : 'General';
+            return { trade: 'Maintenance Worker', icon: 'wrench', label: pretty };
+        }
+
+        // Backward compatibility alias
+        function tradeFor(cat) {
+            return resolveCategory(cat);
+        }
+
+        // Safe icon generator with fallback
+        function renderIcon(name, label = '') {
+            if (typeof window.domiknowIcon === 'function') {
+                return window.domiknowIcon(name, label);
+            }
+            if (typeof domiknowIcon === 'function') {
+                return domiknowIcon(name, label);
+            }
+            return `<span data-icon="${name}" aria-hidden="${label ? 'false' : 'true'}" class="ui-icon"></span>`;
+        }
 
         const STATUS_HERO_CLASS = {
             pending:'hero-pending', approved:'hero-approved', assigned:'hero-assigned',
@@ -566,15 +614,11 @@
             closed:'hero-closed', rejected:'hero-rejected'
         };
 
-        function tradeFor(cat) {
-            return TRADE_MAP[cat] || { trade: 'Maintenance Worker', icon: 'wrench' };
-        }
-
         // ── Status badge helper ───────────────────────────────
         function statusBadge(status) {
             const map = { travelling:'repairing', arrived:'repairing' };
             const cls = map[status] || status;
-            const label = status.replace(/_/g,' ');
+            const label = (status || '').replace(/_/g,' ');
             return `<span class="badge badge-${cls}">${label}</span>`;
         }
         function prioBadge(prio) {
@@ -583,7 +627,10 @@
 
         // ── Init ──────────────────────────────────────────────
         document.addEventListener('DOMContentLoaded', () => {
-            if (!token || !requestId) return;
+            if (!token || !requestId) {
+                if (!requestId) showLoadError('No maintenance request ID was specified in the URL.');
+                return;
+            }
             loadRequest();
 
             // Action panel delegation
@@ -602,55 +649,106 @@
             });
         });
 
+        function showLoadError(msg) {
+            const heroEl = document.getElementById('statusHero');
+            if (heroEl) {
+                heroEl.className = 'status-hero hero-rejected';
+                document.getElementById('heroTitle').textContent = 'Unable to Load Request';
+                document.getElementById('heroStatus').textContent = 'Error';
+                document.getElementById('heroMeta').innerHTML = `<span class="hero-chip">${msg}</span>`;
+            }
+            const infoGrid = document.getElementById('infoGrid');
+            if (infoGrid) {
+                document.getElementById('propertyName').textContent = '—';
+                document.getElementById('unitNumber').textContent = '—';
+                document.getElementById('tenantName').textContent = '—';
+                document.getElementById('preferredSchedule').textContent = '—';
+                document.getElementById('issueCategory').textContent = '—';
+                document.getElementById('priorityLevel').textContent = '—';
+            }
+            const descEl = document.getElementById('issueDescription');
+            if (descEl) descEl.textContent = msg;
+            const actionPanel = document.getElementById('actionPanel');
+            if (actionPanel) actionPanel.style.display = 'none';
+        }
+
         // ── Load request ──────────────────────────────────────
         async function loadRequest() {
+            if (!requestId) {
+                showLoadError('No maintenance request ID was specified in the URL.');
+                return;
+            }
             try {
-                const res  = await fetch(`/api/maintenance/requests/${requestId}`, { headers: { Authorization: `Bearer ${token}` } });
-                if (!res.ok) return;
+                const res  = await fetch(`/api/maintenance/requests/${requestId}`, { 
+                    headers: { Authorization: `Bearer ${token}` } 
+                });
+                if (!res.ok) {
+                    const errData = await res.json().catch(() => ({}));
+                    showLoadError(errData.message || 'Unable to retrieve maintenance request details.');
+                    return;
+                }
                 const { data } = await res.json();
+                if (!data || !data.request) {
+                    showLoadError('Maintenance request record was not found.');
+                    return;
+                }
                 _req = data.request;
                 renderHero(_req);
                 renderInfo(_req, data.assignment);
                 renderTimeline(data.updates || []);
                 renderReport(data.report, _req);
                 renderActionPanel(_req);
-            } catch (err) { console.error(err); }
+            } catch (err) { 
+                console.error('Failed to load maintenance request:', err);
+                showLoadError('An unexpected network or system error occurred while retrieving request data.');
+            }
         }
 
         // ── Hero banner ───────────────────────────────────────
         function renderHero(req) {
-            const { trade, icon } = tradeFor(req.issue_category);
+            const { trade, icon, label } = resolveCategory(req.issue_category);
             const heroEl = document.getElementById('statusHero');
 
             // Remove all hero classes
             heroEl.className = 'status-hero';
             heroEl.classList.add(STATUS_HERO_CLASS[req.status] || 'hero-pending');
 
-            document.getElementById('heroIcon').innerHTML = domiknowIcon(icon);
-            document.getElementById('heroTitle').textContent = req.issue_title;
-            document.getElementById('heroStatus').textContent = req.status.replace(/_/g, ' ');
+            document.getElementById('heroIcon').innerHTML = renderIcon(icon);
+            document.getElementById('heroTitle').textContent = req.issue_title || 'Maintenance Request';
+            document.getElementById('heroStatus').textContent = (req.status || '').replace(/_/g, ' ');
 
             const meta = document.getElementById('heroMeta');
             meta.innerHTML = `
-                <span class="hero-chip">${domiknowIcon(icon)} ${req.issue_category}</span>
-                <span class="hero-chip">${req.priority_level} priority</span>
+                <span class="hero-chip">${renderIcon(icon)} ${label}</span>
+                <span class="hero-chip">${req.priority_level || 'standard'} priority</span>
                 <span class="hero-chip">${req.properties?.property_name || 'Property'} · Unit ${req.unit_number || 'N/A'}</span>
             `;
 
-            document.title = `${req.issue_title} – DomiKnow`;
+            document.title = `${req.issue_title || 'Maintenance Request'} – DomiKnow`;
         }
 
         // ── Request info ──────────────────────────────────────
         function renderInfo(req, assignment) {
-            const { trade, icon } = tradeFor(req.issue_category);
+            const { trade, icon, label } = resolveCategory(req.issue_category);
 
             document.getElementById('propertyName').textContent     = req.properties?.property_name || '—';
             document.getElementById('unitNumber').textContent       = req.unit_number || '—';
             document.getElementById('tenantName').textContent       = `${req.tenant?.full_name || '—'} · ${req.tenant?.contact_number || 'No phone'}`;
             document.getElementById('preferredSchedule').textContent= req.preferred_schedule || '—';
-            document.getElementById('issueCategory').innerHTML      = `${domiknowIcon(icon)} ${req.issue_category}`;
-            document.getElementById('priorityLevel').innerHTML      = prioBadge(req.priority_level);
-            document.getElementById('issueDescription').textContent = req.issue_description;
+
+            const catEl = document.getElementById('issueCategory');
+            catEl.classList.remove('dk-auto-skeleton');
+            catEl.removeAttribute('data-dk-auto-loading');
+            catEl.removeAttribute('aria-busy');
+            catEl.innerHTML = `${renderIcon(icon)} ${label}`;
+
+            const prioEl = document.getElementById('priorityLevel');
+            prioEl.classList.remove('dk-auto-skeleton');
+            prioEl.removeAttribute('data-dk-auto-loading');
+            prioEl.removeAttribute('aria-busy');
+            prioEl.innerHTML = prioBadge(req.priority_level);
+
+            document.getElementById('issueDescription').textContent = req.issue_description || 'No description provided.';
 
             // Tenant photo
             if (req.image_url) {
@@ -694,13 +792,13 @@
                 document.getElementById('workerCardName').textContent  = workerName;
                 document.getElementById('workerCardTrade').textContent = trade;
                 document.getElementById('workerPills').innerHTML = `
-                    <span class="pill">${domiknowIcon('mail')} ${req.assigned_maintenance.email || '—'}</span>
+                    <span class="pill">${renderIcon('mail')} ${req.assigned_maintenance.email || '—'}</span>
                 `;
             }
 
             // Sidebar summary
-            document.getElementById('sideDateFiled').textContent = new Date(req.created_at).toLocaleDateString('en-PH', { month:'long', day:'numeric', year:'numeric' });
-            document.getElementById('sideCat').innerHTML  = `${icon} ${req.issue_category}`;
+            document.getElementById('sideDateFiled').textContent = req.created_at ? new Date(req.created_at).toLocaleDateString('en-PH', { month:'long', day:'numeric', year:'numeric' }) : '—';
+            document.getElementById('sideCat').innerHTML  = `${renderIcon(icon)} ${label}`;
             document.getElementById('sidePrio').innerHTML = prioBadge(req.priority_level);
             document.getElementById('sideStatus').innerHTML = statusBadge(req.status);
         }
@@ -718,8 +816,8 @@
                 const div = document.createElement('div');
                 div.className = 'tl-item tla';
                 div.innerHTML = `
-                    <div class="tl-meta">${dt} · ${u.status_update.replace(/_/g,' ')}</div>
-                    <div class="tl-notes">${u.notes}</div>
+                    <div class="tl-meta">${dt} · ${(u.status_update || '').replace(/_/g,' ')}</div>
+                    <div class="tl-notes">${u.notes || ''}</div>
                 `;
                 tl.appendChild(div);
             });
@@ -728,7 +826,7 @@
         // ── Completion report ─────────────────────────────────
         function renderReport(report, req) {
             if (!report?.problem_found) return;
-            const { trade } = tradeFor(req.issue_category);
+            const { trade } = resolveCategory(req.issue_category);
             document.getElementById('reportCardTitle').textContent = `${trade} Completion Report`;
             document.getElementById('reportCard').classList.remove('hidden');
 
@@ -758,7 +856,7 @@
             const title    = document.getElementById('actionTitle');
             const subtitle = document.getElementById('actionSubtitle');
             const body     = document.getElementById('actionBody');
-            const { trade, icon } = tradeFor(req.issue_category);
+            const { trade, icon, label } = resolveCategory(req.issue_category);
 
             body.innerHTML = '';
             panel.style.display = 'none';
@@ -788,13 +886,13 @@
             // ── APPROVED → Assign worker ───────────────────────
             else if (req.status === 'approved') {
                 title.textContent    = `Dispatch a ${trade}`;
-                subtitle.textContent = `Assign a qualified ${trade.toLowerCase()} to handle this ${req.issue_category} job.`;
+                subtitle.textContent = `Assign a qualified ${trade.toLowerCase()} to handle this ${label.toLowerCase()} job.`;
                 body.innerHTML = `
                     <div data-action-alert role="status" aria-live="polite" style="display:none;"></div>
                     <form id="assignForm">
                         <div class="form-group">
                             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.35rem;">
-                                <label class="form-label" for="workerSelect" style="margin-bottom:0;">${icon} Select ${trade}</label>
+                                <label class="form-label" for="workerSelect" style="margin-bottom:0; display:inline-flex; align-items:center; gap:0.4rem;">${renderIcon(icon)} Select ${trade}</label>
                                 <button type="button" id="openAddWorkerBtnDetail" style="background:none; border:none; color:var(--landlord); font-size:0.78rem; font-weight:700; cursor:pointer; text-decoration:underline;">+ Register New Worker</button>
                             </div>
                             <select id="workerSelect" class="form-input" required>

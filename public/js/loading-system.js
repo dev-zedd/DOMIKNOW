@@ -227,7 +227,24 @@
                 else if (!node.classList.contains('dk-button-loading')) node.removeAttribute('aria-busy');
                 return;
             }
-            if (node.children.length || node.closest('[data-domiknow-skeleton], .dk-button-loading')) return;
+            if (node.closest('[data-domiknow-skeleton], .dk-button-loading')) return;
+            const isAutoSkeleton = node.classList.contains('dk-auto-skeleton')
+                || node.hasAttribute('data-dk-auto-loading')
+                || (node.getAttribute('aria-busy') === 'true' && node.getAttribute('role') === 'status');
+
+            if (node.children.length) {
+                if (isAutoSkeleton) {
+                    node.classList.remove('dk-auto-skeleton');
+                    node.removeAttribute('data-dk-auto-loading');
+                    node.removeAttribute('aria-busy');
+                    if (node.hasAttribute('data-dk-auto-role')) {
+                        node.removeAttribute('data-dk-auto-role');
+                        node.removeAttribute('role');
+                    }
+                }
+                return;
+            }
+
             const text = node.textContent.trim();
             if (LEGACY_LOADING_PATTERN.test(text)) {
                 node.classList.add('dk-auto-skeleton');
@@ -237,11 +254,7 @@
                     node.setAttribute('role', 'status');
                     node.setAttribute('data-dk-auto-role', '');
                 }
-            } else if (
-                node.classList.contains('dk-auto-skeleton')
-                || node.hasAttribute('data-dk-auto-loading')
-                || (node.getAttribute('aria-busy') === 'true' && node.getAttribute('role') === 'status')
-            ) {
+            } else if (isAutoSkeleton) {
                 node.classList.remove('dk-auto-skeleton');
                 node.removeAttribute('data-dk-auto-loading');
                 node.removeAttribute('aria-busy');
