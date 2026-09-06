@@ -25,7 +25,7 @@
   align-items: center !important;
   margin: 0 !important;
   margin-bottom: 0 !important;
-  padding: 0 16px !important;
+  padding: 0 24px !important;
   border-bottom: 1px solid var(--color-border-default) !important;
 }
 
@@ -512,6 +512,34 @@ body[data-role="landlord"] *::-webkit-scrollbar-track,
   border-color: var(--color-action-primary);
   background: var(--color-action-primary-subtle);
   color: var(--color-action-primary) !important;
+}
+
+/* ── Back Navigation Link (consistent with tenant portal lease-details) ── */
+.app-back-nav {
+  margin-bottom: 16px;
+}
+
+.app-details-back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--color-action-primary, #0355f3);
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+
+.app-details-back-link:hover {
+  opacity: 0.85;
+  transform: translateX(-2px);
+  text-decoration: underline;
+}
+
+/* ── Remove duplicate top breadcrumbs on landlord portal ── */
+.dashboard-layout-landlord :where(.dk-breadcrumbs, [data-domiknow-breadcrumbs], .breadcrumb-nav),
+body[data-landlord-page] :where(.dk-breadcrumbs, [data-domiknow-breadcrumbs], .breadcrumb-nav) {
+  display: none !important;
 }
 
 .landlord-flow {
@@ -1173,11 +1201,6 @@ body[data-landlord-page="property-create"] #mapLoadingIndicator {
   box-shadow: var(--shadow-dropdown) !important;
 }
 
-body[data-landlord-page="property-create"] .map-instructions {
-  border-color: var(--color-action-primary) !important;
-  background: var(--color-action-primary-subtle) !important;
-  color: var(--color-text-primary) !important;
-}
 
 body[data-landlord-page="property-create"] #locationMap,
 body[data-landlord-page="property-details"] #landlordMap {

@@ -6,160 +6,869 @@
     <title>Landlord Reports Center - DomiKnow</title>
     <link href="../../css/input.css" rel="stylesheet">
     <style>
-        .header-action-bar {
+        /* ── Modern Action Button ── */
+        .btn-submit-request {
+            background: var(--bg-secondary, #ffffff);
+            border: 1px solid var(--border-color, #cbd5e1);
+            border-radius: 8px;
+            padding: 8px 18px;
+            font-weight: 700;
+            font-size: 0.875rem;
+            color: var(--text-primary, #0f172a);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+            white-space: nowrap;
+        }
+        .btn-submit-request:hover {
+            background: var(--bg-primary, #f8fafc);
+            border-color: #94a3b8;
+            color: #0052ea;
+        }
+
+        /* ── Tabs & Action Header Row ── */
+        .reports-header-row {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            border-bottom: 1px solid var(--border-color, #e2e8f0);
+            margin-bottom: 16px;
+            gap: 16px;
             flex-wrap: wrap;
-            gap: 1rem;
-            margin-bottom: 1.75rem;
         }
-
-        /* ── Tabs Bar ── */
-        .tab-bar {
-            display: flex;
-            gap: 0.5rem;
-            border-bottom: 2px solid var(--border-color);
-            margin-bottom: 1.5rem;
-        }
-        .tab-btn {
-            padding: 0.75rem 1.25rem;
-            font-weight: 700;
-            font-size: 0.9rem;
-            color: var(--text-muted);
-            background: transparent;
-            border: none;
-            border-bottom: 3px solid transparent;
-            cursor: pointer;
-            transition: all 0.18s ease;
+        .reports-tabs-bar {
             display: flex;
             align-items: center;
-            gap: 0.5rem;
+            gap: 22px;
+            overflow-x: auto;
+            scrollbar-width: none;
+            padding-bottom: 12px;
         }
-        .tab-btn:hover {
-            color: var(--landlord);
+        .reports-tabs-bar::-webkit-scrollbar { display: none; }
+        .m-tab-btn {
+            background: none !important;
+            border: none !important;
+            padding: 4px 0 !important;
+            font-size: 0.9375rem !important;
+            font-weight: 700 !important;
+            color: #64748b !important;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            position: relative;
+            transition: color 0.15s ease;
+            white-space: nowrap;
+            box-shadow: none !important;
         }
-        .tab-btn.active {
-            color: var(--landlord);
-            border-bottom-color: var(--landlord);
+        .m-tab-btn:hover {
+            color: #0052ea !important;
         }
-        .tab-badge {
-            background: rgba(239, 68, 68, 0.15);
-            color: #ef4444;
-            padding: 0.15rem 0.5rem;
-            border-radius: 999px;
-            font-size: 0.75rem;
+        .m-tab-btn.active {
+            color: #0052ea !important;
+            font-weight: 800 !important;
+        }
+        .m-tab-btn.active::after {
+            content: '';
+            position: absolute;
+            bottom: -13px;
+            left: 0;
+            right: 0;
+            height: 2.5px;
+            background: #0052ea;
+            border-radius: 2px;
+        }
+        .tab-count {
+            background: #e2e8f0;
+            color: #475569;
+            font-size: 0.6875rem;
             font-weight: 700;
+            padding: 2px 7px;
+            border-radius: 999px;
+            line-height: 1.2;
+        }
+        .m-tab-btn.active .tab-count {
+            background: #eff6ff;
+            color: #0052ea;
         }
 
-        /* ── Cards & Tables ── */
-        .list-card {
-            background: var(--bg-secondary);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-lg);
-            padding: 1.5rem;
-            box-shadow: var(--shadow-lg);
+        /* ── Ledger Controls Bar ── */
+        .ledger-controls-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+        .ledger-search-box {
+            position: relative;
+            display: flex;
+            align-items: center;
+            flex: 1;
+            min-width: 320px;
+            max-width: 500px;
+        }
+        .ledger-search-box svg {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #94a3b8;
+            pointer-events: none;
+            z-index: 1;
+        }
+        .ledger-search-box input {
+            padding: 8px 14px 8px 40px !important;
+            padding-left: 40px !important;
+            border: 1px solid var(--border-color, #cbd5e1);
+            border-radius: 8px;
+            font-size: 0.875rem;
+            color: var(--text-primary, #0f172a);
+            width: 100%;
+            max-width: 100%;
+            background: var(--bg-secondary, #ffffff);
+            outline: none;
+            transition: border-color 0.15s ease, box-shadow 0.15s ease;
+        }
+        .ledger-search-box input:focus {
+            border-color: #0052ea;
+            box-shadow: 0 0 0 3px rgba(0, 82, 234, 0.08);
+        }
+        .ledger-filter-group {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .ledger-select-wrap {
+            position: relative;
+        }
+        .ledger-select {
+            padding: 8px 30px 8px 14px;
+            border: 1px solid var(--border-color, #cbd5e1);
+            border-radius: 8px;
+            font-size: 0.8125rem;
+            font-weight: 600;
+            color: var(--text-secondary, #334155);
+            background: var(--bg-secondary, #ffffff) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23475569' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E") no-repeat right 10px center;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            cursor: pointer;
+            outline: none;
+            transition: border-color 0.15s ease;
+        }
+        .ledger-select:focus {
+            border-color: #0052ea;
+        }
+        @media (max-width: 640px) {
+            .ledger-controls-bar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .ledger-search-box,
+            .ledger-search-box input {
+                width: 100%;
+            }
+            .ledger-filter-group {
+                justify-content: flex-end;
+            }
         }
 
-        .report-item-card {
-            background: var(--bg-primary);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-md);
-            padding: 1.25rem 1.5rem;
-            margin-bottom: 1rem;
+        /* ── Report Cards List ── */
+        .requests-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 32px;
+        }
+        .request-card {
+            background: var(--bg-secondary, #ffffff);
+            border: 1px solid var(--border-color, #e2e8f0) !important;
+            border-radius: 12px;
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+            outline: none;
+        }
+        .request-card:hover {
+            border-color: #cbd5e1 !important;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            transform: translateY(-1px);
+        }
+        .rc-left-group {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            flex: 1.5;
+            min-width: 240px;
+        }
+        .rc-icon-box {
+            width: 44px;
+            height: 44px;
+            border-radius: 10px;
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            color: #0052ea;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            flex-shrink: 0;
+        }
+        .rc-text-box {
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+        }
+        .rc-title {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--text-primary, #0f172a);
+            margin-bottom: 3px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .rc-subtitle {
+            font-size: 0.8125rem;
+            color: var(--text-muted, #64748b);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .rc-assigned-group {
+            min-width: 140px;
+            border-left: 1px solid var(--border-color, #f1f5f9);
+            padding-left: 16px;
+        }
+        .rc-priority-group {
+            min-width: 120px;
+            border-left: 1px solid var(--border-color, #f1f5f9);
+            padding-left: 16px;
+        }
+        .rc-col-label {
+            font-size: 0.75rem;
+            color: var(--text-muted, #64748b);
+            font-weight: 500;
+        }
+        .rc-col-label.uppercase {
+            font-size: 0.6875rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        .rc-col-val {
+            font-size: 0.9375rem;
+            font-weight: 700;
+            color: var(--text-primary, #0f172a);
+            margin-top: 2px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .rc-col-val-prio {
+            margin-top: 2px;
+            font-size: 0.8125rem;
+        }
+        .rc-right-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-shrink: 0;
+        }
+        .rc-status-pill {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.6875rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+        .rc-status-pill.resolved,
+        .rc-status-pill.approved {
+            background: #ecfdf5;
+            color: #059669;
+            border: 1px solid #a7f3d0;
+        }
+        .rc-status-pill.pending,
+        .rc-status-pill.pending_admin_review {
+            background: #fefce8;
+            color: #854d0e;
+            border: 1px solid #fef08a;
+        }
+        .rc-status-pill.in_review {
+            background: #eff6ff;
+            color: #1e40af;
+            border: 1px solid #bfdbfe;
+        }
+        .rc-status-pill.dismissed,
+        .rc-status-pill.rejected {
+            background: #f1f5f9;
+            color: #475569;
+            border: 1px solid #e2e8f0;
+        }
+        .rc-status-pill.needs_more_evidence {
+            background: #faf5ff;
+            color: #7e22ce;
+            border: 1px solid #e9d5ff;
+        }
+        .rc-tag-pill {
+            background: #f1f5f9;
+            color: #475569;
+            font-size: 0.6875rem;
+            font-weight: 600;
+            padding: 3px 8px;
+            border-radius: 6px;
+            text-transform: capitalize;
+            display: inline-block;
+        }
+        .rc-tag-pill.minor {
+            background: #ecfdf5;
+            color: #059669;
+            border: 1px solid #a7f3d0;
+        }
+        .rc-tag-pill.moderate {
+            background: #fffbeb;
+            color: #b45309;
+            border: 1px solid #fde68a;
+        }
+        .rc-tag-pill.major {
+            background: #fff7ed;
+            color: #c2410c;
+            border: 1px solid #fed7aa;
+        }
+        .rc-tag-pill.critical {
+            background: #fef2f2;
+            color: #b91c1c;
+            border: 1px solid #fecaca;
+        }
+        .rc-chevron {
+            color: #94a3b8;
+            display: flex;
+            align-items: center;
+            margin-left: 4px;
+        }
+
+        @media (max-width: 768px) {
+            .request-card {
+                flex-wrap: wrap;
+            }
+            .rc-assigned-group, .rc-priority-group {
+                border-left: none;
+                padding-left: 0;
+            }
+        }
+
+        /* Lease Card in Lease Selection Modal */
+        .m-lease-card-btn {
+            background: var(--bg-secondary, #ffffff);
+            border: 1px solid var(--border-color, #e2e8f0);
+            border-radius: 10px;
+            padding: 14px 16px;
+            width: 100%;
+            text-align: left;
             display: flex;
             justify-content: space-between;
             align-items: center;
             cursor: pointer;
-            transition: all 0.18s ease;
+            transition: all 0.15s ease;
         }
-        .report-item-card:hover {
-            border-color: var(--landlord);
+        .m-lease-card-btn:hover {
+            border-color: #0052ea;
+            background: var(--bg-primary, #f8fafc);
             transform: translateY(-1px);
-            box-shadow: var(--shadow-md);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.04);
         }
 
-        .report-category { font-weight: 700; font-size: 1.05rem; color: var(--text-primary); }
-        .report-meta { font-size: 0.82rem; color: var(--text-secondary); margin-top: 0.35rem; display: flex; gap: 1.25rem; flex-wrap: wrap; }
-        .meta-item { display: inline-flex; align-items: center; gap: 0.35rem; }
+        /* Dark Theme Support */
+        [data-theme="dark"] .btn-submit-request {
+            background: var(--bg-secondary, #1e293b);
+            border-color: var(--border-color, #334155);
+            color: var(--text-primary, #f8fafc);
+        }
+        [data-theme="dark"] .btn-submit-request:hover {
+            background: var(--bg-primary, #0f172a);
+            color: #60a5fa;
+            border-color: #60a5fa;
+        }
+        [data-theme="dark"] .m-tab-btn {
+            color: #94a3b8 !important;
+        }
+        [data-theme="dark"] .m-tab-btn:hover,
+        [data-theme="dark"] .m-tab-btn.active {
+            color: #60a5fa !important;
+        }
+        [data-theme="dark"] .m-tab-btn.active::after {
+            background: #60a5fa;
+        }
+        [data-theme="dark"] .tab-count {
+            background: #334155;
+            color: #cbd5e1;
+        }
+        [data-theme="dark"] .m-tab-btn.active .tab-count {
+            background: #1e3a8a;
+            color: #93c5fd;
+        }
+        [data-theme="dark"] .ledger-search-box input {
+            background: var(--bg-secondary, #1e293b);
+            border-color: var(--border-color, #334155);
+            color: #f8fafc;
+        }
+        [data-theme="dark"] .ledger-select {
+            background-color: var(--bg-secondary, #1e293b);
+            border-color: var(--border-color, #334155);
+            color: #f8fafc;
+        }
+        [data-theme="dark"] .request-card {
+            background: var(--bg-secondary, #1e293b);
+            border-color: var(--border-color, #334155) !important;
+        }
+        [data-theme="dark"] .request-card:hover {
+            border-color: #475569 !important;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+        }
+        [data-theme="dark"] .rc-title {
+            color: #f8fafc;
+        }
+        [data-theme="dark"] .rc-col-val {
+            color: #f8fafc;
+        }
+        [data-theme="dark"] .rc-subtitle,
+        [data-theme="dark"] .rc-col-label {
+            color: #94a3b8;
+        }
+        [data-theme="dark"] .rc-assigned-group,
+        [data-theme="dark"] .rc-priority-group {
+            border-left-color: var(--border-color, #334155);
+        }
+        [data-theme="dark"] .m-lease-card-btn {
+            background: var(--bg-secondary, #1e293b);
+            border-color: var(--border-color, #334155);
+        }
+        [data-theme="dark"] .m-lease-card-btn:hover {
+            background: var(--bg-primary, #0f172a);
+            border-color: #60a5fa;
+        }
+        [data-theme="dark"] .rc-status-pill.resolved,
+        [data-theme="dark"] .rc-status-pill.approved {
+            background: rgba(16, 185, 129, 0.15);
+            color: #34d399;
+            border-color: rgba(16, 185, 129, 0.3);
+        }
+        [data-theme="dark"] .rc-status-pill.pending,
+        [data-theme="dark"] .rc-status-pill.pending_admin_review {
+            background: rgba(245, 158, 11, 0.15);
+            color: #fbbf24;
+            border-color: rgba(245, 158, 11, 0.3);
+        }
+        [data-theme="dark"] .rc-status-pill.in_review {
+            background: rgba(59, 130, 246, 0.15);
+            color: #60a5fa;
+            border-color: rgba(59, 130, 246, 0.3);
+        }
+        [data-theme="dark"] .rc-status-pill.dismissed,
+        [data-theme="dark"] .rc-status-pill.rejected {
+            background: rgba(148, 163, 184, 0.15);
+            color: #94a3b8;
+            border-color: rgba(148, 163, 184, 0.3);
+        }
+        [data-theme="dark"] .rc-status-pill.needs_more_evidence {
+            background: rgba(168, 85, 247, 0.15);
+            color: #c084fc;
+            border-color: rgba(168, 85, 247, 0.3);
+        }
+        [data-theme="dark"] .rc-tag-pill.minor {
+            background: rgba(16, 185, 129, 0.15);
+            color: #34d399;
+            border-color: rgba(16, 185, 129, 0.3);
+        }
+        [data-theme="dark"] .rc-tag-pill.moderate {
+            background: rgba(245, 158, 11, 0.15);
+            color: #fbbf24;
+            border-color: rgba(245, 158, 11, 0.3);
+        }
+        [data-theme="dark"] .rc-tag-pill.major {
+            background: rgba(249, 115, 22, 0.15);
+            color: #fb923c;
+            border-color: rgba(249, 115, 22, 0.3);
+        }
+        [data-theme="dark"] .rc-tag-pill.critical {
+            background: rgba(239, 68, 68, 0.15);
+            color: #f87171;
+            border-color: rgba(239, 68, 68, 0.3);
+        }
 
-        .sev-minor    { background:rgba(16,185,129,.12);color:#10b981;border:1px solid rgba(16,185,129,.25); }
-        .sev-moderate { background:rgba(245,158,11,.12);color:#d97706;border:1px solid rgba(245,158,11,.25); }
-        .sev-major    { background:rgba(249,115,22,.12);color:#ea580c;border:1px solid rgba(249,115,22,.25); }
-        .sev-critical { background:rgba(239,68,68,.12); color:#ef4444;border:1px solid rgba(239,68,68,.25); }
-
-        .empty-state { text-align: center; padding: 3.5rem 2rem; color: var(--text-muted); }
-        .empty-state .empty-icon { font-size: 2.5rem; margin-bottom: 1rem; color: var(--text-muted); display: flex; justify-content: center; }
-
-        /* ── Modal ── */
+        /* ══════════════════════════════════════════════════════
+           MODAL SYSTEM (Consistent, Modern & Minimalist)
+        ══════════════════════════════════════════════════════ */
         .modal-overlay {
-            position: fixed; inset: 0;
-            background: rgba(15,23,42,0.7);
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.45);
             backdrop-filter: blur(4px);
-            display: flex; justify-content: center; align-items: center;
-            z-index: 1000; padding: 1.5rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            padding: 1.5rem;
         }
         .modal-overlay.hidden { display: none !important; }
+
         .modal-container {
-            background: var(--bg-secondary);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-lg);
-            width: 100%; max-width: 760px;
-            max-height: 88vh;
-            display: flex; flex-direction: column;
-            box-shadow: 0 25px 60px rgba(0,0,0,.4);
-            margin: auto; overflow: hidden;
+            background-color: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            width: 100%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.15);
+            display: flex;
+            flex-direction: column;
+            animation: modalFadeIn 0.18s ease;
+        }
+        @keyframes modalFadeIn {
+            from { opacity: 0; transform: translateY(8px) scale(0.99); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
         }
         .modal-header {
             padding: 1.25rem 1.75rem;
-            border-bottom: 1px solid var(--border-color);
-            display: flex; justify-content: space-between; align-items: center;
-            background: var(--bg-primary); flex-shrink: 0;
+            border-bottom: 1px solid #f1f5f9;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            background-color: #ffffff;
+            position: sticky;
+            top: 0;
+            z-index: 10;
         }
-        .modal-body { padding: 1.75rem; overflow-y: auto; flex: 1 1 auto; }
+        .modal-header-title {
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: #0f172a;
+            margin: 0;
+            line-height: 1.2;
+        }
+        .modal-header-subtitle {
+            font-size: 0.875rem;
+            color: #64748b;
+            font-weight: 500;
+            margin-top: 4px;
+        }
+        .modal-body {
+            padding: 1.5rem 1.75rem;
+            overflow-y: auto;
+            flex: 1;
+        }
         .modal-footer {
-            padding: 1rem 1.75rem;
-            border-top: 1px solid var(--border-color);
-            background: var(--bg-primary); flex-shrink: 0;
+            padding: 1.25rem 1.75rem;
+            border-top: 1px solid #f1f5f9;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            background-color: #ffffff;
+            gap: 12px;
+            position: sticky;
+            bottom: 0;
+            z-index: 10;
         }
-        .modal-close-btn {
-            background: transparent; border: none; font-size: 1.5rem;
-            cursor: pointer; color: var(--text-secondary);
-            padding: .25rem .5rem; border-radius: var(--radius-sm); line-height: 1;
+        .modal-close-x {
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            color: #64748b;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 4px;
+            border-radius: 6px;
+            transition: background 0.15s ease, color 0.15s ease;
         }
-        .modal-close-btn:hover { background: var(--border-color); }
+        .modal-close-x:hover {
+            background: #f1f5f9;
+            color: #0f172a;
+        }
 
-        .detail-section { margin-bottom: 1.5rem; }
-        .detail-title {
-            font-size: .75rem; font-weight: 700; text-transform: uppercase;
-            letter-spacing: .07em; color: var(--text-muted);
-            border-bottom: 2px solid var(--border-color); padding-bottom: .4rem; margin-bottom: 1rem;
-            display: flex; align-items: center; gap: 0.4rem;
+        /* Modal Action Buttons */
+        .btn-modal-cancel {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            color: #0f172a;
+            font-size: 0.875rem;
+            font-weight: 600;
+            padding: 9px 22px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            text-decoration: none;
         }
-        .detail-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 0.85rem; }
-        .detail-item { display: flex; flex-direction: column; }
-        .detail-label { font-size:.7rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:.2rem; }
-        .detail-value { font-size:.9rem;font-weight:600;color:var(--text-primary); }
+        .btn-modal-cancel:hover {
+            background: #f8fafc;
+            border-color: #cbd5e1;
+        }
+        .btn-modal-primary {
+            background: #0052ea;
+            border: 1px solid #0052ea;
+            color: #ffffff;
+            font-size: 0.875rem;
+            font-weight: 600;
+            padding: 9px 22px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn-modal-primary:hover:not(:disabled) {
+            background: #0247d1;
+            border-color: #0247d1;
+        }
+        .btn-modal-primary:disabled {
+            opacity: 0.65;
+            cursor: not-allowed;
+        }
+
+        /* ── Detail Summary Cards & Sections ── */
+        .detail-summary-card {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px 20px;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 16px 18px;
+            margin-bottom: 1.25rem;
+        }
+        @media (max-width: 480px) {
+            .detail-summary-card {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+        }
+        .detail-card-item {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+        .dc-label {
+            font-size: 0.75rem;
+            color: #64748b;
+            font-weight: 500;
+        }
+        .dc-val {
+            font-size: 0.875rem;
+            font-weight: 700;
+            color: #0f172a;
+            word-break: break-word;
+        }
+        .detail-section-title {
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #64748b;
+            margin: 1.25rem 0 0.5rem 0;
+            border-left: none !important;
+            padding-left: 0 !important;
+        }
+        .detail-section-title:first-child {
+            margin-top: 0;
+        }
+        .detail-box {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 12px 16px;
+            font-size: 0.875rem;
+            color: #334155;
+            line-height: 1.6;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+        .detail-alert-box {
+            border-radius: 10px;
+            padding: 12px 16px;
+            margin-bottom: 1.25rem;
+            font-size: 0.875rem;
+            line-height: 1.5;
+        }
+        .detail-alert-box.success {
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            color: #166534;
+        }
+        .detail-alert-box.warning {
+            background: #fffbeb;
+            border: 1px solid #fde68a;
+            color: #92400e;
+        }
+        .detail-alert-box.danger {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            color: #991b1b;
+        }
+        .detail-alert-box.info {
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            color: #1e40af;
+        }
+        .detail-alert-box.purple {
+            background: #faf5ff;
+            border: 1px solid #e9d5ff;
+            color: #7e22ce;
+        }
+        .detail-alert-title {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
 
         .evidence-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-            gap: .65rem;
+            grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+            gap: 12px;
         }
         .ev-thumb {
-            border: 1px solid var(--border-color); border-radius: var(--radius-md);
-            overflow: hidden; background: var(--bg-primary); text-decoration: none;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            overflow: hidden;
+            background: #ffffff;
+            text-decoration: none;
+            display: flex;
+            flex-direction: column;
+            transition: all 0.15s ease;
         }
-        .ev-thumb img { width:100%;height:80px;object-fit:cover;display:block; }
-        .ev-thumb .ev-label { font-size:.62rem;padding:.3rem .5rem;color:var(--text-secondary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis; }
-        .ev-thumb .ev-icon-box { height:80px;display:flex;align-items:center;justify-content:center; }
-        .ev-thumb:hover { border-color: var(--landlord); }
+        .ev-thumb img {
+            width: 100%;
+            height: 85px;
+            object-fit: cover;
+            display: block;
+        }
+        .ev-thumb .ev-label {
+            font-size: 0.6875rem;
+            padding: 6px 8px;
+            color: #475569;
+            font-weight: 500;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            background: #f8fafc;
+            border-top: 1px solid #f1f5f9;
+        }
+        .ev-thumb .ev-icon-box {
+            height: 85px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f8fafc;
+            color: #64748b;
+        }
+        .ev-thumb:hover {
+            border-color: #0052ea;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 10px rgba(0, 82, 234, 0.08);
+        }
 
-        .explanation-panel {
-            background: rgba(99,102,241,0.06);
-            border: 1px solid rgba(99,102,241,0.2);
-            border-radius: var(--radius-lg);
-            padding: 1.25rem 1.5rem;
+        /* Dark Theme Support for Modals */
+        [data-theme="dark"] .modal-container {
+            background-color: #1e293b;
+            border-color: #334155;
+        }
+        [data-theme="dark"] .modal-header,
+        [data-theme="dark"] .modal-footer {
+            background-color: #1e293b;
+            border-color: #334155;
+        }
+        [data-theme="dark"] .modal-header-title {
+            color: #f8fafc;
+        }
+        [data-theme="dark"] .modal-header-subtitle {
+            color: #94a3b8;
+        }
+        [data-theme="dark"] .modal-close-x {
+            color: #94a3b8;
+        }
+        [data-theme="dark"] .modal-close-x:hover {
+            background: #0f172a;
+            color: #f8fafc;
+        }
+        [data-theme="dark"] .detail-summary-card {
+            background: #0f172a;
+            border-color: #334155;
+        }
+        [data-theme="dark"] .dc-val {
+            color: #f8fafc;
+        }
+        [data-theme="dark"] .dc-label,
+        [data-theme="dark"] .detail-section-title {
+            color: #94a3b8;
+        }
+        [data-theme="dark"] .detail-box {
+            background: #0f172a;
+            border-color: #334155;
+            color: #cbd5e1;
+        }
+        [data-theme="dark"] .btn-modal-cancel {
+            background: #1e293b;
+            border-color: #334155;
+            color: #f8fafc;
+        }
+        [data-theme="dark"] .btn-modal-cancel:hover {
+            background: #0f172a;
+            border-color: #475569;
+        }
+        [data-theme="dark"] .ev-thumb {
+            background: #1e293b;
+            border-color: #334155;
+        }
+        [data-theme="dark"] .ev-thumb .ev-label {
+            background: #0f172a;
+            border-top-color: #334155;
+            color: #cbd5e1;
+        }
+        [data-theme="dark"] .ev-thumb .ev-icon-box {
+            background: #0f172a;
+            color: #94a3b8;
+        }
+        [data-theme="dark"] .detail-alert-box.success {
+            background: rgba(16, 185, 129, 0.12);
+            border-color: rgba(16, 185, 129, 0.25);
+            color: #34d399;
+        }
+        [data-theme="dark"] .detail-alert-box.warning {
+            background: rgba(245, 158, 11, 0.12);
+            border-color: rgba(245, 158, 11, 0.25);
+            color: #fbbf24;
+        }
+        [data-theme="dark"] .detail-alert-box.danger {
+            background: rgba(239, 68, 68, 0.12);
+            border-color: rgba(239, 68, 68, 0.25);
+            color: #f87171;
+        }
+        [data-theme="dark"] .detail-alert-box.info {
+            background: rgba(59, 130, 246, 0.12);
+            border-color: rgba(59, 130, 246, 0.25);
+            color: #60a5fa;
+        }
+        [data-theme="dark"] .detail-alert-box.purple {
+            background: rgba(168, 85, 247, 0.12);
+            border-color: rgba(168, 85, 247, 0.25);
+            color: #c084fc;
         }
 
         .toast {
@@ -545,7 +1254,7 @@
             </div>
             <div class="navbar-menu">
                 <a href="dashboard.html" class="navbar-menu-link">Dashboard</a>
-                <a href="properties.html" class="navbar-menu-link">My Properties</a>
+                <a href="properties.html" class="navbar-menu-link">Properties</a>
                 <a href="applications.html" class="navbar-menu-link">Applications</a>
                 <a href="leases.html" class="navbar-menu-link">Lease Agreements</a>
                 <a href="billings.html" class="navbar-menu-link">Billings</a>
@@ -564,44 +1273,66 @@
 
     <!-- Main Content -->
     <main class="dashboard-container">
-        <!-- Top Action Bar -->
-        <div class="header-action-bar" style="display:flex; justify-content:flex-end; margin-bottom:1.25rem;">
-            <button type="button" id="btnReportTenant" class="btn-primary" style="width:auto;padding:0.65rem 1.5rem;background:#ef4444;border-color:#ef4444;display:inline-flex;align-items:center;gap:0.4rem;">
-                <svg class="svg-icon" width="16" height="16" viewBox="0 0 24 24"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"></path><line x1="4" y1="22" x2="4" y2="15"></line></svg>
+        <!-- ── Tabs & Action Header Row ── -->
+        <div class="reports-header-row">
+            <div class="reports-tabs-bar">
+                <button type="button" class="m-tab-btn active" id="tabFiledBtn" onclick="switchTab('filed')">
+                    <svg class="svg-icon" width="16" height="16" viewBox="0 0 24 24"><path d="M22 2L11 13"></path><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                    Reports Filed By Me
+                    <span class="tab-count" id="filedCountBadge" style="display:none;">0</span>
+                </button>
+                <button type="button" class="m-tab-btn" id="tabAgainstBtn" onclick="switchTab('against')">
+                    <svg class="svg-icon" width="16" height="16" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                    Reports Against Me
+                    <span class="tab-count" id="againstCountBadge" style="display:none;">0</span>
+                </button>
+            </div>
+            <button type="button" id="btnReportTenant" class="btn-submit-request">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"></path><line x1="4" y1="22" x2="4" y2="15"></line></svg>
                 Report Tenant
             </button>
         </div>
 
-        <!-- ── TAB BAR ── -->
-        <div class="tab-bar">
-            <button type="button" class="tab-btn active" id="tabFiledBtn" onclick="switchTab('filed')">
-                <svg class="svg-icon" width="16" height="16" viewBox="0 0 24 24"><path d="M22 2L11 13"></path><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
-                Reports Filed By Me
-            </button>
-            <button type="button" class="tab-btn" id="tabAgainstBtn" onclick="switchTab('against')">
-                <svg class="svg-icon" width="16" height="16" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-                Reports Against Me
-                <span class="tab-badge" id="againstCountBadge" style="display:none;">0</span>
-            </button>
+        <!-- ── Ledger Controls Bar (Search & Filter) ── -->
+        <div class="ledger-controls-bar">
+            <div class="ledger-search-box">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+                <input type="text" id="reportsSearchInput" placeholder="Search reports by category, tenant, property..." autocomplete="off">
+            </div>
+            <div class="ledger-filter-group">
+                <div class="ledger-select-wrap">
+                    <select id="statusFilter" class="ledger-select">
+                        <option value="all">All Statuses</option>
+                        <option value="pending_admin_review">Pending Review</option>
+                        <option value="in_review">In Review</option>
+                        <option value="approved">Action Enforced</option>
+                        <option value="dismissed">Dismissed</option>
+                        <option value="needs_more_evidence">Needs Evidence</option>
+                    </select>
+                </div>
+            </div>
         </div>
 
         <!-- ── TAB 1: Reports Filed By Me ── -->
-        <div id="tabFiledContent" class="list-card">
-            <div class="empty-state">
-                <div class="empty-icon">
-                    <svg class="svg-icon" width="40" height="40" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+        <div id="tabFiledContent" class="requests-list">
+            <div style="background:var(--bg-secondary, #ffffff); border:1px solid var(--border-color, #e2e8f0); border-radius:12px; padding:48px 24px; text-align:center;">
+                <div style="width:48px; height:48px; border-radius:12px; background:var(--bg-primary, #f8fafc); border:1px solid var(--border-color, #e2e8f0); color:#94a3b8; display:inline-flex; align-items:center; justify-content:center; margin-bottom:12px;">
+                    <svg class="svg-icon" width="24" height="24" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
                 </div>
-                <div>Loading your filed reports...</div>
+                <div style="font-size:0.95rem; font-weight:700; color:var(--text-primary, #0f172a);">Loading your filed reports...</div>
             </div>
         </div>
 
         <!-- ── TAB 2: Reports Against Me ── -->
-        <div id="tabAgainstContent" class="list-card" style="display:none;">
-            <div class="empty-state">
-                <div class="empty-icon">
-                    <svg class="svg-icon" width="40" height="40" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+        <div id="tabAgainstContent" class="requests-list" style="display:none;">
+            <div style="background:var(--bg-secondary, #ffffff); border:1px solid var(--border-color, #e2e8f0); border-radius:12px; padding:48px 24px; text-align:center;">
+                <div style="width:48px; height:48px; border-radius:12px; background:var(--bg-primary, #f8fafc); border:1px solid var(--border-color, #e2e8f0); color:#94a3b8; display:inline-flex; align-items:center; justify-content:center; margin-bottom:12px;">
+                    <svg class="svg-icon" width="24" height="24" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
                 </div>
-                <div>Loading reports against you...</div>
+                <div style="font-size:0.95rem; font-weight:700; color:var(--text-primary, #0f172a);">Loading reports against you...</div>
             </div>
         </div>
     </main>
@@ -611,83 +1342,64 @@
         <div class="modal-container">
             <div class="modal-header">
                 <div>
-                    <h3 style="margin:0;" id="fTitle">Report Detail</h3>
-                    <div style="font-size:.78rem;color:var(--text-muted);margin-top:.2rem;" id="fSubtitle"></div>
+                    <h3 class="modal-header-title" id="fTitle">Report Detail</h3>
+                    <div class="modal-header-subtitle" id="fSubtitle">—</div>
                 </div>
-                <button type="button" class="modal-close-btn" id="filedModalCloseBtn" onclick="closeFiledModal()" aria-label="Close filed report details"><span data-icon="x"></span></button>
+                <button type="button" class="modal-close-x" id="filedModalCloseBtn" onclick="closeFiledModal()" title="Close" aria-label="Close filed report details">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </button>
             </div>
 
             <div class="modal-body">
                 <!-- Status Banner -->
-                <div id="fStatusBanner" style="margin-bottom:1.25rem;padding:0.85rem 1.25rem;border-radius:var(--radius-md);font-weight:600;font-size:.9rem;"></div>
+                <div id="fStatusBanner"></div>
 
-                <!-- Tenant Info -->
-                <div class="detail-section">
-                    <div class="detail-title">
-                        <svg class="svg-icon" width="16" height="16" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-                        Tenant Information
-                    </div>
-                    <div class="detail-grid">
-                        <div class="detail-item"><span class="detail-label">Tenant Name</span><span class="detail-value" id="fTenantName">—</span></div>
-                        <div class="detail-item"><span class="detail-label">Email</span><span class="detail-value" id="fTenantEmail">—</span></div>
-                        <div class="detail-item"><span class="detail-label">Contact</span><span class="detail-value" id="fTenantContact">—</span></div>
-                    </div>
+                <!-- Tenant & Tenancy Details -->
+                <div class="detail-section-title">Tenant & Tenancy Details</div>
+                <div class="detail-summary-card">
+                    <div class="detail-card-item"><span class="dc-label">Tenant Name</span><span class="dc-val" id="fTenantName">—</span></div>
+                    <div class="detail-card-item"><span class="dc-label">Email Address</span><span class="dc-val" id="fTenantEmail">—</span></div>
+                    <div class="detail-card-item"><span class="dc-label">Contact Number</span><span class="dc-val" id="fTenantContact">—</span></div>
+                    <div class="detail-card-item"><span class="dc-label">Lease Contract</span><span class="dc-val" id="fLeaseNumber">—</span></div>
+                    <div class="detail-card-item"><span class="dc-label">Property</span><span class="dc-val" id="fProperty">—</span></div>
+                    <div class="detail-card-item"><span class="dc-label">Unit Number</span><span class="dc-val" id="fUnit">—</span></div>
+                    <div class="detail-card-item" style="grid-column: 1 / -1;"><span class="dc-label">Address</span><span class="dc-val" id="fAddress">—</span></div>
                 </div>
 
-                <!-- Lease Info -->
-                <div class="detail-section">
-                    <div class="detail-title">
-                        <svg class="svg-icon" width="16" height="16" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
-                        Property & Lease Details
-                    </div>
-                    <div class="detail-grid">
-                        <div class="detail-item"><span class="detail-label">Lease Number</span><span class="detail-value" id="fLeaseNumber">—</span></div>
-                        <div class="detail-item"><span class="detail-label">Property</span><span class="detail-value" id="fProperty">—</span></div>
-                        <div class="detail-item"><span class="detail-label">Unit Number</span><span class="detail-value" id="fUnit">—</span></div>
-                        <div class="detail-item" style="grid-column: 1 / -1;"><span class="detail-label">Address</span><span class="detail-value" id="fAddress">—</span></div>
-                    </div>
+                <!-- Incident Details -->
+                <div class="detail-section-title">Incident Details</div>
+                <div class="detail-summary-card" style="margin-bottom: 0.75rem;">
+                    <div class="detail-card-item"><span class="dc-label">Report Category</span><span class="dc-val" id="fCategory">—</span></div>
+                    <div class="detail-card-item"><span class="dc-label">Incident Date</span><span class="dc-val" id="fIncidentDate">—</span></div>
+                    <div class="detail-card-item" style="grid-column: 1 / -1;"><span class="dc-label">Severity Level</span><span class="dc-val" id="fSeverity">—</span></div>
                 </div>
 
-                <!-- Incident -->
-                <div class="detail-section">
-                    <div class="detail-title">
-                        <svg class="svg-icon" width="16" height="16" viewBox="0 0 24 24"><polygon points="7.86 2 16.14 2 22 7.86 22 16.14 16.14 22 7.86 22 2 16.14 2 7.86 7.86 2"></polygon><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
-                        Incident Details
-                    </div>
-                    <div class="detail-grid" style="margin-bottom:1rem;">
-                        <div class="detail-item"><span class="detail-label">Category</span><span class="detail-value" id="fCategory">—</span></div>
-                        <div class="detail-item"><span class="detail-label">Incident Date</span><span class="detail-value" id="fIncidentDate">—</span></div>
-                        <div class="detail-item"><span class="detail-label">Severity</span><span class="detail-value" id="fSeverity">—</span></div>
-                    </div>
-                    <div class="detail-label">Your Description</div>
-                    <div id="fDescription" style="background:var(--bg-primary);border:1px solid var(--border-color);border-radius:var(--radius-md);padding:1rem;font-size:.875rem;color:var(--text-secondary);line-height:1.7;margin-top:.35rem;white-space:pre-wrap;"></div>
-                </div>
+                <div class="detail-section-title">Your Incident Statement</div>
+                <div class="detail-box" id="fDescription">—</div>
 
-                <!-- Evidence -->
-                <div class="detail-section" id="fEvidenceSection" style="display:none;">
-                    <div class="detail-title">
-                        <svg class="svg-icon" width="16" height="16" viewBox="0 0 24 24"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path></svg>
-                        Uploaded Evidence
-                    </div>
+                <!-- Uploaded Evidence -->
+                <div id="fEvidenceSection" style="display:none; margin-top: 1.25rem;">
+                    <div class="detail-section-title">Evidence Attachments</div>
                     <div id="fEvidenceGrid"></div>
                 </div>
 
                 <!-- Tenant Explanation (if any) -->
-                <div class="detail-section" id="fTenantExpSection" style="display:none;">
-                    <div class="detail-title">
-                        <svg class="svg-icon" width="16" height="16" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
-                        Tenant Explanation
-                    </div>
-                    <div style="background:rgba(99,102,241,0.06);border:1px solid rgba(99,102,241,0.2);border-radius:var(--radius-md);padding:1rem;">
-                        <div id="fTenantExpText" style="font-size:.875rem;color:var(--text-secondary);line-height:1.7;white-space:pre-wrap;"></div>
-                        <div id="fTenantExpDate" style="font-size:.72rem;color:var(--text-muted);margin-top:.4rem;"></div>
-                    </div>
+                <div id="fTenantExpSection" style="display:none; margin-top: 1.25rem;">
+                    <div class="detail-section-title">Tenant Explanation Response</div>
+                    <div class="detail-box" id="fTenantExpText"></div>
+                    <div id="fTenantExpDate" style="font-size:0.75rem; color:#64748b; margin-top:0.4rem; text-align:right;"></div>
                 </div>
 
+                <!-- Admin Remarks (if any) -->
+                <div id="fAdminRemarksSection" style="display:none; margin-top: 1.25rem;">
+                    <div class="detail-section-title">Admin Decision & Resolution Remarks</div>
+                    <div class="detail-box" id="fAdminRemarksText" style="background:#f0fdf4; border-color:#bbf7d0; color:#166534;"></div>
+                    <div id="fAdminRemarksDate" style="font-size:0.75rem; color:#64748b; margin-top:0.4rem; text-align:right;"></div>
+                </div>
             </div>
 
-            <div class="modal-footer" style="display:flex;justify-content:flex-end;">
-                <button type="button" id="filedModalFooterCloseBtn" onclick="closeFiledModal()" class="navbar-btn" style="width:auto;padding:.5rem 1.5rem;">Close</button>
+            <div class="modal-footer">
+                <button type="button" id="filedModalFooterCloseBtn" onclick="closeFiledModal()" class="btn-modal-cancel">Close</button>
             </div>
         </div>
     </div>
@@ -697,104 +1409,116 @@
         <div class="modal-container">
             <div class="modal-header">
                 <div>
-                    <h3 style="margin:0;" id="mTitle">Report Detail</h3>
-                    <div style="font-size:.78rem;color:var(--text-muted);margin-top:.2rem;" id="mSubtitle"></div>
+                    <h3 class="modal-header-title" id="mTitle">Report Details</h3>
+                    <div class="modal-header-subtitle" id="mSubtitle">—</div>
                 </div>
-                <button type="button" class="modal-close-btn" id="modalCloseBtn" onclick="closeModal()" aria-label="Close report details"><span data-icon="x"></span></button>
+                <button type="button" class="modal-close-x" id="modalCloseBtn" onclick="closeModal()" title="Close" aria-label="Close report details">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </button>
             </div>
 
             <div class="modal-body">
                 <!-- Status Banner -->
-                <div id="mStatusBanner" style="margin-bottom:1.25rem;padding:0.85rem 1.25rem;border-radius:var(--radius-md);font-weight:600;font-size:.9rem;"></div>
+                <div id="mStatusBanner"></div>
 
-                <!-- Incident -->
-                <div class="detail-section">
-                    <div class="detail-title">
-                        <svg class="svg-icon" width="16" height="16" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
-                        Incident Details
-                    </div>
-                    <div class="detail-grid" style="margin-bottom:1rem;">
-                        <div class="detail-item"><span class="detail-label">Category</span><span class="detail-value" id="mCategory">—</span></div>
-                        <div class="detail-item"><span class="detail-label">Incident Date</span><span class="detail-value" id="mIncidentDate">—</span></div>
-                        <div class="detail-item"><span class="detail-label">Severity</span><span class="detail-value" id="mSeverity">—</span></div>
-                        <div class="detail-item"><span class="detail-label">Filed By (Tenant)</span><span class="detail-value" id="mFiledBy">—</span></div>
-                    </div>
-                    <div class="detail-label">Description</div>
-                    <div id="mDescription" style="background:var(--bg-primary);border:1px solid var(--border-color);border-radius:var(--radius-md);padding:1rem;font-size:.875rem;color:var(--text-secondary);line-height:1.7;margin-top:.35rem;white-space:pre-wrap;"></div>
+                <!-- Reporting Party & Tenancy Info -->
+                <div class="detail-section-title">Reporting Party & Tenancy Details</div>
+                <div class="detail-summary-card">
+                    <div class="detail-card-item"><span class="dc-label">Tenant (Complainant)</span><span class="dc-val" id="mFiledBy">—</span></div>
+                    <div class="detail-card-item"><span class="dc-label">Email Address</span><span class="dc-val" id="mTenantEmail">—</span></div>
+                    <div class="detail-card-item"><span class="dc-label">Contact Number</span><span class="dc-val" id="mTenantContact">—</span></div>
+                    <div class="detail-card-item"><span class="dc-label">Lease Contract</span><span class="dc-val" id="mLeaseNumber">—</span></div>
+                    <div class="detail-card-item"><span class="dc-label">Property</span><span class="dc-val" id="mProperty">—</span></div>
+                    <div class="detail-card-item"><span class="dc-label">Unit Number</span><span class="dc-val" id="mUnit">—</span></div>
+                    <div class="detail-card-item" style="grid-column: 1 / -1;"><span class="dc-label">Address</span><span class="dc-val" id="mAddress">—</span></div>
                 </div>
 
-                <!-- Evidence (only shown after admin review/approval/rejection) -->
-                <div class="detail-section" id="mEvidenceSection">
-                    <div class="detail-title">
-                        <svg class="svg-icon" width="16" height="16" viewBox="0 0 24 24"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path></svg>
-                        Evidence
-                    </div>
+                <!-- Incident Details -->
+                <div class="detail-section-title">Incident Details</div>
+                <div class="detail-summary-card" style="margin-bottom: 0.75rem;">
+                    <div class="detail-card-item"><span class="dc-label">Report Category</span><span class="dc-val" id="mCategory">—</span></div>
+                    <div class="detail-card-item"><span class="dc-label">Incident Date</span><span class="dc-val" id="mIncidentDate">—</span></div>
+                    <div class="detail-card-item" style="grid-column: 1 / -1;"><span class="dc-label">Severity Level</span><span class="dc-val" id="mSeverity">—</span></div>
+                </div>
+
+                <div class="detail-section-title">Report Statement</div>
+                <div class="detail-box" id="mDescription">—</div>
+
+                <!-- Evidence (only shown after admin review) -->
+                <div id="mEvidenceSection" style="display:none; margin-top: 1.25rem;">
+                    <div class="detail-section-title">Evidence Attachments</div>
                     <div id="mEvidence"></div>
                 </div>
 
                 <!-- Your Explanation -->
-                <div class="detail-section" id="mExplanationSection">
-                    <div class="detail-title">
-                        <svg class="svg-icon" width="16" height="16" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
-                        Your Explanation
-                    </div>
+                <div id="mExplanationSection" style="margin-top: 1.25rem;">
+                    <div class="detail-section-title">Your Counter-Statement / Explanation</div>
 
                     <!-- Already submitted -->
-                    <div id="mExplanationSubmitted" style="display:none;background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.25);border-radius:var(--radius-md);padding:1rem;">
-                        <div style="font-size:.72rem;font-weight:700;color:#10b981;margin-bottom:.5rem;display:flex;align-items:center;gap:0.35rem;">
-                            <svg class="svg-icon" width="14" height="14" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                            YOU SUBMITTED AN EXPLANATION
+                    <div id="mExplanationSubmitted" style="display:none;" class="detail-alert-box success">
+                        <div class="detail-alert-title">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                            Your Statement Has Been Submitted
                         </div>
-                        <div id="mExplanationText" style="font-size:.875rem;color:var(--text-secondary);line-height:1.7;white-space:pre-wrap;"></div>
-                        <div id="mExplanationDate" style="font-size:.72rem;color:var(--text-muted);margin-top:.5rem;"></div>
+                        <div class="detail-box" id="mExplanationText" style="background:#ffffff; margin-top: 8px;"></div>
+                        <div id="mExplanationDate" style="font-size:0.75rem; color:#166534; margin-top:0.4rem; text-align:right;"></div>
                     </div>
 
                     <!-- Can still submit -->
-                    <div id="mExplanationForm" style="display:none;" class="explanation-panel">
-                        <p style="font-size:.85rem;color:var(--text-secondary);margin-bottom:1rem;">
-                            Share your side of the story regarding this incident. This will be reviewed by administrators before making a final decision. You can submit <strong>once</strong>.
+                    <div id="mExplanationForm" style="display:none;">
+                        <p style="font-size:0.84rem; color:#64748b; margin-bottom:0.75rem; line-height:1.5;">
+                            Share your perspective regarding this incident. This will be reviewed by safety administrators before making a final determination. You may submit <strong>once</strong>.
                         </p>
-                        <div id="explanationError" style="display:none;background:rgba(239,68,68,0.1);color:#ef4444;border:1px solid rgba(239,68,68,0.25);border-radius:var(--radius-md);padding:.7rem 1rem;font-size:.85rem;margin-bottom:.75rem;"></div>
+                        <div id="explanationError" style="display:none; background:#fef2f2; color:#dc2626; border:1px solid #fecaca; border-radius:8px; padding:0.6rem 0.9rem; font-size:0.8125rem; margin-bottom:0.75rem;"></div>
                         <label class="form-label" for="explanationText">Your Explanation <span style="color:#ef4444;">*</span></label>
-                        <textarea id="explanationText" class="form-input" style="height:120px;resize:vertical;" placeholder="Explain what happened from your perspective..."></textarea>
-                        <button type="button" id="submitExplanationBtn" class="btn-primary" style="margin-top:0.75rem;background-color:var(--landlord);border-color:var(--landlord);">
-                            Submit My Explanation
-                        </button>
+                        <textarea id="explanationText" class="form-input" style="height:110px; resize:vertical;" placeholder="Explain what happened from your perspective..."></textarea>
+                        <div style="margin-top: 0.75rem; display: flex; justify-content: flex-end;">
+                            <button type="button" id="submitExplanationBtn" class="btn-modal-primary">
+                                Submit My Explanation
+                            </button>
+                        </div>
                     </div>
 
                     <!-- Not pending anymore -->
-                    <div id="mExplanationClosed" style="display:none;font-size:.85rem;color:var(--text-muted);font-style:italic;">
-                        Explanations can no longer be submitted for this report.
+                    <div id="mExplanationClosed" style="display:none; color:#64748b; font-style:italic; font-size:0.84rem; padding: 8px 0;">
+                        The window to submit an explanation has closed (this report is no longer pending review).
                     </div>
                 </div>
 
+                <!-- Admin Remarks (if any) -->
+                <div id="mAdminRemarksSection" style="display:none; margin-top: 1.25rem;">
+                    <div class="detail-section-title">Admin Review & Decision Notes</div>
+                    <div class="detail-box" id="mAdminRemarksText" style="background:#f0fdf4; border-color:#bbf7d0; color:#166534;"></div>
+                    <div id="mAdminRemarksDate" style="font-size:0.75rem; color:#64748b; margin-top:0.4rem; text-align:right;"></div>
+                </div>
             </div>
 
-            <div class="modal-footer" style="display:flex;justify-content:flex-end;">
-                <button type="button" id="modalFooterCloseBtn" onclick="closeModal()" class="navbar-btn" style="width:auto;padding:.5rem 1.5rem;">Close</button>
+            <div class="modal-footer">
+                <button type="button" id="modalFooterCloseBtn" onclick="closeModal()" class="btn-modal-cancel">Close</button>
             </div>
         </div>
     </div>
 
     <!-- ── Lease Select Modal (For Report Tenant) ── -->
     <div id="leaseSelectModal" class="modal-overlay hidden" style="display:none;">
-        <div class="modal-container" style="max-width:550px;">
+        <div class="modal-container" style="max-width: 540px;">
             <div class="modal-header">
-                <h3 style="margin:0;">Select Lease for Report</h3>
-                <button type="button" class="modal-close-btn" id="leaseModalCloseBtn" aria-label="Close lease selection" onclick="closeLeaseModal()"><span data-icon="x"></span></button>
+                <div>
+                    <h3 class="modal-header-title">Select Lease Contract</h3>
+                    <div class="modal-header-subtitle">Choose the lease contract associated with the tenant you wish to report:</div>
+                </div>
+                <button type="button" class="modal-close-x" id="leaseModalCloseBtn" aria-label="Close lease selection" onclick="closeLeaseModal()">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </button>
             </div>
             <div class="modal-body">
-                <p style="color:var(--text-secondary);font-size:.875rem;margin-bottom:1.25rem;">
-                    Select the active or past tenancy lease associated with the tenant you wish to report:
-                </p>
-                <div id="leaseSelectList" style="display:flex;flex-direction:column;gap:0.75rem;">
-                    <div style="color:var(--text-muted);text-align:center;padding:1.5rem;">Loading leases...</div>
+                <div id="leaseSelectList" style="display:flex; flex-direction:column; gap:0.75rem;">
+                    <div style="color:var(--text-muted); text-align:center; padding:1.5rem;">Loading leases...</div>
                 </div>
             </div>
-            <div class="modal-footer" style="display:flex;justify-content:flex-end;">
-                <button type="button" id="leaseModalFooterCloseBtn" onclick="closeLeaseModal()" class="navbar-btn" style="width:auto;">Cancel</button>
+            <div class="modal-footer">
+                <button type="button" id="leaseModalFooterCloseBtn" onclick="closeLeaseModal()" class="btn-modal-cancel">Cancel</button>
             </div>
-        </div>
         </div>
     </div>
 
@@ -854,6 +1578,9 @@
         const token = localStorage.getItem('domiknow_token');
         let currentReportId = null;
         let landlordLeases = [];
+        let currentTab = 'filed';
+        let rawFiledReports = [];
+        let rawAgainstReports = [];
 
         const $ = id => document.getElementById(id);
         const fmtDate  = d => d ? new Date(d).toLocaleDateString('en-PH', { year:'numeric', month:'short', day:'numeric' }) : '—';
@@ -863,9 +1590,86 @@
         const svgCalendar = `<svg class="svg-icon" width="14" height="14" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>`;
         const svgHome     = `<svg class="svg-icon" width="14" height="14" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg>`;
         const svgUser     = `<svg class="svg-icon" width="14" height="14" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>`;
+        const svgIcons = {
+            clock: `<svg class="svg-icon" width="18" height="18" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>`,
+            search: `<svg class="svg-icon" width="18" height="18" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>`,
+            checkCircle: `<svg class="svg-icon" width="18" height="18" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>`,
+            shieldCheck: `<svg class="svg-icon" width="18" height="18" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><path d="m9 12 2 2 4-4"></path></svg>`,
+            shieldAlert: `<svg class="svg-icon" width="18" height="18" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>`,
+            paperclip: `<svg class="svg-icon" width="18" height="18" viewBox="0 0 24 24"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path></svg>`,
+            chevronRight: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>`
+        };
+
+        function renderStatusBanner(containerId, status, isFiledByMe) {
+            const banner = $(containerId);
+            if (!banner) return;
+
+            let config = {
+                type: 'warning',
+                icon: svgIcons.clock,
+                title: 'Pending Admin Review',
+                desc: isFiledByMe 
+                    ? 'Your report is queued for investigation by DomiKnow safety & compliance admin.'
+                    : 'A report was filed regarding a potential incident. You may submit your explanation below.'
+            };
+
+            if (status === 'in_review') {
+                config = {
+                    type: 'info',
+                    icon: svgIcons.search,
+                    title: 'Investigation Ongoing',
+                    desc: isFiledByMe 
+                        ? 'An admin reviewer is currently evaluating the report and submitted evidence.'
+                        : 'Admin staff is currently reviewing this case and evidence. Submit your explanation below.'
+                };
+            } else if (status === 'approved') {
+                config = {
+                    type: isFiledByMe ? 'success' : 'danger',
+                    icon: isFiledByMe ? svgIcons.checkCircle : svgIcons.shieldAlert,
+                    title: isFiledByMe ? 'Action Enforced / Resolved' : 'Disciplinary Sanction Enforced',
+                    desc: isFiledByMe 
+                        ? 'Your report was investigated and validated by admin. Disciplinary action/warning has been enforced.'
+                        : 'The admin investigated this report, confirmed policy grounds, and enforced administrative action against your account.'
+                };
+            } else if (status === 'rejected' || status === 'dismissed') {
+                config = {
+                    type: 'info',
+                    icon: svgIcons.shieldCheck,
+                    title: 'Case Dismissed',
+                    desc: isFiledByMe
+                        ? 'Your report was reviewed and dismissed by admin (insufficient evidence or no policy violation found).'
+                        : 'The report filed against you was reviewed and dismissed by admin. No disciplinary action will be taken.'
+                };
+            } else if (status === 'needs_more_evidence') {
+                config = {
+                    type: 'purple',
+                    icon: svgIcons.paperclip,
+                    title: 'Evidence / Statement Requested',
+                    desc: isFiledByMe
+                        ? 'The admin has requested additional evidence from you regarding this report. Use the inquiry thread below.'
+                        : 'The admin has requested additional details or clarification from you regarding this case.'
+                };
+            }
+
+            banner.className = `detail-alert-box ${config.type}`;
+            banner.innerHTML = `
+                <div class="detail-alert-title">
+                    ${config.icon}
+                    <span>${domiknowEscapeHtml(config.title)}</span>
+                </div>
+                <div style="font-size:0.84rem; line-height:1.5; margin-top:3px;">${domiknowEscapeHtml(config.desc)}</div>
+            `;
+        }
 
         function sevClass(s) {
             return { minor:'sev-minor', moderate:'sev-moderate', major:'sev-major', critical:'sev-critical' }[s] || '';
+        }
+        function statusPillClass(s) {
+            if (s === 'approved') return 'approved';
+            if (s === 'rejected' || s === 'dismissed') return 'dismissed';
+            if (s === 'needs_more_evidence') return 'needs_more_evidence';
+            if (s === 'in_review') return 'in_review';
+            return 'pending';
         }
         function statusClass(s) {
             if (s === 'approved')            return 'status-active';
@@ -875,13 +1679,53 @@
         }
         function statusLabel(s) {
             return {
-                pending_admin_review: 'Pending Admin Review',
-                in_review: 'In Review (Staff Assigned)',
-                approved: 'Action Enforced / Resolved',
+                pending_admin_review: 'Pending Review',
+                in_review: 'In Review',
+                approved: 'Action Enforced',
                 rejected: 'Dismissed',
                 dismissed: 'Dismissed',
-                needs_more_evidence: 'Needs Evidence / Response'
+                needs_more_evidence: 'Needs Evidence'
             }[s] || capWords(s);
+        }
+
+        // ── Search & Status Filtering ──
+        function getFilteredReports(list) {
+            const query = ($('reportsSearchInput')?.value || '').trim().toLowerCase();
+            const statusVal = $('statusFilter')?.value || 'all';
+
+            return list.filter(r => {
+                // Status Filter
+                if (statusVal !== 'all') {
+                    if (statusVal === 'pending_admin_review' && r.status !== 'pending_admin_review') return false;
+                    if (statusVal === 'in_review' && r.status !== 'in_review') return false;
+                    if (statusVal === 'approved' && r.status !== 'approved') return false;
+                    if (statusVal === 'dismissed' && (r.status !== 'dismissed' && r.status !== 'rejected')) return false;
+                    if (statusVal === 'needs_more_evidence' && r.status !== 'needs_more_evidence') return false;
+                }
+
+                // Text Query Filter
+                if (!query) return true;
+
+                const category = (r.report_category || '').toLowerCase();
+                const property = (r.properties?.property_name || '').toLowerCase();
+                const tenantName = (r.tenant?.full_name || '').toLowerCase();
+                const description = (r.incident_description || '').toLowerCase();
+                const ref = String(r.id || '').toLowerCase();
+
+                return category.includes(query) ||
+                       property.includes(query) ||
+                       tenantName.includes(query) ||
+                       description.includes(query) ||
+                       ref.includes(query);
+            });
+        }
+
+        function renderCurrentTabList() {
+            if (currentTab === 'filed') {
+                renderFiledList(getFilteredReports(rawFiledReports));
+            } else {
+                renderAgainstList(getFilteredReports(rawAgainstReports));
+            }
         }
 
         document.addEventListener('DOMContentLoaded', () => {
@@ -894,6 +1738,16 @@
             if (params.get('tab') === 'against') {
                 switchTab('against');
             }
+
+            // Search input listener
+            $('reportsSearchInput')?.addEventListener('input', () => {
+                renderCurrentTabList();
+            });
+
+            // Status filter listener
+            $('statusFilter')?.addEventListener('change', () => {
+                renderCurrentTabList();
+            });
 
             const fab = $('chatHeadFab');
             const chatModal = $('chatHeadModal');
@@ -1237,19 +2091,19 @@
 
         // ── Tab Switching ──────────────────────────────────────────────────────
         function switchTab(tab) {
+            currentTab = tab;
             if (tab === 'filed') {
                 $('tabFiledBtn').classList.add('active');
                 $('tabAgainstBtn').classList.remove('active');
-                $('tabFiledContent').style.display   = 'block';
+                $('tabFiledContent').style.display   = 'flex';
                 $('tabAgainstContent').style.display = 'none';
-                loadFiledReports();
             } else {
                 $('tabAgainstBtn').classList.add('active');
                 $('tabFiledBtn').classList.remove('active');
-                $('tabAgainstContent').style.display = 'block';
+                $('tabAgainstContent').style.display = 'flex';
                 $('tabFiledContent').style.display   = 'none';
-                loadReportsAgainstMe();
             }
+            renderCurrentTabList();
         }
 
         // ── Fetch Landlord Leases for "Report Tenant" Button ─────────────────
@@ -1278,15 +2132,21 @@
             listEl.innerHTML = '';
             landlordLeases.forEach(l => {
                 const btn = document.createElement('button');
-                btn.className = 'navbar-btn';
-                btn.style.cssText = 'text-align:left;padding:1.25rem;width:100%;display:flex;justify-content:space-between;align-items:center;border-radius:var(--radius-md);margin-bottom:0.5rem;border: 1px solid var(--border-color);background: var(--bg-primary);';
+                btn.className = 'm-lease-card-btn';
+                const unitVal = l.properties?.unit_number || l.property_units?.unit_number;
+                const unitStr = (unitVal && unitVal !== '—' && !unitVal.toLowerCase().startsWith('unit')) ? `Unit ${unitVal}` : (unitVal && unitVal !== '—' ? unitVal : '');
+                const propStr = l.properties?.property_name || 'Property';
+                const descStr = [propStr, unitStr, `Contract: ${l.lease_number || 'DRAFT'}`].filter(Boolean).join(' • ');
+
                 btn.innerHTML = `
                     <div>
-                        <div style="font-weight:700;color:var(--text-primary);">Lease: ${l.lease_number || 'DRAFT'}</div>
-                        <div style="font-size:.8rem;color:var(--text-muted);">${l.properties?.property_name || '—'} · Unit ${l.properties?.unit_number || '—'}</div>
-                        <div style="font-size:.75rem;color:var(--landlord);margin-top:.2rem;">Tenant: ${l.users?.full_name || l.tenant_name || '—'}</div>
+                        <div style="font-weight:700; font-size:0.95rem; color:var(--text-primary, #0f172a);">${domiknowEscapeHtml(propStr)}</div>
+                        <div style="font-size:0.8125rem; color:var(--text-muted, #64748b); margin-top:2px;">${domiknowEscapeHtml(descStr)}</div>
+                        <div style="font-size:0.75rem; color:#0052ea; font-weight:600; margin-top:3px;">Tenant: ${domiknowEscapeHtml(l.users?.full_name || l.tenant_name || '—')}</div>
                     </div>
-                    <span style="font-size:.85rem;font-weight:600;color:var(--landlord);">Select →</span>
+                    <div style="color:#0052ea; display:flex; align-items:center;">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                    </div>
                 `;
                 btn.onclick = () => {
                     window.location.href = `tenant-report-form.html?lease_id=${l.id}`;
@@ -1310,59 +2170,87 @@
 
         // ── Tab 1: Load Reports Filed By Me (Reports Filed against Tenant) ────
         async function loadFiledReports() {
-            const container = $('tabFiledContent');
             try {
                 const res  = await fetch('/api/tenant-reports/my-filed', { headers: { 'Authorization': `Bearer ${token}` } });
                 const json = await res.json();
 
                 if (!res.ok) {
-                    container.innerHTML = `<div style="padding:2rem;text-align:center;color:#ef4444;">${json.message || 'Failed to load filed reports.'}</div>`;
+                    $('tabFiledContent').innerHTML = `<div style="padding:2rem;text-align:center;color:#ef4444;">${domiknowEscapeHtml(json.message || 'Failed to load filed reports.')}</div>`;
                     return;
                 }
 
-                const reports = json.data || [];
-
-                if (reports.length === 0) {
-                    container.innerHTML = `
-                        <div class="empty-state">
-                            <div class="empty-icon">
-                                <svg class="svg-icon" width="40" height="40" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
-                            </div>
-                            <div style="font-weight:700;font-size:1.1rem;color:var(--text-primary);">No Reports Filed Yet</div>
-                            <div style="font-size:.85rem;margin-top:.4rem;">You haven't filed any incident reports against your tenants.</div>
-                        </div>
-                    `;
-                    return;
+                rawFiledReports = json.data || [];
+                const badge = $('filedCountBadge');
+                if (badge) {
+                    badge.textContent = rawFiledReports.length;
+                    badge.style.display = rawFiledReports.length > 0 ? 'inline-block' : 'none';
                 }
 
-                container.innerHTML = '';
-                reports.forEach(r => {
-                    const card = document.createElement('div');
-                    card.className = 'report-item-card';
-                    card.onclick   = () => openFiledModal(r.id);
-
-                    card.innerHTML = `
-                        <div>
-                            <div class="report-category">${capWords(r.report_category)}</div>
-                            <div class="report-meta">
-                                <span class="meta-item">${svgCalendar} Incident: ${fmtDate(r.incident_date)}</span>
-                                <span class="meta-item">${svgHome} ${r.properties?.property_name || '—'} (Unit ${r.properties?.unit_number || '—'})</span>
-                                <span class="meta-item">${svgUser} Tenant: ${r.tenant?.full_name || '—'}</span>
-                                <span class="meta-item">${svgCalendar} Filed: ${fmtDate(r.created_at)}</span>
-                            </div>
-                        </div>
-                        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:.4rem;">
-                            <span class="status-badge ${statusClass(r.status)}">${statusLabel(r.status)}</span>
-                            <span class="status-badge ${sevClass(r.severity)}" style="font-size:.72rem;text-transform:capitalize;">${r.severity}</span>
-                        </div>
-                    `;
-                    container.appendChild(card);
-                });
-
+                if (currentTab === 'filed') {
+                    renderFiledList(getFilteredReports(rawFiledReports));
+                }
             } catch (err) {
                 console.error(err);
-                container.innerHTML = `<div style="padding:2rem;text-align:center;color:#ef4444;">Failed to load filed reports.</div>`;
+                $('tabFiledContent').innerHTML = `<div style="padding:2rem;text-align:center;color:#ef4444;">Failed to load filed reports.</div>`;
             }
+        }
+
+        function renderFiledList(reports) {
+            const container = $('tabFiledContent');
+            if (!container) return;
+
+            if (reports.length === 0) {
+                container.innerHTML = `
+                    <div style="background:var(--bg-secondary, #ffffff); border:1px solid var(--border-color, #e2e8f0); border-radius:12px; padding:48px 24px; text-align:center;">
+                        <div style="width:48px; height:48px; border-radius:12px; background:var(--bg-primary, #f8fafc); border:1px solid var(--border-color, #e2e8f0); color:#94a3b8; display:inline-flex; align-items:center; justify-content:center; margin-bottom:12px;">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"></path><line x1="4" y1="22" x2="4" y2="15"></line></svg>
+                        </div>
+                        <div style="font-size:1rem; font-weight:700; color:var(--text-primary, #0f172a); margin-bottom:4px;">No Reports Found</div>
+                        <div style="font-size:0.875rem; color:var(--text-muted, #64748b);">You haven't filed any reports matching this criteria.</div>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = '';
+            reports.forEach(r => {
+                const card = document.createElement('div');
+                card.className = 'request-card';
+                card.onclick   = () => openFiledModal(r.id);
+
+                const sev = (r.severity || 'minor').toLowerCase();
+                const unitVal = r.properties?.unit_number || r.lease_records?.property_units?.unit_number;
+                const unitStr = (unitVal && unitVal !== '—' && !unitVal.toLowerCase().startsWith('unit')) ? `Unit ${unitVal}` : (unitVal && unitVal !== '—' ? unitVal : '');
+                const propStr = r.properties?.property_name || 'Property';
+                const subtitleItems = [propStr, unitStr, `Incident: ${fmtDate(r.incident_date)}`].filter(Boolean);
+
+                card.innerHTML = `
+                    <div class="rc-left-group">
+                        <div class="rc-icon-box" style="background:#eff6ff; border-color:#bfdbfe; color:#0052ea;">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"></path><line x1="4" y1="22" x2="4" y2="15"></line></svg>
+                        </div>
+                        <div class="rc-text-box">
+                            <div class="rc-title">${domiknowEscapeHtml(capWords(r.report_category))}</div>
+                            <div class="rc-subtitle">${domiknowEscapeHtml(subtitleItems.join(' • '))}</div>
+                        </div>
+                    </div>
+                    <div class="rc-assigned-group">
+                        <div class="rc-col-label uppercase">TENANT</div>
+                        <div class="rc-col-val">${domiknowEscapeHtml(r.tenant?.full_name || '—')}</div>
+                    </div>
+                    <div class="rc-priority-group">
+                        <div class="rc-col-label uppercase">SEVERITY</div>
+                        <div class="rc-col-val rc-col-val-prio">
+                            <span class="rc-tag-pill ${sev}">${domiknowEscapeHtml(sev)}</span>
+                        </div>
+                    </div>
+                    <div class="rc-right-group">
+                        <span class="rc-status-pill ${statusPillClass(r.status)}">${domiknowEscapeHtml(statusLabel(r.status))}</span>
+                        <span class="rc-chevron">${svgIcons.chevronRight}</span>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
         }
 
         // ── Modal for Landlord's Own Filed Tenant Report Detail ────────────
@@ -1375,8 +2263,9 @@
             }
             document.body.style.overflow = 'hidden';
 
-            $('fEvidenceSection').style.display = 'none';
-            $('fTenantExpSection').style.display = 'none';
+            ['fEvidenceSection', 'fTenantExpSection', 'fAdminRemarksSection'].forEach(id => {
+                if ($(id)) $(id).style.display = 'none';
+            });
             $('fEvidenceGrid').innerHTML = '';
             $('fStatusBanner').innerHTML = '';
 
@@ -1392,23 +2281,9 @@
                 if (!r) { alert('Failed to load report details.'); return; }
 
                 $('fTitle').textContent    = capWords(r.report_category);
-                $('fSubtitle').textContent = `Filed ${fmtDate(r.created_at)} · ${statusLabel(r.status)}`;
+                $('fSubtitle').textContent = `Filed ${fmtDate(r.created_at)} · Ref: #${String(r.id).substring(0,8)}`;
 
-                const bannerColors = {
-                    pending_admin_review: 'background:rgba(245,158,11,.1);color:#d97706;border:1px solid rgba(245,158,11,.3);',
-                    approved:             'background:rgba(16,185,129,.1);color:#10b981;border:1px solid rgba(16,185,129,.3);',
-                    rejected:             'background:rgba(239,68,68,.1);color:#ef4444;border:1px solid rgba(239,68,68,.3);',
-                    needs_more_evidence:  'background:rgba(99,102,241,.1);color:var(--primary);border:1px solid rgba(99,102,241,.3);'
-                };
-                const bannerMessages = {
-                    pending_admin_review: '⏳ Pending Admin Review: Your report against tenant is queued for investigation by admin staff.',
-                    approved:             '✅ Action Enforced: Your report was investigated and validated by admin. Disciplinary action/warning has been enforced.',
-                    rejected:             '🛡️ Case Dismissed: Your report was reviewed and dismissed by admin (insufficient evidence or no TOS policy violation found).',
-                    dismissed:            '🛡️ Case Dismissed: Your report was reviewed and dismissed by admin (insufficient evidence or no TOS policy violation found).',
-                    needs_more_evidence:  '📎 Evidence Requested: The admin has requested additional evidence from you regarding this report.'
-                };
-                $('fStatusBanner').style.cssText = bannerColors[r.status] || bannerColors.pending_admin_review;
-                $('fStatusBanner').textContent   = bannerMessages[r.status] || statusLabel(r.status);
+                renderStatusBanner('fStatusBanner', r.status, true);
 
                 $('fTenantName').textContent    = r.tenant?.full_name || '—';
                 $('fTenantEmail').textContent   = r.tenant?.email || '—';
@@ -1423,7 +2298,8 @@
                 $('fCategory').textContent     = capWords(r.report_category);
                 $('fIncidentDate').textContent = fmtDate(r.incident_date);
                 $('fDescription').textContent  = r.incident_description || '—';
-                $('fSeverity').innerHTML        = `<span class="status-badge ${sevClass(r.severity)}" style="text-transform:capitalize;">${r.severity}</span>`;
+                const sev = (r.severity || 'minor').toLowerCase();
+                $('fSeverity').innerHTML       = `<span class="rc-tag-pill ${sev}">${domiknowEscapeHtml(sev)}</span>`;
 
                 if (r.evidence?.length) {
                     $('fEvidenceSection').style.display = 'block';
@@ -1434,6 +2310,12 @@
                     $('fTenantExpSection').style.display = 'block';
                     $('fTenantExpText').textContent = r.tenant_explanation;
                     $('fTenantExpDate').textContent = `Submitted: ${fmtDT(r.tenant_responded_at)}`;
+                }
+
+                if (r.admin_remarks && $('fAdminRemarksSection')) {
+                    $('fAdminRemarksSection').style.display = 'block';
+                    $('fAdminRemarksText').textContent = r.admin_remarks;
+                    $('fAdminRemarksDate').textContent = r.resolved_at ? `Decision Date: ${fmtDT(r.resolved_at)}` : '';
                 }
 
                 // Enable Chat Head if status is needs_more_evidence
@@ -1453,8 +2335,11 @@
 
             files.forEach(f => {
                 const a = document.createElement('a');
-                a.href = f.file_url;
+                const safeFileUrl = (window.domiknowSafeExternalUrl ? window.domiknowSafeExternalUrl(f.file_url) : f.file_url);
+                const safeFileName = (window.domiknowEscapeHtml ? window.domiknowEscapeHtml(f.file_name || 'Evidence file') : (f.file_name || 'Evidence file'));
+                a.href = safeFileUrl;
                 a.target = '_blank';
+                a.rel = 'noopener noreferrer';
                 a.className = 'ev-thumb';
 
                 const isVideo = (f.file_type || '').startsWith('video/') || 
@@ -1466,11 +2351,11 @@
                                 /\.(jpg|jpeg|png|webp|gif)$/i.test(f.file_name || '');
 
                 if (isVideo) {
-                    a.innerHTML = `<div class="ev-icon-box" style="background:rgba(239,68,68,0.1);color:#ef4444;"><svg class="svg-icon" width="28" height="28" viewBox="0 0 24 24"><polygon points="23 7 16 12 23 17 23 7"></polygon><rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect></svg></div><div class="ev-label">${f.file_name}</div>`;
+                    a.innerHTML = `<div class="ev-icon-box" style="background:rgba(239,68,68,0.1);color:#ef4444;"><svg class="svg-icon" width="28" height="28" viewBox="0 0 24 24"><polygon points="23 7 16 12 23 17 23 7"></polygon><rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect></svg></div><div class="ev-label">${safeFileName}</div>`;
                 } else if (isImage) {
-                    a.innerHTML = `<img src="${f.file_url}" alt="${f.file_name}"><div class="ev-label">${f.file_name}</div>`;
+                    a.innerHTML = `<img src="${safeFileUrl}" alt="${safeFileName}"><div class="ev-label">${safeFileName}</div>`;
                 } else {
-                    a.innerHTML = `<div class="ev-icon-box"><svg class="svg-icon" width="24" height="24" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg></div><div class="ev-label">${f.file_name}</div>`;
+                    a.innerHTML = `<div class="ev-icon-box"><svg class="svg-icon" width="24" height="24" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg></div><div class="ev-label">${safeFileName}</div>`;
                 }
                 grid.appendChild(a);
             });
@@ -1490,64 +2375,87 @@
 
         // ── Tab 2: Load Reports Against Me (Reports Filed by Tenant) ──────────
         async function loadReportsAgainstMe() {
-            const container = $('tabAgainstContent');
             try {
                 const res  = await fetch('/api/landlord-reports/against-me', { headers: { 'Authorization': `Bearer ${token}` } });
                 const json = await res.json();
 
                 if (!res.ok) {
-                    container.innerHTML = `<div style="padding:2rem;text-align:center;color:#ef4444;">${json.message || 'Failed to load reports against you.'}</div>`;
+                    $('tabAgainstContent').innerHTML = `<div style="padding:2rem;text-align:center;color:#ef4444;">${domiknowEscapeHtml(json.message || 'Failed to load reports against you.')}</div>`;
                     return;
                 }
 
-                const reports = json.data || [];
-
-                if (reports.length === 0) {
-                    container.innerHTML = `
-                        <div class="empty-state">
-                            <div class="empty-icon">
-                                <svg class="svg-icon" width="40" height="40" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
-                            </div>
-                            <div style="font-weight:700;font-size:1.1rem;color:var(--text-primary);">No Incident Reports Against You</div>
-                            <div style="font-size:.85rem;margin-top:.4rem;">You currently have clean records with no active tenant reports.</div>
-                        </div>
-                    `;
-                    $('againstCountBadge').style.display = 'none';
-                    return;
+                rawAgainstReports = json.data || [];
+                const badge = $('againstCountBadge');
+                if (badge) {
+                    badge.textContent = rawAgainstReports.length;
+                    badge.style.display = rawAgainstReports.length > 0 ? 'inline-block' : 'none';
                 }
 
-                // Show badge count
-                $('againstCountBadge').textContent = reports.length;
-                $('againstCountBadge').style.display = 'inline-block';
-
-                container.innerHTML = '';
-                reports.forEach(r => {
-                    const card = document.createElement('div');
-                    card.className = 'report-item-card';
-                    card.onclick   = () => openModal(r.id);
-
-                    card.innerHTML = `
-                        <div>
-                            <div class="report-category">${capWords(r.report_category)}</div>
-                            <div class="report-meta">
-                                <span class="meta-item">${svgCalendar} Incident: ${fmtDate(r.incident_date)}</span>
-                                <span class="meta-item">${svgHome} ${r.properties?.property_name || '—'} · Unit ${r.lease_records?.property_units?.unit_number || r.properties?.unit_number || '—'}</span>
-                                <span class="meta-item">${svgUser} Tenant: ${r.tenant?.full_name || '—'}</span>
-                                <span class="meta-item">${svgCalendar} Filed: ${fmtDate(r.created_at)}</span>
-                            </div>
-                        </div>
-                        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:.4rem;">
-                            <span class="status-badge ${statusClass(r.status)}">${statusLabel(r.status)}</span>
-                            <span class="status-badge ${sevClass(r.severity)}" style="font-size:.72rem;text-transform:capitalize;">${r.severity}</span>
-                        </div>
-                    `;
-                    container.appendChild(card);
-                });
-
+                if (currentTab === 'against') {
+                    renderAgainstList(getFilteredReports(rawAgainstReports));
+                }
             } catch (err) {
                 console.error(err);
-                container.innerHTML = `<div style="padding:2rem;text-align:center;color:#ef4444;">Failed to load reports. Please try again.</div>`;
+                $('tabAgainstContent').innerHTML = `<div style="padding:2rem;text-align:center;color:#ef4444;">Failed to load reports. Please try again.</div>`;
             }
+        }
+
+        function renderAgainstList(reports) {
+            const container = $('tabAgainstContent');
+            if (!container) return;
+
+            if (reports.length === 0) {
+                container.innerHTML = `
+                    <div style="background:var(--bg-secondary, #ffffff); border:1px solid var(--border-color, #e2e8f0); border-radius:12px; padding:48px 24px; text-align:center;">
+                        <div style="width:48px; height:48px; border-radius:12px; background:var(--bg-primary, #f8fafc); border:1px solid var(--border-color, #e2e8f0); color:#10b981; display:inline-flex; align-items:center; justify-content:center; margin-bottom:12px;">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><path d="m9 12 2 2 4-4"></path></svg>
+                        </div>
+                        <div style="font-size:1rem; font-weight:700; color:var(--text-primary, #0f172a); margin-bottom:4px;">No Reports Against You</div>
+                        <div style="font-size:0.875rem; color:var(--text-muted, #64748b);">You currently have clean records with no active tenant reports.</div>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = '';
+            reports.forEach(r => {
+                const card = document.createElement('div');
+                card.className = 'request-card';
+                card.onclick   = () => openModal(r.id);
+
+                const sev = (r.severity || 'minor').toLowerCase();
+                const unitVal = r.properties?.unit_number || r.lease_records?.property_units?.unit_number;
+                const unitStr = (unitVal && unitVal !== '—' && !unitVal.toLowerCase().startsWith('unit')) ? `Unit ${unitVal}` : (unitVal && unitVal !== '—' ? unitVal : '');
+                const propStr = r.properties?.property_name || 'Property';
+                const subtitleItems = [propStr, unitStr, `Incident: ${fmtDate(r.incident_date)}`].filter(Boolean);
+
+                card.innerHTML = `
+                    <div class="rc-left-group">
+                        <div class="rc-icon-box" style="background:#fef2f2; border-color:#fecaca; color:#dc2626;">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="7.86 2 16.14 2 22 7.86 22 16.14 16.14 22 7.86 22 2 16.14 2 7.86 7.86 2"></polygon><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                        </div>
+                        <div class="rc-text-box">
+                            <div class="rc-title">${domiknowEscapeHtml(capWords(r.report_category))}</div>
+                            <div class="rc-subtitle">${domiknowEscapeHtml(subtitleItems.join(' • '))}</div>
+                        </div>
+                    </div>
+                    <div class="rc-assigned-group">
+                        <div class="rc-col-label uppercase">REPORTED BY</div>
+                        <div class="rc-col-val">${domiknowEscapeHtml(r.tenant?.full_name || '—')}</div>
+                    </div>
+                    <div class="rc-priority-group">
+                        <div class="rc-col-label uppercase">SEVERITY</div>
+                        <div class="rc-col-val rc-col-val-prio">
+                            <span class="rc-tag-pill ${sev}">${domiknowEscapeHtml(sev)}</span>
+                        </div>
+                    </div>
+                    <div class="rc-right-group">
+                        <span class="rc-status-pill ${statusPillClass(r.status)}">${domiknowEscapeHtml(statusLabel(r.status))}</span>
+                        <span class="rc-chevron">${svgIcons.chevronRight}</span>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
         }
 
         async function openModal(reportId) {
@@ -1559,7 +2467,7 @@
             }
             document.body.style.overflow = 'hidden';
 
-            ['mEvidenceSection'].forEach(id => $(id) && ($(id).style.display = 'none'));
+            ['mEvidenceSection', 'mAdminRemarksSection'].forEach(id => $(id) && ($(id).style.display = 'none'));
             ['mExplanationSubmitted','mExplanationForm','mExplanationClosed'].forEach(id => $(id) && ($(id).style.display = 'none'));
             $('explanationText').value = '';
             $('explanationError').style.display = 'none';
@@ -1573,32 +2481,24 @@
                 if (!r) { alert('Failed to load report details.'); return; }
 
                 $('mTitle').textContent    = capWords(r.report_category);
-                $('mSubtitle').textContent = `Filed ${fmtDate(r.created_at)} · ${statusLabel(r.status)}`;
+                $('mSubtitle').textContent = `Filed ${fmtDate(r.created_at)} · Ref: #${String(r.id).substring(0,8)}`;
 
-                const bannerColors = {
-                    pending_admin_review: 'background:rgba(245,158,11,.1);color:#d97706;border:1px solid rgba(245,158,11,.3);',
-                    in_review:            'background:rgba(59,130,246,.1);color:#2563eb;border:1px solid rgba(59,130,246,.3);',
-                    approved:             'background:rgba(239,68,68,.1);color:#ef4444;border:1px solid rgba(239,68,68,.3);',
-                    rejected:             'background:rgba(16,185,129,.1);color:#10b981;border:1px solid rgba(16,185,129,.3);',
-                    dismissed:            'background:rgba(16,185,129,.1);color:#10b981;border:1px solid rgba(16,185,129,.3);',
-                    needs_more_evidence:  'background:rgba(99,102,241,.1);color:var(--primary);border:1px solid rgba(99,102,241,.3);'
-                };
-                const bannerMessages = {
-                    pending_admin_review: '⏳ Under Review: A report was filed regarding a potential incident. You may submit your explanation below.',
-                    in_review:            '🔍 Investigation Ongoing: Admin staff is currently reviewing this case and evidence. Submit your explanation below.',
-                    approved:             '⛔ Disciplinary Sanction Enforced: The admin investigated this report, confirmed TOS policy grounds, and enforced administrative action/warning against your account.',
-                    rejected:             '🛡️ Case Dismissed: The report filed against you was reviewed and dismissed by admin. No impact on your trust score or listings.',
-                    dismissed:            '🛡️ Case Dismissed: The report filed against you was reviewed and dismissed by admin. No impact on your trust score or listings.',
-                    needs_more_evidence:  '📎 Evidence / Statement Requested: The admin has requested additional details or clarification from you regarding this case.'
-                };
-                $('mStatusBanner').style.cssText = bannerColors[r.status] || bannerColors.pending_admin_review;
-                $('mStatusBanner').textContent   = bannerMessages[r.status] || statusLabel(r.status);
+                renderStatusBanner('mStatusBanner', r.status, false);
 
-                $('mCategory').textContent    = capWords(r.report_category);
+                if ($('mFiledBy'))       $('mFiledBy').textContent       = r.tenant?.full_name || '—';
+                if ($('mTenantEmail'))   $('mTenantEmail').textContent   = r.tenant?.email || '—';
+                if ($('mTenantContact')) $('mTenantContact').textContent = r.tenant?.contact_number || '—';
+                if ($('mLeaseNumber'))   $('mLeaseNumber').textContent   = r.lease_records?.lease_number || 'N/A';
+                if ($('mProperty'))      $('mProperty').textContent      = r.properties?.property_name || '—';
+                const unitVal = r.properties?.unit_number || r.lease_records?.property_units?.unit_number || '—';
+                if ($('mUnit'))          $('mUnit').textContent          = (unitVal && unitVal !== '—' && !unitVal.toLowerCase().startsWith('unit')) ? `Unit ${unitVal}` : unitVal;
+                if ($('mAddress'))       $('mAddress').textContent       = r.properties?.address || '—';
+
+                $('mCategory').textContent     = capWords(r.report_category);
                 $('mIncidentDate').textContent = fmtDate(r.incident_date);
-                $('mFiledBy').textContent      = r.tenant?.full_name || '—';
                 $('mDescription').textContent  = r.incident_description || '—';
-                $('mSeverity').innerHTML       = `<span class="status-badge ${sevClass(r.severity)}" style="text-transform:capitalize;">${r.severity}</span>`;
+                const sev = (r.severity || 'minor').toLowerCase();
+                $('mSeverity').innerHTML       = `<span class="rc-tag-pill ${sev}">${domiknowEscapeHtml(sev)}</span>`;
 
                 if (r.status !== 'pending_admin_review' && r.evidence?.length) {
                     $('mEvidenceSection').style.display = 'block';
@@ -1613,6 +2513,12 @@
                     $('mExplanationForm').style.display = 'block';
                 } else {
                     $('mExplanationClosed').style.display = 'block';
+                }
+
+                if (r.admin_remarks && $('mAdminRemarksSection')) {
+                    $('mAdminRemarksSection').style.display = 'block';
+                    $('mAdminRemarksText').textContent = r.admin_remarks;
+                    $('mAdminRemarksDate').textContent = r.resolved_at ? `Decision Date: ${fmtDT(r.resolved_at)}` : '';
                 }
 
                 // Enable Chat Head if status is needs_more_evidence
@@ -1672,14 +2578,27 @@
 
             files.forEach(f => {
                 const a = document.createElement('a');
-                a.href = f.file_url;
+                const safeFileUrl = (window.domiknowSafeExternalUrl ? window.domiknowSafeExternalUrl(f.file_url) : f.file_url);
+                const safeFileName = (window.domiknowEscapeHtml ? window.domiknowEscapeHtml(f.file_name || 'Evidence file') : (f.file_name || 'Evidence file'));
+                a.href = safeFileUrl;
                 a.target = '_blank';
+                a.rel = 'noopener noreferrer';
                 a.className = 'ev-thumb';
 
-                if (f.file_type.startsWith('image/')) {
-                    a.innerHTML = `<img src="${f.file_url}" alt="${f.file_name}"><div class="ev-label">${f.file_name}</div>`;
+                const isVideo = (f.file_type || '').startsWith('video/') || 
+                                /\.(mp4|mov|webm|avi|mkv)$/i.test(f.file_url || '') || 
+                                /\.(mp4|mov|webm|avi|mkv)$/i.test(f.file_name || '');
+
+                const isImage = (f.file_type || '').startsWith('image/') || 
+                                /\.(jpg|jpeg|png|webp|gif)$/i.test(f.file_url || '') || 
+                                /\.(jpg|jpeg|png|webp|gif)$/i.test(f.file_name || '');
+
+                if (isVideo) {
+                    a.innerHTML = `<div class="ev-icon-box" style="background:rgba(239,68,68,0.1);color:#ef4444;"><svg class="svg-icon" width="28" height="28" viewBox="0 0 24 24"><polygon points="23 7 16 12 23 17 23 7"></polygon><rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect></svg></div><div class="ev-label">${safeFileName}</div>`;
+                } else if (isImage) {
+                    a.innerHTML = `<img src="${safeFileUrl}" alt="${safeFileName}"><div class="ev-label">${safeFileName}</div>`;
                 } else {
-                    a.innerHTML = `<div class="ev-icon-box"><svg class="svg-icon" width="24" height="24" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg></div><div class="ev-label">${f.file_name}</div>`;
+                    a.innerHTML = `<div class="ev-icon-box"><svg class="svg-icon" width="24" height="24" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg></div><div class="ev-label">${safeFileName}</div>`;
                 }
                 grid.appendChild(a);
             });

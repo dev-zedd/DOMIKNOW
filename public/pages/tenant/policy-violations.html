@@ -6,7 +6,7 @@
     <title>Platform Terms & Community Rules - DomiKnow</title>
     <meta name="description" content="Review official platform terms of service, tenant conduct rules, and disciplinary guidelines on DomiKnow.">
     <link href="../../css/input.css" rel="stylesheet">
-    <link href="../../css/design-system.css?v=20260904-2" rel="stylesheet">
+    <link href="../../css/design-system.css?v=20260905-1" rel="stylesheet">
     <style>
         /* ── Tabs & Header Row ── */
         .maintenance-header-row {
@@ -178,44 +178,21 @@
             transform: translateY(-1px);
         }
         .clause-header {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 10px;
-        }
-        .clause-num-badge {
-            width: 28px;
-            height: 28px;
-            border-radius: 8px;
-            background: #eff6ff;
-            border: 1px solid #bfdbfe;
-            color: #0052ea;
-            font-size: 0.75rem;
-            font-weight: 800;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
+            margin-bottom: 8px;
         }
         .clause-title {
-            font-size: 0.95rem;
+            font-size: 1rem;
             font-weight: 700;
             color: #0f172a;
             margin: 0;
-            line-height: 1.3;
+            line-height: 1.35;
         }
         .clause-body {
             font-size: 0.875rem;
             color: #334155;
             line-height: 1.65;
             margin: 0;
-            padding-left: 40px;
-        }
-        @media (max-width: 600px) {
-            .clause-body {
-                padding-left: 0;
-                margin-top: 6px;
-            }
+            padding-left: 0;
         }
 
         .svg-icon {
@@ -286,7 +263,7 @@
     </main>
 
     <script src="../../js/auth.js"></script>
-    <script src="../../js/dashboard.js?v=20260904-15"></script>
+    <script src="../../js/dashboard.js?v=20260905-1"></script>
     <script>
         let allPoliciesData = {};
         let currentPolicyKey = 'tos';
@@ -314,12 +291,14 @@
         });
 
         async function fetchPlatformPolicies() {
-            const container = document.getElementById('policySectionsContainer');
             try {
                 const response = await fetch('/api/policies', {
                     headers: { 'X-DOMIKNOW-SILENT': '1' },
                     domiknowLoading: false
                 });
+                const container = document.getElementById('policySectionsContainer');
+                if (!container) return; // Navigated away
+
                 if (response.ok) {
                     const result = await response.json();
                     const list = result.data || [];
@@ -332,7 +311,10 @@
                 }
             } catch (err) {
                 console.error(err);
-                container.innerHTML = '<div style="background:#ffffff; border:1px solid #fecaca; border-radius:12px; padding:24px; text-align:center; color:#dc2626; font-size:0.875rem;">Network error loading policies. Please try again.</div>';
+                const container = document.getElementById('policySectionsContainer');
+                if (container) {
+                    container.innerHTML = '<div style="background:#ffffff; border:1px solid #fecaca; border-radius:12px; padding:24px; text-align:center; color:#dc2626; font-size:0.875rem;">Network error loading policies. Please try again.</div>';
+                }
             }
         }
 
@@ -355,15 +337,21 @@
         }
 
         function renderActivePolicyClauses() {
-            const policy = allPoliciesData[currentPolicyKey];
             const container = document.getElementById('policySectionsContainer');
+            if (!container) return;
+            const policy = allPoliciesData[currentPolicyKey];
             if (!policy) return;
 
-            document.getElementById('policyCategoryTag').textContent = policy.category || 'Platform Policy';
-            document.getElementById('policyTitleDisplay').textContent = policy.title || 'Platform Terms';
-            document.getElementById('policyVersionDisplay').textContent = `Version: ${policy.version || 'v2.4'}`;
-            document.getElementById('policyLastUpdatedDisplay').textContent = `Updated: ${policy.last_updated || 'August 2026'}`;
-            document.getElementById('policySummaryDisplay').textContent = policy.summary || 'Official rules and guidelines.';
+            const catEl = document.getElementById('policyCategoryTag');
+            if (catEl) catEl.textContent = policy.category || 'Platform Policy';
+            const titleEl = document.getElementById('policyTitleDisplay');
+            if (titleEl) titleEl.textContent = policy.title || 'Platform Terms';
+            const verEl = document.getElementById('policyVersionDisplay');
+            if (verEl) verEl.textContent = `Version: ${policy.version || 'v2.4'}`;
+            const lastUpdatedEl = document.getElementById('policyLastUpdatedDisplay');
+            if (lastUpdatedEl) lastUpdatedEl.textContent = `Updated: ${policy.last_updated || 'August 2026'}`;
+            const summaryEl = document.getElementById('policySummaryDisplay');
+            if (summaryEl) summaryEl.textContent = policy.summary || 'Official rules and guidelines.';
 
             container.innerHTML = '';
 
@@ -393,7 +381,6 @@
                 card.className = 'policy-clause-card';
                 card.innerHTML = `
                     <div class="clause-header">
-                        <div class="clause-num-badge">${idx + 1}</div>
                         <h3 class="clause-title">${domiknowEscapeHtml(sec.heading || `Clause ${idx + 1}`)}</h3>
                     </div>
                     <p class="clause-body">${domiknowEscapeHtml(sec.content || '')}</p>

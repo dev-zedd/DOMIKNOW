@@ -7,7 +7,8 @@
         info: '<circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7h.01"/>',
         success: '<circle cx="12" cy="12" r="9"/><path d="m8 12 2.5 2.5L16.5 9"/>',
         warning: '<path d="m12 3 9 17H3L12 3Z"/><path d="M12 9v4M12 16h.01"/>',
-        danger: '<path d="M5 5l14 14M19 5 5 19"/><circle cx="12" cy="12" r="9"/>'
+        danger: '<path d="M5 5l14 14M19 5 5 19"/><circle cx="12" cy="12" r="9"/>',
+        logout: '<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>'
     };
 
     const DEFAULTS = {
@@ -23,8 +24,9 @@
     let returnFocus = null;
     let queue = Promise.resolve();
 
-    function createIcon(variant) {
-        return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS[variant] || ICONS.info}</svg>`;
+    function createIcon(variant, customIcon) {
+        const iconMarkup = (customIcon && ICONS[customIcon]) ? ICONS[customIcon] : (ICONS[variant] || ICONS.info);
+        return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${iconMarkup}</svg>`;
     }
 
     function ensureShell() {
@@ -35,20 +37,20 @@
         root.hidden = true;
         root.innerHTML = `
             <div class="dk-modal-backdrop" data-dk-dismiss></div>
-            <section class="dk-modal-dialog modal-container" tabindex="-1" aria-modal="true" aria-labelledby="dkModalTitle" aria-describedby="dkModalMessage">
+            <section class="dk-modal-dialog" tabindex="-1" aria-modal="true" aria-labelledby="dkModalTitle" aria-describedby="dkModalMessage">
                 <div class="dk-modal-accent" aria-hidden="true"></div>
-                <header class="dk-modal-header modal-header">
+                <header class="dk-modal-header">
                     <span class="dk-modal-icon" data-dk-icon aria-hidden="true"></span>
                     <div class="dk-modal-heading">
                         <p class="dk-modal-eyebrow" data-dk-eyebrow></p>
-                        <h2 class="dk-modal-title modal-title" id="dkModalTitle" data-dk-title></h2>
+                        <h2 class="dk-modal-title" id="dkModalTitle" data-dk-title></h2>
                     </div>
-                    <button type="button" class="dk-modal-close modal-close" data-dk-cancel aria-label="Close dialog">
+                    <button type="button" class="dk-modal-close" data-dk-cancel aria-label="Close dialog">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg>
                     </button>
                 </header>
-                <div class="dk-modal-body modal-body">
-                    <p class="dk-modal-message modal-desc" id="dkModalMessage" data-dk-message></p>
+                <div class="dk-modal-body">
+                    <p class="dk-modal-message" id="dkModalMessage" data-dk-message></p>
                     <ul class="dk-modal-details" data-dk-details hidden></ul>
                     <label class="dk-modal-field" data-dk-field hidden>
                         <span class="dk-modal-label" data-dk-input-label></span>
@@ -57,7 +59,7 @@
                         <span class="dk-modal-field-error" data-dk-error hidden></span>
                     </label>
                 </div>
-                <footer class="dk-modal-footer modal-footer">
+                <footer class="dk-modal-footer">
                     <button type="button" class="dk-modal-button dk-modal-button--secondary btn btn-secondary" data-dk-cancel>Cancel</button>
                     <button type="button" class="dk-modal-button dk-modal-button--primary btn btn-primary" data-dk-confirm>Continue</button>
                 </footer>
@@ -101,7 +103,8 @@
         return {
             mode,
             variant,
-            eyebrow: raw.eyebrow || defaults.eyebrow,
+            icon: raw.icon || null,
+            eyebrow: raw.eyebrow !== undefined ? raw.eyebrow : defaults.eyebrow,
             title: raw.title || defaults.title,
             message: String(raw.message || ''),
             details: Array.isArray(raw.details) ? raw.details.filter(Boolean).map(String) : [],
@@ -134,8 +137,9 @@
             current.root.dataset.variant = options.variant;
             current.root.dataset.mode = options.mode;
             current.dialog.setAttribute('role', options.variant === 'danger' || options.variant === 'warning' ? 'alertdialog' : 'dialog');
-            current.icon.innerHTML = createIcon(options.variant);
-            setText(current.eyebrow, options.eyebrow);
+            current.icon.innerHTML = createIcon(options.variant, options.icon);
+            setText(current.eyebrow, options.eyebrow || '');
+            current.eyebrow.hidden = !options.eyebrow;
             setText(current.title, options.title);
             setText(current.message, options.message);
             setText(current.confirm, options.confirmLabel);

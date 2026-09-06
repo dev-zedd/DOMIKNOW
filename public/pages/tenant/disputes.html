@@ -6,7 +6,7 @@
     <title>Disputes & Complaints - DomiKnow</title>
     <meta name="description" content="File and track formal tenancy complaints and disputes with your landlord on DomiKnow.">
     <link href="../../css/input.css" rel="stylesheet">
-    <link href="../../css/design-system.css?v=20260904-2" rel="stylesheet">
+    <link href="../../css/design-system.css?v=20260905-1" rel="stylesheet">
     <style>
         /* ── Modern Disputes Page Styles (Matches maintenance.html) ── */
         .btn-submit-request {
@@ -1089,7 +1089,7 @@
     </div>
 
     <script src="../../js/auth.js"></script>
-    <script src="../../js/dashboard.js?v=20260904-15"></script>
+    <script src="../../js/dashboard.js?v=20260905-1"></script>
     <script>
         const token = localStorage.getItem('domiknow_token');
         let leasesMap     = new Map();
@@ -1120,21 +1120,26 @@
 
         // ── Open / Close Modals ───────────────────────────────
         function openFormModal() {
-            document.getElementById('formModal').style.display = 'flex';
+            const m = document.getElementById('formModal');
+            if (m) m.style.display = 'flex';
             document.body.style.overflow = 'hidden';
             clearAlerts();
         }
         function closeFormModal() {
-            document.getElementById('formModal').style.display = 'none';
+            const m = document.getElementById('formModal');
+            if (m) m.style.display = 'none';
             document.body.style.overflow = '';
         }
         function openDetailsModal() {
-            document.getElementById('detailsModal').style.display = 'flex';
+            const m = document.getElementById('detailsModal');
+            if (m) m.style.display = 'flex';
             document.body.style.overflow = 'hidden';
         }
         function closeDetailsModal() {
-            document.getElementById('detailsModal').style.display = 'none';
-            if (document.getElementById('formModal').style.display === 'none') {
+            const m = document.getElementById('detailsModal');
+            if (m) m.style.display = 'none';
+            const fm = document.getElementById('formModal');
+            if (!fm || fm.style.display === 'none') {
                 document.body.style.overflow = '';
             }
         }
@@ -1142,35 +1147,38 @@
         // ── Category Picker ───────────────────────────────────
         function initCategoryPicker() {
             const grid = document.getElementById('catGrid');
+            if (!grid) return;
             grid.addEventListener('click', (e) => {
                 const card = e.target.closest('.cat-card');
                 if (!card) return;
                 grid.querySelectorAll('.cat-card').forEach(c => c.classList.remove('selected'));
                 card.classList.add('selected');
-                document.getElementById('complaintCategory').value = card.dataset.cat;
-                document.getElementById('catErr').style.display = 'none';
+                const catInput = document.getElementById('complaintCategory');
+                if (catInput) catInput.value = card.dataset.cat;
+                const catErr = document.getElementById('catErr');
+                if (catErr) catErr.style.display = 'none';
             });
         }
 
         // ── Event Delegation ──────────────────────────────────
         function initEventDelegation() {
-            document.getElementById('openFormBtn').addEventListener('click', openFormModal);
-            document.getElementById('closeFormBtn').addEventListener('click', closeFormModal);
-            document.getElementById('cancelFormBtn').addEventListener('click', closeFormModal);
-            document.getElementById('submitBtn').addEventListener('click', handleSubmit);
+            document.getElementById('openFormBtn')?.addEventListener('click', openFormModal);
+            document.getElementById('closeFormBtn')?.addEventListener('click', closeFormModal);
+            document.getElementById('cancelFormBtn')?.addEventListener('click', closeFormModal);
+            document.getElementById('submitBtn')?.addEventListener('click', handleSubmit);
 
-            document.getElementById('closeDetailsBtn').addEventListener('click', closeDetailsModal);
-            document.getElementById('closeDetailsFootBtn').addEventListener('click', closeDetailsModal);
+            document.getElementById('closeDetailsBtn')?.addEventListener('click', closeDetailsModal);
+            document.getElementById('closeDetailsFootBtn')?.addEventListener('click', closeDetailsModal);
 
-            document.getElementById('formModal').addEventListener('click', (e) => {
+            document.getElementById('formModal')?.addEventListener('click', (e) => {
                 if (e.target === document.getElementById('formModal')) closeFormModal();
             });
-            document.getElementById('detailsModal').addEventListener('click', (e) => {
+            document.getElementById('detailsModal')?.addEventListener('click', (e) => {
                 if (e.target === document.getElementById('detailsModal')) closeDetailsModal();
             });
 
             // Filter tabs
-            document.getElementById('filterTabs').addEventListener('click', (e) => {
+            document.getElementById('filterTabs')?.addEventListener('click', (e) => {
                 const tab = e.target.closest('.m-tab-btn');
                 if (!tab) return;
                 document.querySelectorAll('.m-tab-btn').forEach(t => t.classList.remove('active'));
@@ -1180,29 +1188,31 @@
             });
 
             // Search input
-            document.getElementById('complaintsSearchInput').addEventListener('input', (e) => {
+            document.getElementById('complaintsSearchInput')?.addEventListener('input', (e) => {
                 searchQuery = (e.target.value || '').trim().toLowerCase();
                 renderComplaints();
             });
 
             // Category filter select
-            document.getElementById('categoryFilterSelect').addEventListener('change', (e) => {
+            document.getElementById('categoryFilterSelect')?.addEventListener('change', (e) => {
                 categoryFilter = e.target.value;
                 renderComplaints();
             });
 
             // Complaint list card click
-            document.getElementById('complaintsList').addEventListener('click', (e) => {
+            document.getElementById('complaintsList')?.addEventListener('click', (e) => {
                 const card = e.target.closest('[data-complaint-id]');
                 if (card) loadComplaintDetails(card.dataset.complaintId);
             });
 
             // Description character count
-            document.getElementById('complaintDescription').addEventListener('input', (e) => {
+            document.getElementById('complaintDescription')?.addEventListener('input', (e) => {
                 const len = e.target.value.trim().length;
                 const el = document.getElementById('descCharCount');
-                el.textContent = len < 20 ? `${len}/20 — minimum 20 characters required` : `${len} characters`;
-                el.style.color = len < 20 ? '#dc2626' : '#64748b';
+                if (el) {
+                    el.textContent = len < 20 ? `${len}/20 — minimum 20 characters required` : `${len} characters`;
+                    el.style.color = len < 20 ? '#dc2626' : '#64748b';
+                }
             });
 
             document.addEventListener('keydown', (e) => {
@@ -1218,13 +1228,19 @@
         function applySelectedLease(leaseId) {
             const lease = leasesMap.get(String(leaseId));
             if (lease) {
-                document.getElementById('libName').textContent = lease.properties?.property_name || 'Rented Property';
-                document.getElementById('libSub').textContent  = lease.unit_number ? `Unit ${lease.unit_number}` : 'Leased Unit';
-                document.getElementById('chipContract').textContent = lease.lease_number || 'N/A';
-                document.getElementById('chipLandlord').textContent = lease.landlord?.full_name || 'Landlord';
-                document.getElementById('leaseInfoBar').style.display = 'flex';
+                const nameEl = document.getElementById('libName');
+                if (nameEl) nameEl.textContent = lease.properties?.property_name || 'Rented Property';
+                const subEl = document.getElementById('libSub');
+                if (subEl) subEl.textContent  = lease.unit_number ? `Unit ${lease.unit_number}` : 'Leased Unit';
+                const chipContract = document.getElementById('chipContract');
+                if (chipContract) chipContract.textContent = lease.lease_number || 'N/A';
+                const chipLandlord = document.getElementById('chipLandlord');
+                if (chipLandlord) chipLandlord.textContent = lease.landlord?.full_name || 'Landlord';
+                const infoBar = document.getElementById('leaseInfoBar');
+                if (infoBar) infoBar.style.display = 'flex';
             } else {
-                document.getElementById('leaseInfoBar').style.display = 'none';
+                const infoBar = document.getElementById('leaseInfoBar');
+                if (infoBar) infoBar.style.display = 'none';
             }
         }
 
@@ -1234,6 +1250,7 @@
             const input = document.getElementById('attachmentFile');
             const prev  = document.getElementById('uploadPreview');
             const name  = document.getElementById('previewName');
+            if (!zone || !input) return;
 
             zone.addEventListener('dragover', (e) => { e.preventDefault(); zone.classList.add('dragover'); });
             zone.addEventListener('dragleave', () => zone.classList.remove('dragover'));
@@ -1244,13 +1261,13 @@
             input.addEventListener('change', () => {
                 if (input.files[0]) showPrev(input.files[0]); else hidePrev();
             });
-            document.getElementById('removeFileBtn').addEventListener('click', () => {
+            document.getElementById('removeFileBtn')?.addEventListener('click', () => {
                 input.value = ''; hidePrev();
             });
 
             function showPrev(f) {
-                name.textContent = f.name;
-                prev.style.display = 'flex';
+                if (name) name.textContent = f.name;
+                if (prev) prev.style.display = 'flex';
                 zone.style.display = 'none';
             }
             function hidePrev() {

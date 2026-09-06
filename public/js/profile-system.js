@@ -84,140 +84,145 @@
 
     function buildShell(root) {
         root.innerHTML = `
-            <section class="profile-hero" aria-labelledby="profileHeroName">
-                <div class="profile-avatar" data-profile-avatar>
-                    <span data-avatar-initials>DU</span><img data-avatar-image alt="" hidden>
-                </div>
-                <div>
-                    <p class="profile-eyebrow">Your DOMIKNOW account</p>
-                    <h2 id="profileHeroName" data-profile-name>Loading profile...</h2>
-                    <p class="profile-hero__email" data-profile-email>Retrieving your account details</p>
-                    <div class="profile-badges">
-                        <span class="profile-badge" data-profile-role>Account role</span>
-                        <span class="profile-badge" data-profile-status>Account status</span>
-                        <span class="profile-badge" data-profile-verified>Verification</span>
-                    </div>
-                </div>
-                <div class="profile-completion" aria-label="Profile completion">
-                    <div class="profile-completion__header"><span>Profile completion</span><strong data-profile-completion>0%</strong></div>
-                    <div class="profile-completion__track" aria-hidden="true"><div class="profile-completion__bar" data-profile-completion-bar></div></div>
-                    <p data-profile-completion-copy>Complete your information so other participants can identify and contact you.</p>
-                </div>
-            </section>
-
-            <div class="profile-layout">
-                <aside class="profile-column profile-column--summary" aria-label="Profile summary">
-                    <section class="profile-card" aria-labelledby="profilePhotoHeading">
-                        <header class="profile-card__header">
-                            <div><h3 id="profilePhotoHeading">Profile photo</h3><p>A clear photo helps build trust.</p></div>
-                        </header>
-                        <div class="profile-card__body profile-photo-editor">
+            <div class="profile-container">
+                <!-- Identity Card -->
+                <section class="profile-card profile-identity-card" aria-labelledby="profileHeroName">
+                    <div class="profile-identity-main">
+                        <div class="profile-avatar-block">
                             <div class="profile-avatar" data-profile-avatar>
-                                <span data-avatar-initials>DU</span><img data-avatar-image alt="Profile photo preview" hidden>
+                                <span data-avatar-initials>DU</span>
+                                <img data-avatar-image alt="Profile photo" hidden>
                             </div>
-                            <div class="profile-photo-editor__copy">
-                                <strong data-photo-name>No photo selected</strong>
-                                <p>JPG, PNG, or WEBP. Maximum 3 MB.</p>
-                            </div>
+                            <button type="button" class="profile-photo-change-btn" data-profile-photo-select>
+                                ${icons.camera}<span>Change photo</span>
+                            </button>
                             <input type="file" data-profile-photo-input accept="image/jpeg,image/png,image/webp" hidden>
-                            <div class="profile-photo-actions">
-                                <button type="button" class="profile-button" data-profile-photo-select>${icons.camera}<span>Choose photo</span></button>
-                                <button type="button" class="profile-button profile-button--primary" data-profile-photo-save disabled>Save photo</button>
-                                <button type="button" class="profile-button profile-button--danger" data-profile-photo-remove hidden>Remove</button>
+                        </div>
+                        <div class="profile-identity-info">
+                            <div class="profile-identity-row">
+                                <h2 id="profileHeroName" data-profile-name>Loading profile...</h2>
+                                <span class="profile-pill profile-pill--role" data-profile-role>Tenant</span>
                             </div>
-                            <p class="profile-form-status" data-photo-status role="status"></p>
+                            <p class="profile-identity-email" data-profile-email>Retrieving your account details</p>
+                            <div class="profile-identity-tags">
+                                <span class="profile-pill" data-profile-status>Account status</span>
+                                <span class="profile-pill" data-profile-verified>Verification</span>
+                                <span class="profile-identity-since">Member since <strong data-fact-created>—</strong></span>
+                            </div>
                         </div>
-                    </section>
+                    </div>
 
-                    <section class="profile-card" aria-labelledby="accountDetailsHeading">
-                        <header class="profile-card__header">
-                            <div><h3 id="accountDetailsHeading">Account details</h3><p>System-managed identity information.</p></div>
-                        </header>
-                        <div class="profile-card__body">
-                            <dl class="profile-facts">
-                                <div class="profile-fact">${icons.mail}<div><dt>Email address</dt><dd data-fact-email>—</dd></div></div>
-                                <div class="profile-fact">${icons.user}<div><dt>Account role</dt><dd data-fact-role>—</dd></div></div>
-                                <div class="profile-fact">${icons.calendar}<div><dt>Member since</dt><dd data-fact-created>—</dd></div></div>
-                                <div class="profile-fact">${icons.shield}<div><dt>Verification</dt><dd data-fact-verification>—</dd></div></div>
-                            </dl>
+                    <!-- Photo Pending/Active Controls -->
+                    <div class="profile-photo-bar" data-photo-bar>
+                        <span class="profile-photo-filename" data-photo-name>No profile photo yet</span>
+                        <div class="profile-photo-bar-actions">
+                            <button type="button" class="profile-button profile-button--primary profile-button--sm" data-profile-photo-save disabled>Save photo</button>
+                            <button type="button" class="profile-button profile-button--danger profile-button--sm" data-profile-photo-remove hidden>Remove photo</button>
                         </div>
-                    </section>
-                </aside>
+                    </div>
+                    <p class="profile-form-status" data-photo-status role="status"></p>
 
-                <div class="profile-column">
-                    <section class="profile-card" aria-labelledby="personalInfoHeading">
-                        <header class="profile-card__header">
-                            <div><h3 id="personalInfoHeading">Personal information</h3><p>Keep the details used in rental and service workflows accurate.</p></div>
-                            <span class="profile-unsaved" data-profile-unsaved data-dirty="false">Saved</span>
-                        </header>
-                        <div class="profile-card__body">
-                            <form class="profile-form" data-profile-form novalidate>
-                                <div class="profile-form-grid">
-                                    <div class="profile-field">
-                                        <label for="profileFullName">Full name</label>
-                                        <input id="profileFullName" class="profile-input" name="full_name" type="text" minlength="2" maxlength="255" autocomplete="name" required>
-                                    </div>
-                                    <div class="profile-field">
-                                        <label for="profileContact">Contact number</label>
-                                        <input id="profileContact" class="profile-input" name="contact_number" type="tel" maxlength="50" autocomplete="tel" placeholder="e.g. +63 917 123 4567">
-                                    </div>
-                                    <div class="profile-field profile-field--wide">
-                                        <label for="profileEmail">Email address</label>
+                    <!-- Hidden elements required for profile-system.js API compatibility -->
+                    <div hidden aria-hidden="true">
+                        <span data-profile-completion>0%</span>
+                        <div data-profile-completion-bar></div>
+                        <span data-profile-completion-copy></span>
+                        <span data-fact-email></span>
+                        <span data-fact-role></span>
+                        <span data-fact-verification></span>
+                    </div>
+                </section>
+
+                <!-- Personal Information Card -->
+                <section class="profile-card" aria-labelledby="personalInfoHeading">
+                    <header class="profile-card__header">
+                        <div>
+                            <h3 id="personalInfoHeading">Personal Information</h3>
+                            <p>Update your contact and residential information.</p>
+                        </div>
+                        <span class="profile-unsaved" data-profile-unsaved data-dirty="false">Saved</span>
+                    </header>
+                    <div class="profile-card__body">
+                        <form class="profile-form" data-profile-form novalidate>
+                            <div class="profile-form-grid">
+                                <div class="profile-field">
+                                    <label for="profileFullName">Full name</label>
+                                    <input id="profileFullName" class="profile-input" name="full_name" type="text" minlength="2" maxlength="255" autocomplete="name" required placeholder="Enter your full name">
+                                </div>
+                                <div class="profile-field">
+                                    <label for="profileContact">Contact number</label>
+                                    <input id="profileContact" class="profile-input" name="contact_number" type="tel" maxlength="50" autocomplete="tel" placeholder="+63 9XX XXX XXXX">
+                                </div>
+                                <div class="profile-field profile-field--wide">
+                                    <label for="profileEmail">Email address</label>
+                                    <div class="profile-readonly-wrap">
                                         <input id="profileEmail" class="profile-input" type="email" readonly aria-describedby="profileEmailHint">
-                                        <p id="profileEmailHint" class="profile-field__hint">Your verified sign-in email cannot be changed from this form.</p>
+                                        <span class="profile-readonly-badge">Verified</span>
                                     </div>
-                                    <div class="profile-field profile-field--wide">
-                                        <label for="profileAddress">Current address</label>
-                                        <textarea id="profileAddress" class="profile-textarea" name="address" maxlength="500" autocomplete="street-address" placeholder="Enter your current residential or business address"></textarea>
-                                    </div>
+                                    <p id="profileEmailHint" class="profile-field__hint">Your sign-in email is managed securely by DOMIKNOW.</p>
                                 </div>
-                                <p class="profile-form-status" data-profile-form-status role="status"></p>
-                                <div class="profile-form-actions">
-                                    <button type="submit" class="profile-button profile-button--primary" data-profile-save>${icons.save}<span>Save changes</span></button>
-                                    <button type="button" class="profile-button" data-profile-reset>Reset</button>
+                                <div class="profile-field profile-field--wide">
+                                    <label for="profileAddress">Current address</label>
+                                    <textarea id="profileAddress" class="profile-textarea" name="address" maxlength="500" autocomplete="street-address" placeholder="Enter your residential address" rows="3"></textarea>
                                 </div>
-                            </form>
-                        </div>
-                    </section>
+                            </div>
+                            <p class="profile-form-status" data-profile-form-status role="status"></p>
+                            <div class="profile-form-actions">
+                                <button type="submit" class="profile-button profile-button--primary" data-profile-save>${icons.save}<span>Save changes</span></button>
+                                <button type="button" class="profile-button" data-profile-reset>Reset</button>
+                            </div>
+                        </form>
+                    </div>
+                </section>
 
-                    <section class="profile-card" aria-labelledby="profileSecurityHeading">
-                        <header class="profile-card__header">
-                            <div><h3 id="profileSecurityHeading">Password and security</h3><p>Confirm your current password before creating a new one.</p></div>
-                        </header>
-                        <div class="profile-card__body">
-                            <form class="profile-form" data-password-form novalidate>
-                                <div class="profile-form-grid">
-                                    <div class="profile-field profile-field--wide">
-                                        <label for="currentPassword">Current password</label>
-                                        <input id="currentPassword" class="profile-input" name="current_password" type="password" autocomplete="current-password" required>
-                                    </div>
-                                    <div class="profile-field">
-                                        <label for="newPassword">New password</label>
-                                        <input id="newPassword" class="profile-input" name="new_password" type="password" minlength="8" maxlength="128" autocomplete="new-password" required>
-                                    </div>
-                                    <div class="profile-field">
-                                        <label for="confirmNewPassword">Confirm new password</label>
-                                        <input id="confirmNewPassword" class="profile-input" name="confirm_password" type="password" minlength="8" maxlength="128" autocomplete="new-password" required>
-                                    </div>
-                                    <div class="profile-field profile-field--wide">
-                                        <div class="profile-password-meter" data-password-meter data-score="0" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
-                                        <ul class="profile-password-rules" aria-label="Password requirements">
-                                            <li data-password-rule="length">At least 8 characters</li>
-                                            <li data-password-rule="upper">One uppercase letter</li>
-                                            <li data-password-rule="lower">One lowercase letter</li>
-                                            <li data-password-rule="number">One number</li>
-                                        </ul>
-                                    </div>
-                                </div>
-                                <label class="profile-password-visibility"><input type="checkbox" data-password-visibility> Show passwords</label>
-                                <p class="profile-form-status" data-password-status role="status"></p>
-                                <div class="profile-form-actions">
-                                    <button type="submit" class="profile-button profile-button--primary" data-password-save>${icons.key}<span>Change password</span></button>
-                                </div>
-                            </form>
+                <!-- Password and Security Card -->
+                <section class="profile-card" aria-labelledby="profileSecurityHeading">
+                    <header class="profile-card__header">
+                        <div>
+                            <h3 id="profileSecurityHeading">Password & Security</h3>
+                            <p>Manage your account password.</p>
                         </div>
-                    </section>
-                </div>
+                    </header>
+                    <div class="profile-card__body">
+                        <form class="profile-form" data-password-form novalidate>
+                            <div class="profile-form-grid">
+                                <div class="profile-field profile-field--wide">
+                                    <label for="currentPassword">Current password</label>
+                                    <input id="currentPassword" class="profile-input" name="current_password" type="password" autocomplete="current-password" required placeholder="Enter current password">
+                                </div>
+                                <div class="profile-field">
+                                    <label for="newPassword">New password</label>
+                                    <input id="newPassword" class="profile-input" name="new_password" type="password" minlength="8" maxlength="128" autocomplete="new-password" required placeholder="New password">
+                                </div>
+                                <div class="profile-field">
+                                    <label for="confirmNewPassword">Confirm new password</label>
+                                    <input id="confirmNewPassword" class="profile-input" name="confirm_password" type="password" minlength="8" maxlength="128" autocomplete="new-password" required placeholder="Confirm new password">
+                                </div>
+                                <div class="profile-field profile-field--wide">
+                                    <div class="profile-password-meter" data-password-meter data-score="0" aria-hidden="true">
+                                        <span></span><span></span><span></span><span></span>
+                                    </div>
+                                    <ul class="profile-password-rules" aria-label="Password requirements">
+                                        <li data-password-rule="length">8+ characters</li>
+                                        <li data-password-rule="upper">Uppercase</li>
+                                        <li data-password-rule="lower">Lowercase</li>
+                                        <li data-password-rule="number">Number</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="profile-password-row">
+                                <label class="profile-password-visibility">
+                                    <input type="checkbox" data-password-visibility>
+                                    <span>Show passwords</span>
+                                </label>
+                            </div>
+                            <p class="profile-form-status" data-password-status role="status"></p>
+                            <div class="profile-form-actions">
+                                <button type="submit" class="profile-button profile-button--primary" data-password-save>${icons.key}<span>Change password</span></button>
+                            </div>
+                        </form>
+                    </div>
+                </section>
             </div>`;
     }
 

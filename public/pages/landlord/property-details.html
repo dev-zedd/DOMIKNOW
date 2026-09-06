@@ -10,109 +10,593 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="../../js/map-system.js" defer></script>
     <style>
-        .details-grid {
-            display: grid;
-            grid-template-columns: 2fr 1fr;
-            gap: 1.5rem;
-            margin-top: 1.5rem;
+        /* ── Container & Layout ── */
+        .pd-layout {
+            max-width: 1240px;
+            margin: 0 auto;
+            padding: 1.5rem 1.5rem 3.5rem;
         }
-        @media (max-width: 900px) {
-            .details-grid {
+
+        /* ── Top Breadcrumb & Hero Header ── */
+        .pd-breadcrumb-bar {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.8125rem;
+            color: #64748b;
+            margin-bottom: 1.25rem;
+        }
+        .pd-breadcrumb-link {
+            display: inline-flex !important;
+            align-items: center !important;
+            gap: 6px !important;
+            color: #64748b !important;
+            text-decoration: none !important;
+            font-weight: 600 !important;
+            font-size: 0.875rem !important;
+            border: none !important;
+            background: transparent !important;
+            background-color: transparent !important;
+            box-shadow: none !important;
+            padding: 0 !important;
+            min-height: auto !important;
+            height: auto !important;
+            border-radius: 0 !important;
+            line-height: 1.25 !important;
+            transform: none !important;
+            transition: color 0.15s ease, transform 0.15s ease !important;
+        }
+        .pd-breadcrumb-link:hover {
+            color: #0052ea !important;
+            transform: translateX(-2px) !important;
+            border-color: transparent !important;
+            background: transparent !important;
+        }
+        .pd-breadcrumb-sep {
+            color: #cbd5e1;
+            font-size: 0.75rem;
+        }
+        .pd-breadcrumb-current {
+            color: #0f172a;
+            font-weight: 600;
+        }
+
+        /* ── Hero Header ── */
+        .pd-hero-card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 24px 28px;
+            margin-bottom: 1.75rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            flex-wrap: wrap;
+            gap: 1.25rem;
+        }
+        .pd-hero-main {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            max-width: 720px;
+        }
+        .pd-hero-meta-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .pd-type-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            background: #f1f5f9;
+            color: #334155;
+            padding: 4px 10px;
+            border-radius: 999px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            border: 1px solid #e2e8f0;
+        }
+        .pd-hero-title {
+            font-size: 1.75rem;
+            font-weight: 850;
+            color: #0f172a;
+            margin: 0;
+            line-height: 1.2;
+            letter-spacing: -0.02em;
+        }
+        .pd-hero-subtitle {
+            font-size: 0.9rem;
+            color: #64748b;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            line-height: 1.4;
+        }
+        .pd-hero-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .btn-pd-action {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 9px 18px;
+            font-size: 0.84rem;
+            font-weight: 600;
+            border-radius: 10px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.18s ease;
+            white-space: nowrap;
+        }
+        .btn-pd-action.primary {
+            background: #0052ea;
+            color: #ffffff;
+            border: 1px solid #0052ea;
+            box-shadow: 0 2px 6px rgba(0, 82, 234, 0.2);
+        }
+        .btn-pd-action.primary:hover {
+            background: #0043c2;
+            border-color: #0043c2;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 82, 234, 0.25);
+        }
+        .btn-pd-action.secondary {
+            background: #ffffff;
+            color: #334155;
+            border: 1px solid #e2e8f0;
+        }
+        .btn-pd-action.secondary:hover {
+            background: #f8fafc;
+            border-color: #cbd5e1;
+            color: #0f172a;
+        }
+
+        /* ── Modern Status Badges ── */
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 0.75rem;
+            font-weight: 750;
+            padding: 4px 10px;
+            border-radius: 999px;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+        .status-badge.status-active,
+        .status-badge.approved,
+        .status-badge.accepted {
+            background: #ecfdf5 !important;
+            color: #059669 !important;
+            border: 1px solid #a7f3d0 !important;
+        }
+        .status-badge.status-pending,
+        .status-badge.pending_review,
+        .status-badge.pending {
+            background: #fffbeb !important;
+            color: #d97706 !important;
+            border: 1px solid #fde68a !important;
+        }
+        .status-badge.status-rejected,
+        .status-badge.rejected {
+            background: #fef2f2 !important;
+            color: #dc2626 !important;
+            border: 1px solid #fecaca !important;
+        }
+
+        /* ── Rejection Notice Banner ── */
+        .pd-rejection-banner {
+            background: #fff5f5;
+            border: 1px solid #fecaca;
+            border-radius: 12px;
+            padding: 16px 20px;
+            margin-bottom: 1.5rem;
+            display: flex;
+            gap: 14px;
+            align-items: flex-start;
+        }
+        .pd-rejection-icon {
+            color: #dc2626;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+        .pd-rejection-title {
+            font-weight: 750;
+            color: #991b1b;
+            font-size: 0.95rem;
+            margin-bottom: 4px;
+        }
+        .pd-rejection-body {
+            color: #7f1d1d;
+            font-size: 0.875rem;
+            line-height: 1.5;
+        }
+        .pd-rejection-date {
+            font-size: 0.75rem;
+            color: #b91c1c;
+            margin-top: 6px;
+        }
+
+        /* ── Main Two-Column Grid ── */
+        .pd-grid {
+            display: grid;
+            grid-template-columns: minmax(0, 1.65fr) minmax(0, 1.15fr);
+            gap: 1.5rem;
+            align-items: start;
+        }
+        @media (max-width: 960px) {
+            .pd-grid {
                 grid-template-columns: 1fr;
             }
         }
-        .prop-section-card {
-            background-color: var(--bg-secondary);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-lg);
-            padding: 1.5rem;
-            box-shadow: var(--shadow-md);
+
+        /* ── Section Cards ── */
+        .pd-card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 22px 24px;
             margin-bottom: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+            transition: border-color 0.15s ease;
         }
-        .section-header-flex {
+        .pd-card:hover {
+            border-color: #cbd5e1;
+        }
+        .pd-card-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 1px solid var(--border-color);
-            padding-bottom: 0.75rem;
-            margin-bottom: 1.25rem;
+            margin-bottom: 18px;
+            padding-bottom: 14px;
+            border-bottom: 1px solid #f1f5f9;
         }
-        .section-header-flex h3 {
+        .pd-card-title-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .pd-card-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            background: #f1f5f9;
+            color: #0052ea;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        .pd-card-title {
+            font-size: 1.05rem;
+            font-weight: 750;
+            color: #0f172a;
             margin: 0;
-            font-size: 1.15rem;
-            color: var(--text-primary);
+            letter-spacing: -0.01em;
         }
-        .image-gallery-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-            gap: 1rem;
-            margin-bottom: 1.5rem;
-        }
-        .gallery-item {
-            position: relative;
-            border-radius: var(--radius-md);
-            border: 1px solid var(--border-color);
-            overflow: hidden;
-            height: 110px;
-        }
-        .gallery-img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        .main-badge {
-            position: absolute;
-            bottom: 4px;
-            left: 4px;
-            background-color: var(--success);
-            color: white;
-            font-size: 0.6rem;
+        .pd-card-badge {
+            font-size: 0.72rem;
             font-weight: 700;
-            padding: 0.15rem 0.4rem;
-            border-radius: var(--radius-full);
-            text-transform: uppercase;
+            color: #64748b;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 999px;
+            padding: 3px 10px;
         }
+
+        /* ── Key-Value Fields ── */
+        .pd-field-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 16px 20px;
+        }
+        .pd-field-item {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+        .pd-field-label {
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        .pd-field-value {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #0f172a;
+            line-height: 1.4;
+            word-break: break-word;
+        }
+        .pd-field-value.highlight {
+            color: #0052ea;
+            font-size: 1.15rem;
+            font-weight: 800;
+        }
+
+        /* ── Building Specs Stat Tiles ── */
+        .pd-specs-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+        }
+        @media (max-width: 600px) {
+            .pd-specs-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        .pd-spec-tile {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 14px 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .pd-spec-tile-label {
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+        .pd-spec-tile-value {
+            font-size: 1.15rem;
+            font-weight: 800;
+            color: #0f172a;
+            line-height: 1.2;
+        }
+
+        /* ── Description Box ── */
+        .pd-desc-box {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 16px 18px;
+            font-size: 0.9rem;
+            color: #334155;
+            line-height: 1.6;
+            white-space: pre-wrap;
+            margin-top: 14px;
+        }
+
+        /* ── Map Styling ── */
+        .domiknow-map-frame {
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+            margin-top: 14px;
+        }
+
+        /* ── Contact Info Cards ── */
+        .pd-contact-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+        }
+        @media (max-width: 600px) {
+            .pd-contact-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        .pd-contact-card {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 14px 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .pd-contact-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            color: #0052ea;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        /* ── Amenities Badges ── */
+        .pd-amenities-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .badge-amenity {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            background: #f8fafc;
+            color: #334155;
+            border: 1px solid #e2e8f0;
+            border-radius: 999px;
+            font-size: 0.8125rem;
+            font-weight: 600;
+            transition: all 0.15s ease;
+        }
+        .badge-amenity:hover {
+            border-color: #cbd5e1;
+            background: #f1f5f9;
+        }
+
+        /* ── House Rules Box ── */
+        .pd-rules-box {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 16px 18px;
+            font-size: 0.875rem;
+            color: #334155;
+            line-height: 1.6;
+            white-space: pre-line;
+        }
+
+        /* ── Right Column: Document List Cards ── */
         .doc-list {
             display: flex;
             flex-direction: column;
-            gap: 0.75rem;
-            margin-bottom: 1.5rem;
+            gap: 12px;
         }
-        .doc-item {
+        .doc-slot-card {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 16px;
+            transition: all 0.15s ease;
+        }
+        .doc-slot-card:hover {
+            border-color: #cbd5e1;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+        }
+        .doc-slot-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 0.75rem 1rem;
-            background-color: var(--bg-primary);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-md);
+            margin-bottom: 10px;
         }
-        .doc-info {
-            display: flex;
-            flex-direction: column;
-            gap: 0.15rem;
-        }
-        .doc-title {
-            font-weight: 700;
-            font-size: 0.875rem;
-        }
-        .doc-meta {
-            font-size: 0.75rem;
-            color: var(--text-muted);
-        }
-        .detail-label {
-            font-size: 0.75rem;
-            font-weight: 600;
-            color: var(--text-muted);
+        .doc-slot-type {
+            font-size: 0.72rem;
+            font-weight: 750;
+            color: #0052ea;
             text-transform: uppercase;
             letter-spacing: 0.05em;
-            margin-bottom: 0.25rem;
         }
-        .detail-value {
-            font-size: 0.9375rem;
+        .doc-slot-body {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .doc-slot-icon {
+            width: 34px;
+            height: 34px;
+            border-radius: 8px;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            color: #64748b;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        .doc-slot-info {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            min-width: 0;
+            flex: 1;
+        }
+        .doc-slot-name {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #0f172a;
+            text-decoration: none;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .doc-slot-name:hover {
+            text-decoration: underline;
+            color: #0052ea;
+        }
+        .doc-slot-meta {
+            font-size: 0.75rem;
+            color: #94a3b8;
+        }
+
+        /* ── Right Column: Photo Slot Cards ── */
+        .photo-gallery-list {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+        .photo-slot-card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            overflow: hidden;
+            transition: all 0.15s ease;
+        }
+        .photo-slot-card:hover {
+            border-color: #cbd5e1;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+        .photo-frame {
+            position: relative;
+            height: 180px;
+            width: 100%;
+            background: #f1f5f9;
+            overflow: hidden;
+        }
+        .photo-frame img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            cursor: pointer;
+            transition: transform 0.25s ease;
+        }
+        .photo-frame img:hover {
+            transform: scale(1.02);
+        }
+        .photo-empty {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            color: #94a3b8;
+            background: #f8fafc;
+            gap: 6px;
+        }
+        .photo-empty span {
+            font-size: 0.78rem;
+            font-weight: 500;
+        }
+        .photo-cover-tag {
+            position: absolute;
+            bottom: 8px;
+            left: 8px;
+            background: rgba(15, 23, 42, 0.85);
+            color: #ffffff;
+            font-size: 0.68rem;
             font-weight: 700;
-            color: var(--text-primary);
+            padding: 3px 8px;
+            border-radius: 999px;
+            backdrop-filter: blur(4px);
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
         }
+        .photo-slot-footer {
+            padding: 10px 14px;
+            font-size: 0.78rem;
+            font-weight: 700;
+            color: #334155;
+            background: #f8fafc;
+            border-top: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* ── Rule Chips in Edit Mode ── */
         .rule-chip {
             display: inline-flex;
             align-items: center;
@@ -129,9 +613,84 @@
             color: var(--text-primary);
         }
         .rule-chip.active-chip {
-            background-color: var(--primary) !important;
-            border-color: var(--primary) !important;
+            background-color: #0052ea !important;
+            border-color: #0052ea !important;
             color: #ffffff !important;
+        }
+
+        /* ── Dark Theme Support ── */
+        [data-theme="dark"] body {
+            background-color: #0f172a;
+            color: #f8fafc;
+        }
+        [data-theme="dark"] .pd-hero-card,
+        [data-theme="dark"] .pd-card,
+        [data-theme="dark"] .photo-slot-card {
+            background: #1e293b;
+            border-color: #334155;
+        }
+        [data-theme="dark"] .pd-hero-title,
+        [data-theme="dark"] .pd-card-title,
+        [data-theme="dark"] .pd-field-value,
+        [data-theme="dark"] .pd-spec-tile-value,
+        [data-theme="dark"] .doc-slot-name,
+        [data-theme="dark"] .pd-breadcrumb-current {
+            color: #f8fafc;
+        }
+        [data-theme="dark"] .pd-hero-subtitle,
+        [data-theme="dark"] .pd-field-label,
+        [data-theme="dark"] .pd-spec-tile-label,
+        [data-theme="dark"] .pd-card-badge,
+        [data-theme="dark"] .pd-breadcrumb-link,
+        [data-theme="dark"] .photo-slot-footer {
+            color: #94a3b8;
+        }
+        [data-theme="dark"] .pd-spec-tile,
+        [data-theme="dark"] .pd-desc-box,
+        [data-theme="dark"] .pd-contact-card,
+        [data-theme="dark"] .badge-amenity,
+        [data-theme="dark"] .pd-rules-box,
+        [data-theme="dark"] .doc-slot-card,
+        [data-theme="dark"] .photo-slot-footer,
+        [data-theme="dark"] .photo-empty {
+            background: #0f172a;
+            border-color: #334155;
+        }
+        [data-theme="dark"] .pd-card-icon,
+        [data-theme="dark"] .pd-contact-icon,
+        [data-theme="dark"] .doc-slot-icon {
+            background: #0f172a;
+            border-color: #334155;
+            color: #60a5fa;
+        }
+        [data-theme="dark"] .btn-pd-action.secondary {
+            background: #1e293b;
+            border-color: #334155;
+            color: #cbd5e1;
+        }
+        [data-theme="dark"] .btn-pd-action.secondary:hover {
+            background: #334155;
+            color: #ffffff;
+        }
+        [data-theme="dark"] .pd-type-pill {
+            background: #0f172a;
+            border-color: #334155;
+            color: #cbd5e1;
+        }
+        [data-theme="dark"] .pd-desc-box,
+        [data-theme="dark"] .pd-rules-box,
+        [data-theme="dark"] .badge-amenity {
+            color: #cbd5e1;
+        }
+        [data-theme="dark"] .pd-card-header {
+            border-bottom-color: #334155;
+        }
+        [data-theme="dark"] .form-input,
+        [data-theme="dark"] .form-select,
+        [data-theme="dark"] .form-textarea {
+            background: #0f172a;
+            border-color: #334155;
+            color: #f8fafc;
         }
     </style>
     <link href="../../css/design-system.css" rel="stylesheet">
@@ -147,7 +706,7 @@
             </div>
             <div class="navbar-menu">
                 <a href="dashboard.html" class="navbar-menu-link">Dashboard</a>
-                <a href="properties.html" class="navbar-menu-link active">My Properties</a>
+                <a href="properties.html" class="navbar-menu-link active">Properties</a>
                 <a href="property-create.html" class="navbar-menu-link">Register Property</a>
                 <a href="applications.html" class="navbar-menu-link">Tenant Applications</a>
             </div>
@@ -159,151 +718,218 @@
     </nav>
 
     <!-- Main Content -->
-    <main class="dashboard-container">
-        <div class="nav-back">
-            <a href="properties.html" class="nav-back-link">← Back to My Properties</a>
+    <main class="dashboard-container pd-layout">
+        <!-- Back Navigation -->
+        <div class="pd-breadcrumb-bar">
+            <a href="properties.html" id="backToPropertiesBtn" class="pd-breadcrumb-link">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                Back to Properties
+            </a>
         </div>
 
-        <div style="display: flex; justify-content: flex-end; align-items: center; margin-top: 1rem; margin-bottom: 1.25rem;">
-            <div style="display: flex; gap: 0.5rem;" id="actionPanel">
-                <!-- Action buttons loaded dynamically -->
+        <!-- Hero Header Card -->
+        <header class="pd-hero-card">
+            <div class="pd-hero-main">
+                <div class="pd-hero-meta-row">
+                    <span class="pd-type-pill" id="heroPropType">Apartment</span>
+                    <span id="propertyStatusBadge" class="status-badge status-pending">PENDING REVIEW</span>
+                </div>
+                <h1 class="pd-hero-title" id="pageTitle">Testing Property 1</h1>
+                <p class="pd-hero-subtitle" id="pageSubtitle">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                    <span>Registered Property</span>
+                </p>
             </div>
-        </div>
+            <div class="pd-hero-actions">
+                <a href="#" id="btnManageUnits" class="btn-pd-action secondary" title="Manage Rooms and Rental Units">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+                    Manage Units
+                </a>
+                <div id="actionPanel" style="display:inline-flex; gap:8px;">
+                    <!-- Action buttons loaded dynamically -->
+                </div>
+            </div>
+        </header>
 
-        <div id="generalFeedback" class="alert alert-success hidden"></div>
+        <!-- Admin Rejection Notice Banner -->
+        <div id="rejectionAlert" class="pd-rejection-banner hidden" role="alert"></div>
 
-        <div class="details-grid">
-            <!-- Left Column: Step 1 Property Details (Sections 1 to 6) -->
-            <div class="details-left">
+        <!-- General Feedback Toast / Alert -->
+        <div id="generalFeedback" class="alert alert-success hidden" style="margin-bottom: 1.5rem; border-radius: 12px;"></div>
+
+        <!-- Main Details Grid -->
+        <div class="pd-grid">
+            <!-- Left Column: Core Property Details & Map -->
+            <div class="pd-col-left">
 
                 <!-- View Mode Details -->
                 <div id="viewDetailsCard">
-                    
-                    <!-- Section 1. Basic Information -->
-                    <div class="prop-section-card">
-                        <div class="section-header-flex">
-                            <h3>Section 1. Basic Information</h3>
-                            <span id="propertyStatusBadge" class="status-badge">PENDING REVIEW</span>
-                        </div>
-                        <div id="rejectionAlert" class="alert alert-warning hidden" style="margin-bottom: 1.5rem;"></div>
 
-                        <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 1.25rem; margin-bottom: 1.25rem;">
-                            <div>
-                                <div class="detail-label">Property Name</div>
-                                <div id="viewPropName" style="font-size: 1.25rem; font-weight: 800; color: var(--primary);">-</div>
+                    <!-- Card 1: Overview & Description -->
+                    <div class="pd-card">
+                        <div class="pd-card-header">
+                            <div class="pd-card-title-group">
+                                <div class="pd-card-icon">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+                                </div>
+                                <h2 class="pd-card-title">Property Overview</h2>
                             </div>
-                            <div>
-                                <div class="detail-label">Property Type</div>
-                                <div id="viewPropType" class="detail-value">-</div>
+                            <span id="viewPropTypeBadge" class="pd-card-badge">Apartment</span>
+                        </div>
+
+                        <div class="pd-field-grid">
+                            <div class="pd-field-item">
+                                <span class="pd-field-label">Property Name</span>
+                                <span id="viewPropName" class="pd-field-value highlight">-</span>
+                            </div>
+                            <div class="pd-field-item">
+                                <span class="pd-field-label">Property Type</span>
+                                <span id="viewPropType" class="pd-field-value">-</span>
+                            </div>
+                            <div class="pd-field-item">
+                                <span class="pd-field-label">Tenant Suitability</span>
+                                <span id="viewTenantSuitability" class="pd-field-value">-</span>
+                            </div>
+                        </div>
+
+                        <div style="margin-top: 16px;">
+                            <span class="pd-field-label">Description</span>
+                            <div id="viewDescription" class="pd-desc-box">No description provided.</div>
+                        </div>
+                    </div>
+
+                    <!-- Card 2: Property Location & Interactive Map -->
+                    <div class="pd-card">
+                        <div class="pd-card-header">
+                            <div class="pd-card-title-group">
+                                <div class="pd-card-icon">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                                </div>
+                                <h2 class="pd-card-title">Location &amp; Map</h2>
+                            </div>
+                            <span class="pd-card-badge">Siniloan, Laguna</span>
+                        </div>
+
+                        <div class="pd-field-grid">
+                            <div class="pd-field-item">
+                                <span class="pd-field-label">Barangay</span>
+                                <span id="viewBarangay" class="pd-field-value">-</span>
+                            </div>
+                            <div class="pd-field-item">
+                                <span class="pd-field-label">Street / Purok / Sitio</span>
+                                <span id="viewAddress" class="pd-field-value">-</span>
+                            </div>
+                            <div class="pd-field-item">
+                                <span class="pd-field-label">Landmark</span>
+                                <span id="viewLandmark" class="pd-field-value">-</span>
+                            </div>
+                        </div>
+
+                        <div id="landlordMap" class="domiknow-map-frame" role="application" aria-label="Map showing registered property location" style="height: 320px; z-index: 1;"></div>
+                    </div>
+
+                    <!-- Card 3: Building Specifications -->
+                    <div class="pd-card">
+                        <div class="pd-card-header">
+                            <div class="pd-card-title-group">
+                                <div class="pd-card-icon">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18M5 21V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16M9 9h1m4 0h1m-6 4h1m4 0h1m-6 4h1m4 0h1"></path></svg>
+                                </div>
+                                <h2 class="pd-card-title">Building Specifications</h2>
+                            </div>
+                        </div>
+
+                        <div class="pd-specs-grid">
+                            <div class="pd-spec-tile">
+                                <span class="pd-spec-tile-label">Total Floors</span>
+                                <span id="viewTotalFloors" class="pd-spec-tile-value">-</span>
+                            </div>
+                            <div class="pd-spec-tile">
+                                <span class="pd-spec-tile-label">Max Occupants / Unit</span>
+                                <span id="viewTotalUnits" class="pd-spec-tile-value">-</span>
+                            </div>
+                            <div class="pd-spec-tile">
+                                <span class="pd-spec-tile-label">Building Capacity</span>
+                                <span id="viewTotalCapacity" class="pd-spec-tile-value">-</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Card 4: Shared Amenities & Rules -->
+                    <div class="pd-card">
+                        <div class="pd-card-header">
+                            <div class="pd-card-title-group">
+                                <div class="pd-card-icon">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path></svg>
+                                </div>
+                                <h2 class="pd-card-title">Shared Amenities &amp; Rules</h2>
+                            </div>
+                        </div>
+
+                        <div style="margin-bottom: 18px;">
+                            <span class="pd-field-label" style="display:block; margin-bottom: 8px;">Included Shared Amenities</span>
+                            <div id="viewAmenities" class="pd-amenities-container">
+                                <!-- List of shared amenities -->
                             </div>
                         </div>
 
                         <div>
-                            <div class="detail-label">Property Description</div>
-                            <p id="viewDescription" style="color: var(--text-secondary); line-height: 1.6; margin: 0;">No description provided.</p>
+                            <span class="pd-field-label" style="display:block; margin-bottom: 8px;">Rules &amp; Guidelines</span>
+                            <div id="viewHouseRules" class="pd-rules-box">No specific rules submitted.</div>
                         </div>
                     </div>
 
-                    <!-- Section 2. Property Location -->
-                    <div class="prop-section-card">
-                        <div class="section-header-flex">
-                            <h3>Section 2. Property Location (Siniloan, Laguna)</h3>
-                        </div>
-
-                        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1.25rem; margin-bottom: 1.25rem;">
-                            <div>
-                                <div class="detail-label">Barangay</div>
-                                <div id="viewBarangay" class="detail-value">-</div>
-                            </div>
-                            <div>
-                                <div class="detail-label">Street / Purok / Sitio</div>
-                                <div id="viewAddress" class="detail-value">-</div>
-                            </div>
-                            <div>
-                                <div class="detail-label">Landmark (Optional)</div>
-                                <div id="viewLandmark" class="detail-value">-</div>
+                    <!-- Card 5: Contact Information -->
+                    <div class="pd-card">
+                        <div class="pd-card-header">
+                            <div class="pd-card-title-group">
+                                <div class="pd-card-icon">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+                                </div>
+                                <h2 class="pd-card-title">Landlord Contact Details</h2>
                             </div>
                         </div>
 
-                        <div style="margin-bottom: 0.5rem;">
-                            <div class="detail-label">Pin Location on Map</div>
-                        </div>
-                        <div id="landlordMap" class="domiknow-map-frame" role="application" aria-label="Map showing the registered property location" style="height: 320px; z-index: 1;"></div>
-                    </div>
-
-                    <!-- Section 3. Contact Information -->
-                    <div class="prop-section-card">
-                        <div class="section-header-flex">
-                            <h3>Section 3. Contact Information (Auto-filled from Landlord Account)</h3>
-                        </div>
-
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem;">
-                            <div>
-                                <div class="detail-label">Contact Number</div>
-                                <div id="viewContactPhone" class="detail-value" style="color: var(--landlord); font-size: 1.05rem;">-</div>
+                        <div class="pd-contact-grid">
+                            <div class="pd-contact-card">
+                                <div class="pd-contact-icon">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+                                </div>
+                                <div>
+                                    <span class="pd-field-label">Contact Number</span>
+                                    <span id="viewContactPhone" class="pd-field-value">-</span>
+                                </div>
                             </div>
-                            <div>
-                                <div class="detail-label">Email Address</div>
-                                <div id="viewContactEmail" class="detail-value" style="font-size: 1.05rem;">-</div>
+                            <div class="pd-contact-card">
+                                <div class="pd-contact-icon">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+                                </div>
+                                <div>
+                                    <span class="pd-field-label">Email Address</span>
+                                    <span id="viewContactEmail" class="pd-field-value">-</span>
+                                </div>
                             </div>
                         </div>
-                    </div>
-
-                    <!-- Section 4. Property Information (Building Specs) -->
-                    <div class="prop-section-card">
-                        <div class="section-header-flex">
-                            <h3>Section 4. Property Information</h3>
-                        </div>
-
-                        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1.25rem;">
-                            <div>
-                                <div class="detail-label">Total Number of Floors</div>
-                                <div id="viewTotalFloors" class="detail-value" style="font-size: 1.1rem;">-</div>
-                            </div>
-                            <div>
-                                <div class="detail-label">Default Maximum Occupants per Unit</div>
-                                <div id="viewTotalUnits" class="detail-value" style="font-size: 1.1rem;">-</div>
-                            </div>
-                            <div>
-                                <div class="detail-label">Total Building Capacity</div>
-                                <div id="viewTotalCapacity" class="detail-value" style="font-size: 1.1rem;">-</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Section 5. Shared Amenities -->
-                    <div class="prop-section-card">
-                        <div class="section-header-flex">
-                            <h3>Section 5. Shared Amenities</h3>
-                        </div>
-
-                        <div id="viewAmenities" style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
-                            <!-- List of 12 shared amenities -->
-                        </div>
-                    </div>
-
-                    <!-- Section 6. Property Rules -->
-                    <div class="prop-section-card">
-                        <div class="section-header-flex">
-                            <h3>Section 6. Property Rules & Guidelines</h3>
-                        </div>
-
-                        <p id="viewHouseRules" style="color: var(--text-secondary); line-height: 1.6; white-space: pre-line; margin: 0;">No specific rules submitted.</p>
                     </div>
 
                 </div>
 
                 <!-- Edit Mode Card -->
-                <div id="editDetailsCard" class="prop-section-card hidden">
-                    <div class="section-header-flex">
-                        <h3>Edit Property Specifications</h3>
-                        <button onclick="toggleMode(false)" class="navbar-btn" style="padding: 0.25rem 0.75rem;">Cancel</button>
+                <div id="editDetailsCard" class="pd-card hidden">
+                    <div class="pd-card-header">
+                        <div class="pd-card-title-group">
+                            <div class="pd-card-icon">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                            </div>
+                            <h2 class="pd-card-title">Edit Property Specifications</h2>
+                        </div>
+                        <button type="button" onclick="toggleMode(false)" class="btn-pd-action secondary" style="padding: 6px 14px; font-size: 0.8rem;">Cancel</button>
                     </div>
                     
                     <form id="editPropertyForm">
                         <!-- Section 1 -->
-                        <h4 style="font-size: 0.9375rem; margin-bottom: 0.75rem; color: var(--primary);">Section 1. Basic Information</h4>
-                        <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 1rem;">
+                        <div style="font-size: 0.8125rem; font-weight: 750; color: #0052ea; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 12px;">1. Basic Information</div>
+                        <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 1rem; margin-bottom: 1rem;">
                             <div class="form-group">
                                 <label for="propertyName" class="form-label">Property Name *</label>
                                 <input type="text" id="propertyName" required class="form-input">
@@ -322,14 +948,14 @@
                             </div>
                         </div>
 
-                        <div class="form-group">
+                        <div class="form-group" style="margin-bottom: 1.5rem;">
                             <label for="description" class="form-label">Property Description *</label>
                             <textarea id="description" rows="3" required class="form-textarea"></textarea>
                         </div>
 
                         <!-- Section 2 -->
-                        <h4 style="font-size: 0.9375rem; margin-bottom: 0.75rem; color: var(--primary);">Section 2. Property Location</h4>
-                        <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 1rem;">
+                        <div style="font-size: 0.8125rem; font-weight: 750; color: #0052ea; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 12px;">2. Property Location</div>
+                        <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
                             <div class="form-group">
                                 <label for="address" class="form-label">Street / Purok / Sitio *</label>
                                 <input type="text" id="address" required class="form-input">
@@ -366,7 +992,7 @@
                             </div>
                         </div>
 
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem;">
                             <div class="form-group">
                                 <label for="latitude" class="form-label">Latitude *</label>
                                 <input type="number" id="latitude" required step="any" class="form-input">
@@ -377,24 +1003,24 @@
                             </div>
                         </div>
 
-                        <!-- Section 4 -->
-                        <h4 style="font-size: 0.9375rem; margin-bottom: 0.75rem; color: var(--primary);">Section 4. Property Information (Building Specs)</h4>
-                        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem;">
+                        <!-- Section 3 -->
+                        <div style="font-size: 0.8125rem; font-weight: 750; color: #0052ea; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 12px;">3. Building Specs &amp; Suitability</div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
                             <div class="form-group">
                                 <label for="totalFloors" class="form-label">Total Floors *</label>
                                 <input type="number" id="totalFloors" required min="1" max="100" step="1" class="form-input">
                             </div>
                             <div class="form-group">
-                                <label for="maxOccupants" class="form-label">Default Maximum Occupants per Unit *</label>
+                                <label for="maxOccupants" class="form-label">Default Max Occupants / Unit *</label>
                                 <input type="number" id="maxOccupants" required min="1" max="100" step="1" class="form-input">
                             </div>
                             <div class="form-group">
-                                <label for="totalCapacity" class="form-label">Total Building Capacity (Optional)</label>
+                                <label for="totalCapacity" class="form-label">Total Building Capacity</label>
                                 <input type="number" id="totalCapacity" min="1" max="10000" step="1" class="form-input">
                             </div>
                         </div>
 
-                        <div class="form-group">
+                        <div class="form-group" style="margin-bottom: 1.5rem;">
                             <label for="prefTenantType" class="form-label">Tenant Suitability *</label>
                             <select id="prefTenantType" required class="form-select">
                                 <option value="" disabled>Select tenant suitability</option>
@@ -405,9 +1031,9 @@
                             </select>
                         </div>
 
-                        <!-- Section 5 -->
-                        <h4 style="font-size: 0.9375rem; margin-bottom: 0.75rem; color: var(--primary);">Section 5. Shared Amenities</h4>
-                        <div class="form-group">
+                        <!-- Section 4 -->
+                        <div style="font-size: 0.8125rem; font-weight: 750; color: #0052ea; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 12px;">4. Shared Amenities</div>
+                        <div class="form-group" style="margin-bottom: 1.5rem;">
                             <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 0.5rem; background-color: var(--bg-primary); padding: 0.85rem; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
                                 <label class="checkbox-label"><input type="checkbox" class="amenity-cb" value="WiFi"> Wi-Fi</label>
                                 <label class="checkbox-label"><input type="checkbox" class="amenity-cb" value="Parking"> Parking Area</label>
@@ -424,9 +1050,9 @@
                             </div>
                         </div>
 
-                        <!-- Section 6 -->
-                        <h4 style="font-size: 0.9375rem; margin-bottom: 0.75rem; color: var(--primary);">Section 6. Property Rules & Guidelines</h4>
-                        <div class="form-group">
+                        <!-- Section 5 -->
+                        <div style="font-size: 0.8125rem; font-weight: 750; color: #0052ea; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 12px;">5. Property Rules &amp; Guidelines</div>
+                        <div class="form-group" style="margin-bottom: 1.5rem;">
                             <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 0.75rem;">
                                 <span class="rule-chip" data-rule="No Smoking inside premise.">No Smoking</span>
                                 <span class="rule-chip" data-rule="No Pets allowed.">No Pets</span>
@@ -438,22 +1064,31 @@
                             <textarea id="houseRules" rows="3" class="form-textarea"></textarea>
                         </div>
 
-                        <button type="submit" id="btnUpdateSubmit" class="btn-primary" style="display: inline-flex; align-items: center; gap: 6px; background-color: var(--landlord);">
-                            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/></svg>
-                            Save Modifications
-                        </button>
+                        <div style="display: flex; justify-content: flex-end; gap: 10px;">
+                            <button type="button" onclick="toggleMode(false)" class="btn-pd-action secondary">Cancel</button>
+                            <button type="submit" id="btnUpdateSubmit" class="btn-pd-action primary">
+                                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/></svg>
+                                Save Modifications
+                            </button>
+                        </div>
                     </form>
                 </div>
 
             </div>
 
-            <!-- Right Column: Step 2 Legal Documents & Step 3 Property Photos -->
-            <div class="details-right">
+            <!-- Right Column: Verification Documents & Media Photos -->
+            <div class="pd-col-right">
 
-                <!-- Step 2: Upload Documents -->
-                <div class="prop-section-card">
-                    <div class="section-header-flex">
-                        <h3>Step 2. Legal Verification Certificates</h3>
+                <!-- Card 1: Legal Verification Documents -->
+                <div class="pd-card">
+                    <div class="pd-card-header">
+                        <div class="pd-card-title-group">
+                            <div class="pd-card-icon">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                            </div>
+                            <h2 class="pd-card-title">Legal Documents</h2>
+                        </div>
+                        <span class="pd-card-badge">4 Files</span>
                     </div>
                     
                     <div id="documentList" class="doc-list">
@@ -461,13 +1096,19 @@
                     </div>
                 </div>
 
-                <!-- Step 3: Property Photos -->
-                <div class="prop-section-card">
-                    <div class="section-header-flex">
-                        <h3>Step 3. Property Building Photos</h3>
+                <!-- Card 2: Property Building Photos -->
+                <div class="pd-card">
+                    <div class="pd-card-header">
+                        <div class="pd-card-title-group">
+                            <div class="pd-card-icon">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
+                            </div>
+                            <h2 class="pd-card-title">Building Photos</h2>
+                        </div>
+                        <span class="pd-card-badge">5 Slots</span>
                     </div>
                     
-                    <div id="imageGallery" style="display: flex; flex-direction: column; gap: 1rem;">
+                    <div id="imageGallery" class="photo-gallery-list">
                         <!-- Rendered dynamically -->
                     </div>
                 </div>
@@ -582,23 +1223,41 @@
 
             // Title and subtitles
             const titleEl = document.getElementById('pageTitle');
-            if (titleEl) titleEl.textContent = prop.property_name;
+            if (titleEl) titleEl.textContent = prop.property_name || 'Property Details';
+
+            const breadcrumbEl = document.getElementById('breadcrumbPropName');
+            if (breadcrumbEl) breadcrumbEl.textContent = prop.property_name || 'Property Details';
+
+            const heroTypeEl = document.getElementById('heroPropType');
+            if (heroTypeEl) heroTypeEl.textContent = (prop.property_type || 'Property').replace(/_/g, ' ');
 
             const subEl = document.getElementById('pageSubtitle');
-            if (subEl) subEl.textContent = `Registered ${prop.property_type.replace(/_/g, ' ')} in Barangay ${prop.barangay || 'Siniloan'}.`;
+            if (subEl) {
+                subEl.innerHTML = `
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                    <span>Barangay ${prop.barangay || 'Siniloan'}, Siniloan, Laguna</span>
+                `;
+            }
 
             // Status badge
             const statusBadge = document.getElementById('propertyStatusBadge');
             if (statusBadge) {
                 statusBadge.className = 'status-badge';
-                statusBadge.textContent = (prop.status || 'pending_review').replace('_', ' ').toUpperCase();
-                if (prop.status === 'approved') {
+                const statusKey = prop.status || 'pending_review';
+                statusBadge.textContent = statusKey.replace('_', ' ').toUpperCase();
+                if (statusKey === 'approved') {
                     statusBadge.classList.add('status-active');
-                } else if (prop.status === 'rejected') {
+                } else if (statusKey === 'rejected') {
                     statusBadge.classList.add('status-rejected');
                 } else {
                     statusBadge.classList.add('status-pending');
                 }
+            }
+
+            // Manage Units Button Link
+            const manageUnitsBtn = document.getElementById('btnManageUnits');
+            if (manageUnitsBtn) {
+                manageUnitsBtn.href = `units.html?property_id=${prop.id}`;
             }
 
             // Action Panel Buttons
@@ -607,13 +1266,11 @@
                 actionPanel.innerHTML = '';
                 if (prop.status === 'pending_review' || prop.status === 'rejected') {
                     actionPanel.innerHTML = `
-                        <button onclick="toggleMode(true)" class="btn-primary" style="display: inline-flex; align-items: center; gap: 6px; background-color: var(--primary); padding: 0.5rem 1.25rem; font-size: 0.875rem;">
-                            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
+                        <button type="button" onclick="toggleMode(true)" class="btn-pd-action primary">
+                            <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
                             Modify Property Details
                         </button>
                     `;
-                } else if (prop.status === 'approved') {
-                    actionPanel.innerHTML = '';
                 }
             }
 
@@ -623,13 +1280,13 @@
                 if (prop.status === 'rejected' && prop.rejection_reason) {
                     const revDate = prop.admin_reviewed_at ? new Date(prop.admin_reviewed_at).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' }) : 'Recently';
                     rejAlert.innerHTML = `
-                        <div style="font-weight: 700; margin-bottom: 0.25rem; display: flex; align-items: center; gap: 6px; color: var(--error);">
-                            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
-                            Admin Rejection Notice
+                        <div class="pd-rejection-icon">
+                            <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
                         </div>
-                        <div><strong>Reason:</strong> ${prop.rejection_reason}</div>
-                        <div style="font-size: 0.75rem; margin-top: 0.25rem; color: var(--text-muted);">
-                            Reviewed on ${revDate}
+                        <div>
+                            <div class="pd-rejection-title">Admin Review: Action Required</div>
+                            <div class="pd-rejection-body"><strong>Reason:</strong> ${prop.rejection_reason}</div>
+                            <div class="pd-rejection-date">Reviewed on ${revDate}</div>
                         </div>
                     `;
                     rejAlert.classList.remove('hidden');
@@ -644,6 +1301,20 @@
 
             const typeEl = document.getElementById('viewPropType');
             if (typeEl) typeEl.textContent = (prop.property_type || '-').replace(/_/g, ' ').toUpperCase();
+
+            const typeBadgeEl = document.getElementById('viewPropTypeBadge');
+            if (typeBadgeEl) typeBadgeEl.textContent = (prop.property_type || 'Property').replace(/_/g, ' ');
+
+            const suitEl = document.getElementById('viewTenantSuitability');
+            if (suitEl) {
+                const suitMap = {
+                    'student': 'Student-Friendly',
+                    'worker': 'Employee / Worker',
+                    'family': 'Family',
+                    'general': 'Mixed / General'
+                };
+                suitEl.textContent = suitMap[prop.tenant_type_suitability] || prop.tenant_type_suitability || 'General / All Welcome';
+            }
 
             const descEl = document.getElementById('viewDescription');
             if (descEl) descEl.textContent = prop.description || 'No description provided.';
@@ -677,18 +1348,18 @@
             // SECTION 4: Property Info (Building Specs)
             const floorsEl = document.getElementById('viewTotalFloors');
             if (floorsEl) floorsEl.textContent = Number(prop.total_floors) > 0
-                ? `${Number(prop.total_floors)} floor${Number(prop.total_floors) === 1 ? '' : 's'}`
-                : 'Not provided';
+                ? `${Number(prop.total_floors)} Floor${Number(prop.total_floors) === 1 ? '' : 's'}`
+                : 'Not specified';
 
             const unitsEl = document.getElementById('viewTotalUnits');
             if (unitsEl) unitsEl.textContent = Number(prop.max_occupants) > 0
-                ? `${Number(prop.max_occupants)} person${Number(prop.max_occupants) === 1 ? '' : 's'} per unit`
-                : 'Not provided';
+                ? `${Number(prop.max_occupants)} Person${Number(prop.max_occupants) === 1 ? '' : 's'}`
+                : 'Not specified';
 
             const capEl = document.getElementById('viewTotalCapacity');
             if (capEl) capEl.textContent = Number(prop.total_capacity) > 0
-                ? `${Number(prop.total_capacity)} persons`
-                : 'Not provided';
+                ? `${Number(prop.total_capacity)} Persons`
+                : 'Not specified';
 
             // SECTION 5: Shared Amenities
             const amenitiesContainer = document.getElementById('viewAmenities');
@@ -698,15 +1369,11 @@
                     amenities.forEach(a => {
                         const tag = document.createElement('span');
                         tag.className = 'badge-amenity';
-                        tag.style.margin = '0';
-                        tag.style.display = 'inline-flex';
-                        tag.style.alignItems = 'center';
-                        tag.style.gap = '4px';
-                        tag.innerHTML = `<svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="color: var(--success);"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg> ${a}`;
+                        tag.innerHTML = `<svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="color: #059669;"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg> <span>${a}</span>`;
                         amenitiesContainer.appendChild(tag);
                     });
                 } else {
-                    amenitiesContainer.innerHTML = '<p style="color: var(--text-muted); font-size: 0.8125rem; font-style: italic;">No shared amenities specified.</p>';
+                    amenitiesContainer.innerHTML = '<p style="color: #94a3b8; font-size: 0.8125rem; font-style: italic; margin: 0;">No shared amenities specified.</p>';
                 }
             }
 
@@ -840,28 +1507,26 @@
 
                 const slotDiv = document.createElement('div');
                 slotDiv.className = 'photo-slot-card';
-                slotDiv.style.border = '1px solid var(--border-color)';
-                slotDiv.style.borderRadius = 'var(--radius-md)';
-                slotDiv.style.overflow = 'hidden';
-                slotDiv.style.backgroundColor = 'var(--bg-primary)';
-                slotDiv.style.position = 'relative';
 
-                let imgHtml = '';
+                let frameContent = '';
                 if (matchedImg) {
-                    imgHtml = `<img src="${matchedImg.image_url}" alt="${slot.label}" style="width: 100%; height: 180px; object-fit: cover; display: block; cursor: pointer;" onclick="window.open('${matchedImg.image_url}')">`;
+                    frameContent = `
+                        <img src="${matchedImg.image_url}" alt="${slot.label}" onclick="window.open('${matchedImg.image_url}')">
+                        ${slot.isMain ? '<span class="photo-cover-tag">Cover Photo</span>' : ''}
+                    `;
                 } else {
-                    imgHtml = `
-                        <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 180px; color: var(--text-muted); background-color: var(--bg-secondary);">
-                            <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="margin-bottom: 6px;"><path stroke-linecap="round" stroke-linejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                            <span style="font-size: 0.75rem;">No photo submitted</span>
+                    frameContent = `
+                        <div class="photo-empty">
+                            <svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                            <span>No photo uploaded</span>
                         </div>
                     `;
                 }
 
                 const replaceButtonHtml = `
-                    <div class="edit-upload-controls" style="display: none; position: absolute; top: 8px; left: 8px; z-index: 10;">
+                    <div class="edit-upload-controls" style="display: none; position: absolute; top: 10px; right: 10px; z-index: 10;">
                         <input type="file" id="fileInput_photo_${index}" accept="image/png, image/jpeg, image/jpg, image/webp" style="display: none;" onchange="uploadSlotPhoto(${index}, '${slot.key}', ${slot.isMain}, '${matchedImg ? matchedImg.id : ''}')">
-                        <button onclick="document.getElementById('fileInput_photo_${index}').click()" style="display: inline-flex; align-items: center; gap: 4px; background-color: rgba(15, 23, 42, 0.85); color: #ffffff; border: 1px solid rgba(255,255,255,0.25); border-radius: var(--radius-md); padding: 0.35rem 0.65rem; font-size: 0.725rem; font-weight: 600; cursor: pointer; backdrop-filter: blur(4px); transition: background-color 0.2s;">
+                        <button type="button" onclick="document.getElementById('fileInput_photo_${index}').click()" class="btn-pd-action primary" style="padding: 5px 12px; font-size: 0.75rem; box-shadow: 0 2px 8px rgba(0,0,0,0.3);">
                             <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
                             ${matchedImg ? 'Replace' : 'Upload'}
                         </button>
@@ -869,12 +1534,13 @@
                 `;
 
                 slotDiv.innerHTML = `
-                    <div style="position: relative; height: 180px; width: 100%;">
-                        ${imgHtml}
+                    <div class="photo-frame">
+                        ${frameContent}
                         ${replaceButtonHtml}
                     </div>
-                    <div style="padding: 0.5rem; font-size: 0.75rem; font-weight: 700; text-align: center; color: var(--text-primary); border-top: 1px solid var(--border-color); background-color: var(--bg-secondary);">
-                        ${slot.label.toUpperCase()}
+                    <div class="photo-slot-footer">
+                        <span>${slot.label}</span>
+                        ${matchedImg ? '<span style="color:#059669; font-weight:700; font-size:0.75rem; display:inline-flex; align-items:center; gap:3px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg> Uploaded</span>' : '<span style="color:#94a3b8; font-weight:600; font-size:0.75rem;">Empty Slot</span>'}
                     </div>
                 `;
 
@@ -910,56 +1576,52 @@
                 }
 
                 const slotDiv = document.createElement('div');
-                slotDiv.style.border = '1px solid var(--border-color)';
-                slotDiv.style.borderRadius = 'var(--radius-md)';
-                slotDiv.style.padding = '1rem';
-                slotDiv.style.backgroundColor = 'var(--bg-primary)';
-                slotDiv.style.marginBottom = '1rem';
+                slotDiv.className = 'doc-slot-card';
 
-                let docContentHtml = '';
+                let docBadgeClass = 'status-pending';
+                let docStatusText = 'PENDING';
+                let sizeKB = '0';
+                let uploadedDate = '';
+
                 if (matchedDoc) {
-                    const sizeKB = (matchedDoc.file_size / 1024).toFixed(0);
-                    const uploadedDate = new Date(matchedDoc.uploaded_at).toLocaleDateString();
-                    
-                    let docBadge = 'status-pending';
-                    if (matchedDoc.status === 'accepted') docBadge = 'status-active';
-                    if (matchedDoc.status === 'rejected') docBadge = 'status-rejected';
-
-                    docContentHtml = `
-                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.75rem;">
-                            <div>
-                                <span class="doc-meta" style="display: inline-flex; align-items: center; gap: 4px;">
-                                    <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                                    <a href="${matchedDoc.file_url}" target="_blank" style="color: var(--text-secondary); text-decoration: underline; font-weight: 600;">${matchedDoc.file_name}</a> (${sizeKB} KB)
-                                </span>
-                                <span class="doc-meta" style="font-size: 0.6875rem; display: block; margin-top: 0.15rem; margin-left: 18px;">Submitted on ${uploadedDate}</span>
-                            </div>
-                            <span class="status-badge ${docBadge}">${matchedDoc.status.toUpperCase()}</span>
-                        </div>
-                    `;
-                } else {
-                    docContentHtml = `
-                        <p style="color: var(--text-muted); font-size: 0.8125rem; font-style: italic; margin: 0 0 0.75rem 0;">No document submitted</p>
-                    `;
+                    sizeKB = (matchedDoc.file_size / 1024).toFixed(0);
+                    uploadedDate = new Date(matchedDoc.uploaded_at).toLocaleDateString();
+                    docStatusText = (matchedDoc.status || 'pending').toUpperCase();
+                    if (matchedDoc.status === 'accepted') docBadgeClass = 'status-active';
+                    else if (matchedDoc.status === 'rejected') docBadgeClass = 'status-rejected';
                 }
 
                 const replaceControlsHtml = `
-                    <div class="edit-upload-controls" style="display: none; border-top: 1px dashed var(--border-color); padding-top: 0.75rem;">
-                        <div style="display: flex; gap: 0.5rem; align-items: center; justify-content: flex-end;">
+                    <div class="edit-upload-controls" style="display: none; margin-top: 12px; padding-top: 10px; border-top: 1px dashed var(--border-color, #e2e8f0);">
+                        <div style="display: flex; gap: 8px; justify-content: flex-end;">
                             <input type="file" id="fileInput_doc_${index}" accept="application/pdf, image/png, image/jpeg, image/jpg" style="display: none;" onchange="uploadSlotDocument(${index}, '${slot.type}', '${matchedDoc ? matchedDoc.id : ''}')">
-                            <button onclick="document.getElementById('fileInput_doc_${index}').click()" class="btn-primary" style="display: inline-flex; align-items: center; gap: 4px; padding: 0.35rem 0.65rem; font-size: 0.725rem; background-color: var(--primary);">
+                            <button type="button" onclick="document.getElementById('fileInput_doc_${index}').click()" class="btn-pd-action primary" style="padding: 5px 12px; font-size: 0.75rem;">
                                 <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
-                                ${matchedDoc ? 'Replace' : 'Upload'}
+                                ${matchedDoc ? 'Replace Document' : 'Upload Document'}
                             </button>
                         </div>
                     </div>
                 `;
 
                 slotDiv.innerHTML = `
-                    <div style="font-weight: 700; font-size: 0.8125rem; color: var(--primary); margin-bottom: 0.5rem;">
-                        ${slot.label.toUpperCase()}
+                    <div class="doc-slot-header">
+                        <span class="doc-slot-type">${slot.label}</span>
+                        ${matchedDoc ? `<span class="status-badge ${docBadgeClass}">${docStatusText}</span>` : '<span class="status-badge status-pending">REQUIRED</span>'}
                     </div>
-                    ${docContentHtml}
+                    <div class="doc-slot-body">
+                        <div class="doc-slot-icon">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+                        </div>
+                        <div class="doc-slot-info">
+                            ${matchedDoc ? `
+                                <a href="${matchedDoc.file_url}" target="_blank" class="doc-slot-name" title="${matchedDoc.file_name}">${matchedDoc.file_name}</a>
+                                <span class="doc-slot-meta">${sizeKB} KB • Submitted on ${uploadedDate}</span>
+                            ` : `
+                                <span class="doc-slot-name" style="color: #94a3b8; font-weight: 500; font-size: 0.8125rem;">No document submitted</span>
+                                <span class="doc-slot-meta">Required for landlord verification</span>
+                            `}
+                        </div>
+                    </div>
                     ${replaceControlsHtml}
                 `;
 

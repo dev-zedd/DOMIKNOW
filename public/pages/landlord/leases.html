@@ -42,6 +42,31 @@
         .party-role { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted); margin-bottom: 0.4rem; }
         .party-name { font-size: 1.05rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.5rem; }
         .party-detail { font-size: 0.8rem; color: var(--text-secondary); line-height: 1.7; }
+
+        /* Action button aligned in header (consistent with tenant portal & properties.html) */
+        .btn-draft-lease {
+            background: #ffffff;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            padding: 8px 18px;
+            font-weight: 700;
+            font-size: 0.875rem;
+            color: #0f172a;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+            white-space: nowrap;
+            text-decoration: none;
+        }
+        .btn-draft-lease:hover {
+            background: #f8fafc;
+            border-color: #94a3b8;
+            color: #0f172a;
+            text-decoration: none;
+        }
     </style>
     <link href="../../css/design-system.css" rel="stylesheet">
     <script src="../../js/ui.js" defer></script>
@@ -55,7 +80,7 @@
             </div>
             <div class="navbar-menu">
                 <a href="dashboard.html" class="navbar-menu-link">Dashboard</a>
-                <a href="properties.html" class="navbar-menu-link">My Properties</a>
+                <a href="properties.html" class="navbar-menu-link">Properties</a>
                 <a href="applications.html" class="navbar-menu-link">Tenant Applications</a>
                 <a href="leases.html" class="navbar-menu-link active">Leases</a>
                 <a href="billings.html" class="navbar-menu-link">Billings</a>
@@ -69,20 +94,22 @@
     </nav>
 
     <main class="dashboard-container">
-        <div style="display:flex;justify-content:flex-end;align-items:center;margin-bottom:1.25rem;">
-            <a href="lease-create.html" class="btn-primary" style="background-color:var(--landlord);width:auto;padding:0.6rem 1.5rem;text-decoration:none;display:inline-flex;align-items:center;gap:0.4rem;">
-                + Draft Lease Agreement
-            </a>
-        </div>
-
         <!-- ── APPROVED TENANT APPLICATIONS QUEUE (READY FOR LEASE) ── -->
         <div class="lease-card" id="approvedAppsCard" style="margin-bottom:2rem;">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;border-bottom:1px solid var(--border-color);padding-bottom:0.75rem;">
-                <h3 style="margin:0;font-size:1.05rem;color:var(--text-primary);display:flex;align-items:center;gap:0.5rem;">
-                    <svg class="svg-icon" width="18" height="18" viewBox="0 0 24 24" style="color:#10b981;"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
-                    Approved Applications Queue (Ready for Lease Execution)
-                </h3>
-                <span style="font-size:0.8rem;color:var(--text-muted);">Applications approved during screening</span>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;border-bottom:1px solid var(--border-color);padding-bottom:0.75rem;flex-wrap:wrap;gap:12px;">
+                <div>
+                    <h3 style="margin:0;font-size:1.05rem;color:var(--text-primary);">
+                        Approved Applications Queue (Ready for Lease Execution)
+                    </h3>
+                    <div style="font-size:0.8rem;color:var(--text-muted);margin-top:0.25rem;">Applications approved during screening</div>
+                </div>
+                <a href="lease-create.html" class="btn-draft-lease">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="12" y1="5" x2="12" y2="19"></line>
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                    </svg>
+                    <span>Draft Lease Agreement</span>
+                </a>
             </div>
             <div id="approvedAppsContainer">
                 <div style="text-align:center;padding:1.5rem;color:var(--text-muted);">Loading approved applications queue...</div>
@@ -90,6 +117,12 @@
         </div>
 
         <div class="lease-card">
+            <div style="margin-bottom:1rem;border-bottom:1px solid var(--border-color);padding-bottom:0.75rem;">
+                <h3 style="margin:0;font-size:1.05rem;color:var(--text-primary);">
+                    Lease Registry
+                </h3>
+                <div style="font-size:0.8rem;color:var(--text-muted);margin-top:0.25rem;">Active, pending, and past tenancy contracts</div>
+            </div>
             <table>
                 <thead>
                     <tr>
@@ -225,7 +258,6 @@
                         <td>
                             <button class="action-btn btn-view" data-action="view" data-lease-id="${lease.id}">View</button>
                             ${editBtn}
-                            <a href="tenant-report-form.html?lease_id=${lease.id}" class="action-btn" style="background:var(--color-error-bg);color:var(--color-error-text);border-color:var(--color-error-border);margin-left:0.5rem;" title="Report this tenant"><span data-icon="flag"></span> Report Tenant</a>
                         </td>
                     `;
                     tbody.appendChild(tr);

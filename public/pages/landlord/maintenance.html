@@ -6,15 +6,126 @@
     <title>Maintenance Management - DomiKnow</title>
     <link href="../../css/input.css" rel="stylesheet">
     <style>
+        .maintenance-tabs-bar {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            overflow-x: auto;
+            scrollbar-width: none;
+            padding-bottom: 12px;
+            width: 100%;
+            border-bottom: 1px solid var(--border-color, #e2e8f0);
+            margin-bottom: 1.5rem;
+        }
+        .maintenance-tabs-bar::-webkit-scrollbar { display: none; }
+        .m-tab-btn {
+            background: none !important;
+            border: none !important;
+            padding: 4px 0 !important;
+            font-size: 0.875rem !important;
+            font-weight: 600 !important;
+            color: #64748b !important;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            position: relative;
+            transition: color 0.15s ease;
+            white-space: nowrap;
+            box-shadow: none !important;
+            min-height: auto !important;
+            outline: none;
+        }
+        .m-tab-btn:hover {
+            color: #0052ea !important;
+            background: none !important;
+        }
+        .m-tab-btn.active {
+            color: #0052ea !important;
+            font-weight: 750 !important;
+            border-bottom: none !important;
+            background: none !important;
+            box-shadow: none !important;
+        }
+        .m-tab-btn.active::after {
+            content: '';
+            position: absolute;
+            bottom: -13px;
+            left: 0;
+            right: 0;
+            height: 2.5px;
+            background: #0052ea;
+            border-radius: 2px 2px 0 0;
+        }
+        .tab-count {
+            background: #e2e8f0;
+            color: #475569;
+            font-size: 0.6875rem;
+            font-weight: 700;
+            padding: 2px 7px;
+            border-radius: 999px;
+            line-height: 1.2;
+        }
+        .m-tab-btn.active .tab-count {
+            background: #eff6ff;
+            color: #0052ea;
+        }
+
         .list-card {
             background-color: var(--bg-secondary);
             border: 1px solid var(--border-color);
             border-radius: var(--radius-lg);
-            padding: 2rem;
-            box-shadow: var(--shadow-lg);
+            padding: 1.5rem;
+            box-shadow: var(--shadow-md, 0 1px 3px rgba(0,0,0,0.05));
             overflow-x: auto;
-            margin-top: 1.5rem;
+            margin-top: 0;
+            margin-bottom: 2rem;
         }
+        .card-header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.25rem;
+            border-bottom: 1px solid var(--border-color, #e2e8f0);
+            padding-bottom: 0.85rem;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .card-header-title {
+            margin: 0;
+            font-size: 1.05rem;
+            font-weight: 750;
+            color: var(--text-primary);
+        }
+        .card-header-subtitle {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-top: 0.25rem;
+        }
+
+        .btn-add-worker {
+            background: #ffffff;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            padding: 7px 16px;
+            font-weight: 700;
+            font-size: 0.875rem;
+            color: #0f172a;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+            white-space: nowrap;
+            text-decoration: none;
+        }
+        .btn-add-worker:hover {
+            background: #f8fafc;
+            border-color: #94a3b8;
+            color: #0052ea;
+        }
+
         table {
             width: 100%;
             border-collapse: collapse;
@@ -29,53 +140,157 @@
             text-transform: uppercase;
             font-size: 0.72rem;
             letter-spacing: 0.05em;
+            background: #f8fafc;
         }
         td {
             padding: 1.15rem 1rem;
             border-bottom: 1px solid var(--border-color);
             color: var(--text-primary);
+            vertical-align: middle;
         }
         tr:hover td {
             background-color: var(--bg-primary);
         }
-        
-        .filters-group {
-            display: flex;
-            gap: 0.5rem;
-            flex-wrap: wrap;
-            margin-top: 1.5rem;
-            margin-bottom: 0.5rem;
+
+        .action-btn.btn-view {
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            padding: 0.35rem 1.1rem !important;
+            min-height: 32px !important;
+            font-size: 0.8125rem !important;
+            font-weight: 700 !important;
+            border-radius: 6px !important;
+            border: 1px solid var(--color-info-border, #bfdbfe) !important;
+            background: var(--color-info-bg, #eff6ff) !important;
+            color: var(--color-info-text, #1d4ed8) !important;
+            text-decoration: none !important;
+            transition: all 0.15s ease !important;
+            box-shadow: none !important;
         }
-        .filter-btn {
-            background: var(--bg-secondary);
-            border: 1px solid var(--border-color);
-            color: var(--text-secondary);
-            padding: 0.45rem 1rem;
-            font-size: 0.8125rem;
-            border-radius: var(--radius-sm);
-            cursor: pointer;
+        .action-btn.btn-view:hover {
+            background: #dbeafe !important;
+            border-color: #93c5fd !important;
+            color: #1e40af !important;
+        }
+
+        /* Dark mode styling */
+        [data-theme="dark"] .btn-add-worker {
+            background: var(--bg-secondary, #1e293b);
+            border-color: var(--border-color, #334155);
+            color: var(--text-primary, #f8fafc);
+        }
+        [data-theme="dark"] .btn-add-worker:hover {
+            background: var(--bg-primary, #0f172a);
+            color: #60a5fa;
+            border-color: #60a5fa;
+        }
+        [data-theme="dark"] .m-tab-btn {
+            color: #94a3b8 !important;
+        }
+        [data-theme="dark"] .m-tab-btn:hover,
+        [data-theme="dark"] .m-tab-btn.active {
+            color: #60a5fa !important;
+        }
+        [data-theme="dark"] .m-tab-btn.active::after {
+            background: #60a5fa;
+        }
+        [data-theme="dark"] .tab-count {
+            background: #334155;
+            color: #cbd5e1;
+        }
+        [data-theme="dark"] .m-tab-btn.active .tab-count {
+            background: rgba(59, 130, 246, 0.2);
+            color: #60a5fa;
+        }
+        [data-theme="dark"] th {
+            background: var(--bg-primary, #0f172a);
+        }
+        [data-theme="dark"] .card-header-row {
+            border-bottom-color: var(--border-color, #334155);
+        }
+        [data-theme="dark"] .action-btn.btn-view {
+            background: rgba(59, 130, 246, 0.15) !important;
+            border-color: rgba(59, 130, 246, 0.3) !important;
+            color: #93c5fd !important;
+        }
+        [data-theme="dark"] .action-btn.btn-view:hover {
+            background: rgba(59, 130, 246, 0.25) !important;
+            border-color: #60a5fa !important;
+            color: #bfdbfe !important;
+        }
+
+        /* Worker Modal Tabs & Cards */
+        .worker-modal-tab {
+            background: none;
+            border: none;
+            border-bottom: 2.5px solid transparent;
+            padding: 8px 14px;
+            font-size: 0.875rem;
             font-weight: 600;
-            transition: all 0.2s ease;
-        }
-        .filter-btn.active {
-            background: var(--landlord);
-            color: white;
-            border-color: var(--landlord);
-        }
-        .action-btn {
-            padding: 0.45rem 1.1rem;
-            font-size: 0.8125rem;
-            border-radius: var(--radius-sm);
+            color: var(--text-muted, #64748b);
             cursor: pointer;
-            font-weight: 700;
-            border: 1px solid transparent;
-            text-decoration: none;
-            display: inline-block;
-            background-color: var(--landlord);
-            color: white;
+            transition: all 0.15s ease;
         }
-        .action-btn:hover {
-            opacity: 0.9;
+        .worker-modal-tab:hover {
+            color: var(--primary, #0355F3);
+        }
+        .worker-modal-tab.active {
+            color: var(--primary, #0355F3);
+            border-bottom-color: var(--primary, #0355F3);
+            font-weight: 750;
+        }
+        .worker-manage-card {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--bg-primary, #ffffff);
+            border: 1px solid var(--border-color, #e2e8f0);
+            border-radius: 8px;
+            padding: 0.85rem 1rem;
+            gap: 0.75rem;
+            transition: border-color 0.15s ease;
+        }
+        .worker-manage-card:hover {
+            border-color: #cbd5e1;
+        }
+        .btn-delete-worker {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            color: #dc2626;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 0.78rem;
+            font-weight: 700;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            flex-shrink: 0;
+            transition: all 0.15s ease;
+        }
+        .btn-delete-worker:hover {
+            background: #fee2e2;
+            border-color: #f87171;
+            color: #b91c1c;
+        }
+        [data-theme="dark"] .worker-manage-card {
+            background: var(--bg-primary, #0f172a);
+            border-color: var(--border-color, #334155);
+        }
+        [data-theme="dark"] .worker-modal-tab.active {
+            color: #60a5fa;
+            border-bottom-color: #60a5fa;
+        }
+        [data-theme="dark"] .btn-delete-worker {
+            background: rgba(239, 68, 68, 0.15);
+            border-color: rgba(239, 68, 68, 0.3);
+            color: #fca5a5;
+        }
+        [data-theme="dark"] .btn-delete-worker:hover {
+            background: rgba(239, 68, 68, 0.25);
+            border-color: #ef4444;
+            color: #fecaca;
         }
     </style>
     <link href="../../css/design-system.css" rel="stylesheet">
@@ -91,7 +306,7 @@
             </div>
             <div class="navbar-menu">
                 <a href="dashboard.html" class="navbar-menu-link">Dashboard</a>
-                <a href="properties.html" class="navbar-menu-link">My Properties</a>
+                <a href="properties.html" class="navbar-menu-link">Properties</a>
                 <a href="applications.html" class="navbar-menu-link">Tenant Applications</a>
                 <a href="leases.html" class="navbar-menu-link">Lease Agreements</a>
                 <a href="billings.html" class="navbar-menu-link">Billings</a>
@@ -107,110 +322,165 @@
 
     <!-- Main Content -->
     <main class="dashboard-container">
-        <div style="display: flex; justify-content: flex-end; align-items: center; margin-bottom: 1.25rem;">
-            <button type="button" id="openAddWorkerBtn" class="action-btn" style="background: var(--landlord); color: #fff; padding: 0.65rem 1.25rem; font-size: 0.9rem; font-weight: 700; border-radius: var(--radius-md); display: inline-flex; align-items: center; gap: 0.5rem;">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                    <circle cx="8.5" cy="7" r="4"></circle>
-                    <line x1="20" y1="8" x2="20" y2="14"></line>
-                    <line x1="17" y1="11" x2="23" y2="11"></line>
-                </svg>
-                Add Maintenance Worker
+        <!-- Status Filter Tabs Bar (Full Width, Consistent System) -->
+        <div class="maintenance-tabs-bar" role="tablist" aria-label="Maintenance status filters">
+            <button class="m-tab-btn active" data-filter="all" role="tab" aria-selected="true" type="button">
+                All Requests <span class="tab-count" id="countAll">0</span>
+            </button>
+            <button class="m-tab-btn" data-filter="pending" role="tab" aria-selected="false" type="button">
+                Pending <span class="tab-count" id="countPending">0</span>
+            </button>
+            <button class="m-tab-btn" data-filter="approved" role="tab" aria-selected="false" type="button">
+                Approved <span class="tab-count" id="countApproved">0</span>
+            </button>
+            <button class="m-tab-btn" data-filter="assigned" role="tab" aria-selected="false" type="button">
+                Assigned <span class="tab-count" id="countAssigned">0</span>
+            </button>
+            <button class="m-tab-btn" data-filter="accepted" role="tab" aria-selected="false" type="button">
+                Accepted <span class="tab-count" id="countAccepted">0</span>
+            </button>
+            <button class="m-tab-btn" data-filter="in_progress" role="tab" aria-selected="false" type="button">
+                In Progress <span class="tab-count" id="countInProgress">0</span>
+            </button>
+            <button class="m-tab-btn" data-filter="completed" role="tab" aria-selected="false" type="button">
+                Completed <span class="tab-count" id="countCompleted">0</span>
+            </button>
+            <button class="m-tab-btn" data-filter="closed" role="tab" aria-selected="false" type="button">
+                Closed / Verified <span class="tab-count" id="countClosed">0</span>
+            </button>
+            <button class="m-tab-btn" data-filter="rejected" role="tab" aria-selected="false" type="button">
+                Rejected <span class="tab-count" id="countRejected">0</span>
             </button>
         </div>
 
-        <div class="filters-group">
-            <button class="filter-btn active" data-filter="all">All Requests</button>
-            <button class="filter-btn" data-filter="pending">Pending Approval</button>
-            <button class="filter-btn" data-filter="approved">Approved Pool</button>
-            <button class="filter-btn" data-filter="assigned">Assigned</button>
-            <button class="filter-btn" data-filter="accepted">Accepted Job</button>
-            <button class="filter-btn" data-filter="in_progress">In Progress</button>
-            <button class="filter-btn" data-filter="completed">Completed Report</button>
-            <button class="filter-btn" data-filter="closed">Closed / Verified</button>
-            <button class="filter-btn" data-filter="rejected">Rejected</button>
-        </div>
-
         <div class="list-card">
+            <div class="card-header-row">
+                <div>
+                    <h3 class="card-header-title">Maintenance Requests</h3>
+                    <div class="card-header-subtitle">Track, assign, and manage repair requests submitted by your tenants</div>
+                </div>
+                <button type="button" id="openManageWorkersBtn" class="btn-add-worker">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="9" cy="7" r="4"></circle>
+                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                        <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                    </svg>
+                    <span>Manage Workers</span>
+                </button>
+            </div>
             <table>
                 <thead>
                     <tr>
                         <th>Property & Unit</th>
-                        <th>Tenant Reporter</th>
-                        <th>Problem Details</th>
+                        <th>Tenant</th>
+                        <th>Issue Details</th>
                         <th>Category</th>
                         <th>Priority</th>
                         <th>Status</th>
-                        <th>Assigned technician</th>
+                        <th>Assigned Worker</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody id="maintenanceQueueBody">
                     <tr>
-                        <td colspan="8" style="text-align: center; color: var(--text-muted);">Loading maintenance coordination reports...</td>
+                        <td colspan="8" style="text-align: center; color: var(--text-muted);">Loading maintenance requests...</td>
                     </tr>
                 </tbody>
             </table>
         </div>
     </main>
 
-    <!-- Add Maintenance Worker Modal -->
+    <!-- Manage & Add Maintenance Worker Modal -->
     <div class="modal-overlay hidden" id="addWorkerModal" style="position: fixed; inset: 0; background: rgba(15,23,42,0.6); backdrop-filter: blur(4px); display: none; justify-content: center; align-items: center; z-index: 1000; padding: 1.5rem;">
-        <div class="modal-box" style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 2rem; max-width: 520px; width: 100%; box-shadow: var(--shadow-premium);">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
-                <h3 style="margin: 0; font-size: 1.1rem; color: var(--text-primary);">Create Maintenance Worker Account</h3>
-                <button type="button" id="closeWorkerModalBtn" aria-label="Close worker account form" style="background:none;border:none;cursor:pointer;color:var(--text-muted);line-height:1;"><span data-icon="x"></span></button>
+        <div class="modal-box" style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 1.75rem; max-width: 580px; width: 100%; box-shadow: var(--shadow-premium); max-height: 88vh; display: flex; flex-direction: column;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.85rem; flex-shrink: 0;">
+                <h3 style="margin: 0; font-size: 1.15rem; color: var(--text-primary);" id="workerModalTitle">Maintenance Personnel</h3>
+                <button type="button" id="closeWorkerModalBtn" aria-label="Close worker modal" style="background:none;border:none;cursor:pointer;color:var(--text-muted);line-height:1;"><span data-icon="x"></span></button>
             </div>
-            <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 1.25rem;">
-                Create a login account for your electrician, plumber, carpenter, or repair technician so they can receive job assignments and submit repair reports.
-            </p>
 
-            <div id="workerAlertErr" style="display: none; background: rgba(239,68,68,.1); color: #ef4444; border: 1px solid rgba(239,68,68,.3); padding: 0.65rem 1rem; border-radius: 6px; font-size: 0.83rem; margin-bottom: 1rem;"></div>
-            <div id="workerAlertOk" style="display: none; background: rgba(16,185,129,.1); color: #10b981; border: 1px solid rgba(16,185,129,.3); padding: 0.65rem 1rem; border-radius: 6px; font-size: 0.83rem; margin-bottom: 1rem;"></div>
+            <!-- Tabs: Active Workers vs Add New -->
+            <div style="display: flex; gap: 8px; border-bottom: 1px solid var(--border-color); margin-bottom: 1.25rem; flex-shrink: 0;">
+                <button type="button" id="tabWorkerListBtn" class="worker-modal-tab active">
+                    Active Workers (<span id="workerListCount">0</span>)
+                </button>
+                <button type="button" id="tabWorkerAddBtn" class="worker-modal-tab">
+                    + Add New Worker
+                </button>
+            </div>
 
-            <form id="addWorkerForm">
-                <div class="form-group" style="margin-bottom: 1rem;">
-                    <label class="form-label" for="workerFullName">Worker Full Name <span style="color: var(--error);">*</span></label>
-                    <input type="text" id="workerFullName" class="form-input" placeholder="e.g. Juan Dela Cruz" required>
+            <div id="workerAlertErr" style="display: none; background: rgba(239,68,68,.1); color: #ef4444; border: 1px solid rgba(239,68,68,.3); padding: 0.65rem 1rem; border-radius: 6px; font-size: 0.83rem; margin-bottom: 1rem; flex-shrink: 0;"></div>
+            <div id="workerAlertOk" style="display: none; background: rgba(16,185,129,.1); color: #10b981; border: 1px solid rgba(16,185,129,.3); padding: 0.65rem 1rem; border-radius: 6px; font-size: 0.83rem; margin-bottom: 1rem; flex-shrink: 0;"></div>
+
+            <!-- View 1: Active Workers List & Delete -->
+            <div id="workerListView" style="overflow-y: auto; flex: 1;">
+                <div id="workerListContainer" style="display: flex; flex-direction: column; gap: 0.75rem; padding-right: 2px;">
+                    <div style="text-align: center; color: var(--text-muted); padding: 2.5rem 1rem; font-size: 0.875rem;">Loading maintenance workers…</div>
                 </div>
+            </div>
 
-                <div class="form-group" style="margin-bottom: 1rem;">
-                    <label class="form-label" for="workerTrade">Specialty / Trade <span style="color: var(--text-muted); font-weight: normal;">(Optional)</span></label>
-                    <select id="workerTrade" class="form-input">
-                        <option value="">-- Select Trade --</option>
-                        <option value="General Repair">General Maintenance & Repair</option>
-                        <option value="Plumber">Plumber (Pipes and water systems)</option>
-                        <option value="Electrician">Electrician (Electrical and wiring)</option>
-                        <option value="Aircon Technician">Aircon Technician (HVAC)</option>
-                        <option value="Carpenter">Carpenter (Woodwork and fixtures)</option>
-                        <option value="Painter">Painter (Walls and finishes)</option>
-                        <option value="Roofer">Roofer / Leak Repair</option>
-                        <option value="Locksmith">Locksmith / Doors & Keys</option>
-                    </select>
-                </div>
+            <!-- View 2: Add Worker Form -->
+            <div id="workerAddView" style="display: none; overflow-y: auto; flex: 1;">
+                <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 1.25rem;">
+                    Create a login account for your electrician, plumber, carpenter, or repair technician so they can receive job assignments and submit repair reports.
+                </p>
 
-                <div class="form-group" style="margin-bottom: 1rem;">
-                    <label class="form-label" for="workerEmail">Email Address (Login Username) <span style="color: var(--error);">*</span></label>
-                    <input type="email" id="workerEmail" class="form-input" placeholder="e.g. worker.juan@gmail.com" required>
-                </div>
+                <form id="addWorkerForm">
+                    <div class="form-group" style="margin-bottom: 1rem;">
+                        <label class="form-label" for="workerFullName">Full Name <span style="color: var(--error);">*</span></label>
+                        <input type="text" id="workerFullName" class="form-input" placeholder="e.g. Juan Dela Cruz" required>
+                    </div>
 
-                <div class="form-group" style="margin-bottom: 1rem;">
-                    <label class="form-label" for="workerContact">Contact Phone Number</label>
-                    <input type="tel" id="workerContact" class="form-input" placeholder="e.g. 09123456789">
-                </div>
+                    <div class="form-group" style="margin-bottom: 1rem;">
+                        <label class="form-label" for="workerTrade">Specialization / Trade <span style="color: var(--text-muted); font-weight: normal;">(Optional)</span></label>
+                        <select id="workerTrade" class="form-input">
+                            <option value="">-- Select Trade --</option>
+                            <option value="General Repair">General Maintenance & Repair</option>
+                            <option value="Plumber">Plumber (Pipes and water systems)</option>
+                            <option value="Electrician">Electrician (Electrical and wiring)</option>
+                            <option value="Aircon Technician">Aircon Technician (HVAC)</option>
+                            <option value="Carpenter">Carpenter (Woodwork and fixtures)</option>
+                            <option value="Painter">Painter (Walls and finishes)</option>
+                            <option value="Roofer">Roofer / Leak Repair</option>
+                            <option value="Locksmith">Locksmith / Doors & Keys</option>
+                        </select>
+                    </div>
 
-                <div class="form-group" style="margin-bottom: 1.5rem;">
-                    <label class="form-label" for="workerPassword">Account Password <span style="color: var(--error);">*</span></label>
-                    <input type="password" id="workerPassword" class="form-input" placeholder="Minimum 6 characters" minlength="6" required>
-                </div>
+                    <div class="form-group" style="margin-bottom: 1rem;">
+                        <label class="form-label" for="workerEmail">Email Address (Login Username) <span style="color: var(--error);">*</span></label>
+                        <input type="email" id="workerEmail" class="form-input" placeholder="e.g. worker.juan@gmail.com" required>
+                    </div>
 
-                <div style="display: flex; justify-content: flex-end; gap: 0.75rem;">
-                    <button type="button" id="cancelWorkerModalBtn" class="navbar-btn" style="background: var(--bg-primary); border: 1px solid var(--border-color); color: var(--text-secondary);">Cancel</button>
-                    <button type="submit" id="submitWorkerBtn" class="action-btn" style="background: var(--landlord); color: #fff; padding: 0.6rem 1.25rem; font-weight: 700;">
-                        Create Worker Account
-                    </button>
-                </div>
-            </form>
+                    <div class="form-group" style="margin-bottom: 1rem;">
+                        <label class="form-label" for="workerContact">Contact Number</label>
+                        <input type="tel" id="workerContact" class="form-input" placeholder="e.g. 09123456789">
+                    </div>
+
+                    <div class="form-group" style="margin-bottom: 1.5rem;">
+                        <label class="form-label" for="workerPassword">Password <span style="color: var(--error);">*</span></label>
+                        <div style="position: relative; display: flex; align-items: center;">
+                            <input type="password" id="workerPassword" class="form-input" placeholder="Minimum 6 characters" minlength="6" required style="padding-right: 42px; width: 100%;">
+                            <button type="button" id="toggleWorkerPasswordBtn" aria-label="Show password" title="Toggle password visibility" style="position: absolute; right: 8px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: var(--text-muted, #64748b); padding: 6px; display: inline-flex; align-items: center; justify-content: center; border-radius: 6px; transition: color 0.15s ease;">
+                                <svg id="eyeIconOpen" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                    <circle cx="12" cy="12" r="3"></circle>
+                                </svg>
+                                <svg id="eyeIconClosed" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: none;">
+                                    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+                                    <line x1="1" y1="1" x2="23" y2="23"></line>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; justify-content: flex-end; gap: 0.75rem;">
+                        <button type="button" id="cancelWorkerModalBtn" class="navbar-btn" style="background: var(--bg-primary); border: 1px solid var(--border-color); color: var(--text-secondary);">Cancel</button>
+                        <button type="submit" id="submitWorkerBtn" class="action-btn" style="background: var(--landlord); color: #fff; padding: 0.6rem 1.25rem; font-weight: 700;">
+                            Create Worker Account
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
 
@@ -227,32 +497,152 @@
             bindWorkerModalEvents();
 
             // Filters delegation
-            document.querySelector('.filters-group').addEventListener('click', (e) => {
-                const btn = e.target.closest('[data-filter]');
-                if (!btn) return;
+            const tabsContainer = document.querySelector('.maintenance-tabs-bar') || document.querySelector('.filters-group');
+            if (tabsContainer) {
+                tabsContainer.addEventListener('click', (e) => {
+                    const btn = e.target.closest('[data-filter]');
+                    if (!btn) return;
 
-                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
+                    tabsContainer.querySelectorAll('[data-filter]').forEach(b => {
+                        b.classList.remove('active');
+                        b.setAttribute('aria-selected', 'false');
+                    });
+                    btn.classList.add('active');
+                    btn.setAttribute('aria-selected', 'true');
 
-                activeFilter = btn.dataset.filter;
-                renderQueueTable();
-            });
+                    activeFilter = btn.dataset.filter;
+                    renderQueueTable();
+                });
+            }
         });
 
         function bindWorkerModalEvents() {
             const modal = document.getElementById('addWorkerModal');
-            const openBtn = document.getElementById('openAddWorkerBtn');
+            const openAddBtn = document.getElementById('openAddWorkerBtn');
+            const openManageBtn = document.getElementById('openManageWorkersBtn');
             const closeBtn = document.getElementById('closeWorkerModalBtn');
             const cancelBtn = document.getElementById('cancelWorkerModalBtn');
             const form = document.getElementById('addWorkerForm');
 
-            const openModal = () => { modal.classList.remove('hidden'); modal.style.display = 'flex'; clearWorkerAlerts(); };
-            const closeModal = () => { modal.classList.add('hidden'); modal.style.display = 'none'; form.reset(); clearWorkerAlerts(); };
+            const tabListBtn = document.getElementById('tabWorkerListBtn');
+            const tabAddBtn = document.getElementById('tabWorkerAddBtn');
+            const listView = document.getElementById('workerListView');
+            const addView = document.getElementById('workerAddView');
 
-            if (openBtn) openBtn.addEventListener('click', openModal);
+            function switchWorkerTab(tab) {
+                clearWorkerAlerts();
+                if (tab === 'list') {
+                    tabListBtn.classList.add('active');
+                    tabAddBtn.classList.remove('active');
+                    listView.style.display = 'block';
+                    addView.style.display = 'none';
+                    loadWorkerList();
+                } else {
+                    tabAddBtn.classList.add('active');
+                    tabListBtn.classList.remove('active');
+                    addView.style.display = 'block';
+                    listView.style.display = 'none';
+                }
+            }
+
+            const openModal = (tab = 'list') => {
+                modal.classList.remove('hidden');
+                modal.style.display = 'flex';
+                switchWorkerTab(tab);
+            };
+
+            const toggleWorkerPassBtn = document.getElementById('toggleWorkerPasswordBtn');
+            const workerPassInput = document.getElementById('workerPassword');
+            const eyeOpen = document.getElementById('eyeIconOpen');
+            const eyeClosed = document.getElementById('eyeIconClosed');
+
+            const resetPasswordVisibility = () => {
+                if (workerPassInput) workerPassInput.type = 'password';
+                if (eyeOpen) eyeOpen.style.display = 'block';
+                if (eyeClosed) eyeClosed.style.display = 'none';
+                if (toggleWorkerPassBtn) toggleWorkerPassBtn.setAttribute('aria-label', 'Show password');
+            };
+
+            const closeModal = () => {
+                modal.classList.add('hidden');
+                modal.style.display = 'none';
+                form.reset();
+                resetPasswordVisibility();
+                clearWorkerAlerts();
+            };
+
+            if (toggleWorkerPassBtn && workerPassInput) {
+                toggleWorkerPassBtn.addEventListener('click', () => {
+                    const isPassword = workerPassInput.type === 'password';
+                    workerPassInput.type = isPassword ? 'text' : 'password';
+                    if (eyeOpen && eyeClosed) {
+                        eyeOpen.style.display = isPassword ? 'none' : 'block';
+                        eyeClosed.style.display = isPassword ? 'block' : 'none';
+                    }
+                    toggleWorkerPassBtn.setAttribute('aria-label', isPassword ? 'Hide password' : 'Show password');
+                });
+            }
+
+            if (openManageBtn) openManageBtn.addEventListener('click', () => openModal('list'));
+            if (openAddBtn) openAddBtn.addEventListener('click', () => openModal('add'));
+            if (tabListBtn) tabListBtn.addEventListener('click', () => switchWorkerTab('list'));
+            if (tabAddBtn) tabAddBtn.addEventListener('click', () => switchWorkerTab('add'));
+
             if (closeBtn) closeBtn.addEventListener('click', closeModal);
             if (cancelBtn) cancelBtn.addEventListener('click', closeModal);
             modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
+
+            // Listen for delete button clicks on worker items
+            document.getElementById('workerListContainer').addEventListener('click', async (e) => {
+                const deleteBtn = e.target.closest('.btn-delete-worker');
+                if (!deleteBtn) return;
+
+                const workerId = deleteBtn.dataset.id;
+                const workerName = deleteBtn.dataset.name || 'Worker';
+
+                const confirmed = typeof window.domiknowConfirm === 'function'
+                    ? await window.domiknowConfirm({
+                        title: 'Delete Maintenance Worker',
+                        message: `Are you sure you want to remove "${workerName}"? They will no longer be able to log in or receive repair tasks.`,
+                        confirmText: 'Delete Worker',
+                        cancelText: 'Cancel',
+                        danger: true
+                    })
+                    : confirm(`Are you sure you want to remove worker "${workerName}"?`);
+
+                if (!confirmed) return;
+
+                deleteBtn.disabled = true;
+                deleteBtn.textContent = 'Removing…';
+                clearWorkerAlerts();
+
+                try {
+                    const res = await fetch(`/api/maintenance/workers/${workerId}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
+                    const json = await res.json();
+                    if (res.ok) {
+                        showWorkerOk(json.message || `Worker "${workerName}" removed successfully.`);
+                        await loadWorkerList();
+                        // Also refresh the maintenance requests table to update any visible technician info
+                        await fetchMaintenanceQueue();
+                    } else {
+                        showWorkerErr(json.message || 'Failed to delete maintenance worker.');
+                        deleteBtn.disabled = false;
+                        deleteBtn.innerHTML = `
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                            <span>Delete</span>
+                        `;
+                    }
+                } catch (err) {
+                    console.error(err);
+                    showWorkerErr('Network error. Please try again.');
+                    deleteBtn.disabled = false;
+                }
+            });
 
             form.addEventListener('submit', async (e) => {
                 e.preventDefault();
@@ -288,7 +678,9 @@
                     if (res.ok) {
                         showWorkerOk('Worker account created successfully! The worker can now log in.');
                         form.reset();
-                        setTimeout(() => { closeModal(); }, 1600);
+                        setTimeout(() => {
+                            switchWorkerTab('list');
+                        }, 1200);
                     } else {
                         showWorkerErr(json.message || 'Failed to create worker account.');
                     }
@@ -300,6 +692,73 @@
                     submitBtn.textContent = 'Create Worker Account';
                 }
             });
+        }
+
+        async function loadWorkerList() {
+            const container = document.getElementById('workerListContainer');
+            const countBadge = document.getElementById('workerListCount');
+
+            try {
+                const res = await fetch('/api/maintenance/personnel', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const json = await res.json();
+                const workers = json.data || [];
+
+                if (countBadge) countBadge.textContent = workers.length;
+
+                if (!workers || workers.length === 0) {
+                    container.innerHTML = `
+                        <div style="text-align: center; color: var(--text-muted); padding: 2.5rem 1rem;">
+                            <div style="font-size: 1rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.35rem;">No active workers found</div>
+                            <div style="font-size: 0.825rem; margin-bottom: 1rem;">You have not registered any maintenance personnel yet.</div>
+                            <button type="button" class="btn-add-worker" onclick="document.getElementById('tabWorkerAddBtn').click()">+ Add Worker</button>
+                        </div>
+                    `;
+                    return;
+                }
+
+                container.innerHTML = workers.map(w => {
+                    const rawName = (w.full_name || 'Worker').trim();
+                    const tradeMatch = rawName.match(/^(.*?)\s*\((.*?)\)$/);
+                    const nameOnly = tradeMatch ? tradeMatch[1].trim() : rawName;
+                    const tradeOnly = tradeMatch ? tradeMatch[2].trim() : (w.trade || '');
+
+                    // Extract clean alphabetic initials (e.g., "Zedrick" -> "ZE", "Juan Dela Cruz" -> "JC")
+                    const cleanLetters = nameOnly.replace(/[^a-zA-Z\s]/g, '').trim();
+                    const nameParts = cleanLetters.split(/\s+/).filter(Boolean);
+                    const initials = nameParts.length > 1
+                        ? (nameParts[0][0] + nameParts[nameParts.length - 1][0]).toUpperCase()
+                        : (cleanLetters.slice(0, 2).toUpperCase() || 'W');
+
+                    return `
+                        <div class="worker-manage-card">
+                            <div style="display: flex; align-items: center; gap: 0.85rem; min-width: 0;">
+                                <div style="width: 40px; height: 40px; border-radius: 50%; background: #0355F3; color: #ffffff; display: flex; align-items: center; justify-content: center; font-weight: 750; font-size: 0.85rem; flex-shrink: 0; letter-spacing: 0.5px;">
+                                    ${initials}
+                                </div>
+                                <div style="min-width: 0;">
+                                    <div style="font-weight: 750; font-size: 0.925rem; color: var(--text-primary); display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                                        <span>${nameOnly}</span>
+                                        ${tradeOnly ? `<span style="font-size: 0.72rem; padding: 2px 8px; border-radius: 9999px; background: rgba(3, 85, 243, 0.1); color: var(--primary, #0355F3); font-weight: 600;">${tradeOnly}</span>` : ''}
+                                    </div>
+                                    <div style="font-size: 0.775rem; color: var(--text-muted); margin-top: 3px;">
+                                        ${w.email} ${w.contact_number ? '· ' + w.contact_number : ''}
+                                    </div>
+                                </div>
+                            </div>
+                            <button type="button" class="btn-delete-worker" data-id="${w.id}" data-name="${rawName.replace(/"/g, '&quot;')}">
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                                <span>Delete</span>
+                            </button>
+                        </div>
+                    `;
+                }).join('');
+
+            } catch (err) {
+                console.error(err);
+                container.innerHTML = `<div style="text-align:center; color:var(--error); padding:2rem;">Failed to load maintenance personnel.</div>`;
+            }
         }
 
         function showWorkerErr(msg) {
@@ -322,18 +781,53 @@
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
                 if (!response.ok) {
-                    tableBody.innerHTML = `<tr><td colspan="8" style="text-align: center; color: var(--error);">Failed to load maintenance queue.</td></tr>`;
+                    tableBody.innerHTML = `<tr><td colspan="8" style="text-align: center; color: var(--error);">Failed to load maintenance requests.</td></tr>`;
                     return;
                 }
 
                 const result = await response.json();
                 requestQueue = result.data || [];
+                updateTabCounts();
                 renderQueueTable();
 
             } catch (err) {
                 console.error(err);
-                tableBody.innerHTML = `<tr><td colspan="8" style="text-align: center; color: var(--error);">Error reaching service api.</td></tr>`;
+                tableBody.innerHTML = `<tr><td colspan="8" style="text-align: center; color: var(--error);">Unable to load maintenance requests. Please refresh or try again.</td></tr>`;
             }
+        }
+
+        function updateTabCounts() {
+            const counts = {
+                all: requestQueue.length,
+                pending: 0,
+                approved: 0,
+                assigned: 0,
+                accepted: 0,
+                in_progress: 0,
+                completed: 0,
+                closed: 0,
+                rejected: 0
+            };
+            requestQueue.forEach(req => {
+                if (['travelling', 'arrived', 'repairing'].includes(req.status)) counts.in_progress++;
+                else if (['verified', 'closed'].includes(req.status)) counts.closed++;
+                else if (counts[req.status] !== undefined) counts[req.status]++;
+            });
+
+            const countEls = {
+                all: document.getElementById('countAll'),
+                pending: document.getElementById('countPending'),
+                approved: document.getElementById('countApproved'),
+                assigned: document.getElementById('countAssigned'),
+                accepted: document.getElementById('countAccepted'),
+                in_progress: document.getElementById('countInProgress'),
+                completed: document.getElementById('countCompleted'),
+                closed: document.getElementById('countClosed'),
+                rejected: document.getElementById('countRejected')
+            };
+            Object.keys(counts).forEach(key => {
+                if (countEls[key]) countEls[key].textContent = counts[key];
+            });
         }
 
         function renderQueueTable() {
@@ -352,7 +846,7 @@
             });
 
             if (filtered.length === 0) {
-                tableBody.innerHTML = `<tr><td colspan="8" style="text-align: center; padding: 3rem; color: var(--text-muted);">No requests match the selected status category.</td></tr>`;
+                tableBody.innerHTML = `<tr><td colspan="8" style="text-align: center; padding: 3rem; color: var(--text-muted);">No maintenance requests found under this category.</td></tr>`;
                 return;
             }
 
@@ -367,6 +861,7 @@
                 else if (req.status === 'rejected') statusBadgeClass = 'status-rejected';
 
                 let technicianName = req.assigned_maintenance?.full_name || 'Unassigned';
+                const schedDisplay = req.preferred_schedule ? `Schedule: ${req.preferred_schedule}` : 'Schedule: Flexible';
 
                 const row = document.createElement('tr');
                 row.innerHTML = `
@@ -374,17 +869,17 @@
                         <div style="font-weight:750; color:var(--text-primary);">${req.properties?.property_name || 'Property'}</div>
                         <div style="font-size:0.75rem; color:var(--text-muted);">Unit: ${req.unit_number || 'N/A'}</div>
                     </td>
-                    <td>${req.users?.full_name || 'Tenant'}</td>
+                    <td style="font-weight:600; color:var(--text-primary);">${req.users?.full_name || '—'}</td>
                     <td>
                         <div style="font-weight:700; color:var(--primary);">${req.issue_title}</div>
-                        <div style="font-size:0.72rem; color:var(--text-secondary); max-width: 180px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">Pref. Sch: ${req.preferred_schedule || '—'}</div>
+                        <div style="font-size:0.75rem; color:var(--text-muted); margin-top:2px;">${schedDisplay}</div>
                     </td>
                     <td style="text-transform: capitalize;">${req.issue_category}</td>
                     <td><span class="status-badge ${priorityBadgeClass}" style="text-transform:capitalize;">${req.priority_level}</span></td>
                     <td><span class="status-badge ${statusBadgeClass}" style="text-transform:capitalize;">${req.status.replace('_', ' ')}</span></td>
                     <td style="font-weight:600; color:var(--text-secondary);">${technicianName}</td>
                     <td>
-                        <a href="maintenance-details.html?id=${req.id}" class="action-btn">Manage</a>
+                        <a href="maintenance-details.html?id=${req.id}" class="action-btn btn-view">Manage</a>
                     </td>
                 `;
                 tableBody.appendChild(row);

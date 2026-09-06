@@ -57,26 +57,73 @@ const screeningModel = {
             .from('tenant_screening')
             .select(`
                 id,
+                application_id,
+                tenant_id,
+                property_id,
+                landlord_id,
                 monthly_income,
                 employment_status,
+                employment_details,
+                payment_behavior_score,
+                previous_rental_history,
+                rental_conduct_notes,
                 screening_score,
                 screening_result_label,
+                screening_remarks,
                 status,
                 created_at,
                 users!tenant_screening_tenant_id_fkey (
                     full_name,
-                    email
+                    email,
+                    contact_number
                 ),
                 properties (
                     property_name,
                     landlord_id
                 )
             `)
-            .eq('properties.landlord_id', landlordId)
+            .eq('landlord_id', landlordId)
             .order('created_at', { ascending: false });
 
         if (error) throw error;
-        return (data || []).filter(item => item.properties !== null);
+        let results = data || [];
+        if (results.length === 0) {
+            const { data: propScreenings } = await supabase
+                .from('tenant_screening')
+                .select(`
+                    id,
+                    application_id,
+                    tenant_id,
+                    property_id,
+                    landlord_id,
+                    monthly_income,
+                    employment_status,
+                    employment_details,
+                    payment_behavior_score,
+                    previous_rental_history,
+                    rental_conduct_notes,
+                    screening_score,
+                    screening_result_label,
+                    screening_remarks,
+                    status,
+                    created_at,
+                    users!tenant_screening_tenant_id_fkey (
+                        full_name,
+                        email,
+                        contact_number
+                    ),
+                    properties (
+                        property_name,
+                        landlord_id
+                    )
+                `)
+                .eq('properties.landlord_id', landlordId)
+                .order('created_at', { ascending: false });
+            if (propScreenings && propScreenings.length > 0) {
+                results = propScreenings.filter(item => item.properties !== null);
+            }
+        }
+        return results;
     },
 
     async findScreeningDetails(id, landlordId) {

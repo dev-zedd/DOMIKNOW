@@ -278,12 +278,13 @@ async function logout() {
 
     try {
         const shouldLogout = await window.domiknowConfirm({
-            variant: 'danger',
-            eyebrow: 'End your session',
-            title: 'Log out of DOMIKNOW?',
-            message: 'You will need to sign in again to access your account and continue your current work.',
+            variant: 'info',
+            icon: 'logout',
+            eyebrow: '',
+            title: 'Log out',
+            message: 'Are you sure you want to log out?',
             confirmLabel: 'Log out',
-            cancelLabel: 'Stay signed in'
+            cancelLabel: 'Cancel'
         });
 
         if (!shouldLogout) return false;

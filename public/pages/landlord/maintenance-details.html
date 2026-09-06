@@ -6,115 +6,141 @@
     <title>Maintenance Request Details - DomiKnow</title>
     <meta name="description" content="Review, approve, assign, and verify tenant maintenance requests.">
     <link href="../../css/input.css" rel="stylesheet">
+    <link href="../../css/landlord.css" rel="stylesheet">
     <style>
         /* ── Back link ─────────────────────────────────────── */
         .back-link {
-            display: inline-flex; align-items: center; gap: 0.45rem;
-            font-size: 0.825rem; font-weight: 700; color: var(--text-muted);
-            text-decoration: none; margin-bottom: 1.5rem;
-            transition: color 0.15s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--primary, #0355F3);
+            text-decoration: none;
+            margin-bottom: 1.25rem;
+            transition: opacity 0.15s ease, transform 0.15s ease;
         }
-        .back-link:hover { color: var(--landlord); }
-
-        /* ── Status Hero Banner ────────────────────────────── */
-        .status-hero {
-            border-radius: var(--radius-lg);
-            padding: 1.75rem 2rem;
-            margin-bottom: 1.75rem;
-            display: flex; align-items: center; gap: 1.5rem;
-            flex-wrap: wrap;
-            position: relative; overflow: hidden;
-        }
-        .status-hero::before {
-            content: '';
-            position: absolute; inset: 0;
-            background: url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none'%3E%3Ccircle cx='40' cy='40' r='40' fill='%23ffffff' fill-opacity='0.03'/%3E%3C/g%3E%3C/svg%3E") repeat;
-        }
-        .hero-icon {
-            width: 60px; height: 60px; border-radius: var(--radius-md);
-            background: rgba(255,255,255,0.15);
-            display: flex; align-items: center; justify-content: center;
-            font-size: 1.75rem; flex-shrink: 0; position: relative;
-        }
-        .hero-text { flex: 1; min-width: 0; position: relative; }
-        .hero-title {
-            font-size: 1.35rem; font-weight: 800;
-            color: white; margin-bottom: 0.35rem;
-            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-        }
-        .hero-meta { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; }
-        .hero-chip {
-            font-size: 0.72rem; font-weight: 700;
-            padding: 0.22rem 0.7rem; border-radius: 999px;
-            background: rgba(255,255,255,0.18); color: white;
-            border: 1px solid rgba(255,255,255,0.25);
-            text-transform: uppercase; letter-spacing: 0.04em;
-        }
-        .hero-status-label {
-            font-size: 0.7rem; font-weight: 800; text-transform: uppercase;
-            color: rgba(255,255,255,0.65); letter-spacing: 0.07em;
-            margin-bottom: 0.2rem;
-        }
-        .hero-status-val {
-            font-size: 1rem; font-weight: 800; color: white;
-            text-transform: capitalize;
+        .back-link:hover {
+            opacity: 0.85;
+            transform: translateX(-2px);
+            text-decoration: underline;
         }
 
-        /* Hero gradient by status */
-        .hero-pending    { background: linear-gradient(135deg, #d97706, #b45309); }
-        .hero-approved   { background: var(--color-action-primary); }
-        .hero-assigned   { background: var(--color-action-primary); }
-        .hero-accepted   { background: var(--color-action-primary); }
-        .hero-travelling { background: linear-gradient(135deg, #ea580c, #c2410c); }
-        .hero-arrived    { background: linear-gradient(135deg, #ea580c, #c2410c); }
-        .hero-repairing  { background: linear-gradient(135deg, #ea580c, #c2410c); }
-        .hero-completed  { background: linear-gradient(135deg, #059669, #047857); }
-        .hero-verified   { background: linear-gradient(135deg, #059669, #047857); }
-        .hero-closed     { background: linear-gradient(135deg, #4b5563, #374151); }
-        .hero-rejected   { background: linear-gradient(135deg, #dc2626, #b91c1c); }
-
-        /* ── Main Grid ─────────────────────────────────────── */
-        .main-grid {
-            display: grid;
-            grid-template-columns: 1fr 340px;
-            gap: 1.75rem;
-            align-items: start;
-        }
-        @media (max-width: 1060px) { .main-grid { grid-template-columns: 1fr; } }
-
-        /* ── Cards ─────────────────────────────────────────── */
-        .detail-card {
+        /* ── Single Unified Card Layout ────────────────────── */
+        .single-detail-card {
             background: var(--bg-secondary);
             border: 1px solid var(--border-color);
             border-radius: var(--radius-lg);
-            box-shadow: var(--shadow-lg);
+            box-shadow: var(--shadow-sm, 0 1px 3px rgba(0,0,0,0.04));
             overflow: hidden;
-            margin-bottom: 1.5rem;
+            margin-bottom: 2.5rem;
         }
-        .detail-card:last-child { margin-bottom: 0; }
-        .card-head {
-            padding: 1.1rem 1.5rem;
+
+        .single-card-header {
+            padding: 1.25rem 1.75rem;
             border-bottom: 1px solid var(--border-color);
             background: var(--bg-primary);
-            display: flex; align-items: center; gap: 0.6rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1rem;
         }
-        .card-head-icon { font-size: 1.1rem; }
-        .card-head-title { font-weight: 800; font-size: 0.95rem; color: var(--text-primary); }
-        .card-body { padding: 1.5rem; }
+
+        .single-card-title {
+            margin: 0;
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: var(--text-primary);
+            letter-spacing: -0.015em;
+        }
+
+        .single-card-meta {
+            margin-top: 0.35rem;
+            font-size: 0.8125rem;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            flex-wrap: wrap;
+        }
+
+        .card-section {
+            padding: 1.75rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .card-section:last-child {
+            border-bottom: none;
+        }
+
+        .section-title-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.25rem;
+        }
+
+        .section-title {
+            font-size: 1rem;
+            font-weight: 750;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin: 0;
+        }
+
+        .section-icon {
+            color: var(--primary, #0355F3);
+            display: inline-flex;
+            align-items: center;
+        }
+        .section-icon svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        /* Action section inside single card */
+        .action-section {
+            background: rgba(3, 85, 243, 0.03);
+            border-bottom: 1px solid var(--border-color);
+        }
+        .action-section-inner {
+            max-width: 680px;
+        }
+        .action-title {
+            font-weight: 800;
+            font-size: 1rem;
+            color: var(--text-primary);
+            margin: 0;
+        }
+        .action-subtitle {
+            font-size: 0.8125rem;
+            color: var(--text-muted);
+            margin-top: 0.2rem;
+            margin-bottom: 1rem;
+        }
 
         /* ── Info grid ─────────────────────────────────────── */
         .info-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 1rem;
+            gap: 1.25rem;
         }
         @media (max-width: 600px) { .info-grid { grid-template-columns: 1fr; } }
         .info-cell-label {
-            font-size: 0.67rem; font-weight: 800; text-transform: uppercase;
-            letter-spacing: 0.08em; color: var(--text-muted); margin-bottom: 0.25rem;
+            font-size: 0.72rem; font-weight: 750; text-transform: uppercase;
+            letter-spacing: 0.05em; color: var(--text-muted); margin-bottom: 0.3rem;
         }
         .info-cell-value {
-            font-weight: 700; font-size: 0.9rem; color: var(--text-primary);
+            font-weight: 650; font-size: 0.9rem; color: var(--text-primary);
+            display: flex; align-items: center; gap: 0.4rem;
+        }
+        .info-cell-value svg {
+            width: 15px;
+            height: 15px;
+            color: var(--primary, #0355F3);
         }
         .info-full { grid-column: span 2; }
         @media (max-width: 600px) { .info-full { grid-column: span 1; } }
@@ -123,158 +149,163 @@
         .desc-box {
             background: var(--bg-primary);
             border: 1px solid var(--border-color);
-            border-radius: var(--radius-sm);
-            padding: 1rem;
+            border-radius: var(--radius-md);
+            padding: 1rem 1.25rem;
             font-size: 0.875rem;
             color: var(--text-secondary);
-            line-height: 1.7;
+            line-height: 1.65;
             white-space: pre-wrap;
         }
 
         /* ── Badges ────────────────────────────────────────── */
         .badge {
-            display: inline-flex; align-items: center; gap: 0.3rem;
-            font-size: 0.7rem; font-weight: 800; padding: 0.24rem 0.7rem;
+            display: inline-flex; align-items: center; gap: 0.35rem;
+            font-size: 0.72rem; font-weight: 750; padding: 0.25rem 0.65rem;
             border-radius: 999px; text-transform: uppercase; letter-spacing: 0.04em;
         }
         .badge::before { content:''; width:6px; height:6px; border-radius:50%; background:currentColor; }
-        .badge-pending    { background:rgba(245,158,11,.14); color:#f59e0b; }
-        .badge-approved   { background:rgba(59,130,246,.14); color:#3b82f6; }
-        .badge-assigned   { background:var(--color-info-bg); color:var(--color-info-text); }
-        .badge-accepted   { background:var(--color-info-bg); color:var(--color-info-text); }
-        .badge-repairing  { background:rgba(249,115,22,.14); color:#f97316; }
-        .badge-travelling { background:rgba(249,115,22,.14); color:#f97316; }
-        .badge-arrived    { background:rgba(249,115,22,.14); color:#f97316; }
+        .badge-pending    { background:rgba(245,158,11,.12); color:#d97706; }
+        .badge-approved   { background:rgba(3,85,243,.12); color:#0355F3; }
+        .badge-assigned   { background:rgba(3,85,243,.12); color:#0355F3; }
+        .badge-accepted   { background:rgba(3,85,243,.12); color:#0355F3; }
+        .badge-repairing  { background:rgba(234,88,12,.12); color:#ea580c; }
+        .badge-travelling { background:rgba(234,88,12,.12); color:#ea580c; }
+        .badge-arrived    { background:rgba(234,88,12,.12); color:#ea580c; }
         .badge-completed  { background:rgba(16,185,129,.12); color:#10b981; }
         .badge-verified   { background:rgba(16,185,129,.12); color:#10b981; }
-        .badge-closed     { background:rgba(107,114,128,.12);color:#6b7280; }
+        .badge-closed     { background:rgba(100,116,139,.12); color:#475569; }
         .badge-rejected   { background:rgba(239,68,68,.12);  color:#ef4444; }
         .badge-prio-low       { background:rgba(16,185,129,.12); color:#10b981; }
-        .badge-prio-medium    { background:rgba(245,158,11,.12); color:#f59e0b; }
-        .badge-prio-high      { background:rgba(249,115,22,.12); color:#f97316; }
+        .badge-prio-medium    { background:rgba(245,158,11,.12); color:#d97706; }
+        .badge-prio-high      { background:rgba(234,88,12,.12); color:#ea580c; }
         .badge-prio-emergency { background:rgba(239,68,68,.12);  color:#ef4444; }
 
         /* ── Worker chip ───────────────────────────────────── */
         .worker-chip {
-            display: inline-flex; align-items: center; gap: 0.6rem;
+            display: inline-flex; align-items: center; gap: 0.75rem;
             background: var(--bg-primary); border: 1px solid var(--border-color);
-            border-radius: var(--radius-md); padding: 0.65rem 0.9rem;
+            border-radius: var(--radius-md); padding: 0.75rem 1rem;
+            width: 100%; box-sizing: border-box;
         }
         .worker-avatar {
-            width: 34px; height: 34px; border-radius: 50%;
-            background: linear-gradient(135deg, var(--landlord), #0369a1);
+            width: 38px; height: 38px; border-radius: 50%;
+            background: var(--primary, #0355F3);
             display: flex; align-items: center; justify-content: center;
-            font-size: 0.8rem; font-weight: 800; color: white; flex-shrink: 0;
+            font-size: 0.85rem; font-weight: 800; color: white; flex-shrink: 0;
         }
-        .worker-name  { font-weight: 700; font-size: 0.875rem; color: var(--text-primary); }
-        .worker-trade { font-size: 0.72rem; color: var(--text-muted); font-weight: 600; }
+        .worker-name  { font-weight: 750; font-size: 0.9rem; color: var(--text-primary); }
+        .worker-trade { font-size: 0.75rem; color: var(--text-muted); font-weight: 600; margin-top: 0.1rem; }
 
         /* ── Photo grid ────────────────────────────────────── */
         .photo-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
         .photo-grid a img {
-            width: 100%; max-height: 160px; object-fit: cover;
-            border-radius: var(--radius-sm); border: 1px solid var(--border-color);
+            width: 100%; max-height: 180px; object-fit: cover;
+            border-radius: var(--radius-md); border: 1px solid var(--border-color);
             display: block; transition: opacity 0.15s;
         }
         .photo-grid a img:hover { opacity: 0.85; }
-        .photo-label { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; color: var(--text-muted); margin-bottom: 0.4rem; }
+        .photo-label { font-size: 0.72rem; font-weight: 750; text-transform: uppercase; color: var(--text-muted); margin-bottom: 0.4rem; letter-spacing: 0.04em; }
 
         /* ── Cost row ──────────────────────────────────────── */
         .cost-row {
             display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;
             background: var(--bg-primary); border: 1px solid var(--border-color);
-            border-radius: var(--radius-sm); padding: 1rem; margin-top: 0.75rem;
+            border-radius: var(--radius-md); padding: 1.15rem; margin-top: 1rem;
         }
-        .cost-val { font-size: 1.25rem; font-weight: 800; color: var(--landlord); margin-top: 0.15rem; }
+        .cost-val { font-size: 1.25rem; font-weight: 800; color: var(--primary, #0355F3); margin-top: 0.15rem; }
 
         /* ── Timeline ──────────────────────────────────────── */
         .timeline {
             border-left: 2px solid var(--border-color);
             padding-left: 1.25rem; margin-left: 0.5rem;
-            display: flex; flex-direction: column; gap: 1.1rem;
+            display: flex; flex-direction: column; gap: 1.15rem;
         }
         .tl-item { position: relative; }
         .tl-item::before {
-            content: ''; position: absolute; left: -26px; top: 4px;
+            content: ''; position: absolute; left: -26px; top: 5px;
             width: 10px; height: 10px; border-radius: 50%;
             background: var(--border-color); border: 2px solid var(--bg-secondary);
         }
-        .tl-item.tla::before { background: var(--landlord); }
-        .tl-meta  { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-muted); }
-        .tl-notes { font-size: 0.85rem; color: var(--text-primary); margin-top: 0.2rem; line-height: 1.5; }
+        .tl-item.tla::before { background: var(--primary, #0355F3); }
+        .tl-meta  { font-size: 0.72rem; font-weight: 750; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-muted); }
+        .tl-notes { font-size: 0.875rem; color: var(--text-primary); margin-top: 0.25rem; line-height: 1.5; }
 
-        /* ── Right Sidebar Column ──────────────────────────── */
-        .right-sidebar { display: flex; flex-direction: column; gap: 1.5rem; }
-        .side-card {
-            background: var(--bg-secondary);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-lg);
-            box-shadow: var(--shadow-lg);
-            overflow: hidden;
-        }
-        .side-head {
-            padding: 1rem 1.25rem;
-            border-bottom: 1px solid var(--border-color);
-            background: var(--bg-primary);
-            display: flex; align-items: center; gap: 0.5rem;
-        }
-        .side-head-title { font-weight: 800; font-size: 0.875rem; color: var(--text-primary); }
-        .side-body { padding: 1.25rem; }
 
-        /* ── Action Panel ──────────────────────────────────── */
-        .action-panel {
-            background: var(--bg-secondary);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-lg);
-            box-shadow: var(--shadow-lg);
-            overflow: hidden;
-        }
-        .action-panel-head {
-            padding: 1.1rem 1.25rem;
-            border-bottom: 1px solid var(--border-color);
-        }
-        .action-panel-head-title { font-weight: 800; font-size: 0.9rem; color: var(--text-primary); margin: 0; }
-        .action-panel-head-sub   { font-size: 0.75rem; color: var(--text-muted); margin-top: 0.15rem; }
-        .action-panel-body { padding: 1.25rem; }
 
         /* ── Buttons ───────────────────────────────────────── */
         .btn {
-            display: inline-flex; align-items: center; justify-content: center; gap: 0.4rem;
-            padding: 0.65rem 1.25rem; font-size: 0.85rem; font-weight: 700;
-            border-radius: var(--radius-sm); border: 1px solid transparent;
-            cursor: pointer; transition: all 0.18s; text-decoration: none;
-            width: 100%; margin-top: 0.5rem;
+            display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;
+            padding: 0.65rem 1.25rem; font-size: 0.875rem; font-weight: 700;
+            border-radius: var(--radius-md); border: 1px solid transparent;
+            cursor: pointer; transition: all 0.15s ease; text-decoration: none;
+            width: 100%; margin-top: 0.65rem;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+            box-sizing: border-box;
         }
-        .btn-approve {
-            background: linear-gradient(135deg, #10b981, #059669); color: white;
+        .btn-approve, .btn-assign, .btn-verify {
+            background: var(--primary, #0355F3); color: #ffffff;
+            border-color: var(--primary, #0355F3);
         }
-        .btn-approve:hover { transform: translateY(-1px); box-shadow: 0 4px 14px rgba(16,185,129,.35); }
+        .btn-approve:hover, .btn-assign:hover, .btn-verify:hover {
+            background: var(--primary-hover, #0247D1);
+            border-color: var(--primary-hover, #0247D1);
+            transform: translateY(-1px);
+        }
         .btn-reject {
-            background: var(--bg-primary); color: #ef4444;
-            border-color: rgba(239,68,68,.3);
+            background: #fef2f2; color: #dc2626;
+            border-color: #fecaca;
         }
-        .btn-reject:hover { background: rgba(239,68,68,.08); }
-        .btn-assign {
-            background: linear-gradient(135deg, var(--landlord), #0369a1); color: white;
+        .btn-reject:hover {
+            background: #fee2e2;
+            border-color: #f87171;
+            color: #b91c1c;
         }
-        .btn-assign:hover { transform: translateY(-1px); box-shadow: 0 4px 14px rgba(14,165,233,.35); }
-        .btn-verify {
-            background: linear-gradient(135deg, #10b981, #059669); color: white;
-        }
-        .btn-verify:hover { transform: translateY(-1px); box-shadow: 0 4px 14px rgba(16,185,129,.3); }
         .btn-rework {
-            background: var(--bg-primary); color: #f97316;
-            border-color: rgba(249,115,22,.3);
+            background: #fff7ed; color: #c2410c;
+            border-color: #ffedd5;
         }
-        .btn-rework:hover { background: rgba(249,115,22,.08); }
+        .btn-rework:hover {
+            background: #ffedd5;
+            border-color: #fed7aa;
+            color: #9a3412;
+        }
         .btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none !important; }
+
+        /* ── Form Controls ─────────────────────────────────── */
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        .form-label {
+            display: block;
+            font-size: 0.78rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.35rem;
+        }
+        .form-input {
+            width: 100%;
+            padding: 0.55rem 0.85rem;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            font-size: 0.875rem;
+            font-family: inherit;
+            outline: none;
+            transition: border-color 0.15s, box-shadow 0.15s;
+            box-sizing: border-box;
+        }
+        .form-input:focus {
+            border-color: var(--border-focus, #7EA2FF);
+            box-shadow: 0 0 0 3px rgba(3, 85, 243, 0.15);
+        }
 
         /* ── Alert inline ──────────────────────────────────── */
         .inline-alert {
-            border-radius: var(--radius-sm); padding: 0.65rem 0.9rem;
+            border-radius: var(--radius-md); padding: 0.65rem 0.9rem;
             font-size: 0.825rem; font-weight: 600;
             display: flex; align-items: center; gap: 0.5rem;
-            margin-bottom: 0.75rem;
+            margin-bottom: 0.85rem;
         }
         .alert-ok  { background:rgba(16,185,129,.09); color:#10b981; border:1px solid rgba(16,185,129,.22); }
         .alert-err { background:rgba(239,68,68,.09);  color:#ef4444; border:1px solid rgba(239,68,68,.22);  }
@@ -287,16 +318,159 @@
             border-radius:var(--radius-sm); padding:0.35rem 0.65rem;
             font-size:0.75rem; font-weight:700; color:var(--text-secondary);
         }
+        .pill svg {
+            width: 13px;
+            height: 13px;
+            color: var(--primary, #0355F3);
+        }
 
         /* Sticky sidebar */
         @media (min-width: 1060px) {
             .right-sidebar { position: sticky; top: 1.5rem; }
         }
+
+        /* ── Dark Theme Overrides ──────────────────────────── */
+        [data-theme="dark"] .single-detail-card {
+            background: var(--bg-secondary, #1e293b);
+            border-color: var(--border-color, #334155);
+        }
+        [data-theme="dark"] .single-card-header {
+            background: var(--bg-primary, #0f172a);
+            border-bottom-color: var(--border-color, #334155);
+        }
+        [data-theme="dark"] .card-section {
+            border-bottom-color: var(--border-color, #334155);
+        }
+        [data-theme="dark"] .action-section {
+            background: rgba(59, 130, 246, 0.06);
+            border-bottom-color: var(--border-color, #334155);
+        }
+        [data-theme="dark"] .desc-box,
+        [data-theme="dark"] .cost-row {
+            background: var(--bg-primary, #0f172a);
+            border-color: var(--border-color, #334155);
+        }
+        [data-theme="dark"] .form-input {
+            background: var(--bg-primary, #0f172a);
+            border-color: var(--border-color, #334155);
+            color: #f8fafc;
+        }
+        [data-theme="dark"] .btn-reject {
+            background: rgba(239, 68, 68, 0.15);
+            border-color: rgba(239, 68, 68, 0.3);
+            color: #fca5a5;
+        }
+        [data-theme="dark"] .btn-reject:hover {
+            background: rgba(239, 68, 68, 0.25);
+            color: #fecaca;
+        }
+        [data-theme="dark"] .btn-rework {
+            background: rgba(249, 115, 22, 0.15);
+            border-color: rgba(249, 115, 22, 0.3);
+            color: #fdba74;
+        }
+        [data-theme="dark"] .btn-rework:hover {
+            background: rgba(249, 115, 22, 0.25);
+            color: #fed7aa;
+        }
+        [data-theme="dark"] .worker-chip {
+            background: var(--bg-primary, #0f172a);
+            border-color: var(--border-color, #334155);
+        }
+        [data-theme="dark"] .pill {
+            background: var(--bg-primary, #0f172a);
+            border-color: var(--border-color, #334155);
+            color: #cbd5e1;
+        }
+
+        /* Prevent unwanted skeleton shimmer animations */
+        .dk-auto-skeleton,
+        [data-dk-auto-loading] {
+            animation: none !important;
+            background: transparent !important;
+        }
+        .dk-auto-skeleton::after,
+        [data-dk-auto-loading]::after {
+            display: none !important;
+        }
+
+        /* Worker Modal Tabs & Cards */
+        .worker-modal-tab {
+            background: none;
+            border: none;
+            border-bottom: 2.5px solid transparent;
+            padding: 8px 14px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--text-muted, #64748b);
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+        .worker-modal-tab:hover {
+            color: var(--primary, #0355F3);
+        }
+        .worker-modal-tab.active {
+            color: var(--primary, #0355F3);
+            border-bottom-color: var(--primary, #0355F3);
+            font-weight: 750;
+        }
+        .worker-manage-card {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--bg-primary, #ffffff);
+            border: 1px solid var(--border-color, #e2e8f0);
+            border-radius: 8px;
+            padding: 0.85rem 1rem;
+            gap: 0.75rem;
+            transition: border-color 0.15s ease;
+        }
+        .worker-manage-card:hover {
+            border-color: #cbd5e1;
+        }
+        .btn-delete-worker {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            color: #dc2626;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 0.78rem;
+            font-weight: 700;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            flex-shrink: 0;
+            transition: all 0.15s ease;
+        }
+        .btn-delete-worker:hover {
+            background: #fee2e2;
+            border-color: #f87171;
+            color: #b91c1c;
+        }
+        [data-theme="dark"] .worker-manage-card {
+            background: var(--bg-primary, #0f172a);
+            border-color: var(--border-color, #334155);
+        }
+        [data-theme="dark"] .worker-modal-tab.active {
+            color: #60a5fa;
+            border-bottom-color: #60a5fa;
+        }
+        [data-theme="dark"] .btn-delete-worker {
+            background: rgba(239, 68, 68, 0.15);
+            border-color: rgba(239, 68, 68, 0.3);
+            color: #fca5a5;
+        }
+        [data-theme="dark"] .btn-delete-worker:hover {
+            background: rgba(239, 68, 68, 0.25);
+            border-color: #ef4444;
+            color: #fecaca;
+        }
     </style>
     <link href="../../css/design-system.css" rel="stylesheet">
     <script src="../../js/ui.js" defer></script>
 </head>
-<body class="app-loading" data-role="landlord" data-page-title="Maintenance Request Details">
+<body class="app-loading" data-role="landlord" data-page-title="Maintenance Request Details" data-domiknow-loading-ignore>
     <!-- Navbar -->
     <nav class="navbar navbar-landlord">
         <div class="navbar-container">
@@ -306,7 +480,7 @@
             </div>
             <div class="navbar-menu">
                 <a href="dashboard.html" class="navbar-menu-link">Dashboard</a>
-                <a href="properties.html" class="navbar-menu-link">My Properties</a>
+                <a href="properties.html" class="navbar-menu-link">Properties</a>
                 <a href="applications.html" class="navbar-menu-link">Tenant Applications</a>
                 <a href="leases.html" class="navbar-menu-link">Lease Agreements</a>
                 <a href="billings.html" class="navbar-menu-link">Billings</a>
@@ -323,217 +497,193 @@
     <!-- Main -->
     <main class="dashboard-container">
 
+        <!-- Top Header Action Bar (No Banner Box) -->
+        <!-- Back link -->
         <a href="maintenance.html" class="back-link">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
-            Back to Maintenance List
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+            <span>Back to Maintenance List</span>
         </a>
 
-        <!-- Status Hero Banner -->
-        <div class="status-hero hero-pending" id="statusHero">
-            <div class="hero-icon" id="heroIcon"><span data-icon="clock"></span></div>
-            <div class="hero-text">
-                <div class="hero-title" id="heroTitle">Loading request...</div>
-                <div class="hero-meta" id="heroMeta"></div>
-            </div>
-            <div style="text-align:right; flex-shrink:0; position:relative;">
-                <div class="hero-status-label">Current Status</div>
-                <div class="hero-status-val" id="heroStatus">—</div>
-            </div>
-        </div>
-
-        <!-- Grid -->
-        <div class="main-grid">
-
-            <!-- ── Left column ── -->
-            <div>
-                <!-- Request Info -->
-                <div class="detail-card">
-                    <div class="card-head">
-                        <span class="card-head-icon"><span data-icon="clipboard"></span></span>
-                        <span class="card-head-title">Request Information</span>
+        <!-- Single Unified Card (All Info in One Card) -->
+        <div class="single-detail-card">
+            <!-- Card Header: Title, Status, and Meta Summary -->
+            <div class="single-card-header">
+                <div>
+                    <div style="display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
+                        <h2 class="single-card-title" id="cardMainTitle">Maintenance Request Details</h2>
+                        <span id="sideStatus" class="badge-status-wrap"></span>
                     </div>
-                    <div class="card-body">
-                        <div class="info-grid" id="infoGrid">
-                            <div>
-                                <div class="info-cell-label">Property</div>
-                                <div class="info-cell-value" id="propertyName">Loading…</div>
-                            </div>
-                            <div>
-                                <div class="info-cell-label">Unit / Room</div>
-                                <div class="info-cell-value" id="unitNumber">Loading…</div>
-                            </div>
-                            <div>
-                                <div class="info-cell-label">Tenant</div>
-                                <div class="info-cell-value" id="tenantName">Loading…</div>
-                            </div>
-                            <div>
-                                <div class="info-cell-label">Preferred Entry Schedule</div>
-                                <div class="info-cell-value" id="preferredSchedule">Loading…</div>
-                            </div>
-                            <div>
-                                <div class="info-cell-label">Issue Category</div>
-                                <div class="info-cell-value" id="issueCategory">Loading…</div>
-                            </div>
-                            <div>
-                                <div class="info-cell-label">Urgency Priority</div>
-                                <div class="info-cell-value" id="priorityLevel">Loading…</div>
-                            </div>
-                            <div id="workerInfoCell" class="hidden">
-                                <div class="info-cell-label" id="workerLabel">Assigned Worker</div>
-                                <div class="info-cell-value" id="workerName">—</div>
-                            </div>
-                            <div id="dueDateCell" class="hidden">
-                                <div class="info-cell-label">Target Completion Date</div>
-                                <div class="info-cell-value" id="dueDate">—</div>
-                            </div>
-                        </div>
-
-                        <!-- Issue Description -->
-                        <div style="margin-top: 1.25rem;">
-                            <div class="info-cell-label" style="margin-bottom: 0.4rem;">Issue Description</div>
-                            <div class="desc-box" id="issueDescription"></div>
-                        </div>
-
-                        <!-- Tenant photo -->
-                        <div id="imageContainer" class="hidden" style="margin-top: 1.25rem;">
-                            <div class="info-cell-label" style="margin-bottom: 0.4rem;">Tenant Uploaded Photo</div>
-                            <a id="issueImgLink" target="_blank">
-                                <img id="issueImg" alt="Tenant-provided maintenance issue evidence" style="max-width: 100%; max-height: 220px; object-fit: cover; border-radius: var(--radius-sm); border: 1px solid var(--border-color); display: block;">
-                            </a>
-                        </div>
-
-                        <!-- Rejection reason -->
-                        <div id="rejectionBanner" class="hidden" style="margin-top: 1.25rem; background: rgba(239,68,68,.08); border: 1px solid rgba(239,68,68,.25); border-radius: var(--radius-sm); padding: 0.9rem 1rem;">
-                            <div style="font-size: 0.68rem; font-weight: 800; text-transform: uppercase; color: #ef4444; margin-bottom: 0.3rem; letter-spacing: 0.07em;">Rejection Reason</div>
-                            <div style="font-size: 0.875rem; color: #ef4444;" id="rejectionText"></div>
-                        </div>
+                    <div class="single-card-meta">
+                        <span><strong>Filed:</strong> <span id="sideDateFiled">—</span></span>
                     </div>
                 </div>
-
-                <!-- Completion Report (shown only when available) -->
-                <div class="detail-card hidden" id="reportCard">
-                    <div class="card-head">
-                        <span class="card-head-icon"><span data-icon="note"></span></span>
-                        <span class="card-head-title" id="reportCardTitle">Worker Completion Report</span>
-                    </div>
-                    <div class="card-body">
-                        <div class="info-grid">
-                            <div class="info-full">
-                                <div class="info-cell-label">Problem Found</div>
-                                <div class="desc-box" id="reportProblem" style="margin-top: 0.3rem;"></div>
-                            </div>
-                            <div class="info-full">
-                                <div class="info-cell-label">Repair / Action Performed</div>
-                                <div class="desc-box" id="reportAction" style="margin-top: 0.3rem;"></div>
-                            </div>
-                            <div>
-                                <div class="info-cell-label">Materials Used</div>
-                                <div class="info-cell-value" id="reportMaterials">—</div>
-                            </div>
-                            <div>
-                                <div class="info-cell-label">Safety / Follow-up Recommendations</div>
-                                <div class="info-cell-value" id="reportNotes">—</div>
-                            </div>
-                        </div>
-
-                        <!-- Costs -->
-                        <div class="cost-row">
-                            <div>
-                                <div class="info-cell-label">Materials Cost</div>
-                                <div class="cost-val" id="lblMaterialCost">₱0.00</div>
-                            </div>
-                            <div>
-                                <div class="info-cell-label">Labor / Service Cost</div>
-                                <div class="cost-val" id="lblLaborCost">₱0.00</div>
-                            </div>
-                        </div>
-
-                        <!-- Before / After photos -->
-                        <div class="photo-grid" style="margin-top: 1.25rem;" id="photoGrid">
-                            <div id="beforePhotoBlock" class="hidden">
-                                <div class="photo-label">Before Photo</div>
-                                <a id="beforeLink" target="_blank"><img id="beforeImg" alt="Before"></a>
-                            </div>
-                            <div id="afterPhotoBlock" class="hidden">
-                                <div class="photo-label">After Photo</div>
-                                <a id="afterLink" target="_blank"><img id="afterImg" alt="After"></a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Timeline -->
-                <div class="detail-card">
-                    <div class="card-head">
-                        <span class="card-head-icon"><span data-icon="calendar"></span></span>
-                        <span class="card-head-title">Coordination Timeline</span>
-                    </div>
-                    <div class="card-body">
-                        <div class="timeline" id="timelineLogs">
-                            <div class="tl-item"><div class="tl-notes" style="color:var(--text-muted);">Loading logs...</div></div>
-                        </div>
-                    </div>
+                <div id="sideDueDateRow" class="hidden" style="text-align: right;">
+                    <div class="info-cell-label">Target Completion</div>
+                    <div class="info-cell-value" id="sideDueDate" style="color: var(--primary); font-weight: 750;">—</div>
                 </div>
             </div>
 
-            <!-- ── Right sidebar ── -->
-            <div class="right-sidebar">
-
-                <!-- Action Panel (dynamic) -->
-                <div class="action-panel" id="actionPanel" style="display:none;">
-                    <div class="action-panel-head">
-                        <div class="action-panel-head-title" id="actionTitle">Action Required</div>
-                        <div class="action-panel-head-sub"  id="actionSubtitle"></div>
+            <!-- Action Section (when active: pending, approved, or completed) -->
+            <div class="card-section action-section" id="actionPanel" style="display:none;">
+                <div class="action-section-inner">
+                    <div class="action-header">
+                        <h3 class="action-title" id="actionTitle">Action Required</h3>
+                        <div class="action-subtitle" id="actionSubtitle"></div>
                     </div>
-                    <div class="action-panel-body" id="actionBody"></div>
+                    <div id="actionBody"></div>
+                </div>
+            </div>
+
+            <!-- Section 1: Request Information -->
+            <div class="card-section">
+                <div class="section-title-row">
+                    <h3 class="section-title">
+                        <span class="section-icon"><span data-icon="clipboard"></span></span>
+                        <span>Request Information</span>
+                    </h3>
+                </div>
+                <div class="info-grid" id="infoGrid">
+                    <div class="info-full">
+                        <div class="info-cell-label">Issue / Problem Title</div>
+                        <div class="info-cell-value" id="issueTitleDisplay" style="font-size: 1.05rem; font-weight: 750; color: var(--text-primary);">—</div>
+                    </div>
+                    <div>
+                        <div class="info-cell-label">Property</div>
+                        <div class="info-cell-value" id="propertyName">—</div>
+                    </div>
+                    <div>
+                        <div class="info-cell-label">Unit / Room</div>
+                        <div class="info-cell-value" id="unitNumber">—</div>
+                    </div>
+                    <div>
+                        <div class="info-cell-label">Tenant</div>
+                        <div class="info-cell-value" id="tenantName">—</div>
+                    </div>
+                    <div>
+                        <div class="info-cell-label">Preferred Entry Schedule</div>
+                        <div class="info-cell-value" id="preferredSchedule">—</div>
+                    </div>
+                    <div>
+                        <div class="info-cell-label">Issue Category</div>
+                        <div class="info-cell-value" id="issueCategory">—</div>
+                    </div>
+                    <div>
+                        <div class="info-cell-label">Urgency Priority</div>
+                        <div class="info-cell-value" id="priorityLevel">—</div>
+                    </div>
+                    <div id="workerInfoCell" class="hidden">
+                        <div class="info-cell-label" id="workerLabel">Assigned Worker</div>
+                        <div class="info-cell-value" id="workerName">—</div>
+                    </div>
+                    <div id="dueDateCell" class="hidden">
+                        <div class="info-cell-label">Target Completion Date</div>
+                        <div class="info-cell-value" id="dueDate">—</div>
+                    </div>
                 </div>
 
-                <!-- Assigned worker card (shown when assigned+) -->
-                <div class="side-card hidden" id="workerCard">
-                    <div class="side-head">
-                        <span><span data-icon="worker"></span></span>
-                        <span class="side-head-title" id="workerCardLabel">Assigned Worker</span>
-                    </div>
-                    <div class="side-body">
-                        <div class="worker-chip">
-                            <div class="worker-avatar" id="workerAvatar">?</div>
-                            <div>
-                                <div class="worker-name" id="workerCardName">—</div>
-                                <div class="worker-trade" id="workerCardTrade">—</div>
-                            </div>
+                <!-- Issue Description -->
+                <div style="margin-top: 1.25rem;">
+                    <div class="info-cell-label" style="margin-bottom: 0.4rem;">Issue Description</div>
+                    <div class="desc-box" id="issueDescription"></div>
+                </div>
+
+                <!-- Tenant photo -->
+                <div id="imageContainer" class="hidden" style="margin-top: 1.25rem;">
+                    <div class="info-cell-label" style="margin-bottom: 0.4rem;">Tenant Uploaded Photo</div>
+                    <a id="issueImgLink" target="_blank">
+                        <img id="issueImg" alt="Tenant-provided maintenance issue evidence" style="max-width: 100%; max-height: 220px; object-fit: cover; border-radius: var(--radius-sm); border: 1px solid var(--border-color); display: block;">
+                    </a>
+                </div>
+
+                <!-- Rejection reason -->
+                <div id="rejectionBanner" class="hidden" style="margin-top: 1.25rem; background: rgba(239,68,68,.08); border: 1px solid rgba(239,68,68,.25); border-radius: var(--radius-sm); padding: 0.9rem 1rem;">
+                    <div style="font-size: 0.68rem; font-weight: 800; text-transform: uppercase; color: #ef4444; margin-bottom: 0.3rem; letter-spacing: 0.07em;">Rejection Reason</div>
+                    <div style="font-size: 0.875rem; color: #ef4444;" id="rejectionText"></div>
+                </div>
+            </div>
+
+            <!-- Section 2: Assigned Maintenance Worker (when assigned+) -->
+            <div class="card-section hidden" id="workerCard">
+                <div class="section-title-row">
+                    <h3 class="section-title">
+                        <span class="section-icon"><span data-icon="worker"></span></span>
+                        <span id="workerCardLabel">Assigned Maintenance Worker</span>
+                    </h3>
+                </div>
+                <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; background: var(--bg-primary); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 1rem 1.25rem;">
+                    <div style="display: flex; align-items: center; gap: 0.85rem;">
+                        <div class="worker-avatar" id="workerAvatar">?</div>
+                        <div>
+                            <div class="worker-name" id="workerCardName" style="font-size: 0.95rem; font-weight: 750;">—</div>
+                            <div class="worker-trade" id="workerCardTrade" style="font-size: 0.78rem; color: var(--text-muted);">—</div>
                         </div>
-                        <div class="pill-row" id="workerPills"></div>
+                    </div>
+                    <div class="pill-row" id="workerPills" style="margin-top: 0;"></div>
+                </div>
+            </div>
+
+            <!-- Section 3: Maintenance Worker Completion Report (shown only when available) -->
+            <div class="card-section hidden" id="reportCard">
+                <div class="section-title-row">
+                    <h3 class="section-title">
+                        <span class="section-icon"><span data-icon="note"></span></span>
+                        <span id="reportCardTitle">Worker Completion Report</span>
+                    </h3>
+                </div>
+                <div class="info-grid">
+                    <div class="info-full">
+                        <div class="info-cell-label">Problem Found</div>
+                        <div class="desc-box" id="reportProblem" style="margin-top: 0.3rem;"></div>
+                    </div>
+                    <div class="info-full">
+                        <div class="info-cell-label">Repair / Action Performed</div>
+                        <div class="desc-box" id="reportAction" style="margin-top: 0.3rem;"></div>
+                    </div>
+                    <div>
+                        <div class="info-cell-label">Materials Used</div>
+                        <div class="info-cell-value" id="reportMaterials">—</div>
+                    </div>
+                    <div>
+                        <div class="info-cell-label">Safety / Follow-up Recommendations</div>
+                        <div class="info-cell-value" id="reportNotes">—</div>
                     </div>
                 </div>
 
-                <!-- Request summary card (always visible) -->
-                <div class="side-card">
-                    <div class="side-head">
-                        <span><span data-icon="pin"></span></span>
-                        <span class="side-head-title">Request Summary</span>
+                <!-- Costs -->
+                <div class="cost-row">
+                    <div>
+                        <div class="info-cell-label">Materials Cost</div>
+                        <div class="cost-val" id="lblMaterialCost">₱0.00</div>
                     </div>
-                    <div class="side-body" style="display:flex; flex-direction:column; gap:0.75rem;">
-                        <div>
-                            <div class="info-cell-label">Date Filed</div>
-                            <div class="info-cell-value" id="sideDateFiled">—</div>
-                        </div>
-                        <div>
-                            <div class="info-cell-label">Category</div>
-                            <div class="info-cell-value" id="sideCat">—</div>
-                        </div>
-                        <div>
-                            <div class="info-cell-label">Priority</div>
-                            <div id="sidePrio">—</div>
-                        </div>
-                        <div>
-                            <div class="info-cell-label">Status</div>
-                            <div id="sideStatus">—</div>
-                        </div>
-                        <div id="sideDueDateRow" class="hidden">
-                            <div class="info-cell-label">Due Date</div>
-                            <div class="info-cell-value" id="sideDueDate">—</div>
-                        </div>
+                    <div>
+                        <div class="info-cell-label">Labor / Service Cost</div>
+                        <div class="cost-val" id="lblLaborCost">₱0.00</div>
                     </div>
+                </div>
+
+                <!-- Before / After photos -->
+                <div class="photo-grid" style="margin-top: 1.25rem;" id="photoGrid">
+                    <div id="beforePhotoBlock" class="hidden">
+                        <div class="photo-label">Before Photo</div>
+                        <a id="beforeLink" target="_blank"><img id="beforeImg" alt="Before"></a>
+                    </div>
+                    <div id="afterPhotoBlock" class="hidden">
+                        <div class="photo-label">After Photo</div>
+                        <a id="afterLink" target="_blank"><img id="afterImg" alt="After"></a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section 4: Coordination Timeline -->
+            <div class="card-section" style="border-bottom: none;">
+                <div class="section-title-row">
+                    <h3 class="section-title">
+                        <span class="section-icon"><span data-icon="calendar"></span></span>
+                        <span>Coordination Timeline</span>
+                    </h3>
+                </div>
+                <div class="timeline" id="timelineLogs">
+                    <div class="tl-item"><div class="tl-notes" style="color:var(--text-muted);">—</div></div>
                 </div>
             </div>
         </div>
@@ -580,7 +730,7 @@
             return `<span class="badge badge-prio-${prio}">${prio}</span>`;
         }
 
-        // ── Init ──────────────────────────────────────────────
+        // ── Init ──────────────────────────────────────
         document.addEventListener('DOMContentLoaded', () => {
             if (!token || !requestId) return;
             loadRequest();
@@ -613,42 +763,54 @@
                 renderTimeline(data.updates || []);
                 renderReport(data.report, _req);
                 renderActionPanel(_req);
-            } catch (err) { console.error(err); }
+            } catch (err) {
+                console.error(err);
+            } finally {
+                document.body.classList.remove('app-loading');
+            }
         }
 
-        // ── Hero banner ───────────────────────────────────────
+        // ── Card Header Info ──────────────────────────────────
         function renderHero(req) {
             const { trade, icon } = tradeFor(req.issue_category);
-            const heroEl = document.getElementById('statusHero');
+            const mainTitle = document.getElementById('cardMainTitle');
+            if (mainTitle) mainTitle.textContent = req.issue_title || 'Maintenance Request Details';
 
-            // Remove all hero classes
-            heroEl.className = 'status-hero';
-            heroEl.classList.add(STATUS_HERO_CLASS[req.status] || 'hero-pending');
-
-            document.getElementById('heroIcon').innerHTML = domiknowIcon(icon);
-            document.getElementById('heroTitle').textContent = req.issue_title;
-            document.getElementById('heroStatus').textContent = req.status.replace(/_/g, ' ');
-
-            const meta = document.getElementById('heroMeta');
-            meta.innerHTML = `
-                <span class="hero-chip">${domiknowIcon(icon)} ${req.issue_category}</span>
-                <span class="hero-chip">${req.priority_level} priority</span>
-                <span class="hero-chip">${req.properties?.property_name || 'Property'} · Unit ${req.unit_number || 'N/A'}</span>
-            `;
-
-            document.title = `${req.issue_title} – DomiKnow`;
+            document.title = `${req.issue_title || 'Maintenance Details'} – DomiKnow`;
         }
 
         // ── Request info ──────────────────────────────────────
         function renderInfo(req, assignment) {
             const { trade, icon } = tradeFor(req.issue_category);
 
+            const titleEl = document.getElementById('issueTitleDisplay');
+            if (titleEl) {
+                titleEl.textContent = req.issue_title || '—';
+                titleEl.classList.remove('dk-auto-skeleton');
+                titleEl.removeAttribute('data-dk-auto-loading');
+                titleEl.removeAttribute('aria-busy');
+            }
             document.getElementById('propertyName').textContent     = req.properties?.property_name || '—';
             document.getElementById('unitNumber').textContent       = req.unit_number || '—';
             document.getElementById('tenantName').textContent       = `${req.tenant?.full_name || '—'} · ${req.tenant?.contact_number || 'No phone'}`;
             document.getElementById('preferredSchedule').textContent= req.preferred_schedule || '—';
-            document.getElementById('issueCategory').innerHTML      = `${domiknowIcon(icon)} ${req.issue_category}`;
-            document.getElementById('priorityLevel').innerHTML      = prioBadge(req.priority_level);
+
+            const catEl = document.getElementById('issueCategory');
+            if (catEl) {
+                catEl.innerHTML = `${domiknowIcon(icon)} ${req.issue_category}`;
+                catEl.classList.remove('dk-auto-skeleton');
+                catEl.removeAttribute('data-dk-auto-loading');
+                catEl.removeAttribute('aria-busy');
+            }
+
+            const prioEl = document.getElementById('priorityLevel');
+            if (prioEl) {
+                prioEl.innerHTML = prioBadge(req.priority_level);
+                prioEl.classList.remove('dk-auto-skeleton');
+                prioEl.removeAttribute('data-dk-auto-loading');
+                prioEl.removeAttribute('aria-busy');
+            }
+
             document.getElementById('issueDescription').textContent = req.issue_description;
 
             // Tenant photo
@@ -697,11 +859,13 @@
                 `;
             }
 
-            // Sidebar summary
-            document.getElementById('sideDateFiled').textContent = new Date(req.created_at).toLocaleDateString('en-PH', { month:'long', day:'numeric', year:'numeric' });
-            document.getElementById('sideCat').innerHTML  = `${icon} ${req.issue_category}`;
-            document.getElementById('sidePrio').innerHTML = prioBadge(req.priority_level);
-            document.getElementById('sideStatus').innerHTML = statusBadge(req.status);
+            // Header summary
+            if (document.getElementById('sideDateFiled')) {
+                document.getElementById('sideDateFiled').textContent = new Date(req.created_at).toLocaleDateString('en-PH', { month:'long', day:'numeric', year:'numeric' });
+            }
+            if (document.getElementById('sideStatus')) {
+                document.getElementById('sideStatus').innerHTML = statusBadge(req.status);
+            }
         }
 
         // ── Timeline ──────────────────────────────────────────
@@ -792,9 +956,9 @@
                     <div data-action-alert role="status" aria-live="polite" style="display:none;"></div>
                     <form id="assignForm">
                         <div class="form-group">
-                            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.35rem;">
+                            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.35rem; flex-wrap:wrap; gap:4px;">
                                 <label class="form-label" for="workerSelect" style="margin-bottom:0;">${icon} Select ${trade}</label>
-                                <button type="button" id="openAddWorkerBtnDetail" style="background:none; border:none; color:var(--landlord); font-size:0.78rem; font-weight:700; cursor:pointer; text-decoration:underline;">+ Register New Worker</button>
+                                <button type="button" id="openManageWorkersBtnDetail" style="background:none; border:none; color:var(--primary, #0355F3); font-size:0.78rem; font-weight:700; cursor:pointer; text-decoration:none;">Manage Workers</button>
                             </div>
                             <select id="workerSelect" class="form-input" required>
                                 <option value="">— Loading available workers… —</option>
@@ -822,11 +986,17 @@
                 const dueInput = document.getElementById('assignDueDate');
                 if (dueInput) dueInput.min = localToday;
 
-                // Bind modal event for registering worker on-the-fly
+                // Bind modal events for managing/registering worker
                 const detailAddWorkerBtn = document.getElementById('openAddWorkerBtnDetail');
                 if (detailAddWorkerBtn) {
                     detailAddWorkerBtn.addEventListener('click', () => {
-                        if (typeof openWorkerModalDetail === 'function') openWorkerModalDetail();
+                        if (typeof openWorkerModalDetail === 'function') openWorkerModalDetail('add');
+                    });
+                }
+                const detailManageWorkerBtn = document.getElementById('openManageWorkersBtnDetail');
+                if (detailManageWorkerBtn) {
+                    detailManageWorkerBtn.addEventListener('click', () => {
+                        if (typeof openWorkerModalDetail === 'function') openWorkerModalDetail('list');
                     });
                 }
 
@@ -971,13 +1141,119 @@
             } catch (e) { console.error(e); }
         }
 
-        function openWorkerModalDetail() {
+        function switchWorkerTabDetail(tab) {
+            clearWorkerAlertsDetail();
+            const tabListBtn = document.getElementById('tabWorkerListBtnDetail');
+            const tabAddBtn  = document.getElementById('tabWorkerAddBtnDetail');
+            const listView   = document.getElementById('workerListViewDetail');
+            const addView    = document.getElementById('workerAddViewDetail');
+
+            if (tab === 'list') {
+                if (tabListBtn) tabListBtn.classList.add('active');
+                if (tabAddBtn)  tabAddBtn.classList.remove('active');
+                if (listView)   listView.style.display = 'block';
+                if (addView)    addView.style.display = 'none';
+                loadWorkerListDetail();
+            } else {
+                if (tabAddBtn)  tabAddBtn.classList.add('active');
+                if (tabListBtn) tabListBtn.classList.remove('active');
+                if (addView)    addView.style.display = 'block';
+                if (listView)   listView.style.display = 'none';
+            }
+        }
+
+        function openWorkerModalDetail(initialTab = 'list') {
             const modal = document.getElementById('addWorkerModalDetail');
-            if (modal) { modal.classList.remove('hidden'); modal.style.display = 'flex'; clearWorkerAlertsDetail(); }
+            if (modal) {
+                modal.classList.remove('hidden');
+                modal.style.display = 'flex';
+                switchWorkerTabDetail(initialTab);
+            }
         }
         function closeWorkerModalDetail() {
             const modal = document.getElementById('addWorkerModalDetail');
-            if (modal) { modal.classList.add('hidden'); modal.style.display = 'none'; document.getElementById('addWorkerFormDetail')?.reset(); clearWorkerAlertsDetail(); }
+            if (modal) {
+                modal.classList.add('hidden');
+                modal.style.display = 'none';
+                document.getElementById('addWorkerFormDetail')?.reset();
+                const passInput = document.getElementById('workerPasswordDetail');
+                if (passInput) passInput.type = 'password';
+                const eyeOpen = document.getElementById('eyeIconOpenDetail');
+                const eyeClosed = document.getElementById('eyeIconClosedDetail');
+                if (eyeOpen) eyeOpen.style.display = 'block';
+                if (eyeClosed) eyeClosed.style.display = 'none';
+                const toggleBtn = document.getElementById('toggleWorkerPasswordBtnDetail');
+                if (toggleBtn) toggleBtn.setAttribute('aria-label', 'Show password');
+                clearWorkerAlertsDetail();
+            }
+        }
+
+        async function loadWorkerListDetail() {
+            const container = document.getElementById('workerListContainerDetail');
+            const countBadge = document.getElementById('workerListCountDetail');
+            if (!container) return;
+
+            try {
+                const res = await fetch('/api/maintenance/personnel', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const json = await res.json();
+                const workers = json.data || [];
+
+                if (countBadge) countBadge.textContent = workers.length;
+
+                if (!workers || workers.length === 0) {
+                    container.innerHTML = `
+                        <div style="text-align: center; color: var(--text-muted); padding: 2.5rem 1rem;">
+                            <div style="font-size: 0.95rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.35rem;">No active workers found</div>
+                            <div style="font-size: 0.825rem; margin-bottom: 1rem;">You have not registered any maintenance personnel yet.</div>
+                            <button type="button" class="btn btn-assign" style="width: auto; padding: 6px 14px; margin: 0 auto;" onclick="document.getElementById('tabWorkerAddBtnDetail').click()">+ Add Worker</button>
+                        </div>
+                    `;
+                    return;
+                }
+
+                container.innerHTML = workers.map(w => {
+                    const rawName = (w.full_name || 'Worker').trim();
+                    const tradeMatch = rawName.match(/^(.*?)\s*\((.*?)\)$/);
+                    const nameOnly = tradeMatch ? tradeMatch[1].trim() : rawName;
+                    const tradeOnly = tradeMatch ? tradeMatch[2].trim() : (w.trade || '');
+
+                    // Extract clean alphabetic initials (e.g., "Zedrick" -> "ZE", "Juan Dela Cruz" -> "JC")
+                    const cleanLetters = nameOnly.replace(/[^a-zA-Z\s]/g, '').trim();
+                    const nameParts = cleanLetters.split(/\s+/).filter(Boolean);
+                    const initials = nameParts.length > 1
+                        ? (nameParts[0][0] + nameParts[nameParts.length - 1][0]).toUpperCase()
+                        : (cleanLetters.slice(0, 2).toUpperCase() || 'W');
+
+                    return `
+                        <div class="worker-manage-card">
+                            <div style="display: flex; align-items: center; gap: 0.85rem; min-width: 0;">
+                                <div style="width: 40px; height: 40px; border-radius: 50%; background: #0355F3; color: #ffffff; display: flex; align-items: center; justify-content: center; font-weight: 750; font-size: 0.85rem; flex-shrink: 0; letter-spacing: 0.5px;">
+                                    ${initials}
+                                </div>
+                                <div style="min-width: 0;">
+                                    <div style="font-weight: 750; font-size: 0.925rem; color: var(--text-primary); display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                                        <span>${nameOnly}</span>
+                                        ${tradeOnly ? `<span style="font-size: 0.72rem; padding: 2px 8px; border-radius: 9999px; background: rgba(3, 85, 243, 0.1); color: var(--primary, #0355F3); font-weight: 600;">${tradeOnly}</span>` : ''}
+                                    </div>
+                                    <div style="font-size: 0.775rem; color: var(--text-muted); margin-top: 3px;">
+                                        ${w.email} ${w.contact_number ? '· ' + w.contact_number : ''}
+                                    </div>
+                                </div>
+                            </div>
+                            <button type="button" class="btn-delete-worker btn-delete-worker-detail" data-id="${w.id}" data-name="${rawName.replace(/"/g, '&quot;')}">
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                                <span>Delete</span>
+                            </button>
+                        </div>
+                    `;
+                }).join('');
+
+            } catch (err) {
+                console.error(err);
+                container.innerHTML = `<div style="text-align:center; color:var(--error); padding:2rem;">Failed to load maintenance personnel.</div>`;
+            }
         }
 
         function showWorkerErrDetail(msg) { const el = document.getElementById('workerAlertErrDetail'); if (el) { el.textContent = msg; el.style.display = 'block'; } }
@@ -992,10 +1268,84 @@
             const modal = document.getElementById('addWorkerModalDetail');
             const closeBtn = document.getElementById('closeWorkerModalBtnDetail');
             const cancelBtn = document.getElementById('cancelWorkerModalBtnDetail');
+            const tabListBtn = document.getElementById('tabWorkerListBtnDetail');
+            const tabAddBtn  = document.getElementById('tabWorkerAddBtnDetail');
+
+            if (tabListBtn) tabListBtn.addEventListener('click', () => switchWorkerTabDetail('list'));
+            if (tabAddBtn)  tabAddBtn.addEventListener('click',  () => switchWorkerTabDetail('add'));
 
             if (closeBtn) closeBtn.addEventListener('click', closeWorkerModalDetail);
             if (cancelBtn) cancelBtn.addEventListener('click', closeWorkerModalDetail);
             if (modal) modal.addEventListener('click', (e) => { if (e.target === modal) closeWorkerModalDetail(); });
+
+            // Password toggle handler in detail modal
+            const togglePassDetail = document.getElementById('toggleWorkerPasswordBtnDetail');
+            const passDetail = document.getElementById('workerPasswordDetail');
+            const eyeOpenDetail = document.getElementById('eyeIconOpenDetail');
+            const eyeClosedDetail = document.getElementById('eyeIconClosedDetail');
+            if (togglePassDetail && passDetail) {
+                togglePassDetail.addEventListener('click', () => {
+                    const isPass = passDetail.type === 'password';
+                    passDetail.type = isPass ? 'text' : 'password';
+                    if (eyeOpenDetail && eyeClosedDetail) {
+                        eyeOpenDetail.style.display = isPass ? 'none' : 'block';
+                        eyeClosedDetail.style.display = isPass ? 'block' : 'none';
+                    }
+                    togglePassDetail.setAttribute('aria-label', isPass ? 'Hide password' : 'Show password');
+                });
+            }
+
+            // Delete worker handler in detail modal
+            const listContainer = document.getElementById('workerListContainerDetail');
+            if (listContainer) {
+                listContainer.addEventListener('click', async (e) => {
+                    const btn = e.target.closest('.btn-delete-worker-detail');
+                    if (!btn) return;
+
+                    const workerId = btn.dataset.id;
+                    const workerName = btn.dataset.name || 'Worker';
+
+                    const confirmed = typeof window.domiknowConfirm === 'function'
+                        ? await window.domiknowConfirm({
+                            title: 'Delete Maintenance Worker',
+                            message: `Are you sure you want to remove "${workerName}"? They will no longer be able to log in or receive repair tasks.`,
+                            confirmText: 'Delete Worker',
+                            cancelText: 'Cancel',
+                            danger: true
+                        })
+                        : confirm(`Are you sure you want to remove worker "${workerName}"?`);
+
+                    if (!confirmed) return;
+
+                    btn.disabled = true;
+                    btn.textContent = 'Removing…';
+                    clearWorkerAlertsDetail();
+
+                    try {
+                        const res = await fetch(`/api/maintenance/workers/${workerId}`, {
+                            method: 'DELETE',
+                            headers: { 'Authorization': `Bearer ${token}` }
+                        });
+                        const json = await res.json();
+                        if (res.ok) {
+                            showWorkerOkDetail(json.message || `Worker "${workerName}" removed successfully.`);
+                            await loadWorkerListDetail();
+                            await populateWorkers();
+                        } else {
+                            showWorkerErrDetail(json.message || 'Failed to delete maintenance worker.');
+                            btn.disabled = false;
+                            btn.innerHTML = `
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                                <span>Delete</span>
+                            `;
+                        }
+                    } catch (err) {
+                        console.error(err);
+                        showWorkerErrDetail('Network error. Please try again.');
+                        btn.disabled = false;
+                    }
+                });
+            }
 
             if (form) {
                 form.addEventListener('submit', async (e) => {
@@ -1025,7 +1375,7 @@
                                 const sel = document.getElementById('workerSelect');
                                 if (sel) sel.value = json.data.id;
                             }
-                            setTimeout(() => { closeWorkerModalDetail(); }, 1200);
+                            setTimeout(() => { switchWorkerTabDetail('list'); }, 1200);
                         } else {
                             showWorkerErrDetail(json.message || 'Failed to create worker account.');
                         }
@@ -1040,63 +1390,96 @@
         });
     </script>
 
-    <!-- Add Maintenance Worker Modal (Detail) -->
+    <!-- Manage & Add Maintenance Worker Modal (Detail) -->
     <div class="modal-overlay hidden" id="addWorkerModalDetail" style="position: fixed; inset: 0; background: rgba(15,23,42,0.6); backdrop-filter: blur(4px); display: none; justify-content: center; align-items: center; z-index: 1000; padding: 1.5rem;">
-        <div class="modal-box" style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 2rem; max-width: 520px; width: 100%; box-shadow: var(--shadow-premium);">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
-                <h3 style="margin: 0; font-size: 1.1rem; color: var(--text-primary);">Create Maintenance Worker Account</h3>
+        <div class="modal-box" style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 1.75rem; max-width: 580px; width: 100%; box-shadow: var(--shadow-premium); max-height: 88vh; display: flex; flex-direction: column;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.85rem; flex-shrink: 0;">
+                <h3 style="margin: 0; font-size: 1.15rem; color: var(--text-primary);">Maintenance Personnel</h3>
                 <button type="button" id="closeWorkerModalBtnDetail" aria-label="Close worker account form" class="modal-close-btn"><span data-icon="x"></span></button>
             </div>
-            <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 1.25rem;">
-                Create a login account for your electrician, plumber, carpenter, or repair technician so they can receive job assignments and submit repair reports.
-            </p>
 
-            <div id="workerAlertErrDetail" style="display: none; background: rgba(239,68,68,.1); color: #ef4444; border: 1px solid rgba(239,68,68,.3); padding: 0.65rem 1rem; border-radius: 6px; font-size: 0.83rem; margin-bottom: 1rem;"></div>
-            <div id="workerAlertOkDetail" style="display: none; background: rgba(16,185,129,.1); color: #10b981; border: 1px solid rgba(16,185,129,.3); padding: 0.65rem 1rem; border-radius: 6px; font-size: 0.83rem; margin-bottom: 1rem;"></div>
+            <!-- Tabs: Active Workers vs Add New -->
+            <div style="display: flex; gap: 8px; border-bottom: 1px solid var(--border-color); margin-bottom: 1.25rem; flex-shrink: 0;">
+                <button type="button" id="tabWorkerListBtnDetail" class="worker-modal-tab active">
+                    Active Workers (<span id="workerListCountDetail">0</span>)
+                </button>
+                <button type="button" id="tabWorkerAddBtnDetail" class="worker-modal-tab">
+                    + Add New Worker
+                </button>
+            </div>
 
-            <form id="addWorkerFormDetail">
-                <div class="form-group" style="margin-bottom: 1rem;">
-                    <label class="form-label" for="workerFullNameDetail">Worker Full Name <span style="color: var(--error);">*</span></label>
-                    <input type="text" id="workerFullNameDetail" class="form-input" placeholder="e.g. Juan Dela Cruz" required>
+            <div id="workerAlertErrDetail" style="display: none; background: rgba(239,68,68,.1); color: #ef4444; border: 1px solid rgba(239,68,68,.3); padding: 0.65rem 1rem; border-radius: 6px; font-size: 0.83rem; margin-bottom: 1rem; flex-shrink: 0;"></div>
+            <div id="workerAlertOkDetail" style="display: none; background: rgba(16,185,129,.1); color: #10b981; border: 1px solid rgba(16,185,129,.3); padding: 0.65rem 1rem; border-radius: 6px; font-size: 0.83rem; margin-bottom: 1rem; flex-shrink: 0;"></div>
+
+            <!-- View 1: Active Workers List & Delete -->
+            <div id="workerListViewDetail" style="overflow-y: auto; flex: 1;">
+                <div id="workerListContainerDetail" style="display: flex; flex-direction: column; gap: 0.75rem; padding-right: 2px;">
+                    <div style="text-align: center; color: var(--text-muted); padding: 2.5rem 1rem; font-size: 0.875rem;">Loading maintenance workers…</div>
                 </div>
+            </div>
 
-                <div class="form-group" style="margin-bottom: 1rem;">
-                    <label class="form-label" for="workerTradeDetail">Specialty / Trade <span style="color: var(--text-muted); font-weight: normal;">(Optional)</span></label>
-                    <select id="workerTradeDetail" class="form-input">
-                        <option value="">-- Select Trade --</option>
-                        <option value="General Repair">General Maintenance & Repair</option>
-                        <option value="Plumber">Plumber (Pipes and water systems)</option>
-                        <option value="Electrician">Electrician (Electrical and wiring)</option>
-                        <option value="Aircon Technician">Aircon Technician (HVAC)</option>
-                        <option value="Carpenter">Carpenter (Woodwork and fixtures)</option>
-                        <option value="Painter">Painter (Walls and finishes)</option>
-                        <option value="Roofer">Roofer / Leak Repair</option>
-                        <option value="Locksmith">Locksmith / Doors & Keys</option>
-                    </select>
-                </div>
+            <!-- View 2: Add Worker Form -->
+            <div id="workerAddViewDetail" style="display: none; overflow-y: auto; flex: 1;">
+                <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 1.25rem;">
+                    Create a login account for your electrician, plumber, carpenter, or repair technician so they can receive job assignments and submit repair reports.
+                </p>
 
-                <div class="form-group" style="margin-bottom: 1rem;">
-                    <label class="form-label" for="workerEmailDetail">Email Address (Login Username) <span style="color: var(--error);">*</span></label>
-                    <input type="email" id="workerEmailDetail" class="form-input" placeholder="e.g. worker.juan@gmail.com" required>
-                </div>
+                <form id="addWorkerFormDetail">
+                    <div class="form-group" style="margin-bottom: 1rem;">
+                        <label class="form-label" for="workerFullNameDetail">Worker Full Name <span style="color: var(--error);">*</span></label>
+                        <input type="text" id="workerFullNameDetail" class="form-input" placeholder="e.g. Juan Dela Cruz" required>
+                    </div>
 
-                <div class="form-group" style="margin-bottom: 1rem;">
-                    <label class="form-label" for="workerContactDetail">Contact Phone Number</label>
-                    <input type="tel" id="workerContactDetail" class="form-input" placeholder="e.g. 09123456789">
-                </div>
+                    <div class="form-group" style="margin-bottom: 1rem;">
+                        <label class="form-label" for="workerTradeDetail">Specialty / Trade <span style="color: var(--text-muted); font-weight: normal;">(Optional)</span></label>
+                        <select id="workerTradeDetail" class="form-input">
+                            <option value="">-- Select Trade --</option>
+                            <option value="General Repair">General Maintenance & Repair</option>
+                            <option value="Plumber">Plumber (Pipes and water systems)</option>
+                            <option value="Electrician">Electrician (Electrical and wiring)</option>
+                            <option value="Aircon Technician">Aircon Technician (HVAC)</option>
+                            <option value="Carpenter">Carpenter (Woodwork and fixtures)</option>
+                            <option value="Painter">Painter (Walls and finishes)</option>
+                            <option value="Roofer">Roofer / Leak Repair</option>
+                            <option value="Locksmith">Locksmith / Doors & Keys</option>
+                        </select>
+                    </div>
 
-                <div class="form-group" style="margin-bottom: 1.5rem;">
-                    <label class="form-label" for="workerPasswordDetail">Account Password <span style="color: var(--error);">*</span></label>
-                    <input type="password" id="workerPasswordDetail" class="form-input" placeholder="Minimum 6 characters" minlength="6" required>
-                </div>
+                    <div class="form-group" style="margin-bottom: 1rem;">
+                        <label class="form-label" for="workerEmailDetail">Email Address (Login Username) <span style="color: var(--error);">*</span></label>
+                        <input type="email" id="workerEmailDetail" class="form-input" placeholder="e.g. worker.juan@gmail.com" required>
+                    </div>
 
-                <div style="display: flex; justify-content: flex-end; gap: 0.75rem;">
-                    <button type="button" id="cancelWorkerModalBtnDetail" class="navbar-btn" style="background: var(--bg-primary); border: 1px solid var(--border-color); color: var(--text-secondary);">Cancel</button>
-                    <button type="submit" id="submitWorkerBtnDetail" class="action-btn" style="background: var(--landlord); color: #fff; padding: 0.6rem 1.25rem; font-weight: 700;">
-                        Create Worker Account
-                    </button>
-                </div>
-            </form>
+                    <div class="form-group" style="margin-bottom: 1rem;">
+                        <label class="form-label" for="workerContactDetail">Contact Phone Number</label>
+                        <input type="tel" id="workerContactDetail" class="form-input" placeholder="e.g. 09123456789">
+                    </div>
+
+                    <div class="form-group" style="margin-bottom: 1.5rem;">
+                        <label class="form-label" for="workerPasswordDetail">Account Password <span style="color: var(--error);">*</span></label>
+                        <div style="position: relative; display: flex; align-items: center;">
+                            <input type="password" id="workerPasswordDetail" class="form-input" placeholder="Minimum 6 characters" minlength="6" required style="padding-right: 42px; width: 100%;">
+                            <button type="button" id="toggleWorkerPasswordBtnDetail" aria-label="Show password" title="Toggle password visibility" style="position: absolute; right: 8px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: var(--text-muted, #64748b); padding: 6px; display: inline-flex; align-items: center; justify-content: center; border-radius: 6px; transition: color 0.15s ease;">
+                                <svg id="eyeIconOpenDetail" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                    <circle cx="12" cy="12" r="3"></circle>
+                                </svg>
+                                <svg id="eyeIconClosedDetail" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: none;">
+                                    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+                                    <line x1="1" y1="1" x2="23" y2="23"></line>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; justify-content: flex-end; gap: 0.75rem;">
+                        <button type="button" id="cancelWorkerModalBtnDetail" class="navbar-btn" style="background: var(--bg-primary); border: 1px solid var(--border-color); color: var(--text-secondary);">Cancel</button>
+                        <button type="submit" id="submitWorkerBtnDetail" class="action-btn" style="background: var(--landlord); color: #fff; padding: 0.6rem 1.25rem; font-weight: 700;">
+                            Create Worker Account
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
 </body>

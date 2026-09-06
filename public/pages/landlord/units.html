@@ -6,132 +6,508 @@
     <title>Room & Unit Management - DomiKnow</title>
     <link href="../../css/input.css" rel="stylesheet">
     <style>
-        :root {
-            --primary-hsl: 262, 80%, 50%;
-            --success-hsl: 142, 76%, 36%;
-            --error-hsl: 350, 89%, 60%;
-            --warning-hsl: 38, 92%, 50%;
+        /* ── Modern Layout & Base ── */
+        .units-layout {
+            max-width: 1240px;
+            margin: 0 auto;
+            padding: 1.5rem 1.5rem 3.5rem;
         }
 
-        .units-header-card {
-            background: var(--color-action-primary);
-            color: #ffffff;
-            border-radius: var(--radius-lg);
-            padding: 2.25rem 2rem;
-            margin-bottom: 2rem;
-            border: 1px solid rgba(255, 255, 255, 0.12);
-            box-shadow: 0 20px 25px -5px rgba(15, 23, 42, 0.12), 0 8px 10px -6px rgba(15, 23, 42, 0.08);
+        /* ── Top Bar / Back Navigation ── */
+        .units-top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.25rem;
+        }
+
+        .units-back-link,
+        .nav-back-link {
+            display: inline-flex !important;
+            align-items: center !important;
+            gap: 6px !important;
+            color: #64748b !important;
+            font-size: 0.875rem !important;
+            font-weight: 600 !important;
+            text-decoration: none !important;
+            border: none !important;
+            background: transparent !important;
+            background-color: transparent !important;
+            box-shadow: none !important;
+            padding: 0 !important;
+            min-height: auto !important;
+            height: auto !important;
+            border-radius: 0 !important;
+            line-height: 1.25 !important;
+            transform: none !important;
+            transition: color 0.15s ease, transform 0.15s ease !important;
+        }
+
+        .units-back-link:hover,
+        .nav-back-link:hover {
+            color: #0052ea !important;
+            transform: translateX(-2px) !important;
+            border-color: transparent !important;
+            background: transparent !important;
+        }
+
+        [data-theme="dark"] .units-back-link,
+        [data-theme="dark"] .nav-back-link {
+            color: #94a3b8 !important;
+        }
+
+        [data-theme="dark"] .units-back-link:hover,
+        [data-theme="dark"] .nav-back-link:hover {
+            color: #60a5fa !important;
+        }
+
+        .units-notif-btn {
             position: relative;
-            overflow: hidden;
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #64748b;
+            cursor: pointer;
+            transition: all 0.15s ease;
         }
 
-        .units-header-card::before {
-            content: '';
+        .units-notif-btn:hover {
+            border-color: #cbd5e1;
+            color: #0f172a;
+        }
+
+        .units-notif-badge {
             position: absolute;
-            top: -40%;
-            right: -10%;
-            width: 340px;
-            height: 340px;
-            background: radial-gradient(circle, rgba(16, 185, 129, 0.25) 0%, rgba(255, 255, 255, 0) 70%);
-            pointer-events: none;
+            top: -4px;
+            right: -4px;
+            background: #ef4444;
+            color: #ffffff;
+            font-size: 0.65rem;
+            font-weight: 800;
+            min-width: 16px;
+            height: 16px;
+            border-radius: 999px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 4px;
+            border: 2px solid #ffffff;
         }
 
-        .units-header-content {
-            position: relative;
-            z-index: 1;
+        /* ── Hero Header Card ── */
+        .units-hero-card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 24px 28px;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
             flex-wrap: wrap;
-            gap: 1.5rem;
+            gap: 1.25rem;
         }
 
-        .nav-back-link {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            color: var(--text-secondary);
-            font-size: 0.875rem;
-            font-weight: 600;
-            text-decoration: none;
-            padding: 0.4rem 0.85rem;
-            border-radius: var(--radius-md);
-            background-color: var(--bg-secondary);
-            border: 1px solid var(--border-color);
-            transition: all var(--transition-fast);
-        }
-
-        .nav-back-link:hover {
-            color: var(--landlord);
-            border-color: var(--landlord);
-            background-color: var(--landlord-bg);
-            transform: translateX(-2px);
-        }
-
-        .stats-summary-bar {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1rem;
-            margin-bottom: 2rem;
-        }
-
-        .stat-chip-card {
-            background-color: var(--bg-secondary);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-md);
-            padding: 1rem 1.25rem;
+        .units-hero-left {
             display: flex;
-            align-items: center;
-            gap: 1rem;
-            box-shadow: var(--shadow-sm);
-            transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+            align-items: flex-start;
+            gap: 18px;
         }
 
-        .stat-chip-card:hover {
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-md);
-        }
-
-        .stat-icon-wrapper {
-            width: 44px;
-            height: 44px;
-            border-radius: var(--radius-md);
+        .units-hero-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 14px;
+            background: #eff6ff;
+            border: 1px solid #dbeafe;
+            color: #0052ea;
             display: flex;
             align-items: center;
             justify-content: center;
             flex-shrink: 0;
         }
 
+        .units-hero-meta {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+
+        .units-hero-eyebrow {
+            font-size: 0.72rem;
+            font-weight: 800;
+            color: #0052ea;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .units-hero-title {
+            font-size: 1.75rem;
+            font-weight: 850;
+            color: #0f172a;
+            margin: 0;
+            line-height: 1.2;
+            letter-spacing: -0.02em;
+            text-transform: uppercase;
+        }
+
+        .units-hero-address {
+            font-size: 0.9rem;
+            color: #64748b;
+            margin: 3px 0 0 0;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .units-hero-right {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 6px;
+        }
+
+        .units-status-label {
+            font-size: 0.7rem;
+            font-weight: 750;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .units-status-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 5px 14px;
+            border-radius: 999px;
+            font-size: 0.8125rem;
+            font-weight: 700;
+            line-height: 1;
+        }
+
+        .units-status-pill.status-operational {
+            background: #ecfdf5;
+            color: #059669;
+            border: 1px solid #a7f3d0;
+        }
+
+        .units-status-pill.status-review {
+            background: #fffbeb;
+            color: #d97706;
+            border: 1px solid #fde68a;
+        }
+
+        .units-status-pill.status-suspended {
+            background: #fef2f2;
+            color: #dc2626;
+            border: 1px solid #fecaca;
+        }
+
+        /* ── 3 Quick Stats Cards ── */
+        .stats-summary-bar {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.25rem;
+            margin-bottom: 1.75rem;
+        }
+
+        @media (max-width: 860px) {
+            .stats-summary-bar {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .stat-card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 14px;
+            padding: 18px 22px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+            transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            border-color: #cbd5e1;
+        }
+
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .stat-icon-blue {
+            background: #eff6ff;
+            border: 1px solid #dbeafe;
+            color: #0052ea;
+        }
+
+        .stat-icon-purple {
+            background: #f5f3ff;
+            border: 1px solid #ede9fe;
+            color: #7c3aed;
+        }
+
+        .stat-icon-green {
+            background: #ecfdf5;
+            border: 1px solid #d1fae5;
+            color: #059669;
+        }
+
+        .stat-content {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            min-width: 0;
+        }
+
+        .stat-label {
+            font-size: 0.7rem;
+            font-weight: 750;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .stat-value {
+            font-size: 1.35rem;
+            font-weight: 850;
+            color: #0f172a;
+            line-height: 1.2;
+        }
+
+        .stat-caption {
+            font-size: 0.78rem;
+            color: #64748b;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* ── Section Header & Controls ── */
+        .units-section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .units-section-title {
+            font-size: 1.25rem;
+            font-weight: 850;
+            color: #0f172a;
+            margin: 0;
+            letter-spacing: -0.01em;
+        }
+
+        .units-section-subtitle {
+            font-size: 0.85rem;
+            color: #64748b;
+            margin: 3px 0 0 0;
+        }
+
+        .units-toolbar {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .units-search-wrap {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .units-search-icon {
+            position: absolute;
+            left: 12px;
+            color: #94a3b8;
+            pointer-events: none;
+        }
+
+        .units-search-input {
+            padding: 9px 12px 9px 36px !important;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 0.84rem;
+            background: #ffffff;
+            color: #0f172a;
+            width: 260px;
+            max-width: 100%;
+            outline: none;
+            transition: all 0.15s ease;
+        }
+
+        .units-search-input:focus {
+            border-color: #0052ea;
+            box-shadow: 0 0 0 3px rgba(0, 82, 234, 0.1);
+        }
+
+        .btn-units-secondary {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 9px 16px;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            background: #ffffff;
+            color: #334155;
+            font-size: 0.84rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            text-decoration: none;
+        }
+
+        .btn-units-secondary:hover {
+            border-color: #cbd5e1;
+            background: #f8fafc;
+            color: #0f172a;
+        }
+
+        .btn-units-primary {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 9px 18px;
+            border: 1px solid #0052ea;
+            border-radius: 10px;
+            background: #0052ea;
+            color: #ffffff;
+            font-size: 0.84rem;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(0, 82, 234, 0.2);
+            transition: all 0.15s ease;
+            text-decoration: none;
+            white-space: nowrap;
+        }
+
+        .btn-units-primary:hover {
+            background: #0043c2;
+            border-color: #0043c2;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 82, 234, 0.25);
+        }
+
+        /* ── Filter Popover ── */
+        .filter-menu-popover {
+            position: absolute;
+            top: calc(100% + 6px);
+            right: 0;
+            width: 260px;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+            padding: 14px 16px;
+            z-index: 50;
+        }
+
+        .filter-menu-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #f1f5f9;
+            font-size: 0.8125rem;
+            font-weight: 750;
+            color: #0f172a;
+        }
+
+        .filter-reset-link {
+            background: none;
+            border: none;
+            color: #0052ea;
+            font-size: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+            padding: 0;
+        }
+
+        .filter-reset-link:hover {
+            text-decoration: underline;
+        }
+
+        .filter-menu-label {
+            display: block;
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            margin-bottom: 4px;
+        }
+
+        .filter-menu-select {
+            width: 100%;
+            padding: 6px 10px;
+            font-size: 0.8125rem;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+            background: #f8fafc;
+            color: #0f172a;
+            margin-bottom: 8px;
+        }
+
+        .filter-active-indicator {
+            width: 6px;
+            height: 6px;
+            border-radius: 999px;
+            background: #0052ea;
+            display: inline-block;
+        }
+
+        /* ── Room Cards Grid ── */
         .room-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-            gap: 1.75rem;
-            margin-top: 1.5rem;
+            gap: 1.5rem;
+            margin-top: 1rem;
         }
 
         .room-card {
-            background-color: var(--bg-secondary);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-lg);
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
             overflow: hidden;
-            box-shadow: var(--shadow-md);
-            transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.25s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.2s ease;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
             display: flex;
             flex-direction: column;
-            position: relative;
+            transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
         }
 
         .room-card:hover {
-            transform: translateY(-5px);
-            box-shadow: var(--shadow-lg);
-            border-color: rgba(5, 150, 105, 0.3);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.07);
+            border-color: #cbd5e1;
         }
 
         .room-thumbnail-wrapper {
             position: relative;
             width: 100%;
-            height: 180px;
-            background-color: #f1f5f9;
+            height: 190px;
+            background: #f1f5f9;
             overflow: hidden;
         }
 
@@ -143,7 +519,7 @@
         }
 
         .room-card:hover .room-thumbnail {
-            transform: scale(1.03);
+            transform: scale(1.02);
         }
 
         .room-no-photo {
@@ -153,120 +529,276 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            color: var(--text-muted);
-            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
-            border-bottom: 1px solid var(--border-color);
+            color: #94a3b8;
+            background: #f8fafc;
+            gap: 6px;
         }
 
-        .room-badge-top-left {
+        .room-photo-badge {
             position: absolute;
-            top: 12px;
-            left: 12px;
-            z-index: 2;
+            top: 10px;
+            left: 10px;
+            background: rgba(15, 23, 42, 0.78);
+            backdrop-filter: blur(4px);
+            color: #ffffff;
+            font-size: 0.7rem;
+            font-weight: 600;
+            padding: 3px 9px;
+            border-radius: 999px;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            letter-spacing: 0.02em;
         }
 
         .room-body {
-            padding: 1.35rem;
-            flex-grow: 1;
+            padding: 18px 20px;
             display: flex;
             flex-direction: column;
-            gap: 1rem;
+            gap: 14px;
+            flex-grow: 1;
         }
 
-        .room-header {
+        .room-header-block {
             display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            gap: 0.75rem;
+            flex-direction: column;
+            gap: 4px;
         }
 
-        .room-title {
-            font-size: 1.2rem;
-            font-weight: 800;
-            color: var(--text-primary);
+        .room-card-title {
+            font-size: 1.15rem;
+            font-weight: 850;
+            color: #0f172a;
             margin: 0;
             line-height: 1.3;
         }
 
-        .room-subtitle {
-            font-size: 0.8125rem;
-            color: var(--text-secondary);
-            margin-top: 0.25rem;
+        .room-meta-row {
             display: flex;
             align-items: center;
-            gap: 0.5rem;
-            flex-wrap: wrap;
-        }
-
-        .beds-list {
-            background-color: var(--bg-primary);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-md);
-            padding: 0.6rem;
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-        }
-
-        .bed-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            gap: 8px;
             font-size: 0.8125rem;
-            padding: 0.45rem 0.75rem;
-            border-radius: var(--radius-sm);
-            background-color: var(--bg-secondary);
-            border: 1px solid var(--border-color);
+            color: #64748b;
         }
 
-        .status-pill {
+        .room-meta-item {
             display: inline-flex;
             align-items: center;
             gap: 5px;
-            font-size: 0.7rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.03em;
-            padding: 0.25rem 0.65rem;
-            border-radius: var(--radius-full);
-            line-height: 1;
         }
 
-        .status-available {
-            background-color: rgba(16, 185, 129, 0.12);
-            color: #047857;
-            border: 1px solid rgba(16, 185, 129, 0.3);
+        .room-meta-sep {
+            color: #cbd5e1;
         }
 
-        .status-occupied {
-            background-color: rgba(239, 68, 68, 0.12);
-            color: #b91c1c;
-            border: 1px solid rgba(239, 68, 68, 0.3);
-        }
-
-        .status-reserved {
-            background-color: rgba(245, 158, 11, 0.12);
-            color: #b45309;
-            border: 1px solid rgba(245, 158, 11, 0.3);
-        }
-
+        /* Amenities Chips */
         .amenities-container {
             display: flex;
             flex-wrap: wrap;
-            gap: 0.4rem;
+            gap: 6px;
         }
 
         .amenity-tag {
             display: inline-flex;
             align-items: center;
             gap: 5px;
-            font-size: 0.725rem;
+            font-size: 0.72rem;
             font-weight: 600;
-            background-color: var(--bg-primary);
-            border: 1px solid var(--border-color);
-            padding: 0.25rem 0.6rem;
-            border-radius: var(--radius-full);
-            color: var(--text-secondary);
+            color: #334155;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            padding: 4px 10px;
+            border-radius: 8px;
+            transition: all 0.15s ease;
+        }
+
+        .amenity-tag:hover {
+            border-color: #cbd5e1;
+            background: #f1f5f9;
+        }
+
+        /* Room Info Box */
+        .room-info-box {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 12px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: auto;
+        }
+
+        .room-info-col {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .room-info-label {
+            font-size: 0.68rem;
+            font-weight: 750;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .room-info-price {
+            font-size: 1.25rem;
+            font-weight: 850;
+            color: #0052ea;
+            line-height: 1.2;
+        }
+
+        .room-status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 0.75rem;
+            font-weight: 750;
+            padding: 4px 10px;
+            border-radius: 999px;
+            line-height: 1;
+        }
+
+        .room-status-badge.status-occupied {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            color: #dc2626;
+        }
+
+        .room-status-badge.status-reserved {
+            background: #fffbeb;
+            border: 1px solid #fde68a;
+            color: #d97706;
+        }
+
+        .room-status-badge.status-available {
+            background: #ecfdf5;
+            border: 1px solid #a7f3d0;
+            color: #059669;
+        }
+
+        .status-dot {
+            font-size: 0.6rem;
+            line-height: 1;
+        }
+
+        /* Action button */
+        .btn-view-details {
+            width: 100%;
+            padding: 10px 16px;
+            border: 1px solid #0052ea;
+            border-radius: 10px;
+            background: #ffffff;
+            color: #0052ea;
+            font-size: 0.84rem;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.15s ease;
+            text-decoration: none;
+        }
+
+        .btn-view-details:hover {
+            background: #0052ea;
+            color: #ffffff;
+            box-shadow: 0 2px 8px rgba(0, 82, 234, 0.2);
+        }
+
+        /* ── Bottom Support Note ── */
+        .units-support-footer {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 6px;
+            margin-top: 3rem;
+            padding: 1rem;
+            color: #64748b;
+            font-size: 0.85rem;
+        }
+
+        .units-support-footer a {
+            color: #0052ea;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .units-support-footer a:hover {
+            text-decoration: underline;
+        }
+
+        /* ── Dark Mode Tokens ── */
+        [data-theme="dark"] .units-hero-card,
+        [data-theme="dark"] .stat-card,
+        [data-theme="dark"] .room-card,
+        [data-theme="dark"] .filter-menu-popover {
+            background: #1e293b;
+            border-color: #334155;
+        }
+
+        [data-theme="dark"] .units-hero-title,
+        [data-theme="dark"] .stat-value,
+        [data-theme="dark"] .units-section-title,
+        [data-theme="dark"] .room-card-title,
+        [data-theme="dark"] .filter-menu-header {
+            color: #f8fafc;
+        }
+
+        [data-theme="dark"] .units-hero-address,
+        [data-theme="dark"] .stat-caption,
+        [data-theme="dark"] .stat-label,
+        [data-theme="dark"] .units-status-label,
+        [data-theme="dark"] .units-section-subtitle,
+        [data-theme="dark"] .room-meta-row,
+        [data-theme="dark"] .room-info-label,
+        [data-theme="dark"] .units-support-footer {
+            color: #94a3b8;
+        }
+
+        [data-theme="dark"] .units-search-input,
+        [data-theme="dark"] .btn-units-secondary,
+        [data-theme="dark"] .filter-menu-select,
+        [data-theme="dark"] .units-notif-btn,
+        [data-theme="dark"] .room-info-box,
+        [data-theme="dark"] .amenity-tag,
+        [data-theme="dark"] .room-no-photo {
+            background: #0f172a;
+            border-color: #334155;
+            color: #f8fafc;
+        }
+
+        [data-theme="dark"] .units-hero-icon,
+        [data-theme="dark"] .stat-icon-blue {
+            background: #0f172a;
+            border-color: #1e3a8a;
+            color: #60a5fa;
+        }
+
+        [data-theme="dark"] .stat-icon-purple {
+            background: #0f172a;
+            border-color: #4c1d95;
+            color: #c084fc;
+        }
+
+        [data-theme="dark"] .stat-icon-green {
+            background: #0f172a;
+            border-color: #064e3b;
+            color: #34d399;
+        }
+
+        [data-theme="dark"] .btn-view-details {
+            background: #1e293b;
+            border-color: #0052ea;
+            color: #60a5fa;
+        }
+
+        [data-theme="dark"] .btn-view-details:hover {
+            background: #0052ea;
+            color: #ffffff;
         }
 
         /* Modal styling */
@@ -279,10 +811,10 @@
             background-color: rgba(15, 23, 42, 0.65);
             backdrop-filter: blur(8px);
             -webkit-backdrop-filter: blur(8px);
-            display: flex;
+            display: none;
             align-items: center;
             justify-content: center;
-            z-index: 100;
+            z-index: 1000;
             opacity: 0;
             pointer-events: none;
             transition: opacity 0.25s ease-in-out;
@@ -290,11 +822,16 @@
         }
 
         .modal-overlay.active {
+            display: flex !important;
             opacity: 1;
             pointer-events: auto;
         }
 
-        .modal-container {
+        .modal-overlay.hidden {
+            display: none !important;
+        }
+
+        #roomModal .modal-container {
             background-color: var(--bg-secondary);
             border: 1px solid var(--border-color);
             border-radius: var(--radius-lg);
@@ -309,11 +846,11 @@
             transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        .modal-overlay.active .modal-container {
+        #roomModal.active .modal-container {
             transform: scale(1) translateY(0);
         }
 
-        .modal-header {
+        #roomModal .modal-header {
             padding: 1.25rem 1.75rem;
             border-bottom: 1px solid var(--border-color);
             display: flex;
@@ -322,13 +859,13 @@
             background-color: var(--bg-secondary);
         }
 
-        .modal-body {
+        #roomModal .modal-body {
             padding: 1.75rem;
             overflow-y: auto;
             flex-grow: 1;
         }
 
-        .modal-footer {
+        #roomModal .modal-footer {
             padding: 1.1rem 1.75rem;
             border-top: 1px solid var(--border-color);
             display: flex;
@@ -448,7 +985,7 @@
     <link href="../../css/design-system.css" rel="stylesheet">
     <script src="../../js/ui.js" defer></script>
 </head>
-<body>
+<body data-landlord-page="units">
     <!-- Navbar (handled dynamically by dashboard.js sidebar script) -->
     <nav class="navbar navbar-landlord">
         <div class="navbar-container">
@@ -458,7 +995,7 @@
             </div>
             <div class="navbar-menu">
                 <a href="dashboard.html" class="navbar-menu-link">Dashboard</a>
-                <a href="properties.html" class="navbar-menu-link active">My Properties</a>
+                <a href="properties.html" class="navbar-menu-link active">Properties</a>
                 <a href="property-create.html" class="navbar-menu-link">Register Property</a>
                 <a href="applications.html" class="navbar-menu-link">Tenant Applications</a>
             </div>
@@ -470,86 +1007,154 @@
     </nav>
 
     <!-- Main Content -->
-    <main class="dashboard-container" style="max-width: 1240px; margin: 0 auto; padding: 2rem 1.5rem;">
-        <div class="nav-back" style="margin-bottom: 1.25rem;">
-            <a href="properties.html" id="backToPropertyBtn" class="nav-back-link">
-                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18"/></svg>
-                Back to My Properties
+    <main class="units-layout">
+        <!-- Top Navigation & Actions -->
+        <div class="units-top-bar">
+            <a href="properties.html" id="backToPropertyBtn" class="units-back-link">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                Back to Properties
             </a>
         </div>
 
-        <!-- Header Hero Card -->
-        <div class="units-header-card">
-            <div class="units-header-content">
-                <div>
-                    <div style="display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.5rem;">
-                        <span style="background: rgba(255,255,255,0.15); backdrop-filter: blur(4px); color: #ffffff; padding: 0.25rem 0.75rem; border-radius: var(--radius-full); font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; display: inline-flex; align-items: center; gap: 5px;">
-                            <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5m0 0h4m-4 0V11m0 0h4m-4 0H9"/></svg>
-                            Property Management
-                        </span>
-                    </div>
-                    <h2 id="propertyNameHeader" style="margin: 0; font-size: 1.85rem; font-weight: 800; color: #ffffff; letter-spacing: -0.02em;">Property Name</h2>
-                    <p id="propertyAddressHeader" style="margin: 0.6rem 0 0 0; color: rgba(255, 255, 255, 0.85); font-size: 0.95rem; display: flex; align-items: center; gap: 6px;">
-                        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="color: #34d399; flex-shrink: 0;"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z"/></svg>
+        <!-- Hero Header Card -->
+        <div class="units-hero-card">
+            <div class="units-hero-left">
+                <div class="units-hero-icon">
+                    <svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 21h16.5M4.5 3h15M5.25 3v18m13.5-18v18M9 6.75h1.5m-1.5 3h1.5m-1.5 3h1.5m3-6H15m-1.5 3H15m-1.5 3H15M9 21v-3.375c0-.621.504-1.125 1.125-1.125h3.75c.621 0 1.125.504 1.125 1.125V21" />
+                    </svg>
+                </div>
+                <div class="units-hero-meta">
+                    <span class="units-hero-eyebrow">Property Management</span>
+                    <h1 id="propertyNameHeader" class="units-hero-title">Property Name</h1>
+                    <p id="propertyAddressHeader" class="units-hero-address">
+                        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="color: #10b981; flex-shrink: 0;"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z"/></svg>
                         <span>Address</span>
                     </p>
                 </div>
             </div>
+            <div class="units-hero-right">
+                <span class="units-status-label">Management Status</span>
+                <span id="propertyStatusPill" class="units-status-pill status-operational">
+                    <span class="status-dot">●</span> Operational
+                </span>
+            </div>
         </div>
 
-        <!-- Quick Stats Bar -->
+        <!-- 3 Quick Stats Cards -->
         <div class="stats-summary-bar">
-            <div class="stat-chip-card">
-                <div class="stat-icon-wrapper" style="background-color: var(--color-success-bg); color: var(--color-success-text);">
-                    <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z"/></svg>
+            <!-- Total Rooms Card -->
+            <div class="stat-card">
+                <div class="stat-icon stat-icon-blue">
+                    <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9" />
+                    </svg>
                 </div>
-                <div>
-                    <span style="font-size: 0.75rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.04em;">Total Rooms</span>
-                    <h4 id="statTotalRooms" style="margin: 0; font-size: 1.35rem; font-weight: 800; color: var(--text-primary);">0</h4>
-                </div>
-            </div>
-
-            <div class="stat-chip-card">
-                <div class="stat-icon-wrapper" style="background-color: var(--color-info-bg); color: var(--color-info-text);">
-                    <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25"/></svg>
-                </div>
-                <div>
-                    <span style="font-size: 0.75rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.04em;">Rental Units</span>
-                    <h4 id="statRentalType" style="margin: 0; font-size: 1.1rem; font-weight: 700; color: var(--text-primary);">Active Property</h4>
+                <div class="stat-content">
+                    <span class="stat-label">Total Rooms</span>
+                    <span id="statTotalRooms" class="stat-value">0</span>
+                    <span class="stat-caption">Active rooms & spaces</span>
                 </div>
             </div>
 
-            <div class="stat-chip-card">
-                <div class="stat-icon-wrapper" style="background-color: var(--color-warning-bg); color: var(--color-warning-text);">
-                    <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            <!-- Rental Units Card -->
+            <div class="stat-card">
+                <div class="stat-icon stat-icon-purple">
+                    <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
+                    </svg>
                 </div>
-                <div>
-                    <span style="font-size: 0.75rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.04em;">Management Status</span>
-                    <h4 style="margin: 0; font-size: 1.1rem; font-weight: 700; color: var(--color-warning-text);">Operational</h4>
+                <div class="stat-content">
+                    <span class="stat-label">Rental Units</span>
+                    <span id="statRentalType" class="stat-value">Apartment</span>
+                    <span class="stat-caption">Property type</span>
+                </div>
+            </div>
+
+            <!-- Last Updated Card -->
+            <div class="stat-card">
+                <div class="stat-icon stat-icon-green">
+                    <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 9v7.5" />
+                    </svg>
+                </div>
+                <div class="stat-content">
+                    <span class="stat-label">Last Updated</span>
+                    <span id="statLastUpdatedDate" class="stat-value">--</span>
+                    <span id="statLastUpdatedTime" class="stat-caption">--</span>
                 </div>
             </div>
         </div>
 
-        <!-- Action Header -->
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
-            <div>
-                <h3 style="margin: 0; font-size: 1.35rem; font-weight: 800; color: var(--text-primary); letter-spacing: -0.01em;">Rental Rooms & Spaces</h3>
-                <p style="margin: 0.25rem 0 0 0; color: var(--text-secondary); font-size: 0.875rem;">Manage room availability, photos, pricing, and specific room amenities.</p>
+        <!-- Section Controls Bar -->
+        <div class="units-section-header">
+            <div class="units-search-wrap">
+                <svg class="units-search-icon" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+                </svg>
+                <input type="text" id="roomSearchInput" class="units-search-input" placeholder="Search rooms..." autocomplete="off">
             </div>
-            <button id="openAddRoomModalBtn" class="btn-primary" style="display: inline-flex; align-items: center; gap: 8px; background-color: var(--landlord); border-color: var(--landlord); padding: 0.65rem 1.25rem; font-weight: 700; border-radius: var(--radius-md); box-shadow: var(--shadow-sm); cursor: pointer;">
-                <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
-                Add Rental Room
-            </button>
+            <div class="units-toolbar">
+
+                <div style="position: relative;">
+                    <button type="button" id="roomFilterBtn" class="btn-units-secondary" aria-expanded="false" aria-haspopup="true">
+                        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 01-.659 1.591l-5.432 5.432a2.25 2.25 0 00-.659 1.591v2.927a2.25 2.25 0 01-1.244 2.013L9.75 21v-6.568a2.25 2.25 0 00-.659-1.591L3.659 7.409A2.25 2.25 0 013 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0112 3z" />
+                        </svg>
+                        Filter
+                        <span id="filterIndicator" class="filter-active-indicator hidden"></span>
+                    </button>
+
+                    <!-- Filter Dropdown Popover -->
+                    <div id="roomFilterMenu" class="filter-menu-popover hidden">
+                        <div class="filter-menu-header">
+                            <span>Filter Rooms</span>
+                            <button type="button" id="resetFiltersBtn" class="filter-reset-link">Reset</button>
+                        </div>
+                        <div>
+                            <label class="filter-menu-label" for="filterStatus">Status</label>
+                            <select id="filterStatus" class="filter-menu-select">
+                                <option value="all">All Statuses</option>
+                                <option value="available">Available</option>
+                                <option value="occupied">Occupied</option>
+                                <option value="reserved">Reserved</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="filter-menu-label" for="filterFloor">Floor</label>
+                            <select id="filterFloor" class="filter-menu-select">
+                                <option value="all">All Floors</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="filter-menu-label" for="filterGender">Gender Policy</label>
+                            <select id="filterGender" class="filter-menu-select">
+                                <option value="all">All Genders</option>
+                                <option value="mixed">Mixed</option>
+                                <option value="male">Male Only</option>
+                                <option value="female">Female Only</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="button" id="openAddRoomModalBtn" class="btn-units-primary">
+                    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                    </svg>
+                    Add Rental Room
+                </button>
+            </div>
         </div>
 
         <!-- No Rooms Empty State -->
         <div id="noRoomsPlaceholder" class="hidden" style="text-align: center; padding: 4.5rem 2rem; background-color: var(--bg-secondary); border: 2px dashed var(--border-color); border-radius: var(--radius-lg); margin-top: 1.5rem;">
-            <div style="width: 72px; height: 72px; background-color: var(--landlord-bg); color: var(--landlord); border-radius: var(--radius-full); display: inline-flex; align-items: center; justify-content: center; margin-bottom: 1.25rem;">
+            <div style="width: 72px; height: 72px; background-color: #eff6ff; color: #0052ea; border-radius: var(--radius-full); display: inline-flex; align-items: center; justify-content: center; margin-bottom: 1.25rem;">
                 <svg width="36" height="36" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 21v-4.875c0-.621.504-1.125 1.125-1.125h5.25c.621 0 1.125.504 1.125 1.125V21m0 0h4.5V3.545a1.125 1.125 0 00-.503-.921l-8.377-5.585a1.125 1.125 0 00-1.244 0L2.753 2.624a1.125 1.125 0 00-.503.921V21h4.5m0 0h7.5"/></svg>
             </div>
             <h4 style="margin: 0; font-size: 1.15rem; font-weight: 800; color: var(--text-primary);">No Rooms Configured Yet</h4>
             <p style="margin: 0.4rem auto 1.5rem auto; color: var(--text-secondary); font-size: 0.9rem; max-width: 420px;">Start building your rental inventory by creating individual room spaces, setting floor numbers, and configuring bed allocations.</p>
-            <button onclick="document.getElementById('openAddRoomModalBtn').click()" class="btn-primary" style="display: inline-flex; align-items: center; gap: 8px; background-color: var(--landlord); border-color: var(--landlord); padding: 0.6rem 1.25rem;">
+            <button onclick="document.getElementById('openAddRoomModalBtn').click()" class="btn-units-primary">
                 <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
                 Add First Room
             </button>
@@ -562,7 +1167,7 @@
     </main>
 
     <!-- Add/Edit Room Modal -->
-    <div id="roomModal" class="modal-overlay">
+    <div id="roomModal" class="modal-overlay hidden" style="display: none;">
         <div class="modal-container">
             <div class="modal-header">
                 <div style="display: flex; align-items: center; gap: 10px;">
@@ -746,6 +1351,25 @@
         let otherAmenitiesList = [];
         let editingUnitId = null;
 
+        function showRoomModal() {
+            const modal = document.getElementById('roomModal');
+            if (!modal) return;
+            modal.classList.remove('hidden');
+            modal.style.display = 'flex';
+            requestAnimationFrame(() => {
+                modal.classList.add('active');
+            });
+        }
+
+        function hideRoomModal() {
+            const modal = document.getElementById('roomModal');
+            if (!modal) return;
+            modal.classList.remove('active');
+            modal.classList.add('hidden');
+            modal.style.display = 'none';
+            editingUnitId = null;
+        }
+
         // Amenity SVG Mapping dictionary
         const AMENITY_SVG_MAP = {
             'Aircon': `<svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v18m-9-9h18m-4.5-4.5L6.5 16.5m11 0L6.5 7.5"/></svg>`,
@@ -820,16 +1444,18 @@
 
                     populateFloorSelect();
                     populateSharedAmenitiesReference();
-                    modal.classList.add('active');
+                    showRoomModal();
                 } else {
-                    modal.classList.remove('active');
-                    editingUnitId = null;
+                    hideRoomModal();
                 }
             };
 
             openModalBtn.addEventListener('click', () => toggleModal(true));
             closeModalBtn.addEventListener('click', () => toggleModal(false));
             cancelModalBtn.addEventListener('click', () => toggleModal(false));
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) toggleModal(false);
+            });
 
             // Dynamic toggle per rental style radio click
             document.querySelectorAll('input[name="rentalStyle"]').forEach(radio => {
@@ -837,6 +1463,17 @@
             });
 
             document.getElementById('roomForm').addEventListener('submit', handleAddRoomSubmit);
+
+            // Bind notification button
+            const notifBtn = document.getElementById('unitsNotifBtn');
+            if (notifBtn) {
+                notifBtn.addEventListener('click', () => {
+                    window.location.href = 'notifications.html';
+                });
+            }
+
+            // Init filters & search
+            initFilters();
 
             // Fetch property & unit data
             fetchPropertyHeader();
@@ -963,6 +1600,165 @@
             });
         }
 
+        /* ── Search & Filter Logic ── */
+        let activeFilters = {
+            search: '',
+            status: 'all',
+            floor: 'all',
+            gender: 'all'
+        };
+
+        function initFilters() {
+            const searchInput = document.getElementById('roomSearchInput');
+            const filterBtn = document.getElementById('roomFilterBtn');
+            const filterMenu = document.getElementById('roomFilterMenu');
+            const resetBtn = document.getElementById('resetFiltersBtn');
+            const statusSelect = document.getElementById('filterStatus');
+            const floorSelect = document.getElementById('filterFloor');
+            const genderSelect = document.getElementById('filterGender');
+
+            if (searchInput) {
+                searchInput.addEventListener('input', (e) => {
+                    activeFilters.search = e.target.value.trim().toLowerCase();
+                    applyRoomFilters();
+                });
+            }
+
+            if (filterBtn && filterMenu) {
+                filterBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const isHidden = filterMenu.classList.contains('hidden');
+                    if (isHidden) {
+                        filterMenu.classList.remove('hidden');
+                        filterBtn.setAttribute('aria-expanded', 'true');
+                    } else {
+                        filterMenu.classList.add('hidden');
+                        filterBtn.setAttribute('aria-expanded', 'false');
+                    }
+                });
+
+                document.addEventListener('click', (e) => {
+                    if (!filterMenu.contains(e.target) && e.target !== filterBtn && !filterBtn.contains(e.target)) {
+                        filterMenu.classList.add('hidden');
+                        filterBtn.setAttribute('aria-expanded', 'false');
+                    }
+                });
+            }
+
+            if (statusSelect) {
+                statusSelect.addEventListener('change', (e) => {
+                    activeFilters.status = e.target.value;
+                    applyRoomFilters();
+                });
+            }
+
+            if (floorSelect) {
+                floorSelect.addEventListener('change', (e) => {
+                    activeFilters.floor = e.target.value;
+                    applyRoomFilters();
+                });
+            }
+
+            if (genderSelect) {
+                genderSelect.addEventListener('change', (e) => {
+                    activeFilters.gender = e.target.value;
+                    applyRoomFilters();
+                });
+            }
+
+            if (resetBtn) {
+                resetBtn.addEventListener('click', () => {
+                    activeFilters = { search: '', status: 'all', floor: 'all', gender: 'all' };
+                    if (searchInput) searchInput.value = '';
+                    if (statusSelect) statusSelect.value = 'all';
+                    if (floorSelect) floorSelect.value = 'all';
+                    if (genderSelect) genderSelect.value = 'all';
+                    applyRoomFilters();
+                });
+            }
+        }
+
+        function updateFilterIndicator() {
+            const indicator = document.getElementById('filterIndicator');
+            if (!indicator) return;
+            const isFiltered = activeFilters.status !== 'all' || activeFilters.floor !== 'all' || activeFilters.gender !== 'all';
+            if (isFiltered) {
+                indicator.classList.remove('hidden');
+            } else {
+                indicator.classList.add('hidden');
+            }
+        }
+
+        function populateFilterFloors() {
+            const floorSelect = document.getElementById('filterFloor');
+            if (!floorSelect) return;
+            
+            const floors = new Set();
+            propertyUnitsList.forEach(r => {
+                if (r.floor && r.floor !== 'N/A') floors.add(r.floor);
+            });
+
+            const currentVal = floorSelect.value;
+            floorSelect.innerHTML = '<option value="all">All Floors</option>';
+            Array.from(floors).sort().forEach(fl => {
+                const opt = document.createElement('option');
+                opt.value = fl;
+                opt.textContent = fl;
+                floorSelect.appendChild(opt);
+            });
+            if (floors.has(currentVal)) {
+                floorSelect.value = currentVal;
+            }
+        }
+
+        function applyRoomFilters() {
+            updateFilterIndicator();
+
+            const filtered = propertyUnitsList.filter(room => {
+                if (activeFilters.search) {
+                    const query = activeFilters.search;
+                    const unitMatch = room.unit_number && String(room.unit_number).toLowerCase().includes(query);
+                    const nameMatch = room.room_name && room.room_name.toLowerCase().includes(query);
+                    const floorMatch = room.floor && room.floor.toLowerCase().includes(query);
+                    const amenityMatch = room.amenities && room.amenities.some(a => a.toLowerCase().includes(query));
+                    if (!unitMatch && !nameMatch && !floorMatch && !amenityMatch) {
+                        return false;
+                    }
+                }
+
+                if (activeFilters.status !== 'all') {
+                    let roomStatus = (room.status || 'available').toLowerCase();
+                    if (room.rental_style === 'per_bed' && room.beds && room.beds.length > 0) {
+                        const allOccupied = room.beds.every(b => b.status === 'occupied');
+                        const anyOccupiedOrReserved = room.beds.some(b => b.status === 'occupied' || b.status === 'reserved');
+                        if (allOccupied) roomStatus = 'occupied';
+                        else if (anyOccupiedOrReserved) roomStatus = 'reserved';
+                        else roomStatus = 'available';
+                    }
+                    if (roomStatus !== activeFilters.status) {
+                        return false;
+                    }
+                }
+
+                if (activeFilters.floor !== 'all') {
+                    if (room.floor !== activeFilters.floor) {
+                        return false;
+                    }
+                }
+
+                if (activeFilters.gender !== 'all') {
+                    const gender = (room.gender_restriction || 'mixed').toLowerCase();
+                    if (gender !== activeFilters.gender) {
+                        return false;
+                    }
+                }
+
+                return true;
+            });
+
+            renderRoomsUI(filtered);
+        }
+
         async function fetchPropertyHeader() {
             try {
                 const response = await fetch(`/api/landlord/properties/${propertyId}`, {
@@ -975,14 +1771,35 @@
                     
                     const addressEl = document.getElementById('propertyAddressHeader');
                     addressEl.innerHTML = `
-                        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="color: #34d399; flex-shrink: 0;"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z"/></svg>
+                        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="color: #10b981; flex-shrink: 0;"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z"/></svg>
                         <span>${currentProperty.address}, Brgy. ${currentProperty.barangay || 'N/A'}, Siniloan</span>
                     `;
 
                     const typeText = currentProperty.property_type
                         ? currentProperty.property_type.replace('_', ' ').replace(/\b\w/g, c => c.toUpperCase())
-                        : 'Active Property';
+                        : 'Apartment';
                     document.getElementById('statRentalType').textContent = typeText;
+
+                    // Format Last Updated Date & Time
+                    const updatedDate = currentProperty.updated_at || currentProperty.created_at || new Date().toISOString();
+                    const dateObj = new Date(updatedDate);
+                    const dateStr = dateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+                    const timeStr = dateObj.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
+
+                    const dateEl = document.getElementById('statLastUpdatedDate');
+                    if (dateEl) dateEl.textContent = dateStr;
+                    const timeEl = document.getElementById('statLastUpdatedTime');
+                    if (timeEl) timeEl.textContent = timeStr;
+
+                    // Management Status Pill
+                    const statusPill = document.getElementById('propertyStatusPill');
+                    if (statusPill) {
+                        const pStatus = currentProperty.status || 'operational';
+                        const isOp = pStatus === 'active' || pStatus === 'approved' || pStatus === 'operational';
+                        statusPill.className = `units-status-pill ${isOp ? 'status-operational' : 'status-' + pStatus}`;
+                        const label = isOp ? 'Operational' : (pStatus.charAt(0).toUpperCase() + pStatus.slice(1));
+                        statusPill.innerHTML = `<span class="status-dot">●</span> ${label}`;
+                    }
                 }
             } catch (err) {
                 console.error(err);
@@ -996,54 +1813,63 @@
                     const result = await response.json();
                     propertyUnitsList = result.data || [];
                     document.getElementById('statTotalRooms').textContent = propertyUnitsList.length;
-                    renderRoomsUI();
+                    populateFilterFloors();
+                    applyRoomFilters();
                 }
             } catch (err) {
                 console.error(err);
             }
         }
 
-        function renderRoomsUI() {
+        function renderRoomsUI(roomsToRender = null) {
             const container = document.getElementById('roomsContainer');
             const placeholder = document.getElementById('noRoomsPlaceholder');
             container.innerHTML = '';
 
-            if (propertyUnitsList.length === 0) {
+            const list = roomsToRender !== null ? roomsToRender : propertyUnitsList;
+
+            if (list.length === 0) {
                 placeholder.classList.remove('hidden');
                 return;
             }
             placeholder.classList.add('hidden');
 
-            propertyUnitsList.forEach(room => {
+            list.forEach(room => {
                 const card = document.createElement('div');
                 card.className = 'room-card';
 
+                const totalPhotos = room.images && room.images.length > 0
+                    ? room.images.length
+                    : (room.main_image_url ? 1 : 0);
+
                 let photoHtml = '';
-                if (room.main_image_url || (room.images && room.images.length > 0)) {
+                if (totalPhotos > 0) {
                     const src = room.main_image_url || room.images[0].image_url;
                     photoHtml = `
                         <div class="room-thumbnail-wrapper">
-                            <img src="${src}" alt="Room Thumbnail" class="room-thumbnail">
-                            <span class="room-badge-top-left" style="background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(4px); color: #fff; padding: 0.2rem 0.55rem; border-radius: var(--radius-full); font-size: 0.7rem; font-weight: 700; display: inline-flex; align-items: center; gap: 4px;">
-                                <svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6.827 6.175A2.31 2.31 0 015.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 00-1.134-.175 2.31 2.31 0 01-1.64-1.055l-.822-1.316a2.192 2.192 0 00-1.736-1.039 48.774 48.774 0 00-5.232 0c-.653.036-1.259.422-1.736 1.039l-.821 1.316z"/><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 12.75a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0z"/></svg>
-                                ${room.images ? room.images.length : 1} Photos
+                            <img src="${src}" alt="Room ${room.unit_number}" class="room-thumbnail" loading="lazy">
+                            <span class="room-photo-badge">
+                                <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6.827 6.175A2.31 2.31 0 015.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 00-1.134-.175 2.31 2.31 0 01-1.64-1.055l-.822-1.316a2.192 2.192 0 00-1.736-1.039 48.774 48.774 0 00-5.232 0c-.653.036-1.259.422-1.736 1.039l-.821 1.316z"/><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 12.75a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0z"/></svg>
+                                1 / ${totalPhotos} Photos
                             </span>
                         </div>
                     `;
                 } else {
                     photoHtml = `
-                        <div class="room-no-photo">
-                            <svg width="32" height="32" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24" style="color: var(--text-muted);"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"/></svg>
-                            <span style="font-size: 0.75rem; font-weight: 600; margin-top: 6px; color: var(--text-secondary);">No photo uploaded</span>
+                        <div class="room-thumbnail-wrapper">
+                            <div class="room-no-photo">
+                                <svg width="32" height="32" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"/></svg>
+                                <span style="font-size: 0.75rem; font-weight: 600;">No photo uploaded</span>
+                            </div>
                         </div>
                     `;
                 }
 
                 const displayName = room.room_name ? `Room ${room.unit_number} (${room.room_name})` : `Room ${room.unit_number}`;
-                const floorLabel = room.floor && room.floor !== 'N/A' ? `${room.floor}` : 'Unspecified Floor';
+                const floorLabel = room.floor && room.floor !== 'N/A' ? `${room.floor}` : '1st Floor';
                 
                 let genderText = 'Mixed';
-                let genderIcon = `<svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z"/></svg>`;
+                let genderIcon = `<svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z"/></svg>`;
                 
                 if (room.gender_restriction === 'male') {
                     genderText = 'Male Only';
@@ -1057,92 +1883,97 @@
                         <div class="amenities-container">
                             ${room.amenities.map(a => {
                                 const svgIcon = AMENITY_SVG_MAP[a] || DEFAULT_AMENITY_SVG;
-                                return `<span class="amenity-tag">${svgIcon}${a}</span>`;
+                                return `<span class="amenity-tag">${svgIcon} ${a}</span>`;
                             }).join('')}
                         </div>
                     `;
                 }
 
-                let bodyDetailsHtml = '';
+                let formattedRent = '₱0';
+                let statusClass = 'status-available';
+                let statusText = 'Available';
 
                 if (room.rental_style === 'per_bed') {
                     const bedList = room.beds || [];
-                    bodyDetailsHtml = `
-                        <div>
-                            <div style="font-size: 0.725rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 0.4rem; display: flex; align-items: center; gap: 5px;">
-                                <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M2 18h20M2 14h20M4 14V8a2 2 0 012-2h12a2 2 0 012 2v6M4 18v2M20 18v2"/></svg>
-                                Bed spaces (${bedList.length} total)
-                            </div>
-                            <div class="beds-list">
-                                ${bedList.map(bed => {
-                                    let statusDotSvg = `<svg width="8" height="8" fill="currentColor" viewBox="0 0 8 8"><circle cx="4" cy="4" r="4"/></svg>`;
-                                    return `
-                                        <div class="bed-item">
-                                            <span style="font-weight: 700; font-size: 0.8125rem; color: var(--text-primary); display: flex; align-items: center; gap: 6px;">
-                                                <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="color: var(--text-muted);"><path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14"/></svg>
-                                                ${bed.bed_label}
-                                            </span>
-                                            <div style="display: flex; align-items: center; gap: 10px;">
-                                                <span style="color: var(--landlord); font-weight: 800; font-size: 0.825rem;">${Number(bed.monthly_rent) > 0 ? `₱${Number(bed.monthly_rent).toLocaleString('en-PH')}/mo` : 'Price not set'}</span>
-                                                <span class="status-pill status-${bed.status}">${statusDotSvg} ${bed.status}</span>
-                                            </div>
-                                        </div>
-                                    `;
-                                }).join('')}
-                            </div>
-                        </div>
-                    `;
-                } else {
-                    const rent = Number(room.monthly_rent) > 0 ? `₱${Number(room.monthly_rent).toLocaleString('en-PH')}` : 'Price not set';
-                    const status = room.status || 'available';
-                    let statusDotSvg = `<svg width="8" height="8" fill="currentColor" viewBox="0 0 8 8"><circle cx="4" cy="4" r="4"/></svg>`;
+                    let rentVal = 0;
+                    if (bedList.length > 0) {
+                        const rents = bedList.map(b => Number(b.monthly_rent) || 0).filter(r => r > 0);
+                        rentVal = rents.length > 0 ? Math.min(...rents) : 0;
+                    } else if (Number(room.rent_per_bed) > 0) {
+                        rentVal = Number(room.rent_per_bed);
+                    }
+                    formattedRent = rentVal > 0 ? `₱${rentVal.toLocaleString('en-PH')}` : '₱0';
 
-                    bodyDetailsHtml = `
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; background-color: var(--bg-primary); padding: 0.85rem 1rem; radius: var(--radius-md); border: 1px solid var(--border-color); margin-top: 0.25rem;">
-                            <div>
-                                <span style="font-size: 0.7rem; font-weight: 700; color: var(--text-muted); display: block; text-transform: uppercase; letter-spacing: 0.04em;">Monthly Rent</span>
-                                <span style="font-size: 1.15rem; font-weight: 800; color: var(--landlord);">${rent}</span>
-                            </div>
-                            <div>
-                                <span style="font-size: 0.7rem; font-weight: 700; color: var(--text-muted); display: block; text-transform: uppercase; letter-spacing: 0.04em;">Room Status</span>
-                                <span class="status-pill status-${status}" style="margin-top: 4px;">${statusDotSvg} ${status}</span>
-                            </div>
-                        </div>
-                    `;
+                    if (bedList.length > 0) {
+                        const allOccupied = bedList.every(b => b.status === 'occupied');
+                        const anyOccupiedOrReserved = bedList.some(b => b.status === 'occupied' || b.status === 'reserved');
+                        if (allOccupied) {
+                            statusClass = 'status-occupied';
+                            statusText = 'Occupied';
+                        } else if (anyOccupiedOrReserved) {
+                            statusClass = 'status-reserved';
+                            statusText = 'Reserved';
+                        } else {
+                            statusClass = 'status-available';
+                            statusText = 'Available';
+                        }
+                    } else {
+                        statusClass = 'status-available';
+                        statusText = 'Available';
+                    }
+                } else {
+                    const rentVal = Number(room.monthly_rent) || 0;
+                    formattedRent = rentVal > 0 ? `₱${rentVal.toLocaleString('en-PH')}` : '₱0';
+                    const s = (room.status || 'available').toLowerCase();
+                    if (s === 'occupied') {
+                        statusClass = 'status-occupied';
+                        statusText = 'Occupied';
+                    } else if (s === 'reserved') {
+                        statusClass = 'status-reserved';
+                        statusText = 'Reserved';
+                    } else {
+                        statusClass = 'status-available';
+                        statusText = 'Available';
+                    }
                 }
 
                 card.innerHTML = `
                     ${photoHtml}
                     <div class="room-body">
-                        <div class="room-header">
-                            <div>
-                                <h4 class="room-title">${displayName}</h4>
-                                <div class="room-subtitle">
-                                    <span style="display: inline-flex; align-items: center; gap: 4px;">
-                                        <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/></svg>
-                                        ${floorLabel}
-                                    </span>
-                                    <span>•</span>
-                                    <span style="display: inline-flex; align-items: center; gap: 4px;">
-                                        ${genderIcon}
-                                        ${genderText}
-                                    </span>
-                                </div>
+                        <div class="room-header-block">
+                            <h3 class="room-card-title">${displayName}</h3>
+                            <div class="room-meta-row">
+                                <span class="room-meta-item">
+                                    <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/></svg>
+                                    ${floorLabel}
+                                </span>
+                                <span class="room-meta-sep">•</span>
+                                <span class="room-meta-item">
+                                    ${genderIcon}
+                                    ${genderText}
+                                </span>
                             </div>
-                            <span class="status-pill" style="background-color: var(--bg-primary); border: 1px solid var(--border-color); color: var(--text-secondary); text-transform: capitalize; font-weight: 700; font-size: 0.7rem; height: fit-content; padding: 0.25rem 0.55rem; border-radius: var(--radius-sm);">
-                                ${room.rental_style === 'per_bed' ? 'Bed Space' : 'Whole Room'}
-                            </span>
                         </div>
 
                         ${amenitiesHtml}
-                        ${bodyDetailsHtml}
 
-                        <div style="margin-top: auto; padding-top: 0.5rem;">
-                            <button onclick='openDetailsModal("${room.id}")' class="btn-primary" style="background-color: var(--landlord); border-color: var(--landlord); font-size: 0.8125rem; padding: 0.5rem 0.85rem; width: 100%; display: flex; align-items: center; justify-content: center; gap: 6px; font-weight: 700; border-radius: var(--radius-md); box-shadow: var(--shadow-sm); cursor: pointer;">
-                                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"/></svg>
-                                Room Details & Settings
-                            </button>
+                        <div class="room-info-box">
+                            <div class="room-info-col">
+                                <span class="room-info-label">Monthly Rent</span>
+                                <span class="room-info-price">${formattedRent}</span>
+                            </div>
+                            <div class="room-info-col" style="align-items: flex-end;">
+                                <span class="room-info-label">Status</span>
+                                <span class="room-status-badge ${statusClass}">
+                                    <span class="status-dot">●</span> ${statusText}
+                                </span>
+                            </div>
                         </div>
+
+                        <button type="button" onclick='openDetailsModal("${room.id}")' class="btn-view-details">
+                            <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25"/></svg>
+                            View Room Details
+                        </button>
                     </div>
                 `;
 
@@ -1351,7 +2182,7 @@
                     await Promise.all(uploadPromises);
                 }
 
-                document.getElementById('roomModal').classList.remove('active');
+                hideRoomModal();
                 fetchPropertyUnits();
 
             } catch (err) {
@@ -1456,7 +2287,7 @@
             deleteBtn.onclick = () => deleteRoomFromModal(room.id, room.unit_number);
             deleteBtn.disabled = !canEdit;
 
-            document.getElementById('roomModal').classList.add('active');
+            showRoomModal();
         }
 
         async function deleteRoomFromModal(id, roomNumber) {
@@ -1479,7 +2310,7 @@
 
                 const result = await response.json();
                 if (response.ok) {
-                    document.getElementById('roomModal').classList.remove('active');
+                    hideRoomModal();
                     fetchPropertyUnits();
                 } else {
                     alert(result.message || 'Failed to delete room.');

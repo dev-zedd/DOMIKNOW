@@ -83,7 +83,7 @@
             display: none !important;
         }
         .action-btn {
-            padding: 0.45rem 1rem;
+            padding: 0.4rem 0.85rem;
             font-size: 0.8125rem;
             border-radius: var(--radius-sm);
             cursor: pointer;
@@ -91,7 +91,11 @@
             border: 1px solid transparent;
             transition: all 0.2s ease;
             text-decoration: none;
-            display: inline-block;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.4rem;
+            white-space: nowrap !important;
         }
         .btn-audit {
             background-color: var(--landlord);
@@ -108,6 +112,30 @@
         .btn-view:hover {
             background-color: var(--border-color);
         }
+
+        /* ── Remove duplicate top breadcrumbs on payments ── */
+        .dk-breadcrumbs, [data-domiknow-breadcrumbs], .breadcrumb-nav {
+            display: none !important;
+        }
+        /* ── Back Navigation Link (styled like tenant/lease-details.html & property-create.html) ── */
+        .app-back-nav {
+            margin-bottom: 1.25rem;
+        }
+        .app-details-back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--color-action-primary, #0355f3);
+            font-size: 0.875rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: opacity 0.15s ease, transform 0.15s ease;
+        }
+        .app-details-back-link:hover {
+            opacity: 0.85;
+            transform: translateX(-2px);
+            text-decoration: underline;
+        }
     </style>
     <link href="../../css/design-system.css" rel="stylesheet">
     <script src="../../js/ui.js" defer></script>
@@ -122,7 +150,7 @@
             </div>
             <div class="navbar-menu">
                 <a href="dashboard.html" class="navbar-menu-link">Dashboard</a>
-                <a href="properties.html" class="navbar-menu-link">My Properties</a>
+                <a href="properties.html" class="navbar-menu-link">Properties</a>
                 <a href="applications.html" class="navbar-menu-link">Tenant Applications</a>
                 <a href="leases.html" class="navbar-menu-link">Leases</a>
                 <a href="billings.html" class="navbar-menu-link">Billings</a>
@@ -137,7 +165,21 @@
 
     <!-- Main Content -->
     <main class="dashboard-container">
+        <div class="app-back-nav">
+            <a href="billings.html" class="app-details-back-link" id="backToListBtn">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <line x1="19" y1="12" x2="5" y2="12"></line>
+                    <polyline points="12 19 5 12 12 5"></polyline>
+                </svg>
+                <span>Back to list</span>
+            </a>
+        </div>
+
         <div class="payments-card">
+            <div style="margin-bottom:1rem;border-bottom:1px solid var(--border-color);padding-bottom:0.75rem;">
+                <h3 style="margin:0;font-size:1.05rem;color:var(--text-primary);">Payment Verification & Audit Queue</h3>
+                <div style="font-size:0.8rem;color:var(--text-muted);margin-top:0.25rem;">Review and verify submitted tenant payment proofs and transactions</div>
+            </div>
             <table>
                 <thead>
                     <tr>
@@ -147,9 +189,9 @@
                         <th>Amount Paid</th>
                         <th>Method</th>
                         <th>Reference Code</th>
-                        <th>Proof File</th>
-                        <th>Status</th>
-                        <th>Action</th>
+                        <th style="white-space: nowrap;">Proof File</th>
+                        <th style="white-space: nowrap;">Status</th>
+                        <th style="white-space: nowrap;">Action</th>
                     </tr>
                 </thead>
                 <tbody id="paymentsTableBody">
@@ -277,7 +319,7 @@
 
                     const proofUrl = domiknowSafeExternalUrl(pay.payment_proof_url);
                     const proofControl = proofUrl !== '#' && pay.payment_proof_available !== false
-                        ? `<a href="${proofUrl}" target="_blank" rel="noopener noreferrer" class="action-btn btn-view">View File</a>`
+                        ? `<a href="${proofUrl}" target="_blank" rel="noopener noreferrer" class="action-btn btn-view" title="View uploaded payment proof" style="white-space:nowrap;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg><span>View File</span></a>`
                         : '<span class="status-badge status-muted" title="No file exists at the stored path">Unavailable</span>';
 
                     const row = document.createElement('tr');
@@ -294,11 +336,11 @@
                         <td style="font-weight:700; color:var(--text-primary);">₱${amount}</td>
                         <td style="text-transform: capitalize;">${pay.payment_method.replace('_', ' ')}</td>
                         <td style="font-family: monospace; font-size: 0.85rem; font-weight: 600;">${pay.payment_reference_number}</td>
-                        <td>
+                        <td style="white-space: nowrap;">
                             ${proofControl}
                         </td>
-                        <td><span class="status-badge ${statusClass}">${statusLabel}</span></td>
-                        <td>${actionBtn}</td>
+                        <td style="white-space: nowrap;"><span class="status-badge ${statusClass}">${statusLabel}</span></td>
+                        <td style="white-space: nowrap;">${actionBtn}</td>
                     `;
                     tableBody.appendChild(row);
                 });

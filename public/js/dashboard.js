@@ -303,12 +303,13 @@ async function requestAuthenticatedLogout() {
     }
 
     const modalOptions = {
-        variant: 'danger',
-        eyebrow: 'End your session',
-        title: 'Log out of DOMIKNOW?',
-        message: 'You will need to sign in again to access your account and continue your current work.',
+        variant: 'info',
+        icon: 'logout',
+        eyebrow: '',
+        title: 'Log out',
+        message: 'Are you sure you want to log out?',
         confirmLabel: 'Log out',
-        cancelLabel: 'Stay signed in'
+        cancelLabel: 'Cancel'
     };
     let shouldLogout = false;
     try {
@@ -391,33 +392,31 @@ function renderNewDashboardLayout(user) {
         ],
         landlord: [
             {
-                section: 'Main',
+                section: 'Portfolio',
                 items: [
-                    { label: 'My Properties', href: 'properties.html' },
-                    { label: 'Register Property', href: 'property-create.html' }
+                    { label: 'Properties', href: 'properties.html' }
                 ]
             },
             {
-                section: 'Tenant Management',
+                section: 'Tenancy',
                 items: [
                     { label: 'Tenant Applications', href: 'applications.html' },
-                    { label: 'Leases', href: 'leases.html' }
+                    { label: 'Lease Agreements', href: 'leases.html' }
                 ]
             },
             {
-                section: 'Rental Operations',
+                section: 'Financials',
                 items: [
-                    { label: 'Billings', href: 'billings.html' },
-                    { label: 'Payments', href: 'payments.html' }
+                    { label: 'Billing & Payments', href: 'billings.html' }
                 ]
             },
             {
-                section: 'Support and Regulation',
+                section: 'Operations & Support',
                 items: [
-                    { label: 'Maintenance Management', href: 'maintenance.html' },
-                    { label: 'Reports', href: 'reports.html' },
-                    { label: 'Disputes', href: 'disputes.html' },
-                    { label: 'Ratings and Feedback', href: 'feedback.html' }
+                    { label: 'Maintenance', href: 'maintenance.html' },
+                    { label: 'Reports Center', href: 'reports.html' },
+                    { label: 'Complaints', href: 'disputes.html' },
+                    { label: 'Reviews & Feedback', href: 'feedback.html' }
                 ]
             }
         ],
@@ -588,38 +587,29 @@ function renderNewDashboardLayout(user) {
             {
                 section: 'Portfolio',
                 items: [
-                    { label: 'My properties', href: 'properties.html', icon: 'My Properties' },
-                    { label: 'Register property', href: 'property-create.html', icon: 'Register Property' }
+                    { label: 'Properties', href: 'properties.html', icon: 'Properties' }
                 ]
             },
             {
                 section: 'Tenancy',
                 items: [
-                    { label: 'Tenant applications', href: 'applications.html', icon: 'Tenant Applications' },
-                    { label: 'Lease agreements', href: 'leases.html', icon: 'Leases' }
+                    { label: 'Tenant Applications', href: 'applications.html', icon: 'Tenant Applications' },
+                    { label: 'Lease Agreements', href: 'leases.html', icon: 'Leases' }
                 ]
             },
             {
-                section: 'Revenue',
+                section: 'Financials',
                 items: [
-                    { label: 'Billing', href: 'billings.html', icon: 'Billings' },
-                    { label: 'Payment verification', href: 'payments.html', icon: 'Payments' }
+                    { label: 'Billing & Payments', href: 'billings.html', icon: 'Billings' }
                 ]
             },
             {
-                section: 'Operations',
+                section: 'Operations & Support',
                 items: [
                     { label: 'Maintenance', href: 'maintenance.html', icon: 'Maintenance Management' },
-                    { label: 'Reports center', href: 'reports.html', icon: 'Reports' },
-                    { label: 'Complaints & disputes', href: 'disputes.html', icon: 'Disputes' },
-                    { label: 'Ratings & feedback', href: 'feedback.html', icon: 'Ratings and Feedback' },
-                    { label: 'Notifications', href: 'notifications.html', icon: 'Notifications' }
-                ]
-            },
-            {
-                section: 'Account',
-                items: [
-                    { label: 'My profile', href: 'profile.html', icon: 'Profile' }
+                    { label: 'Reports Center', href: 'reports.html', icon: 'Reports' },
+                    { label: 'Complaints', href: 'disputes.html', icon: 'Disputes' },
+                    { label: 'Reviews & Feedback', href: 'feedback.html', icon: 'Ratings and Feedback' }
                 ]
             }
         ];
@@ -792,11 +782,11 @@ function renderNewDashboardLayout(user) {
                                 </span>
                                 <span id="dropdownThemeLabel">Dark mode</span>
                             </button>
-                            <button type="button" class="topbar-dropdown-item" id="dropdownTutorialBtn" data-walkthrough-replay role="menuitem" aria-label="Play tutorial walkthrough">
+                            <button type="button" class="topbar-dropdown-item" id="dropdownTutorialBtn" data-walkthrough-replay role="menuitem" aria-label="Play guide walkthrough">
                                 <span class="dropdown-item-icon" aria-hidden="true">
                                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
                                 </span>
-                                <span>Tutorial</span>
+                                <span>Guide</span>
                             </button>
                             <div class="topbar-dropdown-divider" role="separator"></div>
                             <button type="button" class="topbar-dropdown-item topbar-dropdown-logout" id="dropdownLogoutBtn" role="menuitem">
@@ -930,33 +920,21 @@ function renderNewDashboardLayout(user) {
                             ${getLinkIcon('Register Property')}
                             <span>Register property</span>
                         </a>
-                        <a href="/pages/landlord/payments.html" class="nav-sheet-item" ${activeNavigationFilename === 'payments.html' ? 'aria-current="page"' : ''}>
-                            ${getLinkIcon('Payments')}
-                            <span>Payment verification</span>
-                        </a>
                         <a href="/pages/landlord/maintenance.html" class="nav-sheet-item" ${activeNavigationFilename === 'maintenance.html' ? 'aria-current="page"' : ''}>
                             ${getLinkIcon('Maintenance Management')}
                             <span>Maintenance</span>
                         </a>
                         <a href="/pages/landlord/reports.html" class="nav-sheet-item" ${activeNavigationFilename === 'reports.html' ? 'aria-current="page"' : ''}>
                             ${getLinkIcon('Reports')}
-                            <span>Reports center</span>
+                            <span>Reports Center</span>
                         </a>
                         <a href="/pages/landlord/disputes.html" class="nav-sheet-item" ${activeNavigationFilename === 'disputes.html' ? 'aria-current="page"' : ''}>
                             ${getLinkIcon('Disputes')}
-                            <span>Complaints &amp; disputes</span>
+                            <span>Complaints</span>
                         </a>
                         <a href="/pages/landlord/feedback.html" class="nav-sheet-item" ${activeNavigationFilename === 'feedback.html' ? 'aria-current="page"' : ''}>
                             ${getLinkIcon('Ratings and Feedback')}
-                            <span>Ratings &amp; feedback</span>
-                        </a>
-                        <a href="/pages/landlord/notifications.html" class="nav-sheet-item" ${activeNavigationFilename === 'notifications.html' ? 'aria-current="page"' : ''}>
-                            ${getLinkIcon('Notifications')}
-                            <span>Notifications</span>
-                        </a>
-                        <a href="/pages/landlord/profile.html" class="nav-sheet-item" ${activeNavigationFilename === 'profile.html' ? 'aria-current="page"' : ''}>
-                            ${getLinkIcon('Profile')}
-                            <span>My profile</span>
+                            <span>Reviews &amp; Feedback</span>
                         </a>
                         <button type="button" id="sheetLogoutBtn" class="nav-sheet-item logout" aria-label="Log out of DOMIKNOW">
                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
@@ -1587,14 +1565,35 @@ async function seamlessNavigateTo(targetUrlString, role, pushState = true) {
         // and can visually override later pages.
         preparePageStyleLifecycle();
         document.head.querySelectorAll('style[data-domiknow-page-style]').forEach(style => style.remove());
+        const getNormalizedStylesheetKey = (urlStr) => {
+            if (!urlStr) return '';
+            try {
+                const parsed = new URL(urlStr, window.location.href);
+                if (parsed.origin === window.location.origin) {
+                    return parsed.pathname.toLowerCase();
+                }
+                return parsed.href;
+            } catch (_) {
+                return urlStr.split('?')[0].split('#')[0].toLowerCase();
+            }
+        };
+
+        const existingLoadedStylesheets = new Set(
+            Array.from(document.head.querySelectorAll('link[rel="stylesheet"]'))
+                .map(link => getNormalizedStylesheetKey(link.getAttribute('href') || link.href))
+                .filter(Boolean)
+        );
+
         newDoc.querySelectorAll('link[rel="stylesheet"], style').forEach(el => {
             if (el.tagName === 'LINK') {
                 const href = el.getAttribute('href');
-                if (href && !document.querySelector(`link[href="${href}"]`)) {
+                const sheetKey = getNormalizedStylesheetKey(href);
+                if (href && sheetKey && !existingLoadedStylesheets.has(sheetKey)) {
                     const newLink = document.createElement('link');
                     newLink.rel = 'stylesheet';
                     newLink.href = href;
                     document.head.appendChild(newLink);
+                    existingLoadedStylesheets.add(sheetKey);
                 }
             } else if (el.tagName === 'STYLE') {
                 const newStyle = document.createElement('style');
@@ -1603,6 +1602,16 @@ async function seamlessNavigateTo(targetUrlString, role, pushState = true) {
                 document.head.appendChild(newStyle);
             }
         });
+
+        // 0. Clean up previous page listeners and intervals
+        if (Array.isArray(window.__domiknowActivePageCleanups)) {
+            while (window.__domiknowActivePageCleanups.length > 0) {
+                const cleanup = window.__domiknowActivePageCleanups.pop();
+                try { cleanup(); } catch (e) { console.warn('Page cleanup warning:', e); }
+            }
+        }
+        const activePageCleanups = [];
+        window.__domiknowActivePageCleanups = activePageCleanups;
 
         // 1. Remove previous page-specific modals from body (keep shell and persistent chat)
         Array.from(document.body.children).forEach(child => {
@@ -1668,7 +1677,74 @@ async function seamlessNavigateTo(targetUrlString, role, pushState = true) {
         // 7. Trigger module enhancers for newly mounted content
         document.dispatchEvent(new CustomEvent('domiknow:page-content-updated', { detail: { role, path: window.location.pathname } }));
 
-        // 8. Execute page scripts in isolated scope
+        // 8. Execute page scripts in isolated scope with page-level lifecycle protection
+        const pageDCLCallbacks = [];
+
+        const scopedDocument = new Proxy(document, {
+            get(target, prop) {
+                if (prop === 'addEventListener') {
+                    return function(type, listener, options) {
+                        if (type === 'DOMContentLoaded') {
+                            if (typeof listener === 'function') {
+                                pageDCLCallbacks.push(listener);
+                            }
+                            return;
+                        }
+                        target.addEventListener(type, listener, options);
+                        activePageCleanups.push(() => {
+                            try { target.removeEventListener(type, listener, options); } catch(e) {}
+                        });
+                    };
+                }
+                const val = target[prop];
+                return typeof val === 'function' ? val.bind(target) : val;
+            },
+            set(target, prop, value) {
+                target[prop] = value;
+                return true;
+            }
+        });
+
+        const scopedWindow = new Proxy(window, {
+            get(target, prop) {
+                if (prop === 'document') {
+                    return scopedDocument;
+                }
+                if (prop === 'addEventListener') {
+                    return function(type, listener, options) {
+                        if (type === 'DOMContentLoaded') {
+                            if (typeof listener === 'function') {
+                                pageDCLCallbacks.push(listener);
+                            }
+                            return;
+                        }
+                        target.addEventListener(type, listener, options);
+                        activePageCleanups.push(() => {
+                            try { target.removeEventListener(type, listener, options); } catch(e) {}
+                        });
+                    };
+                }
+                if (prop === 'setInterval') {
+                    return function(handler, timeout, ...args) {
+                        const id = target.setInterval(handler, timeout, ...args);
+                        activePageCleanups.push(() => clearInterval(id));
+                        return id;
+                    };
+                }
+                const val = target[prop];
+                return typeof val === 'function' ? val.bind(target) : val;
+            },
+            set(target, prop, value) {
+                target[prop] = value;
+                return true;
+            }
+        });
+
+        window.__domiknowPageEnv = {
+            window: scopedWindow,
+            document: scopedDocument
+        };
+
         for (const script of scriptsToRun) {
             const src = script.getAttribute('src');
             if (src) {
@@ -1687,14 +1763,21 @@ async function seamlessNavigateTo(targetUrlString, role, pushState = true) {
 
                 const s = document.createElement('script');
                 s.type = 'text/javascript';
-                s.textContent = `(function(window, document) { try { ${text}\n${exportLines} } catch(err) { console.error("Page script error:", err); } })(window, document);`;
+                s.textContent = `(function(window, document) { try { ${text}\n${exportLines} } catch(err) { console.error("Page script error:", err); } })(window.__domiknowPageEnv.window, window.__domiknowPageEnv.document);`;
                 document.body.appendChild(s);
                 s.remove();
             }
         }
+        delete window.__domiknowPageEnv;
 
-        // 9. Dispatch DOMContentLoaded event
-        document.dispatchEvent(new Event('DOMContentLoaded'));
+        // 9. Execute DOMContentLoaded handlers scoped to this newly mounted page
+        for (const cb of pageDCLCallbacks) {
+            try {
+                cb(new Event('DOMContentLoaded'));
+            } catch (err) {
+                console.error('Page initialization error:', err);
+            }
+        }
 
         // Reset scroll position
         window.scrollTo({ top: 0, behavior: 'instant' });
@@ -1855,6 +1938,13 @@ function getLinkIcon(label) {
     };
 
     icons['Overview'] = icons['Dashboard'];
+    icons['Properties'] = icons['My Properties'];
+    icons['Tenant Applications'] = icons['Tenant Applications'];
+    icons['Lease Agreements'] = icons['Leases'];
+    icons['Billing & Payments'] = icons['Billings'];
+    icons['Reports Center'] = icons['Reports'];
+    icons['Complaints'] = icons['Disputes'];
+    icons['Reviews & Feedback'] = icons['Ratings and Feedback'];
     icons['User Access'] = icons['User Management'];
     icons['Property Approvals'] = icons['Property Review'];
     icons['Reservations'] = icons['Reservation Monitoring'];

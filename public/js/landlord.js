@@ -3,9 +3,9 @@
 
     const OPERATING_STEPS = [
         { key: 'portfolio', label: 'Portfolio', href: 'properties.html' },
-        { key: 'applicants', label: 'Applicants', href: 'applications.html' },
-        { key: 'leases', label: 'Leases', href: 'leases.html' },
-        { key: 'revenue', label: 'Revenue', href: 'billings.html' }
+        { key: 'applicants', label: 'Tenant Applications', href: 'applications.html' },
+        { key: 'leases', label: 'Lease Agreements', href: 'leases.html' },
+        { key: 'revenue', label: 'Financials', href: 'billings.html' }
     ];
 
     const nativeAlert = window.alert.bind(window);

@@ -6,7 +6,7 @@
     <title>Maintenance Requests - DomiKnow</title>
     <meta name="description" content="File and track maintenance requests for your rented property on DomiKnow.">
     <link href="../../css/input.css" rel="stylesheet">
-    <link href="../../css/design-system.css?v=20260904-2" rel="stylesheet">
+    <link href="../../css/design-system.css?v=20260905-1" rel="stylesheet">
     <style>
         /* ── Modern Maintenance Page Styles ── */
         .btn-submit-request {
@@ -969,10 +969,43 @@
 
         /* ── Validation hints ───────────────────────────────── */
         .val-hint { font-size:0.73rem; color:var(--error); margin-top:0.35rem; display:none; }
+
+        /* ── Disable all loading animations on this page ── */
+        .dk-loading-bar,
+        [data-domiknow-loading-bar] {
+            display: none !important;
+            opacity: 0 !important;
+            visibility: hidden !important;
+            animation: none !important;
+        }
+        .dk-loading-bar::before {
+            animation: none !important;
+        }
+        .dk-skeleton::after,
+        .dk-auto-skeleton::after,
+        .public-listing-card__media.is-loading::after {
+            display: none !important;
+            animation: none !important;
+        }
+        .dk-auto-skeleton {
+            background: transparent !important;
+            animation: none !important;
+            color: inherit !important;
+        }
+        .spin-icon,
+        .dk-spinner,
+        .dk-auto-button-loading::before {
+            display: none !important;
+            animation: none !important;
+        }
+        .main-content-inner.dk-route-loading {
+            opacity: 1 !important;
+            transition: none !important;
+        }
     </style>
     <script src="../../js/ui.js?v=20260827-3" defer></script>
 </head>
-<body class="app-loading" data-role="tenant" data-page-title="Maintenance Requests">
+<body class="app-loading" data-role="tenant" data-page-title="Maintenance Requests" data-domiknow-loading-ignore>
     <!-- Navbar -->
     <nav class="navbar navbar-tenant">
         <div class="navbar-container">
@@ -997,7 +1030,7 @@
     </nav>
 
     <!-- ── Main Content ── -->
-    <main class="dashboard-container">
+    <main class="dashboard-container" data-domiknow-loading-ignore>
 
         <!-- Filter tabs & Submit Button Combined Row -->
         <div class="maintenance-header-row">
@@ -1042,9 +1075,7 @@
         </div>
 
         <!-- Request Cards List -->
-        <div class="requests-list" id="requestsList">
-            <div class="empty-state"><div class="ei">⏳</div><p>Loading your maintenance history...</p></div>
-        </div>
+        <div class="requests-list" id="requestsList"></div>
     </main>
 
     <!-- ════════════════════════════════════════════
@@ -1213,7 +1244,7 @@
     </div>
 
     <script src="../../js/auth.js"></script>
-    <script src="../../js/dashboard.js?v=20260904-15"></script>
+    <script src="../../js/dashboard.js?v=20260905-1"></script>
     <script>
         const token = localStorage.getItem('domiknow_token');
         let activeLeaseList = [];
@@ -1238,24 +1269,29 @@
 
         // ── Open / close form modal ───────────────────────────
         function openFormModal() {
-            document.getElementById('formModal').style.display = 'flex';
+            const m = document.getElementById('formModal');
+            if (m) m.style.display = 'flex';
             document.body.style.overflow = 'hidden';
             clearAlerts();
         }
         function closeFormModal() {
-            document.getElementById('formModal').style.display = 'none';
+            const m = document.getElementById('formModal');
+            if (m) m.style.display = 'none';
             document.body.style.overflow = '';
         }
 
         // ── Open / close details modal ────────────────────────
         function openDetailsModal() {
-            document.getElementById('detailsModal').style.display = 'flex';
+            const m = document.getElementById('detailsModal');
+            if (m) m.style.display = 'flex';
             document.body.style.overflow = 'hidden';
         }
         function closeDetailsModal() {
-            document.getElementById('detailsModal').style.display = 'none';
+            const m = document.getElementById('detailsModal');
+            if (m) m.style.display = 'none';
             // Only restore overflow if form modal is also closed
-            if (document.getElementById('formModal').style.display === 'none') {
+            const fm = document.getElementById('formModal');
+            if (!fm || fm.style.display === 'none') {
                 document.body.style.overflow = '';
             }
         }
@@ -1263,24 +1299,24 @@
         // ── Event Delegation ──────────────────────────────────
         function initEventDelegation() {
             // Open form modal
-            document.getElementById('openFormBtn').addEventListener('click', openFormModal);
-            document.getElementById('closeFormBtn').addEventListener('click', closeFormModal);
-            document.getElementById('cancelFormBtn').addEventListener('click', closeFormModal);
-            document.getElementById('submitBtn').addEventListener('click', handleSubmit);
+            document.getElementById('openFormBtn')?.addEventListener('click', openFormModal);
+            document.getElementById('closeFormBtn')?.addEventListener('click', closeFormModal);
+            document.getElementById('cancelFormBtn')?.addEventListener('click', closeFormModal);
+            document.getElementById('submitBtn')?.addEventListener('click', handleSubmit);
 
             // Close modals on overlay click
-            document.getElementById('formModal').addEventListener('click', (e) => {
+            document.getElementById('formModal')?.addEventListener('click', (e) => {
                 if (e.target === document.getElementById('formModal')) closeFormModal();
             });
-            document.getElementById('detailsModal').addEventListener('click', (e) => {
+            document.getElementById('detailsModal')?.addEventListener('click', (e) => {
                 if (e.target === document.getElementById('detailsModal')) closeDetailsModal();
             });
 
             // Close details
-            document.getElementById('closeDetailsBtn').addEventListener('click', closeDetailsModal);
+            document.getElementById('closeDetailsBtn')?.addEventListener('click', closeDetailsModal);
 
             // Details footer actions
-            document.getElementById('detailsFoot').addEventListener('click', async (e) => {
+            document.getElementById('detailsFoot')?.addEventListener('click', async (e) => {
                 const btn = e.target.closest('[data-action]');
                 if (!btn) return;
                 const action = btn.dataset.action;
@@ -1291,7 +1327,7 @@
             });
 
             // Filter tabs
-            document.getElementById('filterTabs').addEventListener('click', (e) => {
+            document.getElementById('filterTabs')?.addEventListener('click', (e) => {
                 const tab = e.target.closest('.m-tab-btn');
                 if (!tab) return;
                 document.querySelectorAll('.m-tab-btn').forEach(t => t.classList.remove('active'));
@@ -1307,11 +1343,10 @@
             document.getElementById('priorityFilterSelect')?.addEventListener('change', renderRequests);
 
             // Request card clicks
-            document.getElementById('requestsList').addEventListener('click', (e) => {
+            document.getElementById('requestsList')?.addEventListener('click', (e) => {
                 const card = e.target.closest('[data-request-id]');
                 if (card) loadDetails(card.dataset.requestId);
             });
-
 
             // ESC key
             document.addEventListener('keydown', (e) => {
@@ -1325,28 +1360,42 @@
         // ── Pickers ───────────────────────────────────────────
         function initPickers() {
             // Category
-            document.getElementById('catGrid').addEventListener('click', (e) => {
-                const card = e.target.closest('.cat-card');
-                if (!card) return;
-                document.querySelectorAll('.cat-card').forEach(c => c.classList.remove('selected'));
-                card.classList.add('selected');
-                document.getElementById('categoryHidden').value = card.dataset.cat;
-                document.getElementById('catErr').style.display = 'none';
-            });
+            const catGrid = document.getElementById('catGrid');
+            if (catGrid) {
+                catGrid.addEventListener('click', (e) => {
+                    const card = e.target.closest('.cat-card');
+                    if (!card) return;
+                    catGrid.querySelectorAll('.cat-card').forEach(c => c.classList.remove('selected'));
+                    card.classList.add('selected');
+                    const catInput = document.getElementById('categoryHidden');
+                    if (catInput) catInput.value = card.dataset.cat;
+                    const catErr = document.getElementById('catErr');
+                    if (catErr) catErr.style.display = 'none';
+                });
+            }
             // Priority
-            document.getElementById('prioRow').addEventListener('click', (e) => {
-                const card = e.target.closest('.prio-card');
-                if (!card) return;
-                document.querySelectorAll('.prio-card').forEach(c => c.classList.remove('selected'));
-                card.classList.add('selected');
-                document.getElementById('priorityHidden').value = card.dataset.prio;
-                document.getElementById('prioErr').style.display = 'none';
-            });
+            const prioRow = document.getElementById('prioRow');
+            if (prioRow) {
+                prioRow.addEventListener('click', (e) => {
+                    const card = e.target.closest('.prio-card');
+                    if (!card) return;
+                    prioRow.querySelectorAll('.prio-card').forEach(c => c.classList.remove('selected'));
+                    card.classList.add('selected');
+                    const prioInput = document.getElementById('priorityHidden');
+                    if (prioInput) prioInput.value = card.dataset.prio;
+                    const prioErr = document.getElementById('prioErr');
+                    if (prioErr) prioErr.style.display = 'none';
+                });
+            }
             // Default date/time
-            const tom = new Date(); tom.setDate(tom.getDate() + 1);
-            document.getElementById('preferredDate').value = tom.toISOString().split('T')[0];
-            document.getElementById('preferredDate').min   = new Date().toISOString().split('T')[0];
-            document.getElementById('preferredTime').value = '09:00';
+            const dateInput = document.getElementById('preferredDate');
+            if (dateInput) {
+                const tom = new Date(); tom.setDate(tom.getDate() + 1);
+                dateInput.value = tom.toISOString().split('T')[0];
+                dateInput.min   = new Date().toISOString().split('T')[0];
+            }
+            const timeInput = document.getElementById('preferredTime');
+            if (timeInput) timeInput.value = '09:00';
         }
 
         // ── Upload zone ───────────────────────────────────────
@@ -1356,6 +1405,7 @@
             const preview = document.getElementById('uploadPreview');
             const img     = document.getElementById('previewImg');
             const name    = document.getElementById('previewName');
+            if (!zone || !input) return;
 
             zone.addEventListener('dragover', (e) => { e.preventDefault(); zone.classList.add('dragover'); });
             zone.addEventListener('dragleave', () => zone.classList.remove('dragover'));
@@ -1366,7 +1416,7 @@
             input.addEventListener('change', () => {
                 if (input.files[0]) showPreview(input.files[0]); else hidePreview();
             });
-            document.getElementById('removeFileBtn').addEventListener('click', () => {
+            document.getElementById('removeFileBtn')?.addEventListener('click', () => {
                 input.value = ''; hidePreview();
             });
 
@@ -1393,7 +1443,10 @@
         // ── Fetch leases ──────────────────────────────────────
         async function fetchActiveLeases() {
             try {
-                const res = await fetch('/api/leases/my', { headers: { Authorization: `Bearer ${token}` } });
+                const res = await fetch('/api/leases/my', {
+                    headers: { Authorization: `Bearer ${token}`, 'X-DOMIKNOW-SILENT': '1' },
+                    domiknowLoading: false
+                });
                 if (!res.ok) return;
                 const { data } = await res.json();
                 const active = (data || []).filter(l => l.lease_status === 'active');
@@ -1441,7 +1494,10 @@
         // ── Fetch requests ────────────────────────────────────
         async function fetchMyRequests() {
             try {
-                const res = await fetch('/api/maintenance/requests/tenant', { headers: { Authorization: `Bearer ${token}` } });
+                const res = await fetch('/api/maintenance/requests/tenant', {
+                    headers: { Authorization: `Bearer ${token}`, 'X-DOMIKNOW-SILENT': '1' },
+                    domiknowLoading: false
+                });
                 if (!res.ok) { showListError('Failed to load maintenance history.'); return; }
                 const { data } = await res.json();
                 allRequests = data || [];
@@ -1885,7 +1941,7 @@
 
             const submitBtn = document.getElementById('submitBtn');
             submitBtn.disabled = true;
-            submitBtn.innerHTML = `<span class="spin-icon"></span> Submitting...`;
+            submitBtn.textContent = 'Submitting...';
 
             const leaseObj = activeLeaseList.find(l => l.id === leaseId);
             const unitNum  = leaseObj?.property_units?.unit_number || leaseObj?.properties?.unit_number || '';
@@ -1912,8 +1968,9 @@
             try {
                 const res = await fetch('/api/maintenance/requests', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-                    body: JSON.stringify(body)
+                    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}`, 'X-DOMIKNOW-SILENT': '1' },
+                    body: JSON.stringify(body),
+                    domiknowLoading: false
                 });
                 const result = await res.json();
                 if (res.ok) {
@@ -1963,14 +2020,6 @@
                 r.onerror = reject;
             });
         }
-
-        // Spinner CSS
-        const style = document.createElement('style');
-        style.textContent = `
-            @keyframes spin { to { transform: rotate(360deg); } }
-            .spin-icon { display:inline-block; width:14px; height:14px; border:2px solid white; border-top-color:transparent; border-radius:50%; animation:spin 0.65s linear infinite; }
-        `;
-        document.head.appendChild(style);
     </script>
 </body>
 </html>

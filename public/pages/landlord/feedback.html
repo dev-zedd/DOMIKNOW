@@ -3,259 +3,742 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Property & Landlord Ratings - DomiKnow</title>
-    <meta name="description" content="View tenant ratings and feedback submitted for your rental properties and yourself.">
+    <title>Tenant Feedback & Ratings - DomiKnow</title>
+    <meta name="description" content="View tenant ratings and feedback submitted for your rental properties and landlord services.">
     <link href="../../css/input.css" rel="stylesheet">
+    <link href="../../css/design-system.css" rel="stylesheet">
     <style>
-        /* ── Summary Strip ──────────────────────────────────── */
-        .summary-strip {
-            display: flex;
-            gap: 1.25rem;
-            margin: 1.5rem 0;
-            flex-wrap: wrap;
-        }
-        .summary-card {
-            background: var(--bg-secondary);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-md);
-            padding: 1.25rem 1.75rem;
-            box-shadow: var(--shadow-md);
-            display: flex;
-            flex-direction: column;
-            gap: 0.35rem;
-            min-width: 160px;
-            flex: 1;
-        }
-        .summary-value {
-            font-size: 2rem;
-            font-weight: 800;
-            color: var(--text-primary);
-            line-height: 1;
-        }
-        .summary-label {
-            font-size: 0.75rem;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            font-weight: 600;
-        }
-        .star-avg {
-            color: #f59e0b;
-            font-size: 1.1rem;
-            letter-spacing: 0.08em;
+        /* ══════════════════════════════════════════════════════
+           PAGE ESSENTIALS & THEME TOKENS
+        ══════════════════════════════════════════════════════ */
+        :root {
+            --primary: #0052ea;
+            --primary-hover: #0247d1;
+            --primary-light: #eff6ff;
+            --landlord: #0052ea;
+            --landlord-hover: #0247d1;
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --text-muted: #64748b;
+            --bg-primary: #f8fafc;
+            --bg-secondary: #ffffff;
+            --border-color: #e2e8f0;
         }
 
-        /* ── Tabs Styling ─────────────────────────────────────── */
-        .tabs-header {
-            display: flex;
-            border-bottom: 2px solid var(--border-color);
-            margin: 1.5rem 0;
-            gap: 1rem;
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
         }
-        .tab-btn {
-            background: none;
-            border: none;
-            padding: 0.75rem 1.25rem;
-            font-size: 0.95rem;
-            font-weight: 700;
-            color: var(--text-muted);
-            cursor: pointer;
-            border-bottom: 3px solid transparent;
-            transition: color var(--transition-fast), border-color var(--transition-fast);
+
+        .dashboard-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem 4rem;
+        }
+
+        /* ══════════════════════════════════════════════════════
+           TABS BAR
+        ══════════════════════════════════════════════════════ */
+        .maintenance-tabs-bar {
             display: flex;
             align-items: center;
-            gap: 0.5rem;
-        }
-        .tab-btn:hover {
-            color: var(--landlord);
-        }
-        .tab-btn.active {
-            color: var(--landlord);
-            border-bottom-color: var(--landlord);
-        }
-
-        /* ── List Card ──────────────────────────────────────── */
-        .list-card {
-            background: var(--bg-secondary);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-lg);
-            padding: 2rem;
-            box-shadow: var(--shadow-lg);
+            gap: 24px;
             overflow-x: auto;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.9rem;
-            text-align: left;
-        }
-        th {
-            font-weight: 700;
-            color: var(--text-secondary);
-            padding: 0.75rem 1rem;
-            border-bottom: 2px solid var(--border-color);
-            text-transform: uppercase;
-            font-size: 0.72rem;
-            letter-spacing: 0.05em;
-        }
-        td {
-            padding: 1rem;
-            border-bottom: 1px solid var(--border-color);
-            color: var(--text-primary);
-            vertical-align: top;
-        }
-        tr:hover td { background: var(--bg-primary); }
-
-        .star-display { color: #f59e0b; font-size: 1rem; letter-spacing: 0.05em; }
-
-        /* ── Modal ──────────────────────────────────────────── */
-        .modal-overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(15, 23, 42, 0.6);
-            backdrop-filter: blur(4px);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-            padding: 1.5rem;
-        }
-        .modal-overlay.hidden { display: none; }
-        .modal-box {
-            background: var(--bg-secondary);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-lg);
-            padding: 2rem;
-            max-width: 540px;
-            width: 100%;
-            max-height: 90vh;
-            overflow-y: auto;
-            box-shadow: var(--shadow-premium);
-            animation: mIn 0.2s ease;
-        }
-        @keyframes mIn {
-            from { opacity:0; transform: translateY(10px) scale(0.97); }
-            to   { opacity:1; transform: translateY(0) scale(1); }
-        }
-        .modal-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
+            scrollbar-width: none;
+            border-bottom: 1px solid #e2e8f0;
             margin-bottom: 1.5rem;
+            padding-bottom: 2px;
         }
-        .modal-close-x {
+        .maintenance-tabs-bar::-webkit-scrollbar { display: none; }
+
+        .m-tab-btn {
             background: none;
             border: none;
+            padding: 10px 0;
+            font-size: 0.9375rem;
+            font-weight: 700;
+            color: #64748b;
             cursor: pointer;
-            color: var(--text-muted);
-            padding: 0.25rem;
-            border-radius: var(--radius-sm);
-            transition: color var(--transition-fast);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            position: relative;
+            transition: color 0.15s ease;
+            white-space: nowrap;
         }
-        .modal-close-x:hover { color: var(--text-primary); }
-        
-        .detail-row {
-            display: grid;
-            grid-template-columns: 140px 1fr;
-            gap: 0.5rem 1rem;
-            margin-bottom: 0.9rem;
-            align-items: start;
+        .m-tab-btn:hover {
+            color: #0052ea;
         }
-        .detail-label {
-            font-size: 0.75rem;
+        .m-tab-btn.active {
+            color: #0052ea;
+            font-weight: 800;
+        }
+        .m-tab-btn.active::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            right: 0;
+            height: 2.5px;
+            background: #0052ea;
+            border-radius: 2px;
+        }
+        .tab-count {
+            background: #f1f5f9;
+            color: #475569;
+            font-size: 0.6875rem;
             font-weight: 700;
-            color: var(--text-secondary);
-            text-transform: uppercase;
-            letter-spacing: 0.04em;
-            padding-top: 0.05rem;
+            padding: 2px 7px;
+            border-radius: 999px;
+            line-height: 1.2;
+            transition: all 0.15s ease;
         }
-        .detail-value {
-            font-size: 0.9rem;
-            color: var(--text-primary);
-            word-break: break-word;
-        }
-        .detail-divider {
-            border: none;
-            border-top: 1px solid var(--border-color);
-            margin: 1rem 0;
-        }
-        .modal-footer {
-            display: flex;
-            justify-content: flex-end;
-            margin-top: 1.5rem;
+        .m-tab-btn.active .tab-count {
+            background: #eff6ff;
+            color: #0052ea;
         }
 
-        .modal-breakdown-card {
-            background: var(--bg-primary);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-md);
-            padding: 0.9rem 1.1rem;
-            margin-top: 0.75rem;
-        }
-        .modal-breakdown-title {
-            font-size: 0.8rem;
-            font-weight: 700;
-            color: var(--text-primary);
-            margin-bottom: 0.6rem;
-            text-transform: uppercase;
-            letter-spacing: 0.03em;
-        }
-        .modal-breakdown-row {
+        /* ══════════════════════════════════════════════════════
+           LEDGER CONTROLS BAR
+        ══════════════════════════════════════════════════════ */
+        .ledger-controls-bar {
             display: flex;
+            align-items: center;
             justify-content: space-between;
-            align-items: center;
-            font-size: 0.82rem;
-            padding: 0.35rem 0;
-            border-bottom: 1px dashed var(--border-color);
-        }
-        .modal-breakdown-row:last-child {
-            border-bottom: none;
-        }
-        .modal-breakdown-val {
-            font-weight: 600;
-            color: var(--text-primary);
-        }
-
-        /* ── Property filter bar ───────────────────────────── */
-        .filter-bar {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
+            gap: 12px;
             margin-bottom: 1.25rem;
             flex-wrap: wrap;
         }
-        .filter-bar label {
-            font-size: 0.82rem;
-            font-weight: 600;
-            color: var(--text-secondary);
+        .ledger-search-box {
+            position: relative;
+            display: flex;
+            align-items: center;
+            flex: 1;
+            min-width: 260px;
+            max-width: 480px;
+        }
+        .ledger-search-box svg {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #94a3b8;
+            pointer-events: none;
+            z-index: 2;
+        }
+        .ledger-search-box input {
+            width: 100%;
+            padding: 9px 14px 9px 42px !important;
+            padding-left: 42px !important;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 9px;
+            font-size: 0.875rem;
+            color: #0f172a;
+            outline: none;
+            transition: all 0.15s ease;
+        }
+        .ledger-search-box input:focus {
+            border-color: #0052ea;
+            box-shadow: 0 0 0 3px rgba(0, 82, 234, 0.12);
         }
 
-        /* ── Empty state ────────────────────────────────────── */
-        .empty-state {
-            text-align: center;
-            padding: 3.5rem 1rem;
-            color: var(--text-muted);
+        .ledger-filter-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .ledger-select-wrap {
+            position: relative;
+        }
+        .ledger-select {
+            padding: 9px 14px;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 9px;
+            font-size: 0.84rem;
+            font-weight: 600;
+            color: #334155;
+            cursor: pointer;
+            outline: none;
+            transition: all 0.15s ease;
+        }
+        .ledger-select:focus {
+            border-color: #0052ea;
+            box-shadow: 0 0 0 3px rgba(0, 82, 234, 0.12);
+        }
+
+        /* ══════════════════════════════════════════════════════
+           MODERN REQUESTS / RATINGS LIST
+        ══════════════════════════════════════════════════════ */
+        .requests-list {
             display: flex;
             flex-direction: column;
-            align-items: center;
             gap: 0.75rem;
         }
-        .empty-state svg { opacity: 0.25; }
 
-        /* ── Feedback snippet ───────────────────────────────── */
-        .feedback-snippet {
-            font-size: 0.78rem;
-            color: var(--text-muted);
-            margin-top: 0.3rem;
+        .request-card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 1rem 1.25rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+            outline: none;
+        }
+        .request-card:hover {
+            border-color: #cbd5e1;
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.06);
+            transform: translateY(-1px);
+        }
+
+        .rc-left-group {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            flex: 1.2;
+            min-width: 220px;
+        }
+        .rc-icon-box {
+            width: 42px;
+            height: 42px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            background: #eff6ff;
+            color: #0052ea;
+            border: 1px solid #bfdbfe;
+        }
+        .rc-icon-box.score-high {
+            background: #fffbeb;
+            color: #f59e0b;
+            border-color: #fde68a;
+        }
+        .rc-icon-box.score-mid {
+            background: #eff6ff;
+            color: #3b82f6;
+            border-color: #bfdbfe;
+        }
+        .rc-icon-box.score-low {
+            background: #fef2f2;
+            color: #ef4444;
+            border-color: #fecaca;
+        }
+
+        .rc-text-box {
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+        }
+        .rc-title {
+            font-size: 0.95rem;
+            font-weight: 750;
+            color: #0f172a;
+            margin-bottom: 3px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .rc-subtitle {
+            font-size: 0.8125rem;
+            color: #64748b;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .rc-feedback-col {
+            flex: 1.5;
+            min-width: 200px;
+            border-left: 1px solid #f1f5f9;
+            padding-left: 16px;
+        }
+        .rc-col-label {
+            font-size: 0.6875rem;
+            font-weight: 700;
+            color: #94a3b8;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            margin-bottom: 2px;
+        }
+        .rc-feedback-text {
+            font-size: 0.84rem;
+            color: #475569;
+            line-height: 1.4;
             display: -webkit-box;
             -webkit-line-clamp: 2;
             line-clamp: 2;
             -webkit-box-orient: vertical;
             overflow: hidden;
-            max-width: 360px;
+            font-style: italic;
+        }
+
+        .rc-score-col {
+            min-width: 150px;
+            border-left: 1px solid #f1f5f9;
+            padding-left: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+        .star-display {
+            color: #f59e0b;
+            font-size: 0.95rem;
+            letter-spacing: 0.04em;
+        }
+        .rc-score-pill {
+            font-size: 0.72rem;
+            font-weight: 700;
+            display: inline-block;
+            margin-top: 2px;
+        }
+        .rc-score-pill.score-high { color: #b45309; }
+        .rc-score-pill.score-mid  { color: #1d4ed8; }
+        .rc-score-pill.score-low  { color: #b91c1c; }
+
+        .rc-right-group {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-shrink: 0;
+            margin-left: auto;
+        }
+        .btn-manage-card {
+            background: #ffffff;
+            border: 1px solid #cbd5e1;
+            color: #0f172a;
+            font-size: 0.8125rem;
+            font-weight: 700;
+            padding: 7px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            white-space: nowrap;
+        }
+        .btn-manage-card:hover {
+            background: #0052ea;
+            border-color: #0052ea;
+            color: #ffffff;
+            box-shadow: 0 4px 10px rgba(0, 82, 234, 0.25);
+        }
+        .rc-chevron {
+            color: #94a3b8;
+            display: flex;
+            align-items: center;
+        }
+
+        @media (max-width: 900px) {
+            .request-card {
+                flex-wrap: wrap;
+            }
+            .rc-feedback-col, .rc-score-col {
+                border-left: none;
+                padding-left: 0;
+            }
+            .rc-right-group {
+                width: 100%;
+                justify-content: flex-end;
+            }
+        }
+
+        /* ══════════════════════════════════════════════════════
+           MODAL SYSTEM
+        ══════════════════════════════════════════════════════ */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.55);
+            backdrop-filter: blur(5px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            padding: 1.5rem;
+            animation: fadeIn 0.15s ease;
+        }
+        .modal-overlay.hidden {
+            display: none !important;
+        }
+
+        .modal-container {
+            background-color: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            width: 100%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.15);
+            display: flex;
+            flex-direction: column;
+            animation: modalFadeIn 0.18s ease;
+        }
+        @keyframes modalFadeIn {
+            from { opacity: 0; transform: translateY(8px) scale(0.99); }
+            to   { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        .modal-header {
+            padding: 1.25rem 1.75rem;
+            border-bottom: 1px solid #f1f5f9;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            background-color: #ffffff;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        .modal-header-title {
+            font-size: 1.2rem;
+            font-weight: 800;
+            color: #0f172a;
+            margin: 0;
+            line-height: 1.2;
+        }
+        .modal-header-subtitle {
+            font-size: 0.8125rem;
+            color: #64748b;
+            font-weight: 500;
+            margin-top: 4px;
+        }
+        .modal-close-x {
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            color: #64748b;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 4px;
+            border-radius: 6px;
+            transition: background 0.15s ease, color 0.15s ease;
+        }
+        .modal-close-x:hover {
+            background: #f1f5f9;
+            color: #0f172a;
+        }
+
+        .modal-body {
+            padding: 1.5rem 1.75rem;
+            overflow-y: auto;
+            flex: 1;
+        }
+        .modal-footer {
+            padding: 1.25rem 1.75rem;
+            border-top: 1px solid #f1f5f9;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            background-color: #ffffff;
+            position: sticky;
+            bottom: 0;
+            z-index: 10;
+        }
+
+        .btn-modal-cancel {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            color: #0f172a;
+            font-size: 0.875rem;
+            font-weight: 600;
+            padding: 9px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+        .btn-modal-cancel:hover {
+            background: #f8fafc;
+            border-color: #cbd5e1;
+        }
+
+        /* ── Modal Components ── */
+        /* ── Modal Components (Minimal & Clean) ── */
+        .modal-score-summary {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 20px;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            margin-bottom: 1.25rem;
+        }
+        .modal-score-num {
+            font-size: 2rem;
+            font-weight: 850;
+            color: #0f172a;
+            line-height: 1;
+            letter-spacing: -0.02em;
+        }
+        .modal-score-denom {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #64748b;
+        }
+        .modal-score-stars {
+            color: #f59e0b;
+            font-size: 1.05rem;
+            letter-spacing: 0.04em;
+            margin-top: 4px;
+        }
+        .modal-score-badge {
+            font-size: 0.78rem;
+            font-weight: 700;
+            padding: 5px 12px;
+            border-radius: 999px;
+            background: #ffffff;
+            border: 1px solid #cbd5e1;
+            color: #334155;
+        }
+
+        .detail-section-title {
+            font-size: 0.72rem;
+            font-weight: 700;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin: 1.25rem 0 0.5rem 0;
+        }
+        .detail-section-title:first-child {
+            margin-top: 0;
+        }
+
+        .detail-summary-card {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 14px 16px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px 16px;
+        }
+        .dc-label {
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            margin-bottom: 2px;
+        }
+        .dc-val {
+            font-size: 0.875rem;
+            color: #0f172a;
+            font-weight: 600;
+        }
+
+        .detail-box {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 14px 16px;
+            font-size: 0.875rem;
+            color: #334155;
+            line-height: 1.6;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+
+        .criteria-breakdown-card {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 14px 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .criterion-row {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .criterion-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.8125rem;
+        }
+        .criterion-name {
+            font-weight: 600;
+            color: #334155;
+        }
+        .criterion-score-badge {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .criterion-stars {
+            color: #f59e0b;
+            font-size: 0.82rem;
+        }
+        .criterion-num {
+            font-weight: 700;
+            color: #64748b;
+            font-size: 0.78rem;
+        }
+        .criterion-bar-track {
+            height: 4px;
+            background: #e2e8f0;
+            border-radius: 999px;
+            overflow: hidden;
+        }
+        .criterion-bar-fill {
+            height: 100%;
+            background: #0052ea;
+            border-radius: 999px;
+            transition: width 0.25s ease;
+        }
+
+        /* ── Empty State ── */
+        .empty-state {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 14px;
+            padding: 48px 24px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .empty-state-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            color: #94a3b8;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 12px;
+        }
+
+        /* ══════════════════════════════════════════════════════
+           DARK THEME SUPPORT
+        ══════════════════════════════════════════════════════ */
+        [data-theme="dark"] body {
+            background-color: #0f172a;
+            color: #f8fafc;
+        }
+        [data-theme="dark"] .request-card,
+        [data-theme="dark"] .empty-state,
+        [data-theme="dark"] .modal-container {
+            background: #1e293b;
+            border-color: #334155;
+        }
+        [data-theme="dark"] .request-card:hover {
+            border-color: #475569;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+        }
+        [data-theme="dark"] .rc-title,
+        [data-theme="dark"] .modal-header-title,
+        [data-theme="dark"] .dc-val,
+        [data-theme="dark"] .criterion-num {
+            color: #f8fafc;
+        }
+        [data-theme="dark"] .rc-subtitle,
+        [data-theme="dark"] .rc-col-label,
+        [data-theme="dark"] .modal-header-subtitle,
+        [data-theme="dark"] .dc-label,
+        [data-theme="dark"] .detail-section-title,
+        [data-theme="dark"] .criterion-name {
+            color: #94a3b8;
+        }
+        [data-theme="dark"] .rc-feedback-text {
+            color: #cbd5e1;
+        }
+        [data-theme="dark"] .maintenance-tabs-bar {
+            border-bottom-color: #334155;
+        }
+        [data-theme="dark"] .tab-count {
+            background: #334155;
+            color: #cbd5e1;
+        }
+        [data-theme="dark"] .m-tab-btn {
+            color: #94a3b8;
+        }
+        [data-theme="dark"] .m-tab-btn:hover,
+        [data-theme="dark"] .m-tab-btn.active {
+            color: #60a5fa;
+        }
+        [data-theme="dark"] .m-tab-btn.active::after {
+            background: #60a5fa;
+        }
+        [data-theme="dark"] .m-tab-btn.active .tab-count {
+            background: #1e3a8a;
+            color: #93c5fd;
+        }
+        [data-theme="dark"] .ledger-search-box input,
+        [data-theme="dark"] .ledger-select,
+        [data-theme="dark"] .btn-manage-card {
+            background: #0f172a;
+            border-color: #334155;
+            color: #f8fafc;
+        }
+        [data-theme="dark"] .btn-manage-card:hover {
+            background: #0052ea;
+            border-color: #0052ea;
+            color: #ffffff;
+        }
+        [data-theme="dark"] .modal-header,
+        [data-theme="dark"] .modal-footer {
+            background: #1e293b;
+            border-color: #334155;
+        }
+        [data-theme="dark"] .detail-summary-card,
+        [data-theme="dark"] .detail-box,
+        [data-theme="dark"] .criteria-breakdown-card {
+            background: #0f172a;
+            border-color: #334155;
+            color: #cbd5e1;
+        }
+        [data-theme="dark"] .criterion-bar-track {
+            background: #334155;
+        }
+        [data-theme="dark"] .btn-modal-cancel {
+            background: #1e293b;
+            border-color: #334155;
+            color: #f8fafc;
+        }
+        [data-theme="dark"] .rc-feedback-col,
+        [data-theme="dark"] .rc-score-col {
+            border-left-color: #334155;
+        }
+        [data-theme="dark"] .empty-state-icon {
+            background: #0f172a;
+            border-color: #334155;
+            color: #64748b;
+        }
+        [data-theme="dark"] .modal-score-summary {
+            background: #0f172a;
+            border-color: #334155;
+        }
+        [data-theme="dark"] .modal-score-num {
+            color: #f8fafc;
+        }
+        [data-theme="dark"] .modal-score-denom {
+            color: #94a3b8;
+        }
+        [data-theme="dark"] .modal-score-badge {
+            background: #1e293b;
+            border-color: #334155;
+            color: #cbd5e1;
+        }
+        [data-theme="dark"] .criterion-bar-fill {
+            background: #3b82f6;
         }
     </style>
-    <link href="../../css/design-system.css" rel="stylesheet">
     <script src="../../js/ui.js" defer></script>
 </head>
 <body>
@@ -268,14 +751,14 @@
             </div>
             <div class="navbar-menu">
                 <a href="dashboard.html" class="navbar-menu-link">Dashboard</a>
-                <a href="properties.html" class="navbar-menu-link">My Properties</a>
+                <a href="properties.html" class="navbar-menu-link">Properties</a>
                 <a href="applications.html" class="navbar-menu-link">Applications</a>
                 <a href="leases.html" class="navbar-menu-link">Lease Agreements</a>
                 <a href="billings.html" class="navbar-menu-link">Billings</a>
                 <a href="payments.html" class="navbar-menu-link">Payments Registry</a>
                 <a href="maintenance.html" class="navbar-menu-link">Maintenance</a>
                 <a href="reports.html" class="navbar-menu-link">Reports</a>
-                <a href="disputes.html" class="navbar-menu-link">Disputes</a>
+                <a href="disputes.html" class="navbar-menu-link">Complaints</a>
                 <a href="feedback.html" class="navbar-menu-link active">Feedback</a>
             </div>
             <div class="navbar-right">
@@ -285,87 +768,83 @@
         </div>
     </nav>
 
-    <!-- Main -->
+    <!-- Main Content -->
     <main class="dashboard-container">
-        <!-- Tabs -->
-        <div class="tabs-header">
-            <button class="tab-btn active" id="tabPropertyBtn">
-                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>
+        <!-- Filter Tabs Bar -->
+        <div class="maintenance-tabs-bar" id="feedbackTabs">
+            <button class="m-tab-btn active" id="tabPropertyBtn" type="button">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                    <polyline points="9 22 9 12 15 12 15 22"></polyline>
                 </svg>
-                Property Ratings (Module A)
+                Property Ratings <span class="tab-count" id="tabCountProperty">0</span>
             </button>
-            <button class="tab-btn" id="tabLandlordBtn">
-                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+            <button class="m-tab-btn" id="tabLandlordBtn" type="button">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="12" cy="7" r="4"></circle>
                 </svg>
-                Landlord Ratings (Module B)
+                Landlord Ratings <span class="tab-count" id="tabCountLandlord">0</span>
             </button>
         </div>
 
-        <!-- Summary Strip -->
-        <div class="summary-strip">
-            <div class="summary-card">
-                <span class="summary-value" id="totalRatingsCount">—</span>
-                <span class="summary-label">Total Ratings</span>
+        <!-- Ledger Controls Bar (Search & Filters) -->
+        <div class="ledger-controls-bar">
+            <div class="ledger-search-box">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+                <input type="text" id="feedbackSearchInput" placeholder="Search feedback text, tenant, or property..." autocomplete="off">
             </div>
-            <div class="summary-card">
-                <span class="summary-value" id="avgRatingValue" style="color:#f59e0b;">—</span>
-                <span class="summary-label">Average Rating</span>
-                <span class="star-avg" id="avgStarDisplay"></span>
-            </div>
-            <div class="summary-card">
-                <span class="summary-value" id="fiveStarCount" style="color:var(--success);">—</span>
-                <span class="summary-label">5-Star Reviews</span>
-            </div>
-        </div>
-
-        <!-- Ratings Table -->
-        <div class="list-card">
-            <div class="filter-bar">
-                <div id="propFilterContainer" style="display:inline-flex; align-items:center; gap:0.5rem;">
-                    <label for="propertyFilter">Filter by Property:</label>
-                    <select id="propertyFilter" class="form-input" style="max-width:260px; padding:0.45rem 0.85rem; font-size:0.85rem;">
-                        <option value="">All Properties</option>
+            <div class="ledger-filter-group">
+                <div class="ledger-select-wrap" id="propFilterContainer">
+                    <select id="propertyFilter" class="ledger-select" aria-label="Filter by Property">
+                        <option value="">All Properties ⌵</option>
                     </select>
                 </div>
-                <label for="starFilter" style="margin-left:0.5rem;">Rating:</label>
-                <select id="starFilter" class="form-input" style="max-width:160px; padding:0.45rem 0.85rem; font-size:0.85rem;">
-                    <option value="">All Stars</option>
-                    <option value="5">5 Stars</option>
-                    <option value="4">4 Stars</option>
-                    <option value="3">3 Stars</option>
-                    <option value="2">2 Stars</option>
-                    <option value="1">1 Star</option>
-                </select>
+                <div class="ledger-select-wrap">
+                    <select id="starFilter" class="ledger-select" aria-label="Filter by Rating">
+                        <option value="">All Stars ⌵</option>
+                        <option value="5">5 Stars ★★★★★</option>
+                        <option value="4">4 Stars ★★★★☆</option>
+                        <option value="3">3 Stars ★★★☆☆</option>
+                        <option value="2">2 Stars ★★☆☆☆</option>
+                        <option value="1">1 Star ★☆☆☆☆</option>
+                    </select>
+                </div>
             </div>
-            <table>
-                <thead>
-                    <tr id="tableHeaderRow">
-                        <!-- Populated dynamically -->
-                    </tr>
-                </thead>
-                <tbody id="ratingsTableBody">
-                    <tr><td colspan="5" style="text-align:center; color:var(--text-muted);">Loading ratings...</td></tr>
-                </tbody>
-            </table>
+        </div>
+
+        <!-- Hidden container for backwards compatibility -->
+        <div id="tableHeaderRow" style="display:none;" aria-hidden="true"></div>
+
+        <!-- Ratings Cards List Container -->
+        <div class="requests-list" id="ratingsTableBody">
+            <div style="background:var(--bg-secondary, #ffffff); border:1px solid var(--border-color, #e2e8f0); border-radius:14px; padding:48px 24px; text-align:center;">
+                <div class="empty-state-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                </div>
+                <div style="font-size:0.95rem; font-weight:700; color:var(--text-primary, #0f172a);">Loading ratings & feedback...</div>
+            </div>
         </div>
     </main>
 
     <!-- Details Modal -->
-    <div class="modal-overlay hidden" id="detailsModal">
-        <div class="modal-box">
+    <div class="modal-overlay hidden" id="detailsModal" style="display:none;">
+        <div class="modal-container">
             <div class="modal-header">
-                <h3 style="margin:0; font-size:1.05rem; color:var(--text-primary);" id="modalTitle">Rating Details</h3>
-                <button class="modal-close-x" id="closeModalBtn" title="Close">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
-                    </svg>
+                <div>
+                    <h3 class="modal-header-title" id="modalTitle">Rating Details</h3>
+                    <div class="modal-header-subtitle" id="modalSubtitle">—</div>
+                </div>
+                <button type="button" class="modal-close-x" id="closeModalBtn" aria-label="Close review details">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
                 </button>
             </div>
-            <div id="modalBody"></div>
+            <div class="modal-body" id="modalBody"></div>
             <div class="modal-footer">
-                <button class="btn-secondary action-btn" id="closeModalFooterBtn" style="padding:0.5rem 1.1rem;">Close</button>
+                <button type="button" class="btn-modal-cancel" id="closeModalFooterBtn">Close</button>
             </div>
         </div>
     </div>
@@ -377,6 +856,7 @@
         
         let currentTab = 'property'; // 'property' or 'landlord'
         let allRatings = [];
+        let searchQuery = '';
 
         const STAR_LABELS = { 1: 'Very Poor', 2: 'Poor', 3: 'Fair', 4: 'Good', 5: 'Excellent' };
 
@@ -390,7 +870,7 @@
             { id: 'water_supply', name: 'Water Supply' },
             { id: 'electricity_reliability', name: 'Electricity Reliability' },
             { id: 'noise_level', name: 'Noise Level' },
-            { id: 'overall_satisfaction', name: 'Overall Property Satisfaction' }
+            { id: 'overall_satisfaction', name: 'Overall Satisfaction' }
         ];
 
         const LANDLORD_CRITERIA = [
@@ -401,19 +881,19 @@
             { id: 'maintenance_response', name: 'Maintenance Response' },
             { id: 'respectfulness', name: 'Respectfulness' },
             { id: 'reliability', name: 'Reliability' },
-            { id: 'overall_satisfaction', name: 'Overall Landlord Satisfaction' }
+            { id: 'overall_satisfaction', name: 'Overall Satisfaction' }
         ];
 
         document.addEventListener('DOMContentLoaded', () => {
             if (!token) return;
 
-            // Wire up tab buttons using addEventListener (avoids CSP inline handler issues)
             const tabPropertyBtn = document.getElementById('tabPropertyBtn');
             const tabLandlordBtn = document.getElementById('tabLandlordBtn');
             if (tabPropertyBtn) tabPropertyBtn.addEventListener('click', () => switchLandlordTab('property'));
             if (tabLandlordBtn) tabLandlordBtn.addEventListener('click', () => switchLandlordTab('landlord'));
 
             switchLandlordTab('property');
+            fetchTabCounts();
 
             document.getElementById('closeModalBtn').addEventListener('click', closeModal);
             document.getElementById('closeModalFooterBtn').addEventListener('click', closeModal);
@@ -423,6 +903,10 @@
 
             document.getElementById('propertyFilter').addEventListener('change', renderTable);
             document.getElementById('starFilter').addEventListener('change', renderTable);
+            document.getElementById('feedbackSearchInput')?.addEventListener('input', (e) => {
+                searchQuery = (e.target.value || '').trim().toLowerCase();
+                renderTable();
+            });
 
             document.getElementById('ratingsTableBody').addEventListener('click', (e) => {
                 const btn = e.target.closest('[data-rating-id]');
@@ -437,40 +921,52 @@
             document.getElementById('tabPropertyBtn').classList.toggle('active', tabName === 'property');
             document.getElementById('tabLandlordBtn').classList.toggle('active', tabName === 'landlord');
 
-            // Show/hide property filter container (landlord ratings are about the landlord, not specific property)
-            document.getElementById('propFilterContainer').style.display = tabName === 'property' ? 'inline-flex' : 'none';
+            const propContainer = document.getElementById('propFilterContainer');
+            if (propContainer) {
+                propContainer.style.display = tabName === 'property' ? 'inline-flex' : 'none';
+            }
 
             // Reset filters
             document.getElementById('propertyFilter').value = '';
             document.getElementById('starFilter').value = '';
-
-            // Setup table headers
-            const headerRow = document.getElementById('tableHeaderRow');
-            if (tabName === 'property') {
-                headerRow.innerHTML = `
-                    <th>Property &amp; Tenant</th>
-                    <th>Feedback Preview</th>
-                    <th>Average Score</th>
-                    <th>Date</th>
-                    <th>Action</th>
-                `;
-            } else {
-                headerRow.innerHTML = `
-                    <th>Tenant Details</th>
-                    <th>Feedback Preview</th>
-                    <th>Average Score</th>
-                    <th>Date</th>
-                    <th>Action</th>
-                `;
-            }
+            const searchInput = document.getElementById('feedbackSearchInput');
+            if (searchInput) searchInput.value = '';
+            searchQuery = '';
 
             fetchRatings();
         }
 
-        // ── Fetch ───────────────────────────────────────────────────────────
+        async function fetchTabCounts() {
+            try {
+                const [propRes, landRes] = await Promise.all([
+                    fetch('/api/landlord/property-ratings', { headers: { 'Authorization': `Bearer ${token}` } }),
+                    fetch('/api/landlord/landlord-ratings', { headers: { 'Authorization': `Bearer ${token}` } })
+                ]);
+                if (propRes.ok) {
+                    const d = await propRes.json();
+                    const badge = document.getElementById('tabCountProperty');
+                    if (badge) badge.textContent = (d.data || []).length;
+                }
+                if (landRes.ok) {
+                    const d = await landRes.json();
+                    const badge = document.getElementById('tabCountLandlord');
+                    if (badge) badge.textContent = (d.data || []).length;
+                }
+            } catch (err) {
+                // silent
+            }
+        }
+
+        // ── Fetch Ratings ───────────────────────────────────────────────────
         async function fetchRatings() {
-            const tbody = document.getElementById('ratingsTableBody');
-            tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:var(--text-muted);">Loading ratings...</td></tr>';
+            const listEl = document.getElementById('ratingsTableBody');
+            listEl.innerHTML = `
+                <div style="background:var(--bg-secondary, #ffffff); border:1px solid var(--border-color, #e2e8f0); border-radius:14px; padding:48px 24px; text-align:center;">
+                    <div class="empty-state-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                    </div>
+                    <div style="font-size:0.95rem; font-weight:700; color:var(--text-primary, #0f172a);">Loading ratings & feedback...</div>
+                </div>`;
             
             const url = currentTab === 'property' 
                 ? '/api/landlord/property-ratings' 
@@ -481,7 +977,11 @@
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
                 if (!res.ok) {
-                    tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;color:var(--error);">Failed to load ratings.</td></tr>`;
+                    listEl.innerHTML = `
+                        <div class="empty-state">
+                            <div style="color:#ef4444; font-weight:700;">Failed to load ratings.</div>
+                            <div style="color:var(--text-muted); font-size:0.875rem; margin-top:4px;">Please refresh or verify your session.</div>
+                        </div>`;
                     return;
                 }
                 const result = await res.json();
@@ -493,38 +993,31 @@
                 renderTable();
             } catch (err) {
                 console.error(err);
-                tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;color:var(--error);">Network error.</td></tr>`;
+                listEl.innerHTML = `
+                    <div class="empty-state">
+                        <div style="color:#ef4444; font-weight:700;">Network error occurred.</div>
+                        <div style="color:var(--text-muted); font-size:0.875rem; margin-top:4px;">Please check your connection and try again.</div>
+                    </div>`;
             }
         }
 
         // ── Summary ─────────────────────────────────────────────────────────
         function populateSummary() {
             const total = allRatings.length;
-            const avg = total > 0
-                ? (allRatings.reduce((s, r) => s + parseFloat(r.overall_computed_avg), 0) / total).toFixed(2)
-                : '0.00';
-            
-            // Check if overall satisfaction is 5
-            const fiveStars = allRatings.filter(r => parseInt(r.overall_satisfaction) === 5).length;
 
-            document.getElementById('totalRatingsCount').textContent = total;
-            document.getElementById('avgRatingValue').textContent = avg;
-            document.getElementById('fiveStarCount').textContent = fiveStars;
-
-            const avgNum = parseFloat(avg);
-            const fullStars = Math.floor(avgNum);
-            const halfStar = avgNum - fullStars >= 0.5 ? 1 : 0;
-            document.getElementById('avgStarDisplay').innerHTML =
-                '&#9733;'.repeat(fullStars) +
-                (halfStar ? '<span style="opacity:0.5">&#9733;</span>' : '') +
-                '<span style="color:#d1d5db;">&#9733;</span>'.repeat(Math.max(0, 5 - fullStars - halfStar));
+            if (currentTab === 'property') {
+                const badge = document.getElementById('tabCountProperty');
+                if (badge) badge.textContent = total;
+            } else {
+                const badge = document.getElementById('tabCountLandlord');
+                if (badge) badge.textContent = total;
+            }
         }
 
         // ── Filters ─────────────────────────────────────────────────────────
         function populatePropertyFilter() {
             const sel = document.getElementById('propertyFilter');
-            // Reset options except the first one
-            sel.innerHTML = '<option value="">All Properties</option>';
+            sel.innerHTML = '<option value="">All Properties ⌵</option>';
             const seen = new Set();
             allRatings.forEach(r => {
                 const name = r.properties?.property_name;
@@ -543,92 +1036,110 @@
             const starFilter = document.getElementById('starFilter').value;
             return allRatings.filter(r => {
                 const propMatch = currentTab === 'landlord' || !propFilter || r.properties?.property_name === propFilter;
-                // Match based on rounded overall_computed_avg
-                const ratingRounded = Math.round(parseFloat(r.overall_computed_avg));
-                const starMatch = !starFilter || ratingRounded === parseInt(starFilter);
-                return propMatch && starMatch;
+                const ratingRounded = Math.round(parseFloat(r.overall_computed_avg || 0));
+                const starMatch = !starFilter || ratingRounded === parseInt(starFilter, 10);
+                if (!propMatch || !starMatch) return false;
+
+                if (searchQuery) {
+                    const text = `${r.properties?.property_name || ''} ${r.tenant?.full_name || ''} ${r.feedback || ''}`.toLowerCase();
+                    if (!text.includes(searchQuery)) return false;
+                }
+                return true;
             });
         }
 
-        // ── Render Table ────────────────────────────────────────────────────
+        // ── Render Ratings Cards ────────────────────────────────────────────
         function renderTable() {
-            const tbody = document.getElementById('ratingsTableBody');
+            const listEl = document.getElementById('ratingsTableBody');
             const filtered = getFiltered();
 
             if (filtered.length === 0) {
-                tbody.innerHTML = `
-                    <tr><td colspan="5">
-                        <div class="empty-state">
-                            <svg width="44" height="44" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                listEl.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
                             </svg>
-                            <span style="font-weight:600;">No ratings found</span>
-                            <span style="font-size:0.8rem;">No tenant reviews have been submitted yet.</span>
                         </div>
-                    </td></tr>`;
+                        <div style="font-weight:750; font-size:1rem; color:var(--text-primary); margin-bottom:4px;">No ratings found</div>
+                        <div style="font-size:0.875rem; color:var(--text-muted);">No tenant ratings matched your filter criteria.</div>
+                    </div>`;
                 return;
             }
 
-            tbody.innerHTML = '';
+            listEl.innerHTML = '';
             filtered.forEach(rat => {
                 const avgVal = parseFloat(rat.overall_computed_avg || 0);
-                const starsHtml = buildStarDisplay(Math.round(avgVal));
+                const roundedAvg = Math.round(avgVal);
+                const starsHtml = buildStarDisplay(roundedAvg);
                 const dateStr = new Date(rat.submitted_at).toLocaleDateString('en-PH', {
-                    year: 'numeric', month: 'long', day: 'numeric'
+                    year: 'numeric', month: 'short', day: 'numeric'
                 });
                 const snippet = rat.feedback
-                    ? rat.feedback.substring(0, 100) + (rat.feedback.length > 100 ? '...' : '')
-                    : 'No written feedback.';
+                    ? rat.feedback
+                    : 'No written comments provided.';
 
-                const targetLabel = currentTab === 'property' 
-                    ? `
-                        <div style="font-weight:700; color:var(--text-primary);">${rat.properties?.property_name || 'Property'}</div>
-                        <div style="font-size:0.75rem; color:var(--text-secondary); margin-top:0.2rem;">
-                            By: <strong>${rat.tenant?.full_name || 'Tenant'}</strong>
-                        </div>
-                    `
-                    : `
-                        <div style="font-weight:700; color:var(--text-primary);">${rat.tenant?.full_name || 'Tenant'}</div>
-                        <div style="font-size:0.75rem; color:var(--text-secondary); margin-top:0.2rem;">
-                            Lease: <strong>${rat.properties?.property_name || 'N/A'}</strong>
-                        </div>
-                    `;
+                const scoreLabel = STAR_LABELS[roundedAvg] || 'Rated';
+                const scoreClass = roundedAvg >= 4 ? 'score-high' : roundedAvg >= 3 ? 'score-mid' : 'score-low';
 
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td>${targetLabel}</td>
-                    <td>
-                        <div class="feedback-snippet">${escapeHtml(snippet)}</div>
-                    </td>
-                    <td>
-                        ${starsHtml}
-                        <div style="font-size:0.72rem; color:var(--text-muted); margin-top:0.25rem;">
-                            ${avgVal.toFixed(2)}/5 — ${STAR_LABELS[Math.round(avgVal)] || ''}
+                const targetTitle = currentTab === 'property' 
+                    ? (rat.properties?.property_name || 'Property')
+                    : (rat.tenant?.full_name || 'Tenant Review');
+
+                const targetSubtitle = currentTab === 'property'
+                    ? `By: ${rat.tenant?.full_name || 'Tenant'} • ${dateStr}`
+                    : `Lease: ${rat.properties?.property_name || 'Property'} • ${dateStr}`;
+
+                const card = document.createElement('div');
+                card.className = 'request-card';
+                card.dataset.ratingId = rat.id;
+
+                card.innerHTML = `
+                    <div class="rc-left-group">
+                        <div class="rc-icon-box ${scoreClass}">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                            </svg>
                         </div>
-                    </td>
-                    <td style="font-size:0.82rem; color:var(--text-secondary); white-space:nowrap;">${dateStr}</td>
-                    <td>
-                        <button class="btn-primary" data-rating-id="${rat.id}"
-                            style="font-size:0.78rem; padding:0.35rem 0.85rem; background:var(--landlord); border-color:var(--landlord);">
-                            Details
-                        </button>
-                    </td>
+                        <div class="rc-text-box">
+                            <div class="rc-title">${escapeHtml(targetTitle)}</div>
+                            <div class="rc-subtitle">${escapeHtml(targetSubtitle)}</div>
+                        </div>
+                    </div>
+                    <div class="rc-feedback-col">
+                        <div class="rc-col-label">FEEDBACK PREVIEW</div>
+                        <div class="rc-feedback-text">"${escapeHtml(snippet)}"</div>
+                    </div>
+                    <div class="rc-score-col">
+                        <div class="rc-col-label">AVERAGE SCORE</div>
+                        <div class="star-display">${starsHtml}</div>
+                        <div class="rc-score-pill ${scoreClass}">
+                            ${avgVal.toFixed(2)} / 5.0 • ${scoreLabel}
+                        </div>
+                    </div>
+                    <div class="rc-right-group">
+                        <button type="button" class="btn-manage-card" data-rating-id="${rat.id}" title="View Breakdown">Details</button>
+                        <span class="rc-chevron">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                        </span>
+                    </div>
                 `;
-                tbody.appendChild(tr);
+                listEl.appendChild(card);
             });
         }
 
         function buildStarDisplay(rating) {
             const filled = '&#9733;'.repeat(rating);
-            const empty = '<span style="color:#d1d5db;">&#9733;</span>'.repeat(Math.max(0, 5 - rating));
+            const empty = '<span style="color:#cbd5e1;">&#9733;</span>'.repeat(Math.max(0, 5 - rating));
             return `<span class="star-display">${filled}</span>${empty}`;
         }
 
         function escapeHtml(str) {
-            return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+            if (!str) return '';
+            return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
         }
 
-        // ── Modal ────────────────────────────────────────────────────────────
+        // ── Details Modal ───────────────────────────────────────────────────
         function openModal(ratingId) {
             const rat = allRatings.find(r => r.id === ratingId);
             if (!rat) return;
@@ -640,57 +1151,90 @@
             const criteriaList = currentTab === 'property' ? PROPERTY_CRITERIA : LANDLORD_CRITERIA;
             let breakdownHtml = '';
             criteriaList.forEach(crit => {
-                const score = rat[crit.id];
+                const score = parseInt(rat[crit.id] || 0, 10);
+                const percent = Math.min(100, Math.max(0, (score / 5) * 100));
+                const starsHtml = buildStarDisplay(score);
                 breakdownHtml += `
-                    <div class="modal-breakdown-row">
-                        <span style="text-transform:capitalize;">${crit.name}</span>
-                        <div style="display:flex; align-items:center; gap:0.4rem;">
-                            ${buildStarDisplay(score)}
-                            <span class="modal-breakdown-val">${score}</span>
+                    <div class="criterion-row">
+                        <div class="criterion-header">
+                            <span class="criterion-name">${crit.name}</span>
+                            <div class="criterion-score-badge">
+                                <span class="criterion-stars">${starsHtml}</span>
+                                <span class="criterion-num">${score}/5</span>
+                            </div>
+                        </div>
+                        <div class="criterion-bar-track">
+                            <div class="criterion-bar-fill" style="width: ${percent}%;"></div>
                         </div>
                     </div>
                 `;
             });
 
+            const avgVal = parseFloat(rat.overall_computed_avg || 0);
+            const roundedAvg = Math.round(avgVal);
+            const scoreLabel = STAR_LABELS[roundedAvg] || 'Rated';
+            const scoreStars = buildStarDisplay(roundedAvg);
+
             document.getElementById('modalTitle').textContent = currentTab === 'property' ? 'Property Review Details' : 'Landlord Review Details';
+            document.getElementById('modalSubtitle').textContent = `Submitted on ${dateStr}`;
 
             document.getElementById('modalBody').innerHTML = `
-                <div class="detail-row">
-                    <span class="detail-label">Property</span>
-                    <span class="detail-value" style="font-weight:700;">${rat.properties?.property_name || 'N/A'}</span>
-                </div>
-                <div class="detail-row">
-                    <span class="detail-label">Tenant</span>
-                    <span class="detail-value">${rat.tenant?.full_name || 'N/A'}</span>
-                </div>
-                
-                <div class="modal-breakdown-card">
-                    <div class="modal-breakdown-title">Scores Breakdown</div>
-                    ${breakdownHtml}
+                <!-- Minimal Hero Score Box -->
+                <div class="modal-score-summary">
+                    <div>
+                        <div class="modal-score-num">${avgVal.toFixed(2)} <span class="modal-score-denom">/ 5.00</span></div>
+                        <div class="modal-score-stars">${scoreStars}</div>
+                    </div>
+                    <div>
+                        <span class="modal-score-badge">${scoreLabel} Rating</span>
+                    </div>
                 </div>
 
-                <hr class="detail-divider">
-                <div class="detail-row">
-                    <span class="detail-label">Average Score</span>
-                    <span class="detail-value" style="font-weight:800; font-size:1.1rem; color:#f59e0b;">
-                        ${parseFloat(rat.overall_computed_avg).toFixed(2)}/5.00
-                    </span>
+                <!-- Tenancy Summary Card -->
+                <div class="detail-section-title">Review Context</div>
+                <div class="detail-summary-card">
+                    <div>
+                        <div class="dc-label">Property</div>
+                        <div class="dc-val" style="font-weight:700;">${escapeHtml(rat.properties?.property_name || 'N/A')}</div>
+                    </div>
+                    <div>
+                        <div class="dc-label">Tenant</div>
+                        <div class="dc-val">${escapeHtml(rat.tenant?.full_name || 'N/A')}</div>
+                    </div>
+                    <div>
+                        <div class="dc-label">Review Scope</div>
+                        <div class="dc-val">${currentTab === 'property' ? 'Rental Property Experience' : 'Landlord Conduct & Services'}</div>
+                    </div>
+                    <div>
+                        <div class="dc-label">Submission Date</div>
+                        <div class="dc-val">${dateStr}</div>
+                    </div>
                 </div>
-                <div class="detail-row" style="align-items:start;">
-                    <span class="detail-label">Feedback Review</span>
-                    <span class="detail-value" style="white-space:pre-wrap; background:var(--bg-primary); padding:0.75rem 1rem; border-radius:var(--radius-md); border:1px solid var(--border-color);">${escapeHtml(rat.feedback || 'No written feedback.')}</span>
+
+                <!-- Written Feedback -->
+                <div class="detail-section-title">Written Feedback</div>
+                <div class="detail-box">
+                    "${escapeHtml(rat.feedback || 'No written comments provided.')}"
                 </div>
-                <div class="detail-row">
-                    <span class="detail-label">Submitted</span>
-                    <span class="detail-value">${dateStr}</span>
+
+                <!-- Criteria Scores Breakdown -->
+                <div class="detail-section-title">Criterion Ratings Breakdown</div>
+                <div class="criteria-breakdown-card">
+                    ${breakdownHtml}
                 </div>
             `;
 
-            document.getElementById('detailsModal').classList.remove('hidden');
+            const modal = document.getElementById('detailsModal');
+            modal.classList.remove('hidden');
+            modal.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
         }
 
         function closeModal() {
-            document.getElementById('detailsModal').classList.add('hidden');
+            const modal = document.getElementById('detailsModal');
+            modal.classList.add('hidden');
+            modal.style.display = 'none';
+            document.body.style.overflow = '';
         }
     </script>
 </body>

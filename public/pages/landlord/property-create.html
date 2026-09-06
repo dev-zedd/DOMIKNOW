@@ -20,15 +20,6 @@
             z-index: 1;
             background-color: var(--color-bg-subtle);
         }
-        .map-instructions {
-            background-color: var(--primary-light);
-            border-left: 4px solid var(--primary);
-            padding: 0.75rem 1rem;
-            border-radius: var(--radius-sm);
-            margin-bottom: 1rem;
-            font-size: 0.875rem;
-            color: var(--text-primary);
-        }
         .location-actions {
             display: flex;
             gap: 0.75rem;
@@ -54,6 +45,29 @@
         .location-btn:disabled {
             opacity: 0.5;
             cursor: not-allowed;
+        }
+        /* ── Remove duplicate top breadcrumbs on property-create ── */
+        .dk-breadcrumbs, [data-domiknow-breadcrumbs], .breadcrumb-nav {
+            display: none !important;
+        }
+        /* ── Back Navigation Link (styled like tenant/lease-details.html) ── */
+        .app-back-nav {
+            margin-bottom: 1.25rem;
+        }
+        .app-details-back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--color-action-primary, #0355f3);
+            font-size: 0.875rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: opacity 0.15s ease, transform 0.15s ease;
+        }
+        .app-details-back-link:hover {
+            opacity: 0.85;
+            transform: translateX(-2px);
+            text-decoration: underline;
         }
         /* Step Wizard styles */
         .step-wizard-nav {
@@ -249,7 +263,7 @@
             </div>
             <div class="navbar-menu">
                 <a href="dashboard.html" class="navbar-menu-link">Dashboard</a>
-                <a href="properties.html" class="navbar-menu-link">My Properties</a>
+                <a href="properties.html" class="navbar-menu-link">Properties</a>
                 <a href="property-create.html" class="navbar-menu-link active">Register Property</a>
                 <a href="applications.html" class="navbar-menu-link">Tenant Applications</a>
             </div>
@@ -262,6 +276,16 @@
 
     <!-- Main Content -->
     <main class="dashboard-container" style="max-width: 900px;">
+        <div class="app-back-nav">
+            <a href="properties.html" class="app-details-back-link" id="backToListBtn">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <line x1="19" y1="12" x2="5" y2="12"></line>
+                    <polyline points="12 19 5 12 12 5"></polyline>
+                </svg>
+                <span>Back to list</span>
+            </a>
+        </div>
+
         <!-- Wizard Navigation -->
         <div class="step-wizard-nav" aria-label="Property registration progress">
             <button type="button" id="stepHeader1" class="step-header active" onclick="goToStep(1)" title="View Step 1: Property Details" aria-controls="stepPanel1" aria-current="step">
@@ -356,13 +380,6 @@
                     </div>
                 </div>
 
-                <div class="map-instructions" style="display: flex; align-items: center; gap: 0.5rem;">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0; color: var(--primary);">
-                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
-                        <circle cx="12" cy="10" r="3"></circle>
-                    </svg>
-                    <span><strong>Location Pin Auto-Fill:</strong> Clicking or dragging the marker pin on the map automatically detects your <strong>Street/Sitio</strong> and <strong>Barangay</strong>. You can also adjust manually anytime.</span>
-                </div>
 
                 <div class="location-actions">
                     <button type="button" id="btnGetLocation" class="location-btn" style="display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;">

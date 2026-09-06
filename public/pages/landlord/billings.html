@@ -7,58 +7,100 @@
     <link href="../../css/input.css" rel="stylesheet">
     <style>
         /* Modern styling system */
-        .summary-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-            gap: 1.25rem;
-            margin-bottom: 2rem;
-        }
-        .stat-card {
-            background-color: var(--bg-secondary);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-lg);
-            padding: 1.25rem;
-            box-shadow: var(--shadow-sm);
+        /* ── Billings Tabs & Action Header Row (consistent with tenant portal & properties.html) ── */
+        .billings-header-row {
             display: flex;
-            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #e2e8f0;
+            margin-bottom: 1.5rem;
+            gap: 16px;
+            flex-wrap: wrap;
         }
-        .stat-label {
-            font-size: 0.72rem;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            color: var(--text-muted);
-            margin-bottom: 0.5rem;
+        .billings-tabs-bar {
+            display: flex;
+            align-items: center;
+            gap: 22px;
+            overflow-x: auto;
+            scrollbar-width: none;
+            padding-bottom: 12px;
         }
-        .stat-val {
-            font-size: 1.5rem;
-            font-weight: 800;
-            color: var(--text-primary);
+        .billings-tabs-bar::-webkit-scrollbar { display: none; }
+        .m-tab-btn {
+            background: none !important;
+            border: none !important;
+            padding: 4px 0 !important;
+            font-size: 0.9375rem !important;
+            font-weight: 700 !important;
+            color: #64748b !important;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            position: relative;
+            transition: color 0.15s ease;
+            white-space: nowrap;
+            box-shadow: none !important;
+            min-height: auto !important;
         }
-        .stat-val.revenue {
-            color: #10b981;
+        .m-tab-btn:hover {
+            color: #0052ea !important;
+            background: none !important;
+        }
+        .m-tab-btn.active {
+            color: #0052ea !important;
+            font-weight: 800 !important;
+            border-bottom: none !important;
+            background: none !important;
+            box-shadow: none !important;
+        }
+        .m-tab-btn.active::after {
+            content: '';
+            position: absolute;
+            bottom: -13px;
+            left: 0;
+            right: 0;
+            height: 2.5px;
+            background: #0052ea;
+            border-radius: 2px;
+        }
+        .tab-count {
+            background: #e2e8f0;
+            color: #475569;
+            font-size: 0.6875rem;
+            font-weight: 700;
+            padding: 2px 7px;
+            border-radius: 999px;
+            line-height: 1.2;
+        }
+        .m-tab-btn.active .tab-count {
+            background: #eff6ff;
+            color: #0052ea;
         }
 
-        .tabs-header {
-            display: flex;
-            gap: 0.5rem;
-            border-bottom: 2px solid var(--border-color);
-            margin-bottom: 1.5rem;
-        }
-        .tab-btn {
-            background: none;
-            border: none;
-            padding: 0.75rem 1.25rem;
-            font-size: 0.9rem;
+        .btn-verify-payments {
+            background: #ffffff;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            padding: 8px 18px;
             font-weight: 700;
-            color: var(--text-secondary);
+            font-size: 0.875rem;
+            color: #0f172a;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
             cursor: pointer;
-            border-bottom: 3px solid transparent;
-            margin-bottom: -2px;
-            transition: all 0.2s ease;
+            transition: all 0.15s ease;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+            white-space: nowrap;
+            text-decoration: none;
+            margin-bottom: 12px;
         }
-        .tab-btn.active {
-            color: var(--landlord);
-            border-bottom-color: var(--landlord);
+        .btn-verify-payments:hover {
+            background: #f8fafc;
+            border-color: #94a3b8;
+            color: #0f172a;
+            text-decoration: none;
         }
 
         .filter-panel {
@@ -292,7 +334,7 @@
             </div>
             <div class="navbar-menu">
                 <a href="dashboard.html" class="navbar-menu-link">Dashboard</a>
-                <a href="properties.html" class="navbar-menu-link">My Properties</a>
+                <a href="properties.html" class="navbar-menu-link">Properties</a>
                 <a href="applications.html" class="navbar-menu-link">Tenant Applications</a>
                 <a href="leases.html" class="navbar-menu-link">Leases</a>
                 <a href="billings.html" class="navbar-menu-link active">Billings</a>
@@ -307,34 +349,23 @@
 
     <!-- Main Content -->
     <main class="dashboard-container">
-        <!-- Summary Section -->
-        <div class="summary-grid">
-            <div class="stat-card">
-                <span class="stat-label">Total Issued Bills</span>
-                <span id="statTotalActive" class="stat-val">—</span>
+        <!-- Header row with Tab Controls and Action Button (consistent with tenant portal & properties.html) -->
+        <div class="billings-header-row">
+            <div class="billings-tabs-bar" role="tablist" aria-label="Billing views">
+                <button id="tabActiveLeases" class="m-tab-btn active" role="tab" aria-selected="true" type="button">
+                    Active Leases (Current Month Billing) <span class="tab-count" id="tabCountActiveLeases">0</span>
+                </button>
+                <button id="tabHistory" class="m-tab-btn" role="tab" aria-selected="false" type="button">
+                    Billing Statement Logs <span class="tab-count" id="tabCountHistory">0</span>
+                </button>
             </div>
-            <div class="stat-card">
-                <span class="stat-label">Paid Invoices</span>
-                <span id="statPaid" class="stat-val">—</span>
-            </div>
-            <div class="stat-card">
-                <span class="stat-label">Awaiting Verification</span>
-                <span id="statPendingVerify" class="stat-val">—</span>
-            </div>
-            <div class="stat-card">
-                <span class="stat-label">Overdue Invoices</span>
-                <span id="statOverdue" class="stat-val" style="color:var(--error);">—</span>
-            </div>
-            <div class="stat-card">
-                <span class="stat-label">Total Monthly Revenue</span>
-                <span id="statRevenue" class="stat-val revenue">—</span>
-            </div>
-        </div>
-
-        <!-- Navigation Tabs -->
-        <div class="tabs-header">
-            <button id="tabActiveLeases" class="tab-btn active">Active Leases (Current Month Billing)</button>
-            <button id="tabHistory" class="tab-btn">Billing Statement Logs</button>
+            <a href="payments.html" class="btn-verify-payments">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
+                    <line x1="1" y1="10" x2="23" y2="10"></line>
+                </svg>
+                <span>Verify Payments</span>
+            </a>
         </div>
 
         <!-- Tab 1: Active Leases Dashboard -->
@@ -631,12 +662,16 @@
 
             if (tab === 'leases') {
                 activeLeasesTab.classList.add('active');
+                activeLeasesTab.setAttribute('aria-selected', 'true');
                 historyTab.classList.remove('active');
+                historyTab.setAttribute('aria-selected', 'false');
                 activeLeasesSec.classList.remove('hidden');
                 historySec.classList.add('hidden');
             } else {
                 activeLeasesTab.classList.remove('active');
+                activeLeasesTab.setAttribute('aria-selected', 'false');
                 historyTab.classList.add('active');
+                historyTab.setAttribute('aria-selected', 'true');
                 activeLeasesSec.classList.add('hidden');
                 historySec.classList.remove('hidden');
             }
@@ -657,6 +692,11 @@
                 allBillings = billingData.data || [];
 
                 calculateSummaryStats();
+                const activeCountEl = document.getElementById('tabCountActiveLeases');
+                const historyCountEl = document.getElementById('tabCountHistory');
+                if (activeCountEl) activeCountEl.textContent = activeLeases.length;
+                if (historyCountEl) historyCountEl.textContent = allBillings.length;
+
                 renderActiveLeasesTable();
                 renderHistoryTable();
                 document.getElementById('activeLeasesTableBody').setAttribute('aria-busy', 'false');
@@ -695,11 +735,16 @@
                 }
             });
 
-            document.getElementById('statTotalActive').textContent = totalActive;
-            document.getElementById('statPaid').textContent = paidCount;
-            document.getElementById('statPendingVerify').textContent = pendingVerifyCount;
-            document.getElementById('statOverdue').textContent = overdueCount;
-            document.getElementById('statRevenue').textContent = `₱${totalRevenue.toLocaleString(undefined, { minimumFractionDigits: 2 })}`;
+            const statTotalEl = document.getElementById('statTotalActive');
+            if (statTotalEl) statTotalEl.textContent = totalActive;
+            const statPaidEl = document.getElementById('statPaid');
+            if (statPaidEl) statPaidEl.textContent = paidCount;
+            const statPendingEl = document.getElementById('statPendingVerify');
+            if (statPendingEl) statPendingEl.textContent = pendingVerifyCount;
+            const statOverdueEl = document.getElementById('statOverdue');
+            if (statOverdueEl) statOverdueEl.textContent = overdueCount;
+            const statRevenueEl = document.getElementById('statRevenue');
+            if (statRevenueEl) statRevenueEl.textContent = `₱${totalRevenue.toLocaleString(undefined, { minimumFractionDigits: 2 })}`;
         }
 
         function renderActiveLeasesTable() {

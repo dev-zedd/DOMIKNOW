@@ -55,40 +55,31 @@ const NAVIGATION_CONFIG = {
   ],
   landlord: [
     {
-      section: 'Main',
+      section: 'Portfolio',
       items: [
-        { label: 'My Properties', href: 'properties.html' },
-        { label: 'Register Property', href: 'property-create.html' }
+        { label: 'Properties', href: 'properties.html' }
       ]
     },
     {
-      section: 'Tenant Management',
+      section: 'Tenancy',
       items: [
         { label: 'Tenant Applications', href: 'applications.html' },
-        { label: 'Leases', href: 'leases.html' }
+        { label: 'Lease Agreements', href: 'leases.html' }
       ]
     },
     {
-      section: 'Rental Operations',
+      section: 'Financials',
       items: [
-        { label: 'Billings', href: 'billings.html' },
-        { label: 'Payments', href: 'payments.html' }
+        { label: 'Billing & Payments', href: 'billings.html' }
       ]
     },
     {
-      section: 'Support and Regulation',
+      section: 'Operations & Support',
       items: [
-        { label: 'Maintenance Management', href: 'maintenance.html' },
-        { label: 'Reports', href: 'reports.html' },
-        { label: 'Disputes', href: 'disputes.html' },
-        { label: 'Ratings and Feedback', href: 'feedback.html' }
-      ]
-    },
-    {
-      section: 'Account',
-      items: [
-        { label: 'Notifications', href: 'notifications.html' },
-        { label: 'My Profile', href: 'profile.html' }
+        { label: 'Maintenance', href: 'maintenance.html' },
+        { label: 'Reports Center', href: 'reports.html' },
+        { label: 'Complaints', href: 'disputes.html' },
+        { label: 'Reviews & Feedback', href: 'feedback.html' }
       ]
     }
   ],

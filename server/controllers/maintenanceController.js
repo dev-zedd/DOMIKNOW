@@ -731,7 +731,7 @@ const maintenanceController = {
         try {
             let query = supabase
                 .from('users')
-                .select('id, full_name, email')
+                .select('id, full_name, email, contact_number, created_at')
                 .eq('role', 'maintenance')
                 .eq('account_status', 'active');
 
@@ -815,6 +815,93 @@ const maintenanceController = {
         } catch (error) {
             console.error('Create worker error:', error);
             return responseHelper.error(res, 'Failed to create worker account.', error, 500);
+        }
+    },
+
+    // ── Delete / Remove Maintenance Worker ──────────────────────────────
+    async deleteMaintenanceWorker(req, res) {
+        try {
+            const { id } = req.params;
+            const landlordId = req.user.id;
+            const role = req.user.role;
+
+            // 1. Verify worker exists
+            const { data: worker, error: workerErr } = await supabase
+                .from('users')
+                .select('id, full_name, email, role, created_by_landlord_id, account_status')
+                .eq('id', id)
+                .maybeSingle();
+
+            if (workerErr) throw workerErr;
+            if (!worker || worker.role !== 'maintenance') {
+                return responseHelper.error(res, 'Maintenance worker not found.', null, 404);
+            }
+
+            // 2. Authorization check: landlord can only delete workers they created
+            if (role === 'landlord' && worker.created_by_landlord_id !== landlordId) {
+                return responseHelper.error(res, 'You do not have permission to delete this maintenance worker.', null, 403);
+            }
+
+            // 3. Check for ongoing/active tasks
+            const { data: activeTasks, error: activeErr } = await supabase
+                .from('maintenance_requests')
+                .select('id, issue_title, status')
+                .eq('assigned_maintenance_id', id)
+                .in('status', ['assigned', 'accepted', 'travelling', 'arrived', 'repairing']);
+
+            if (activeErr) throw activeErr;
+
+            if (activeTasks && activeTasks.length > 0) {
+                const sampleTitle = activeTasks[0].issue_title;
+                return responseHelper.error(
+                    res,
+                    `Cannot delete this worker because they have ${activeTasks.length} ongoing repair task(s) (e.g. "${sampleTitle}"). Please reassign or complete those tasks before removing this worker.`,
+                    null,
+                    400
+                );
+            }
+
+            // 4. Check if worker has historical records
+            let hardDeleted = false;
+            const { data: allTasks } = await supabase
+                .from('maintenance_requests')
+                .select('id')
+                .eq('assigned_maintenance_id', id)
+                .limit(1);
+
+            if (!allTasks || allTasks.length === 0) {
+                const { error: delErr } = await supabase
+                    .from('users')
+                    .delete()
+                    .eq('id', id);
+
+                if (!delErr) hardDeleted = true;
+            }
+
+            if (!hardDeleted) {
+                const { error: updErr } = await supabase
+                    .from('users')
+                    .update({
+                        account_status: 'disabled',
+                        is_verified: false,
+                        updated_at: new Date()
+                    })
+                    .eq('id', id);
+
+                if (updErr) throw updErr;
+            }
+
+            await auditLogModel.log(
+                landlordId,
+                'DELETE_MAINTENANCE_WORKER',
+                `Removed worker ${worker.full_name} (${worker.email})`
+            );
+
+            return responseHelper.success(res, `Maintenance worker "${worker.full_name}" has been successfully removed.`);
+
+        } catch (error) {
+            console.error('Delete worker error:', error);
+            return responseHelper.error(res, 'Failed to delete maintenance worker.', error, 500);
         }
     }
 };

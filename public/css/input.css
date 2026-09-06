@@ -1457,7 +1457,7 @@ h1, h2, h3, h4 {
   max-height: 72px;
   box-sizing: border-box;
   margin: 0;
-  padding: 0 1rem;
+  padding: 0 1.5rem;
   border-bottom: 1px solid #e2e8f0;
   width: 100%;
   flex-shrink: 0;
@@ -1666,7 +1666,7 @@ h1, h2, h3, h4 {
   width: 280px;
   background-color: #ffffff !important;
   border-right: 1px solid #e2e8f0;
-  padding: 1.5rem 1rem !important;
+  padding: 0 !important;
   display: flex;
   flex-direction: column;
   color: #0f172a;
@@ -1683,7 +1683,7 @@ h1, h2, h3, h4 {
 /* Sidebar Tenant Collapsed state */
 .sidebar-tenant.collapsed {
   width: 76px;
-  padding: 1.5rem 0.5rem !important;
+  padding: 0 !important;
 }
 
 /* Sidebar Toggle Button */
@@ -1728,7 +1728,7 @@ h1, h2, h3, h4 {
   max-height: 72px;
   box-sizing: border-box;
   margin: 0;
-  padding: 0 1rem;
+  padding: 0 1.5rem;
   border-bottom: 1px solid #e2e8f0;
   width: 100%;
 }
@@ -2209,14 +2209,14 @@ h1, h2, h3, h4 {
 @media (max-width: 1024px) {
   .sidebar-tenant {
     width: 280px !important;
-    padding: 1.5rem 1rem !important;
+    padding: 0 !important;
     left: 0;
     transform: translateX(-100%);
   }
   
   .sidebar-tenant.collapsed {
     width: 280px !important;
-    padding: 1.5rem 1rem !important;
+    padding: 0 !important;
   }
   
   .sidebar-tenant.open {

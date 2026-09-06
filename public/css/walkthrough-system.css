@@ -1,45 +1,283 @@
 /* DOMIKNOW contextual walkthrough system */
-.dk-tour-root { position: fixed; inset: 0; z-index: 11000; color: var(--color-text-primary); font-family: var(--font-family); }
+.dk-tour-root { position: fixed; inset: 0; z-index: 11000; overflow: hidden; color: var(--color-text-primary); font-family: var(--font-family); }
 .dk-tour-root[hidden] { display: none !important; }
-.dk-tour-mask { position: fixed; z-index: 0; background: var(--color-bg-overlay); transition: width var(--motion-normal), height var(--motion-normal), inset var(--motion-normal); }
+.dk-tour-mask { display: none !important; }
 .dk-tour-mask--top { top: 0; right: 0; left: 0; height: 0; }
 .dk-tour-mask--right { top: 0; right: 0; width: 0; height: 0; }
 .dk-tour-mask--bottom { right: 0; bottom: 0; left: 0; height: 0; }
 .dk-tour-mask--left { top: 0; left: 0; width: 0; height: 0; }
-.dk-tour-highlight { position: fixed; z-index: 1; border: 2px solid var(--color-action-primary); border-radius: var(--radius-lg); box-shadow: 0 0 0 4px color-mix(in srgb, var(--color-action-primary) 20%, transparent), var(--shadow-dropdown); pointer-events: none; transition: width var(--motion-normal), height var(--motion-normal), inset var(--motion-normal); }
-.dk-tour-card { position: fixed; z-index: 2; width: min(390px, calc(100vw - 32px)); overflow: hidden; border: 1px solid var(--color-border-default); border-radius: var(--radius-xl); background: var(--color-bg-surface); color: var(--color-text-primary); box-shadow: var(--shadow-modal); outline: none; animation: dk-tour-card-enter var(--motion-normal); }
-.dk-tour-card__header { display: grid; min-height: 64px; grid-template-columns: 40px minmax(0, 1fr) 40px; gap: var(--space-3); align-items: center; padding: var(--space-3) var(--space-4); border-bottom: 1px solid var(--color-divider); }
-.dk-tour-card__icon { display: grid; width: 40px; height: 40px; place-items: center; border-radius: var(--radius-md); background: var(--color-action-primary-subtle); color: var(--color-action-primary); }
-.dk-tour-card__icon :where(.ui-icon, svg) { width: 20px; height: 20px; }
-.dk-tour-card__heading { min-width: 0; }
-.dk-tour-card__eyebrow { margin: 0 0 2px; color: var(--color-action-primary); font-size: var(--font-size-label-sm); font-weight: 700; letter-spacing: .08em; line-height: var(--line-height-label-sm); text-transform: uppercase; }
-.dk-tour-card__context { margin: 0; overflow: hidden; color: var(--color-text-secondary); font-size: var(--font-size-body-sm); line-height: var(--line-height-body-sm); text-overflow: ellipsis; white-space: nowrap; }
-.dk-tour-card__close { display: inline-grid; width: 40px; min-width: 40px; height: 40px; min-height: 40px; padding: 0; place-items: center; border: 1px solid var(--color-border-default); border-radius: var(--radius-md); background: var(--color-bg-surface); color: var(--color-text-secondary); cursor: pointer; }
-.dk-tour-card__close:hover, .dk-tour-card__close:focus-visible { border-color: var(--color-border-strong); background: var(--color-bg-hover); color: var(--color-text-primary); }
-.dk-tour-card__body { padding: var(--space-5) var(--space-5) var(--space-4); }
-.dk-tour-card__title { margin: 0 0 var(--space-2); color: var(--color-text-brand); font-size: var(--font-size-h3); font-weight: 700; line-height: var(--line-height-h3); }
-.dk-tour-card__description { margin: 0; color: var(--color-text-secondary); font-size: var(--font-size-body-md); line-height: var(--line-height-body-lg); }
-.dk-tour-progress { display: flex; gap: var(--space-2); align-items: center; padding: 0 var(--space-5) var(--space-4); }
-.dk-tour-progress__bar { height: 4px; flex: 1 1 0; overflow: hidden; border-radius: var(--radius-full); background: var(--color-border-default); }
-.dk-tour-progress__bar::after { display: block; width: 0; height: 100%; border-radius: inherit; background: var(--color-action-primary); content: ""; transition: width var(--motion-normal); }
-.dk-tour-progress__bar.is-complete::after, .dk-tour-progress__bar.is-current::after { width: 100%; }
-.dk-tour-progress__bar.is-current::after { opacity: .62; }
-.dk-tour-card__footer { display: flex; min-height: 68px; gap: var(--space-3); align-items: center; padding: var(--space-3) var(--space-5); border-top: 1px solid var(--color-divider); background: var(--color-bg-subtle); }
-.dk-tour-card__spacer { flex: 1 1 auto; }
-.dk-tour-button { display: inline-flex; min-height: var(--control-height); padding: 0 var(--space-4); align-items: center; justify-content: center; border: 1px solid var(--color-border-default); border-radius: var(--radius-md); background: var(--color-bg-surface); color: var(--color-text-brand); font: 600 var(--font-size-body-md)/var(--line-height-body-md) var(--font-family); cursor: pointer; }
-.dk-tour-button:hover, .dk-tour-button:focus-visible { border-color: var(--color-border-strong); background: var(--color-bg-hover); color: var(--color-text-primary); }
-.dk-tour-button--primary { border-color: var(--color-action-primary); background: var(--color-action-primary); color: var(--color-text-on-action); }
-.dk-tour-button--primary:hover, .dk-tour-button--primary:focus-visible { border-color: var(--color-action-primary-hover); background: var(--color-action-primary-hover); color: var(--color-text-on-action); }
-.dk-tour-button--quiet { padding-inline: var(--space-2); border-color: transparent; background: transparent; color: var(--color-text-secondary); }
-.dk-tour-button:focus-visible, .dk-tour-card__close:focus-visible, .dk-tour-replay:focus-visible { outline: none; box-shadow: var(--shadow-focus); }
-.dk-tour-replay { display: inline-grid; width: 44px; min-width: 44px; height: 44px; min-height: 44px; padding: 0; place-items: center; border: 1px solid var(--color-border-default); border-radius: var(--radius-md); background: var(--color-bg-surface); color: var(--color-text-secondary); cursor: pointer; }
-.dk-tour-replay:hover { border-color: var(--color-border-strong); background: var(--color-bg-hover); color: var(--color-action-primary); }
-.dk-tour-replay :where(.ui-icon, svg) { width: 19px; height: 19px; }
-.dk-tour-replay--floating { position: fixed; left: max(var(--space-4), env(safe-area-inset-left)); right: auto; bottom: max(var(--space-4), env(safe-area-inset-bottom)); z-index: 900; box-shadow: var(--shadow-dropdown); }
-body.dk-tour-open { overflow: hidden !important; }
-@keyframes dk-tour-card-enter { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+.dk-tour-highlight { position: fixed; z-index: 1; border: 2px solid var(--color-action-primary); border-radius: 18px; box-shadow: 0 0 0 5px color-mix(in srgb, var(--color-action-primary) 22%, transparent), 0 0 0 9999px var(--color-bg-overlay), 0 12px 36px rgba(15, 23, 42, 0.28); pointer-events: none; will-change: top, left, width, height; transition: border-radius var(--motion-normal), opacity var(--motion-normal); }
+/* Redesigned Sleek Floating HUD Guide Modal */
+.dk-tour-card {
+  position: fixed;
+  z-index: 2;
+  width: min(480px, calc(100vw - 28px));
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--color-border-default) 80%, var(--color-action-primary) 20%);
+  border-radius: 16px;
+  background: color-mix(in srgb, var(--color-bg-surface) 95%, transparent);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  color: var(--color-text-primary);
+  box-shadow: 0 4px 6px -1px rgba(4, 36, 88, 0.05), 0 16px 32px -6px rgba(4, 36, 88, 0.16), 0 0 0 1px color-mix(in srgb, var(--color-action-primary) 10%, transparent);
+  outline: none;
+  animation: dk-tour-card-enter var(--motion-normal);
+  transition: top 0.3s cubic-bezier(0.16, 1, 0.3, 1), left 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.dk-tour-card__header {
+  display: flex;
+  min-height: 32px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px 2px;
+}
+
+.dk-tour-card__badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 2px 8px 2px 5px;
+  border-radius: 999px;
+  background: var(--color-action-primary-subtle);
+  color: var(--color-action-primary);
+  max-width: calc(100% - 32px);
+}
+
+.dk-tour-card__icon {
+  display: inline-grid;
+  width: 18px;
+  height: 18px;
+  place-items: center;
+  border-radius: 999px;
+  background: var(--color-action-primary);
+  color: var(--color-text-on-action, #ffffff);
+  flex-shrink: 0;
+}
+
+.dk-tour-card__icon :where(.ui-icon, svg) {
+  width: 10px;
+  height: 10px;
+}
+
+.dk-tour-card__eyebrow {
+  margin: 0;
+  color: var(--color-action-primary);
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: .06em;
+  line-height: 1;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.dk-tour-card__dot {
+  font-size: 0.6rem;
+  opacity: 0.45;
+  line-height: 1;
+}
+
+.dk-tour-card__context {
+  margin: 0;
+  overflow: hidden;
+  color: color-mix(in srgb, var(--color-action-primary) 85%, var(--color-text-primary));
+  font-size: 0.73rem;
+  font-weight: 600;
+  line-height: 1;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dk-tour-card__close {
+  display: inline-grid;
+  width: 26px;
+  min-width: 26px;
+  height: 26px;
+  min-height: 26px;
+  padding: 0;
+  place-items: center;
+  border: 1px solid color-mix(in srgb, var(--color-border-default) 60%, transparent);
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--color-bg-surface) 60%, transparent);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: all var(--motion-fast);
+}
+
+.dk-tour-card__close:hover, .dk-tour-card__close:focus-visible {
+  border-color: var(--color-border-strong);
+  background: var(--color-bg-hover);
+  color: var(--color-text-primary);
+  transform: scale(1.05);
+}
+
+.dk-tour-card__body {
+  padding: 2px 14px 4px;
+}
+
+.dk-tour-card__title {
+  margin: 0 0 2px;
+  color: var(--color-text-brand);
+  font-family: 'Outfit', var(--font-family);
+  font-size: 1.02rem;
+  font-weight: 750;
+  letter-spacing: -0.015em;
+  line-height: 1.25;
+}
+
+.dk-tour-card__description {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: 0.8125rem;
+  line-height: 1.4;
+}
+
+.dk-tour-progress {
+  display: flex;
+  gap: 5px;
+  align-items: center;
+  padding: 3px 14px 4px;
+}
+
+.dk-tour-progress__bar {
+  height: 3px;
+  flex: 1 1 0;
+  overflow: hidden;
+  border-radius: var(--radius-full);
+  background: color-mix(in srgb, var(--color-border-default) 85%, transparent);
+}
+
+.dk-tour-progress__bar::after {
+  display: block;
+  width: 0;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--color-action-primary);
+  content: "";
+  transition: width var(--motion-normal);
+}
+
+.dk-tour-progress__bar.is-complete::after {
+  width: 100%;
+}
+
+.dk-tour-progress__bar.is-current::after {
+  width: 100%;
+  box-shadow: 0 0 6px color-mix(in srgb, var(--color-action-primary) 60%, transparent);
+}
+
+.dk-tour-card__footer {
+  display: flex;
+  min-height: 38px;
+  gap: var(--space-2);
+  align-items: center;
+  padding: 3px 12px 8px;
+}
+
+.dk-tour-card__spacer {
+  flex: 1 1 auto;
+}
+
+.dk-tour-button {
+  display: inline-flex;
+  min-height: 30px;
+  height: 30px;
+  padding: 0 13px;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-sm);
+  background: var(--color-bg-surface);
+  color: var(--color-text-brand);
+  font: 600 0.8rem/1 var(--font-family);
+  cursor: pointer;
+  transition: all var(--motion-fast);
+}
+
+.dk-tour-button:hover, .dk-tour-button:focus-visible {
+  border-color: var(--color-border-strong);
+  background: var(--color-bg-hover);
+  color: var(--color-text-primary);
+}
+
+.dk-tour-button--primary {
+  border-color: var(--color-action-primary);
+  background: var(--color-action-primary);
+  color: var(--color-text-on-action, #ffffff);
+  box-shadow: 0 2px 6px color-mix(in srgb, var(--color-action-primary) 35%, transparent);
+}
+
+.dk-tour-button--primary:hover, .dk-tour-button--primary:focus-visible {
+  border-color: var(--color-action-primary-hover);
+  background: var(--color-action-primary-hover);
+  color: var(--color-text-on-action, #ffffff);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px color-mix(in srgb, var(--color-action-primary) 45%, transparent);
+}
+
+.dk-tour-button--quiet {
+  padding-inline: 4px;
+  border-color: transparent;
+  background: transparent;
+  color: var(--color-text-secondary);
+  font-size: 0.76rem;
+  font-weight: 550;
+}
+
+.dk-tour-button--quiet:hover {
+  background: transparent;
+  color: var(--color-text-primary);
+  text-decoration: underline;
+}
+
+.dk-tour-button:focus-visible, .dk-tour-card__close:focus-visible, .dk-tour-replay:focus-visible {
+  outline: none;
+  box-shadow: var(--shadow-focus);
+}
+
+.dk-tour-replay {
+  display: inline-grid;
+  width: 44px;
+  min-width: 44px;
+  height: 44px;
+  min-height: 44px;
+  padding: 0;
+  place-items: center;
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-md);
+  background: var(--color-bg-surface);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: all var(--motion-fast);
+}
+
+.dk-tour-replay:hover {
+  border-color: var(--color-border-strong);
+  background: var(--color-bg-hover);
+  color: var(--color-action-primary);
+  transform: scale(1.04);
+}
+
+.dk-tour-replay :where(.ui-icon, svg) {
+  width: 19px;
+  height: 19px;
+}
+
+.dk-tour-replay--floating {
+  position: fixed;
+  left: max(var(--space-4), env(safe-area-inset-left));
+  right: auto;
+  bottom: max(var(--space-4), env(safe-area-inset-bottom));
+  z-index: 900;
+  box-shadow: var(--shadow-dropdown);
+}
+
+@keyframes dk-tour-card-enter {
+  from { opacity: 0; transform: translateY(-8px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
 @media (max-width: 640px) {
-  .dk-tour-highlight { border-radius: var(--radius-md); }
+  .dk-tour-highlight { border-radius: 14px; }
   .dk-tour-card { right: var(--space-2) !important; bottom: max(var(--space-2), env(safe-area-inset-bottom)) !important; left: var(--space-2) !important; display: flex; width: auto; max-height: min(70dvh, 520px); flex-direction: column; border-radius: var(--radius-lg); }
   .dk-tour-card[data-card-position="top"] { top: max(var(--space-2), env(safe-area-inset-top)) !important; bottom: auto !important; }
   .dk-tour-card__header, .dk-tour-progress, .dk-tour-card__footer { flex: 0 0 auto; }

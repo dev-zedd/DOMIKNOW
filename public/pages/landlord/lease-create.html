@@ -180,6 +180,30 @@
             height: 16px;
             accent-color: var(--landlord);
         }
+
+        /* ── Remove duplicate top breadcrumbs on lease-create ── */
+        .dk-breadcrumbs, [data-domiknow-breadcrumbs], .breadcrumb-nav {
+            display: none !important;
+        }
+        /* ── Back Navigation Link (styled like tenant/lease-details.html & property-create.html) ── */
+        .app-back-nav {
+            margin-bottom: 1.25rem;
+        }
+        .app-details-back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--color-action-primary, #0355f3);
+            font-size: 0.875rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: opacity 0.15s ease, transform 0.15s ease;
+        }
+        .app-details-back-link:hover {
+            opacity: 0.85;
+            transform: translateX(-2px);
+            text-decoration: underline;
+        }
     </style>
     <link href="../../css/design-system.css" rel="stylesheet">
     <script src="../../js/ui.js" defer></script>
@@ -194,7 +218,7 @@
             </div>
             <div class="navbar-menu">
                 <a href="dashboard.html" class="navbar-menu-link">Dashboard</a>
-                <a href="properties.html" class="navbar-menu-link">My Properties</a>
+                <a href="properties.html" class="navbar-menu-link">Properties</a>
                 <a href="applications.html" class="navbar-menu-link">Tenant Applications</a>
                 <a href="leases.html" class="navbar-menu-link active">Leases</a>
                 <a href="billings.html" class="navbar-menu-link">Billings</a>
@@ -209,9 +233,13 @@
 
     <!-- Main Content -->
     <main class="dashboard-container" style="max-width: 1200px;">
-        <div style="display:flex; justify-content:flex-end; align-items:center; margin-bottom: 1.25rem;">
-            <a href="leases.html" class="navbar-btn" style="background-color: var(--text-secondary); color: white; width:auto; padding: 0.5rem 1.25rem; text-decoration:none; display:inline-flex; align-items:center; gap:0.4rem; font-weight:600;">
-                ← Back to Lease Directory
+        <div class="app-back-nav">
+            <a href="leases.html" class="app-details-back-link" id="backToListBtn">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <line x1="19" y1="12" x2="5" y2="12"></line>
+                    <polyline points="12 19 5 12 12 5"></polyline>
+                </svg>
+                <span>Back to list</span>
             </a>
         </div>
 

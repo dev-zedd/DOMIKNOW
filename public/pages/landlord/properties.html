@@ -134,23 +134,95 @@
             align-items: center;
             gap: 1rem;
         }
-        .tab-btn {
+        /* ── Register Property Action Button (consistent with tenant portal) ── */
+        .btn-register-property {
+            background: #ffffff;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            padding: 8px 18px;
+            font-weight: 700;
+            font-size: 0.875rem;
+            color: #0f172a;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+            white-space: nowrap;
+            text-decoration: none;
+            margin-bottom: 12px;
+        }
+        .btn-register-property:hover {
+            background: #f8fafc;
+            border-color: #94a3b8;
+            color: #0f172a;
+            text-decoration: none;
+        }
+
+        /* ── Properties Tabs & Action Header Row (consistent with tenant portal) ── */
+        .properties-header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #e2e8f0;
+            margin-bottom: 1.5rem;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+        .properties-tabs-bar {
+            display: flex;
+            align-items: center;
+            gap: 22px;
+            overflow-x: auto;
+            scrollbar-width: none;
+            padding-bottom: 12px;
+        }
+        .properties-tabs-bar::-webkit-scrollbar { display: none; }
+        .m-tab-btn {
             background: none;
             border: none;
-            border-bottom: 3px solid transparent;
-            padding: 0.75rem 1.25rem;
-            font-weight: 700;
-            color: var(--text-secondary);
-            cursor: pointer;
-            transition: all var(--transition-fast);
+            padding: 4px 0;
             font-size: 0.9375rem;
+            font-weight: 700;
+            color: #64748b;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            position: relative;
+            transition: color 0.15s ease;
+            white-space: nowrap;
         }
-        .tab-btn:hover {
-            color: var(--text-primary);
+        .m-tab-btn:hover {
+            color: #0052ea;
         }
-        .tab-btn.active {
-            border-bottom-color: var(--landlord) !important;
-            color: var(--text-primary) !important;
+        .m-tab-btn.active {
+            color: #0052ea;
+            font-weight: 800;
+        }
+        .m-tab-btn.active::after {
+            content: '';
+            position: absolute;
+            bottom: -13px;
+            left: 0;
+            right: 0;
+            height: 2.5px;
+            background: #0052ea;
+            border-radius: 2px;
+        }
+        .tab-count {
+            background: #e2e8f0;
+            color: #475569;
+            font-size: 0.6875rem;
+            font-weight: 700;
+            padding: 2px 7px;
+            border-radius: 999px;
+            line-height: 1.2;
+        }
+        .m-tab-btn.active .tab-count {
+            background: #eff6ff;
+            color: #0052ea;
         }
     </style>
     <link href="../../css/design-system.css" rel="stylesheet">
@@ -166,7 +238,7 @@
             </div>
             <div class="navbar-menu">
                 <a href="dashboard.html" class="navbar-menu-link">Dashboard</a>
-                <a href="properties.html" class="navbar-menu-link active">My Properties</a>
+                <a href="properties.html" class="navbar-menu-link active">Properties</a>
                 <a href="property-create.html" class="navbar-menu-link">Register Property</a>
                 <a href="applications.html" class="navbar-menu-link">Tenant Applications</a>
             </div>
@@ -179,17 +251,23 @@
 
     <!-- Main Content -->
     <main class="dashboard-container">
-        <div style="display: flex; justify-content: flex-end; align-items: center; margin-bottom: 1.25rem;">
-            <a href="property-create.html" class="btn-primary" style="display: inline-flex; align-items: center; gap: 6px; width: auto; background-color: var(--landlord); text-decoration: none;">
-                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
-                Register New Property
+        <!-- Header row with Tab Controls and Action Button (consistent with tenant portal) -->
+        <div class="properties-header-row">
+            <div class="properties-tabs-bar" role="tablist" aria-label="Property status">
+                <button id="tabPending" class="m-tab-btn active" role="tab" aria-selected="true" onclick="switchTab('pending')">
+                    Pending Review <span class="tab-count" id="tabCountPending">0</span>
+                </button>
+                <button id="tabApproved" class="m-tab-btn" role="tab" aria-selected="false" onclick="switchTab('approved')">
+                    Approved <span class="tab-count" id="tabCountApproved">0</span>
+                </button>
+            </div>
+            <a href="property-create.html" class="btn-register-property">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+                <span>Register New Property</span>
             </a>
-        </div>
-
-        <!-- Tab Controls -->
-        <div role="tablist" aria-label="Property status" style="display: flex; gap: 0.5rem; border-bottom: 2px solid var(--border-color); margin-bottom: 1.5rem;">
-            <button id="tabPending" class="tab-btn active" role="tab" aria-selected="true" onclick="switchTab('pending')">Pending Review</button>
-            <button id="tabApproved" class="tab-btn" role="tab" aria-selected="false" onclick="switchTab('approved')">Approved</button>
         </div>
 
         <div id="propertiesGrid" class="prop-grid" aria-live="polite" aria-busy="true">
@@ -224,6 +302,15 @@
 
                 const result = await response.json();
                 allProperties = result.data || [];
+
+                // Update tab counters (consistent with tenant portal)
+                const pendingCount = allProperties.filter(p => p.status === 'pending_review' || p.status === 'rejected').length;
+                const approvedCount = allProperties.filter(p => p.status === 'approved' || p.status === 'unavailable' || p.status === 'reserved').length;
+                const pendingBadge = document.getElementById('tabCountPending');
+                const approvedBadge = document.getElementById('tabCountApproved');
+                if (pendingBadge) pendingBadge.textContent = pendingCount;
+                if (approvedBadge) approvedBadge.textContent = approvedCount;
+
                 renderProperties();
                 grid.setAttribute('aria-busy', 'false');
 

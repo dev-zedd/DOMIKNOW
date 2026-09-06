@@ -374,9 +374,88 @@ const landlordModel = {
             application.properties.amenities = combinedAmenities;
         }
 
+        // Fetch screening if exists for this application or tenant
+        let screening = null;
+        try {
+            const { data: appScreening } = await supabase
+                .from('tenant_screening')
+                .select('*')
+                .eq('application_id', id)
+                .maybeSingle();
+
+            if (appScreening) {
+                screening = appScreening;
+            } else if (application.tenant_id) {
+                const { data: tenantScreening } = await supabase
+                    .from('tenant_screening')
+                    .select('*')
+                    .eq('tenant_id', application.tenant_id)
+                    .order('created_at', { ascending: false })
+                    .limit(1)
+                    .maybeSingle();
+                if (tenantScreening) {
+                    screening = tenantScreening;
+                }
+            }
+        } catch (sErr) {
+            console.error('Error fetching screening in findApplicationDetails:', sErr);
+        }
+
+        // Fetch tenant platform history (leases, violations, outstanding bills)
+        let tenantHistory = {
+            leases: [],
+            violations: [],
+            unpaid_balance: 0,
+            unpaid_bills_count: 0
+        };
+
+        if (application.tenant_id) {
+            try {
+                // Fetch prior/active leases
+                const { data: priorLeases } = await supabase
+                    .from('lease_records')
+                    .select(`
+                        id,
+                        lease_number,
+                        lease_status,
+                        lease_start_date,
+                        lease_end_date,
+                        monthly_rent,
+                        properties (
+                            property_name
+                        )
+                    `)
+                    .eq('tenant_id', application.tenant_id)
+                    .order('created_at', { ascending: false });
+                tenantHistory.leases = priorLeases || [];
+
+                // Fetch reported policy violations
+                const { data: vios } = await supabase
+                    .from('policy_violations')
+                    .select('id, violation_type, status, created_at')
+                    .eq('violator_id', application.tenant_id);
+                tenantHistory.violations = vios || [];
+
+                // Fetch unpaid / overdue bills
+                const { data: unpaidBills } = await supabase
+                    .from('billing_records')
+                    .select('total_amount, billing_status, due_date')
+                    .eq('tenant_id', application.tenant_id)
+                    .in('billing_status', ['unpaid', 'overdue']);
+                if (unpaidBills && unpaidBills.length > 0) {
+                    tenantHistory.unpaid_bills_count = unpaidBills.length;
+                    tenantHistory.unpaid_balance = unpaidBills.reduce((sum, b) => sum + (Number(b.total_amount) || 0), 0);
+                }
+            } catch (hErr) {
+                console.error('Error fetching tenant history in findApplicationDetails:', hErr);
+            }
+        }
+
         return {
             ...application,
-            documents
+            documents,
+            screening,
+            tenant_history: tenantHistory
         };
     },
 

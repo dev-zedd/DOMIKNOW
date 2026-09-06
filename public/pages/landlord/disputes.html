@@ -6,210 +6,870 @@
     <title>Complaint Management - DomiKnow</title>
     <meta name="description" content="Review, manage, and resolve formal complaints submitted by your tenants.">
     <link href="../../css/input.css" rel="stylesheet">
+    <link href="../../css/design-system.css" rel="stylesheet">
     <style>
-        /* ── Summary Strip ───────────────────────────────────── */
-        .summary-strip {
-            display: flex; gap: 1rem; margin: 1.25rem 0; flex-wrap: wrap;
-        }
-        .stat-card {
-            background: var(--bg-secondary);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-md);
-            padding: 1rem 1.5rem;
-            box-shadow: var(--shadow-md);
-            flex: 1; min-width: 120px;
-            display: flex; flex-direction: column; gap: 0.2rem;
-        }
-        .stat-value { font-size: 1.8rem; font-weight: 800; color: var(--text-primary); line-height: 1; }
-        .stat-label { font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600; }
-
-        /* ── List Panel ──────────────────────────────────────── */
-        .list-panel {
-            background: var(--bg-secondary);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-lg);
-            padding: 2rem;
-            box-shadow: var(--shadow-lg);
-        }
-        .filter-bar {
-            display: flex; gap: 0.75rem; margin-bottom: 1.25rem; flex-wrap: wrap; align-items: center;
-        }
-        .filter-bar label { font-size: 0.82rem; font-weight: 600; color: var(--text-secondary); }
-        .filter-btn {
-            font-size: 0.78rem; padding: 0.35rem 0.9rem;
-            border-radius: var(--radius-full); border: 1.5px solid var(--border-color);
-            background: transparent; cursor: pointer; font-weight: 600;
-            color: var(--text-secondary); transition: all var(--transition-fast);
-        }
-        .filter-btn:hover, .filter-btn.active {
-            background: var(--landlord); color: #fff; border-color: var(--landlord);
+        /* ══════════════════════════════════════════════════════
+           PAGE ESSENTIALS & THEME TOKENS
+        ══════════════════════════════════════════════════════ */
+        :root {
+            --primary: #0052ea;
+            --primary-hover: #0247d1;
+            --primary-light: #eff6ff;
+            --landlord: #0052ea;
+            --landlord-hover: #0247d1;
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --text-muted: #64748b;
+            --bg-primary: #f8fafc;
+            --bg-secondary: #ffffff;
+            --border-color: #e2e8f0;
         }
 
-        /* ── Table ───────────────────────────────────────────── */
-        .table-wrap { overflow-x: auto; }
-        table { width: 100%; border-collapse: collapse; font-size: 0.88rem; text-align: left; }
-        th {
-            font-weight: 700; color: var(--text-secondary);
-            padding: 0.7rem 1rem;
-            border-bottom: 2px solid var(--border-color);
-            text-transform: uppercase; font-size: 0.72rem; letter-spacing: 0.05em;
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
         }
-        td {
-            padding: 1rem; border-bottom: 1px solid var(--border-color);
-            color: var(--text-primary); vertical-align: top;
-        }
-        tr:hover td { background: var(--bg-primary); }
 
-        /* ── Status Chips ────────────────────────────────────── */
-        .chip {
-            display: inline-block; padding: 0.2rem 0.65rem;
-            border-radius: var(--radius-full); font-size: 0.72rem;
-            font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em;
+        .dashboard-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem 4rem;
         }
-        .chip-submitted    { background:var(--color-info-bg); color:var(--color-info-text); }
-        .chip-under_review { background:var(--color-warning-bg); color:var(--color-warning-text); }
-        .chip-in_progress  { background:var(--color-warning-bg); color:var(--color-warning-text); }
-        .chip-resolved     { background:var(--color-success-bg); color:var(--color-success-text); }
-        .chip-closed       { background:var(--color-bg-subtle); color:var(--color-text-secondary); }
-        .chip-rejected     { background:var(--color-error-bg); color:var(--color-error-text); }
 
-        /* ── Action Buttons ──────────────────────────────────── */
-        .action-btn {
-            font-size: 0.78rem; padding: 0.35rem 0.85rem;
-            border-radius: var(--radius-sm); border: none;
-            cursor: pointer; font-weight: 600;
-            transition: background var(--transition-fast), transform var(--transition-fast);
+        /* ══════════════════════════════════════════════════════
+           TABS & LEDGER CONTROLS
+        ══════════════════════════════════════════════════════ */
+        .maintenance-tabs-bar {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+            overflow-x: auto;
+            scrollbar-width: none;
+            padding-bottom: 12px;
+            width: 100%;
+            border-bottom: 1px solid #e2e8f0;
+            margin-bottom: 1.25rem;
         }
-        .action-btn:hover { transform: translateY(-1px); }
-        .btn-view { background: var(--primary-light); color: var(--primary); }
-        .btn-view:hover { background: var(--primary); color: #fff; }
+        .maintenance-tabs-bar::-webkit-scrollbar { display: none; }
 
-        /* ── Modal ───────────────────────────────────────────── */
+        .m-tab-btn {
+            background: none !important;
+            border: none !important;
+            padding: 4px 0 !important;
+            font-size: 0.9rem !important;
+            font-weight: 600 !important;
+            color: #64748b !important;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            position: relative;
+            transition: color 0.15s ease;
+            white-space: nowrap;
+            outline: none;
+            box-shadow: none !important;
+        }
+        .m-tab-btn:hover {
+            color: #0052ea !important;
+        }
+        .m-tab-btn.active {
+            color: #0052ea !important;
+            font-weight: 800 !important;
+        }
+        .m-tab-btn.active::after {
+            content: '';
+            position: absolute;
+            bottom: -13px;
+            left: 0;
+            right: 0;
+            height: 2.5px;
+            background: #0052ea;
+            border-radius: 2px 2px 0 0;
+        }
+        .tab-count {
+            background: #e2e8f0;
+            color: #475569;
+            font-size: 0.6875rem;
+            font-weight: 700;
+            padding: 2px 7px;
+            border-radius: 999px;
+            line-height: 1.2;
+        }
+        .m-tab-btn.active .tab-count {
+            background: #eff6ff;
+            color: #0052ea;
+        }
+
+        .ledger-controls-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 18px;
+            flex-wrap: wrap;
+        }
+        .ledger-search-box {
+            position: relative;
+            display: flex;
+            align-items: center;
+            flex: 1;
+            max-width: 380px;
+        }
+        .ledger-search-box svg {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #94a3b8;
+            pointer-events: none;
+            z-index: 1;
+        }
+        .ledger-search-box input {
+            padding: 9px 14px 9px 42px !important;
+            padding-left: 42px !important;
+            border: 1px solid #cbd5e1;
+            border-radius: 9px;
+            font-size: 0.875rem;
+            color: #0f172a;
+            width: 100%;
+            background: #ffffff;
+            outline: none;
+            transition: border-color 0.15s ease, box-shadow 0.15s ease;
+        }
+        .ledger-search-box input:focus {
+            border-color: #0052ea;
+            box-shadow: 0 0 0 3px rgba(0, 82, 234, 0.08);
+        }
+        .ledger-filter-group {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .ledger-select-wrap {
+            position: relative;
+        }
+        .ledger-select {
+            padding: 9px 32px 9px 14px;
+            border: 1px solid #cbd5e1;
+            border-radius: 9px;
+            font-size: 0.8125rem;
+            font-weight: 600;
+            color: #334155;
+            background: #ffffff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23475569' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E") no-repeat right 12px center;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            cursor: pointer;
+            outline: none;
+            transition: border-color 0.15s ease;
+        }
+        .ledger-select:focus {
+            border-color: #0052ea;
+        }
+
+        /* ══════════════════════════════════════════════════════
+           COMPLAINT REQUEST CARDS
+        ══════════════════════════════════════════════════════ */
+        .requests-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 32px;
+        }
+        .request-card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 14px;
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            cursor: pointer;
+            transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+            outline: none;
+        }
+        .request-card:hover {
+            border-color: #cbd5e1;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+            transform: translateY(-1px);
+        }
+        .rc-left-group {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            flex: 1.5;
+            min-width: 240px;
+        }
+        .rc-icon-box {
+            width: 44px;
+            height: 44px;
+            border-radius: 11px;
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            color: #0052ea;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        .rc-icon-box.submitted    { background: #f0fdfa; border-color: #99f6e4; color: #0d9488; }
+        .rc-icon-box.under_review { background: #fffbeb; border-color: #fde68a; color: #d97706; }
+        .rc-icon-box.in_progress  { background: #f5f3ff; border-color: #ddd6fe; color: #7c3aed; }
+        .rc-icon-box.resolved     { background: #f0fdf4; border-color: #bbf7d0; color: #16a34a; }
+        .rc-icon-box.closed       { background: #f8fafc; border-color: #e2e8f0; color: #64748b; }
+        .rc-icon-box.rejected     { background: #fef2f2; border-color: #fecaca; color: #dc2626; }
+
+        .rc-text-box {
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+        }
+        .rc-title {
+            font-size: 0.95rem;
+            font-weight: 750;
+            color: #0f172a;
+            margin-bottom: 3px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .rc-subtitle {
+            font-size: 0.8125rem;
+            color: #64748b;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .rc-assigned-group {
+            min-width: 140px;
+            border-left: 1px solid #f1f5f9;
+            padding-left: 16px;
+        }
+        .rc-priority-group {
+            min-width: 130px;
+            border-left: 1px solid #f1f5f9;
+            padding-left: 16px;
+        }
+        .rc-col-label {
+            font-size: 0.6875rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #64748b;
+        }
+        .rc-col-val {
+            font-size: 0.875rem;
+            font-weight: 700;
+            color: #0f172a;
+            margin-top: 2px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .rc-right-group {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-shrink: 0;
+        }
+
+        .rc-status-pill {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.6875rem;
+            font-weight: 750;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+        .rc-status-pill.submitted {
+            background: #f0fdfa;
+            color: #0f766e;
+            border: 1px solid #99f6e4;
+        }
+        .rc-status-pill.under_review {
+            background: #fffbeb;
+            color: #b45309;
+            border: 1px solid #fde68a;
+        }
+        .rc-status-pill.in_progress {
+            background: #f5f3ff;
+            color: #6d28d9;
+            border: 1px solid #ddd6fe;
+        }
+        .rc-status-pill.resolved {
+            background: #ecfdf5;
+            color: #059669;
+            border: 1px solid #a7f3d0;
+        }
+        .rc-status-pill.closed {
+            background: #f1f5f9;
+            color: #475569;
+            border: 1px solid #cbd5e1;
+        }
+        .rc-status-pill.rejected {
+            background: #fef2f2;
+            color: #dc2626;
+            border: 1px solid #fecaca;
+        }
+
+        .btn-manage-card {
+            background: #ffffff;
+            border: 1px solid #cbd5e1;
+            color: #0f172a;
+            font-size: 0.8125rem;
+            font-weight: 600;
+            padding: 6px 14px;
+            border-radius: 7px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .btn-manage-card:hover {
+            background: #0052ea;
+            border-color: #0052ea;
+            color: #ffffff;
+        }
+        .rc-chevron {
+            color: #94a3b8;
+            display: flex;
+            align-items: center;
+        }
+
+        @media (max-width: 900px) {
+            .rc-assigned-group,
+            .rc-priority-group {
+                display: none;
+            }
+        }
+        @media (max-width: 600px) {
+            .request-card {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 12px;
+            }
+            .rc-right-group {
+                justify-content: space-between;
+            }
+        }
+
+        /* ══════════════════════════════════════════════════════
+           MODAL SYSTEM (Consistent, Sleek & Minimalist)
+        ══════════════════════════════════════════════════════ */
         .modal-overlay {
-            position: fixed; inset: 0;
-            background: rgba(15,23,42,0.6);
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.45);
             backdrop-filter: blur(4px);
-            display: flex; justify-content: center; align-items: center;
-            z-index: 1000; padding: 1.5rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            padding: 1.5rem;
         }
-        .modal-overlay.hidden { display: none; }
-        .modal-box {
-            background: var(--bg-secondary);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-lg);
-            padding: 2rem;
-            max-width: 640px; width: 100%;
-            box-shadow: var(--shadow-premium);
-            max-height: 90vh; overflow-y: auto;
-            animation: mIn 0.2s ease;
+        .modal-overlay.hidden { display: none !important; }
+
+        .modal-container {
+            background-color: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            width: 100%;
+            max-width: 640px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.15);
+            display: flex;
+            flex-direction: column;
+            animation: modalFadeIn 0.18s ease;
         }
-        @keyframes mIn {
-            from { opacity:0; transform: translateY(10px) scale(0.97); }
-            to   { opacity:1; transform: translateY(0) scale(1); }
+        @keyframes modalFadeIn {
+            from { opacity: 0; transform: translateY(8px) scale(0.99); }
+            to   { opacity: 1; transform: translateY(0) scale(1); }
         }
+
         .modal-header {
-            display: flex; align-items: center;
-            justify-content: space-between; margin-bottom: 1.5rem;
+            padding: 1.25rem 1.75rem;
+            border-bottom: 1px solid #f1f5f9;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            background-color: #ffffff;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        .modal-header-title {
+            font-size: 1.2rem;
+            font-weight: 800;
+            color: #0f172a;
+            margin: 0;
+            line-height: 1.2;
+        }
+        .modal-header-subtitle {
+            font-size: 0.8125rem;
+            color: #64748b;
+            font-weight: 500;
+            margin-top: 4px;
         }
         .modal-close-x {
-            background: none; border: none; cursor: pointer;
-            color: var(--text-muted); padding: 0.25rem;
-            border-radius: var(--radius-sm); transition: color var(--transition-fast);
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            color: #64748b;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 4px;
+            border-radius: 6px;
+            transition: background 0.15s ease, color 0.15s ease;
         }
-        .modal-close-x:hover { color: var(--text-primary); }
-        .detail-row {
-            display: grid; grid-template-columns: 140px 1fr;
-            gap: 0.5rem 1rem; margin-bottom: 0.9rem; align-items: start;
+        .modal-close-x:hover {
+            background: #f1f5f9;
+            color: #0f172a;
         }
-        .detail-label {
-            font-size: 0.75rem; font-weight: 700; color: var(--text-secondary);
-            text-transform: uppercase; letter-spacing: 0.04em; padding-top: 0.05rem;
-        }
-        .detail-value { font-size: 0.9rem; color: var(--text-primary); word-break: break-word; }
-        .detail-divider { border: none; border-top: 1px solid var(--border-color); margin: 1rem 0; }
 
-        /* ── Action Section ──────────────────────────────────── */
+        .modal-body {
+            padding: 1.5rem 1.75rem;
+            overflow-y: auto;
+            flex: 1;
+        }
+        .modal-footer {
+            padding: 1.25rem 1.75rem;
+            border-top: 1px solid #f1f5f9;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            background-color: #ffffff;
+            gap: 12px;
+            position: sticky;
+            bottom: 0;
+            z-index: 10;
+        }
+
+        .btn-modal-cancel {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            color: #0f172a;
+            font-size: 0.875rem;
+            font-weight: 600;
+            padding: 9px 22px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+        .btn-modal-cancel:hover {
+            background: #f8fafc;
+            border-color: #cbd5e1;
+        }
+
+        .btn-modal-primary {
+            background: #0052ea;
+            border: 1px solid #0052ea;
+            color: #ffffff;
+            font-size: 0.875rem;
+            font-weight: 600;
+            padding: 9px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn-modal-primary:hover {
+            background: #0247d1;
+            border-color: #0247d1;
+        }
+
+        .btn-progress {
+            background: #7c3aed;
+            border: 1px solid #7c3aed;
+            color: #ffffff;
+            font-size: 0.875rem;
+            font-weight: 600;
+            padding: 9px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+        .btn-progress:hover {
+            background: #6d28d9;
+            border-color: #6d28d9;
+        }
+
+        .btn-resolve {
+            background: #16a34a;
+            border: 1px solid #16a34a;
+            color: #ffffff;
+            font-size: 0.875rem;
+            font-weight: 600;
+            padding: 9px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+        .btn-resolve:hover {
+            background: #15803d;
+            border-color: #15803d;
+        }
+
+        .btn-reject-pill {
+            background: #fef2f2;
+            color: #dc2626;
+            border: 1px solid #fecaca;
+            font-size: 0.875rem;
+            font-weight: 600;
+            padding: 9px 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+        .btn-reject-pill:hover {
+            background: #dc2626;
+            color: #ffffff;
+            border-color: #dc2626;
+        }
+
+        .btn-close-complaint {
+            background: #f1f5f9;
+            color: #334155;
+            border: 1px solid #cbd5e1;
+            font-size: 0.875rem;
+            font-weight: 600;
+            padding: 9px 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+        .btn-close-complaint:hover {
+            background: #334155;
+            color: #ffffff;
+            border-color: #334155;
+        }
+
+        /* ── Detail Cards & Alert Boxes ── */
+        .detail-summary-card {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px 18px;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 16px 18px;
+            margin-bottom: 1.25rem;
+        }
+        @media (max-width: 480px) {
+            .detail-summary-card {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+        }
+        .detail-card-item {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+        .dc-label {
+            font-size: 0.72rem;
+            color: #64748b;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+        .dc-val {
+            font-size: 0.875rem;
+            font-weight: 700;
+            color: #0f172a;
+            word-break: break-word;
+        }
+        .detail-section-title {
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #64748b;
+            margin: 1.25rem 0 0.5rem 0;
+        }
+        .detail-section-title:first-child {
+            margin-top: 0;
+        }
+        .detail-box {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 12px 16px;
+            font-size: 0.875rem;
+            color: #334155;
+            line-height: 1.6;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+
+        .detail-alert-box {
+            border-radius: 10px;
+            padding: 12px 16px;
+            margin-bottom: 1.25rem;
+            font-size: 0.875rem;
+            line-height: 1.5;
+        }
+        .detail-alert-box.success {
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            color: #166534;
+        }
+        .detail-alert-box.warning {
+            background: #fffbeb;
+            border: 1px solid #fde68a;
+            color: #92400e;
+        }
+        .detail-alert-box.danger {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            color: #991b1b;
+        }
+        .detail-alert-box.info {
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            color: #1e40af;
+        }
+        .detail-alert-box.purple {
+            background: #faf5ff;
+            border: 1px solid #e9d5ff;
+            color: #7e22ce;
+        }
+        .detail-alert-title {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        /* ── Action Section ── */
         .action-section {
-            background: var(--bg-primary);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-md);
-            padding: 1.25rem;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 16px;
             margin-top: 1.25rem;
         }
         .action-section-title {
-            font-size: 0.8rem; font-weight: 700;
-            color: var(--text-secondary); text-transform: uppercase;
-            letter-spacing: 0.05em; margin-bottom: 1rem;
+            font-size: 0.78rem;
+            font-weight: 700;
+            color: #475569;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.75rem;
         }
         .action-buttons-row {
-            display: flex; gap: 0.75rem; flex-wrap: wrap; margin-top: 0.75rem;
-        }
-        .btn-accept {
-            background: var(--landlord); color: #fff;
-            border: none; border-radius: var(--radius-sm);
-            padding: 0.55rem 1.1rem; font-size: 0.85rem;
-            font-weight: 700; cursor: pointer;
-            transition: background var(--transition-fast);
-        }
-        .btn-accept:hover { background: var(--landlord-hover); }
-        .btn-reject-pill {
-            background: var(--error-bg); color: var(--error);
-            border: 1.5px solid #fca5a5; border-radius: var(--radius-sm);
-            padding: 0.55rem 1.1rem; font-size: 0.85rem;
-            font-weight: 700; cursor: pointer;
-            transition: background var(--transition-fast);
-        }
-        .btn-reject-pill:hover { background: var(--error); color: #fff; }
-        .btn-progress {
-            background: var(--warning-bg); color: var(--warning);
-            border: 1.5px solid #fcd34d; border-radius: var(--radius-sm);
-            padding: 0.55rem 1.1rem; font-size: 0.85rem;
-            font-weight: 700; cursor: pointer;
-        }
-        .btn-resolve {
-            background: var(--success-bg); color: var(--success);
-            border: 1.5px solid #6ee7b7; border-radius: var(--radius-sm);
-            padding: 0.55rem 1.1rem; font-size: 0.85rem;
-            font-weight: 700; cursor: pointer;
-        }
-        .btn-close-complaint {
-            background: #f1f5f9; color: #475569;
-            border: 1.5px solid var(--border-color); border-radius: var(--radius-sm);
-            padding: 0.55rem 1.1rem; font-size: 0.85rem;
-            font-weight: 700; cursor: pointer;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 0.5rem;
         }
 
-        /* ── Alert bars ──────────────────────────────────────── */
+        /* ── Timeline ── */
+        .timeline {
+            margin-top: 0.75rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+        .timeline-item {
+            display: flex;
+            gap: 0.85rem;
+            align-items: flex-start;
+        }
+        .timeline-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #cbd5e1;
+            margin-top: 0.3rem;
+            flex-shrink: 0;
+            border: 2px solid #ffffff;
+            box-shadow: 0 0 0 1px #cbd5e1;
+        }
+        .timeline-dot.done {
+            background: #16a34a;
+            box-shadow: 0 0 0 1px #16a34a;
+        }
+        .timeline-dot.active {
+            background: #0052ea;
+            box-shadow: 0 0 0 3px rgba(0, 82, 234, 0.2);
+        }
+        .timeline-dot.rejected {
+            background: #dc2626;
+            box-shadow: 0 0 0 1px #dc2626;
+        }
+        .timeline-text {
+            font-size: 0.84rem;
+            color: #334155;
+        }
+        .timeline-date {
+            font-size: 0.72rem;
+            color: #64748b;
+            margin-top: 2px;
+        }
+
+        /* ── Alert Bar ── */
         .alert-bar {
-            border-radius: var(--radius-sm); padding: 0.65rem 1rem;
-            font-size: 0.83rem; font-weight: 500; margin-bottom: 0.75rem; display: none;
+            border-radius: 8px;
+            padding: 0.65rem 1rem;
+            font-size: 0.83rem;
+            font-weight: 500;
+            margin-bottom: 0.75rem;
+            display: none;
         }
         .alert-bar.visible { display: block; }
-        .alert-error { background: var(--color-error-bg); color: var(--color-error-text); border: 1px solid var(--color-error-border); }
-        .alert-success { background: var(--color-success-bg); color: var(--color-success-text); border: 1px solid var(--color-success-border); }
-
-        /* ── Timeline ────────────────────────────────────────── */
-        .timeline { margin-top: 0.5rem; }
-        .timeline-item { display: flex; gap: 0.85rem; margin-bottom: 0.85rem; align-items: flex-start; }
-        .timeline-dot {
-            width: 10px; height: 10px; border-radius: 50%;
-            background: var(--border-color); margin-top: 0.35rem;
-            flex-shrink: 0; border: 2px solid var(--border-color);
+        .alert-error {
+            background: #fef2f2;
+            color: #dc2626;
+            border: 1px solid #fecaca;
         }
-        .timeline-dot.done    { background: var(--success); border-color: var(--success); }
-        .timeline-dot.active  { background: var(--landlord); border-color: var(--landlord); }
-        .timeline-dot.rejected{ background: var(--error); border-color: var(--error); }
-        .timeline-text { font-size: 0.82rem; color: var(--text-secondary); }
-        .timeline-date { font-size: 0.71rem; color: var(--text-muted); margin-top: 0.1rem; }
+        .alert-success {
+            background: #f0fdf4;
+            color: #16a34a;
+            border: 1px solid #bbf7d0;
+        }
 
-        /* ── Empty ───────────────────────────────────────────── */
+        /* ── Empty State ── */
         .empty-state {
-            text-align: center; padding: 3rem 1rem; color: var(--text-muted);
-            display: flex; flex-direction: column; align-items: center; gap: 0.75rem;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 14px;
+            padding: 48px 24px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
         }
-        .empty-state svg { opacity: 0.25; }
+        .empty-state-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            color: #94a3b8;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 12px;
+        }
+
+        /* ══════════════════════════════════════════════════════
+           DARK THEME SUPPORT
+        ══════════════════════════════════════════════════════ */
+        [data-theme="dark"] body {
+            background-color: #0f172a;
+            color: #f8fafc;
+        }
+        [data-theme="dark"] .request-card,
+        [data-theme="dark"] .empty-state,
+        [data-theme="dark"] .modal-container {
+            background: #1e293b;
+            border-color: #334155;
+        }
+        [data-theme="dark"] .request-card:hover {
+            border-color: #475569;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+        }
+        [data-theme="dark"] .rc-title,
+        [data-theme="dark"] .rc-col-val,
+        [data-theme="dark"] .modal-header-title,
+        [data-theme="dark"] .dc-val {
+            color: #f8fafc;
+        }
+        [data-theme="dark"] .rc-subtitle,
+        [data-theme="dark"] .rc-col-label,
+        [data-theme="dark"] .modal-header-subtitle,
+        [data-theme="dark"] .dc-label,
+        [data-theme="dark"] .detail-section-title {
+            color: #94a3b8;
+        }
+        [data-theme="dark"] .maintenance-tabs-bar {
+            border-bottom-color: #334155;
+        }
+        [data-theme="dark"] .tab-count {
+            background: #334155;
+            color: #cbd5e1;
+        }
+        [data-theme="dark"] .ledger-search-box input,
+        [data-theme="dark"] .ledger-select,
+        [data-theme="dark"] .btn-manage-card {
+            background: #0f172a;
+            border-color: #334155;
+            color: #f8fafc;
+        }
+        [data-theme="dark"] .btn-manage-card:hover {
+            background: #0052ea;
+            border-color: #0052ea;
+            color: #ffffff;
+        }
+        [data-theme="dark"] .modal-header,
+        [data-theme="dark"] .modal-footer {
+            background: #1e293b;
+            border-color: #334155;
+        }
+        [data-theme="dark"] .detail-summary-card,
+        [data-theme="dark"] .detail-box,
+        [data-theme="dark"] .action-section {
+            background: #0f172a;
+            border-color: #334155;
+            color: #cbd5e1;
+        }
+        [data-theme="dark"] .btn-modal-cancel {
+            background: #1e293b;
+            border-color: #334155;
+            color: #f8fafc;
+        }
+        [data-theme="dark"] .rc-assigned-group,
+        [data-theme="dark"] .rc-priority-group {
+            border-left-color: #334155;
+        }
+        [data-theme="dark"] .rc-icon-box.closed {
+            background: #0f172a;
+            border-color: #334155;
+            color: #94a3b8;
+        }
+        [data-theme="dark"] .rc-status-pill.closed {
+            background: #334155;
+            color: #cbd5e1;
+            border-color: #475569;
+        }
+        [data-theme="dark"] .detail-alert-box.success {
+            background: rgba(16, 185, 129, 0.12);
+            border-color: rgba(16, 185, 129, 0.25);
+            color: #34d399;
+        }
+        [data-theme="dark"] .detail-alert-box.warning {
+            background: rgba(245, 158, 11, 0.12);
+            border-color: rgba(245, 158, 11, 0.25);
+            color: #fbbf24;
+        }
+        [data-theme="dark"] .detail-alert-box.danger {
+            background: rgba(239, 68, 68, 0.12);
+            border-color: rgba(239, 68, 68, 0.25);
+            color: #f87171;
+        }
+        [data-theme="dark"] .detail-alert-box.info {
+            background: rgba(59, 130, 246, 0.12);
+            border-color: rgba(59, 130, 246, 0.25);
+            color: #60a5fa;
+        }
+        [data-theme="dark"] .empty-state-icon {
+            background: #0f172a;
+            border-color: #334155;
+            color: #64748b;
+        }
     </style>
-    <link href="../../css/design-system.css" rel="stylesheet">
     <script src="../../js/ui.js" defer></script>
 </head>
 <body>
@@ -222,7 +882,7 @@
             </div>
             <div class="navbar-menu">
                 <a href="dashboard.html" class="navbar-menu-link">Dashboard</a>
-                <a href="properties.html" class="navbar-menu-link">My Properties</a>
+                <a href="properties.html" class="navbar-menu-link">Properties</a>
                 <a href="applications.html" class="navbar-menu-link">Applications</a>
                 <a href="leases.html" class="navbar-menu-link">Lease Agreements</a>
                 <a href="billings.html" class="navbar-menu-link">Billings</a>
@@ -241,78 +901,71 @@
 
     <!-- Main -->
     <main class="dashboard-container">
-        <!-- Stats -->
-        <div class="summary-strip">
-            <div class="stat-card">
-                <span class="stat-value" id="statTotal">—</span>
-                <span class="stat-label">Total</span>
+        <!-- Filter Tabs Bar -->
+        <div class="maintenance-tabs-bar" id="filterTabs">
+            <button class="m-tab-btn active" data-status="">All <span class="tab-count" id="tabCountAll">0</span></button>
+            <button class="m-tab-btn" data-status="submitted">Submitted <span class="tab-count" id="tabCountSubmitted">0</span></button>
+            <button class="m-tab-btn" data-status="under_review">Under Review <span class="tab-count" id="tabCountReview">0</span></button>
+            <button class="m-tab-btn" data-status="in_progress">In Progress <span class="tab-count" id="tabCountProgress">0</span></button>
+            <button class="m-tab-btn" data-status="resolved">Resolved <span class="tab-count" id="tabCountResolved">0</span></button>
+            <button class="m-tab-btn" data-status="closed">Closed <span class="tab-count" id="tabCountClosed">0</span></button>
+            <button class="m-tab-btn" data-status="rejected">Rejected <span class="tab-count" id="tabCountRejected">0</span></button>
+        </div>
+
+        <!-- Ledger Controls Bar (Search & Category Dropdown) -->
+        <div class="ledger-controls-bar">
+            <div class="ledger-search-box">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+                <input type="text" id="complaintsSearchInput" placeholder="Search by subject, tenant, property, or complaint #..." autocomplete="off">
             </div>
-            <div class="stat-card">
-                <span class="stat-value" id="statNew" style="color:var(--color-info-text);">—</span>
-                <span class="stat-label">Submitted</span>
-            </div>
-            <div class="stat-card">
-                <span class="stat-value" id="statReview" style="color:var(--color-warning-text);">—</span>
-                <span class="stat-label">Under Review</span>
-            </div>
-            <div class="stat-card">
-                <span class="stat-value" id="statProgress" style="color:var(--color-warning-text);">—</span>
-                <span class="stat-label">In Progress</span>
-            </div>
-            <div class="stat-card">
-                <span class="stat-value" id="statResolved" style="color:var(--success);">—</span>
-                <span class="stat-label">Resolved</span>
+            <div class="ledger-filter-group">
+                <div class="ledger-select-wrap">
+                    <select id="categoryFilterSelect" class="ledger-select" aria-label="Filter by Category">
+                        <option value="all">All Categories ⌵</option>
+                        <option value="billing_concern">Billing Concern</option>
+                        <option value="landlord_concern">Landlord Concern</option>
+                        <option value="safety_concern">Safety Concern</option>
+                        <option value="policy_violation">Policy Violation</option>
+                        <option value="utility_concern">Utility Concern</option>
+                        <option value="noise_complaint">Noise Complaint</option>
+                        <option value="other">Other Concern</option>
+                    </select>
+                </div>
             </div>
         </div>
 
-        <div class="list-panel">
-            <!-- Filter bar -->
-            <div class="filter-bar">
-                <label>Filter:</label>
-                <button class="filter-btn active" data-status="">All</button>
-                <button class="filter-btn" data-status="submitted">Submitted</button>
-                <button class="filter-btn" data-status="under_review">Under Review</button>
-                <button class="filter-btn" data-status="in_progress">In Progress</button>
-                <button class="filter-btn" data-status="resolved">Resolved</button>
-                <button class="filter-btn" data-status="closed">Closed</button>
-                <button class="filter-btn" data-status="rejected">Rejected</button>
-            </div>
-
-            <div class="table-wrap">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Complaint</th>
-                            <th>Tenant</th>
-                            <th>Category</th>
-                            <th>Status</th>
-                            <th>Date</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody id="complaintsTableBody">
-                        <tr><td colspan="6" style="text-align:center;color:var(--text-muted);">Loading complaints...</td></tr>
-                    </tbody>
-                </table>
+        <!-- Complaints List Container -->
+        <div class="requests-list" id="complaintsList">
+            <div style="background:var(--bg-secondary, #ffffff); border:1px solid var(--border-color, #e2e8f0); border-radius:14px; padding:48px 24px; text-align:center;">
+                <div class="empty-state-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                </div>
+                <div style="font-size:0.95rem; font-weight:700; color:var(--text-primary, #0f172a);">Loading complaints ledger...</div>
             </div>
         </div>
     </main>
 
     <!-- Details Modal -->
-    <div class="modal-overlay hidden" id="detailsModal">
-        <div class="modal-box">
+    <div class="modal-overlay hidden" id="detailsModal" style="display:none;">
+        <div class="modal-container">
             <div class="modal-header">
-                <h3 style="margin:0; font-size:1rem; color:var(--text-primary);" id="modalTitle">Complaint Details</h3>
-                <button class="modal-close-x" id="closeModalBtn" type="button" aria-label="Close complaint details">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
-                    </svg>
+                <div>
+                    <h3 class="modal-header-title" id="modalTitle">Complaint Details</h3>
+                    <div class="modal-header-subtitle" id="modalSubtitle">—</div>
+                </div>
+                <button type="button" class="modal-close-x" id="closeModalBtn" aria-label="Close complaint details">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
                 </button>
             </div>
-            <div id="modalBody"></div>
-            <div id="actionSection"></div>
-            <div style="display:flex; justify-content:flex-end; margin-top:1.5rem;">
-                <button class="btn-close-complaint" id="closeModalFooter" style="font-size:0.85rem; padding:0.5rem 1.1rem;">Close</button>
+            <div class="modal-body" id="modalBody"></div>
+            <div id="actionSectionWrap">
+                <div id="actionSection"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-modal-cancel" id="closeModalFooter">Close</button>
             </div>
         </div>
     </div>
@@ -323,6 +976,8 @@
         const token = localStorage.getItem('domiknow_token');
         let allComplaints = [];
         let currentFilter = '';
+        let currentCategory = 'all';
+        let searchQuery = '';
         let currentComplaint = null;
 
         const CATEGORY_LABELS = {
@@ -332,10 +987,17 @@
             policy_violation: 'Policy Violation',
             utility_concern: 'Utility Concern',
             noise_complaint: 'Noise Complaint',
-            other: 'Other'
+            other: 'Other Concern'
         };
 
-        const STATUS_FLOW = ['submitted', 'under_review', 'in_progress', 'resolved', 'closed'];
+        const svgIcons = {
+            clock: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>`,
+            search: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>`,
+            checkCircle: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>`,
+            alertCircle: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>`,
+            shieldAlert: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>`,
+            chevronRight: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>`
+        };
 
         document.addEventListener('DOMContentLoaded', () => {
             if (!token) return;
@@ -343,92 +1005,154 @@
             bindEvents();
         });
 
-        // ── Fetch ───────────────────────────────────────────────────────────
-
+        // ── Fetch Complaints ────────────────────────────────────────────────
         async function fetchComplaints() {
-            const tbody = document.getElementById('complaintsTableBody');
+            const listEl = document.getElementById('complaintsList');
             try {
-                const url = currentFilter ? `/api/landlord/complaints?status=${currentFilter}` : '/api/landlord/complaints';
-                const res = await fetch(url, { headers: { 'Authorization': `Bearer ${token}` } });
-                if (!res.ok) { tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;color:var(--error);">Failed to load.</td></tr>`; return; }
+                const res = await fetch('/api/landlord/complaints', { headers: { 'Authorization': `Bearer ${token}` } });
+                if (!res.ok) {
+                    listEl.innerHTML = `
+                        <div class="empty-state">
+                            <div style="color:#ef4444; font-weight:700;">Failed to load complaints.</div>
+                            <div style="color:var(--text-muted); font-size:0.875rem; margin-top:4px;">Please refresh or verify your session.</div>
+                        </div>`;
+                    return;
+                }
                 const result = await res.json();
                 allComplaints = result.data || [];
-                updateStats();
-                renderTable();
+                updateStats(allComplaints);
+                renderComplaints();
             } catch (err) {
                 console.error(err);
-                tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;color:var(--error);">Network error.</td></tr>`;
+                listEl.innerHTML = `
+                    <div class="empty-state">
+                        <div style="color:#ef4444; font-weight:700;">Network error occurred.</div>
+                        <div style="color:var(--text-muted); font-size:0.875rem; margin-top:4px;">Please check your connection and try again.</div>
+                    </div>`;
             }
         }
 
-        function updateStats() {
-            // Stats always computed from full list (fetch without filter for stats)
-            fetch('/api/landlord/complaints', { headers: { 'Authorization': `Bearer ${token}` } })
-                .then(r => r.json())
-                .then(result => {
-                    const all = result.data || [];
-                    document.getElementById('statTotal').textContent = all.length;
-                    document.getElementById('statNew').textContent = all.filter(c => c.status === 'submitted').length;
-                    document.getElementById('statReview').textContent = all.filter(c => c.status === 'under_review').length;
-                    document.getElementById('statProgress').textContent = all.filter(c => c.status === 'in_progress').length;
-                    document.getElementById('statResolved').textContent = all.filter(c => ['resolved','closed'].includes(c.status)).length;
-                })
-                .catch(() => {});
+        function updateStats(all) {
+            const submittedCount = all.filter(c => c.status === 'submitted').length;
+            const reviewCount    = all.filter(c => c.status === 'under_review').length;
+            const progressCount  = all.filter(c => c.status === 'in_progress').length;
+            const resolvedCount  = all.filter(c => c.status === 'resolved').length;
+            const closedCount    = all.filter(c => c.status === 'closed').length;
+            const rejectedCount  = all.filter(c => c.status === 'rejected').length;
+
+            // Tab Badges
+            if (document.getElementById('tabCountAll'))       document.getElementById('tabCountAll').textContent       = all.length;
+            if (document.getElementById('tabCountSubmitted')) document.getElementById('tabCountSubmitted').textContent = submittedCount;
+            if (document.getElementById('tabCountReview'))    document.getElementById('tabCountReview').textContent    = reviewCount;
+            if (document.getElementById('tabCountProgress'))  document.getElementById('tabCountProgress').textContent  = progressCount;
+            if (document.getElementById('tabCountResolved'))  document.getElementById('tabCountResolved').textContent  = resolvedCount;
+            if (document.getElementById('tabCountClosed'))    document.getElementById('tabCountClosed').textContent    = closedCount;
+            if (document.getElementById('tabCountRejected'))  document.getElementById('tabCountRejected').textContent  = rejectedCount;
         }
 
-        // ── Render ──────────────────────────────────────────────────────────
+        // ── Render Complaints Cards ─────────────────────────────────────────
+        function renderComplaints() {
+            const listEl = document.getElementById('complaintsList');
+            if (!listEl) return;
 
-        function renderTable() {
-            const tbody = document.getElementById('complaintsTableBody');
-            if (allComplaints.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="6"><div class="empty-state">
-                    <svg width="44" height="44" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-                    </svg>
-                    <span style="font-weight:600;">No complaints found</span>
-                    <span style="font-size:0.8rem;">No tenant complaints for the selected filter.</span>
-                </div></td></tr>`;
+            const filtered = allComplaints.filter(c => {
+                // Status Filter
+                if (currentFilter && c.status !== currentFilter) return false;
+
+                // Category Filter
+                if (currentCategory !== 'all' && c.category !== currentCategory) return false;
+
+                // Search Query Filter
+                if (searchQuery) {
+                    const text = `${c.subject || ''} ${c.description || ''} ${c.complaint_number || ''} ${c.properties?.property_name || ''} ${c.tenant?.full_name || ''}`.toLowerCase();
+                    if (!text.includes(searchQuery)) return false;
+                }
+                return true;
+            });
+
+            if (filtered.length === 0) {
+                listEl.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                        </div>
+                        <div style="font-weight:750; font-size:1rem; color:var(--text-primary); margin-bottom:4px;">No complaints found</div>
+                        <div style="font-size:0.875rem; color:var(--text-muted);">No tenant complaints matched the current filter criteria.</div>
+                    </div>`;
                 return;
             }
-            tbody.innerHTML = '';
-            allComplaints.forEach(c => {
-                const dateStr = new Date(c.submitted_at).toLocaleDateString('en-PH', { year:'numeric', month:'short', day:'numeric' });
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td>
-                        <div style="font-weight:700; font-size:0.88rem;">${escHtml(c.subject)}</div>
-                        <div style="font-size:0.72rem; color:var(--text-muted); font-family:monospace;">${c.complaint_number}</div>
-                    </td>
-                    <td style="font-size:0.85rem;">${c.tenant?.full_name || 'N/A'}</td>
-                    <td style="font-size:0.82rem;">${CATEGORY_LABELS[c.category] || c.category}</td>
-                    <td><span class="chip chip-${c.status}">${c.status.replace('_',' ')}</span></td>
-                    <td style="font-size:0.82rem; white-space:nowrap; color:var(--text-secondary);">${dateStr}</td>
-                    <td><button class="action-btn btn-view" data-id="${c.id}">Manage</button></td>
+
+            listEl.innerHTML = '';
+            filtered.forEach(c => {
+                const dateStr = new Date(c.submitted_at).toLocaleDateString('en-PH', { year: 'numeric', month: 'short', day: 'numeric' });
+                const catLabel = CATEGORY_LABELS[c.category] || c.category || 'General';
+                const propStr = c.properties?.property_name || 'Property';
+                const unitVal = c.properties?.unit_number;
+                const unitStr = (unitVal && unitVal !== '—' && !unitVal.toLowerCase().startsWith('unit')) ? `Unit ${unitVal}` : (unitVal && unitVal !== '—' ? unitVal : '');
+                const subtitleItems = [c.complaint_number, propStr, unitStr, dateStr].filter(Boolean);
+
+                const card = document.createElement('div');
+                card.className = 'request-card';
+                card.dataset.id = c.id;
+
+                card.innerHTML = `
+                    <div class="rc-left-group">
+                        <div class="rc-icon-box ${c.status}">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                            </svg>
+                        </div>
+                        <div class="rc-text-box">
+                            <div class="rc-title">${escHtml(c.subject || 'Complaint')}</div>
+                            <div class="rc-subtitle">${escHtml(subtitleItems.join(' • '))}</div>
+                        </div>
+                    </div>
+                    <div class="rc-assigned-group">
+                        <div class="rc-col-label">TENANT</div>
+                        <div class="rc-col-val">${escHtml(c.tenant?.full_name || 'N/A')}</div>
+                    </div>
+                    <div class="rc-priority-group">
+                        <div class="rc-col-label">CATEGORY</div>
+                        <div class="rc-col-val" style="font-size:0.8125rem;">${escHtml(catLabel)}</div>
+                    </div>
+                    <div class="rc-right-group">
+                        <span class="rc-status-pill ${c.status}">${escHtml(c.status.replace('_',' '))}</span>
+                        <button type="button" class="btn-manage-card" data-id="${c.id}" title="Manage Complaint">Manage</button>
+                        <span class="rc-chevron">${svgIcons.chevronRight}</span>
+                    </div>
                 `;
-                tbody.appendChild(tr);
+                listEl.appendChild(card);
             });
         }
 
-        // ── Events ──────────────────────────────────────────────────────────
-
+        // ── Events Binding ──────────────────────────────────────────────────
         function bindEvents() {
-            // Filter buttons
-            document.querySelector('.filter-bar').addEventListener('click', (e) => {
-                const btn = e.target.closest('.filter-btn');
+            // Tab bar click
+            document.getElementById('filterTabs').addEventListener('click', (e) => {
+                const btn = e.target.closest('.m-tab-btn');
                 if (!btn) return;
-                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                currentFilter = btn.dataset.status;
-                fetchComplaints();
+                setActiveStatusFilter(btn.dataset.status);
             });
 
-            // Table click
-            document.getElementById('complaintsTableBody').addEventListener('click', (e) => {
-                const btn = e.target.closest('[data-id]');
-                if (btn) openModal(btn.dataset.id);
+            // Search input
+            document.getElementById('complaintsSearchInput')?.addEventListener('input', (e) => {
+                searchQuery = (e.target.value || '').trim().toLowerCase();
+                renderComplaints();
             });
 
-            // Modal close
+            // Category select
+            document.getElementById('categoryFilterSelect')?.addEventListener('change', (e) => {
+                currentCategory = e.target.value || 'all';
+                renderComplaints();
+            });
+
+            // Complaints list card & manage click
+            document.getElementById('complaintsList').addEventListener('click', (e) => {
+                const target = e.target.closest('[data-id]');
+                if (target) openModal(target.dataset.id);
+            });
+
+            // Modal close buttons
             document.getElementById('closeModalBtn').addEventListener('click', closeModal);
             document.getElementById('closeModalFooter').addEventListener('click', closeModal);
             document.getElementById('detailsModal').addEventListener('click', (e) => {
@@ -443,14 +1167,28 @@
             });
         }
 
-        // ── Modal ────────────────────────────────────────────────────────────
+        function setActiveStatusFilter(status) {
+            currentFilter = status || '';
 
+            // Update Tab active state
+            document.querySelectorAll('.m-tab-btn').forEach(b => {
+                b.classList.toggle('active', b.dataset.status === currentFilter);
+            });
+
+            renderComplaints();
+        }
+
+        // ── Modal Handling ──────────────────────────────────────────────────
         async function openModal(complaintId) {
             const modal = document.getElementById('detailsModal');
             const body = document.getElementById('modalBody');
             const actionSec = document.getElementById('actionSection');
+
             modal.classList.remove('hidden');
-            body.innerHTML = '<div style="text-align:center;padding:2rem;color:var(--text-muted);">Loading...</div>';
+            modal.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+
+            body.innerHTML = '<div style="text-align:center;padding:3rem 1rem;color:var(--text-muted);">Loading complaint details...</div>';
             actionSec.innerHTML = '';
 
             try {
@@ -458,23 +1196,71 @@
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
                 const result = await res.json();
-                if (!res.ok) { body.innerHTML = `<div style="color:var(--error);">${result.message}</div>`; return; }
+                if (!res.ok) {
+                    body.innerHTML = `<div style="color:#ef4444;text-align:center;padding:2rem;">${result.message || 'Failed to load details.'}</div>`;
+                    return;
+                }
 
                 currentComplaint = result.data;
                 renderModalBody(currentComplaint);
                 renderActionSection(currentComplaint);
             } catch (err) {
                 console.error(err);
-                body.innerHTML = `<div style="color:var(--error);">Network error.</div>`;
+                body.innerHTML = `<div style="color:#ef4444;text-align:center;padding:2rem;">Network error loading details.</div>`;
             }
         }
 
         function renderModalBody(c) {
             const body = document.getElementById('modalBody');
-            const dateStr = new Date(c.submitted_at).toLocaleDateString('en-PH', { year:'numeric', month:'long', day:'numeric' });
+            const dateStr = new Date(c.submitted_at).toLocaleDateString('en-PH', { year: 'numeric', month: 'long', day: 'numeric' });
+            const catLabel = CATEGORY_LABELS[c.category] || c.category || 'General Concern';
             const logs = c.status_logs || [];
 
-            // Timeline
+            document.getElementById('modalTitle').textContent = c.subject || 'Complaint Details';
+            document.getElementById('modalSubtitle').textContent = `${c.complaint_number} • Submitted ${dateStr}`;
+
+            // Status Banner Config
+            const bannerConfigs = {
+                submitted: {
+                    type: 'info',
+                    icon: svgIcons.clock,
+                    title: 'New Complaint Submitted',
+                    desc: 'The tenant has formally submitted this complaint. Please review the details below and accept for review or reject.'
+                },
+                under_review: {
+                    type: 'warning',
+                    icon: svgIcons.search,
+                    title: 'Investigation In Progress',
+                    desc: 'You have acknowledged and accepted this complaint. It is currently pending active resolution.'
+                },
+                in_progress: {
+                    type: 'purple',
+                    icon: svgIcons.alertCircle,
+                    title: 'Resolution Actions In Progress',
+                    desc: 'Corrective actions or tenant discussions are ongoing. Record resolution notes once the issue has been cleared.'
+                },
+                resolved: {
+                    type: 'success',
+                    icon: svgIcons.checkCircle,
+                    title: 'Complaint Resolved',
+                    desc: 'This complaint has been formally addressed and resolved. The resolution statement has been recorded.'
+                },
+                closed: {
+                    type: 'info',
+                    icon: svgIcons.checkCircle,
+                    title: 'Complaint Case Closed',
+                    desc: 'This case has been completed and permanently closed in the tenancy ledger.'
+                },
+                rejected: {
+                    type: 'danger',
+                    icon: svgIcons.shieldAlert,
+                    title: 'Complaint Rejected',
+                    desc: 'This complaint was evaluated and rejected with a recorded reason.'
+                }
+            };
+            const b = bannerConfigs[c.status] || bannerConfigs.submitted;
+
+            // Timeline HTML
             let timelineHtml = '';
             if (c.status === 'rejected') {
                 timelineHtml = `
@@ -484,8 +1270,9 @@
                     </div>
                     <div class="timeline-item">
                         <div class="timeline-dot rejected"></div>
-                        <div><div class="timeline-text"><strong style="color:var(--error);">Rejected</strong></div>
-                        ${c.rejection_reason ? `<div class="timeline-date" style="color:var(--error);">${escHtml(c.rejection_reason)}</div>` : ''}
+                        <div>
+                            <div class="timeline-text"><strong style="color:#dc2626;">Rejected</strong></div>
+                            ${c.rejection_reason ? `<div class="timeline-date" style="color:#dc2626;">${escHtml(c.rejection_reason)}</div>` : ''}
                         </div>
                     </div>`;
             } else {
@@ -498,65 +1285,77 @@
                     const isDone = pastStatuses.includes(step);
                     const isActive = step === c.status;
                     const log = logs.find(l => l.new_status === step);
+
                     timelineHtml += `
                         <div class="timeline-item">
                             <div class="timeline-dot ${isActive ? 'active' : (isDone ? 'done' : '')}"></div>
                             <div>
-                                <div class="timeline-text"><strong style="${isActive ? 'color:var(--landlord);' : ''}">${step.replace('_',' ')}</strong></div>
-                                ${log ? `<div class="timeline-date">${new Date(log.updated_at).toLocaleDateString('en-PH', {month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'})}${log.remarks ? ' — ' + escHtml(log.remarks.substring(0,60)) : ''}</div>` : ''}
+                                <div class="timeline-text"><strong style="${isActive ? 'color:#0052ea;' : ''}">${step.replace('_',' ').toUpperCase()}</strong></div>
+                                ${log ? `<div class="timeline-date">${new Date(log.updated_at).toLocaleDateString('en-PH', {month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'})}${log.remarks ? ' — ' + escHtml(log.remarks.substring(0,70)) : ''}</div>` : ''}
                             </div>
                         </div>`;
                 });
             }
 
-            document.getElementById('modalTitle').textContent = `${c.complaint_number}`;
+            const unitVal = c.properties?.unit_number;
+            const unitStr = (unitVal && unitVal !== '—' && !unitVal.toLowerCase().startsWith('unit')) ? `Unit ${unitVal}` : (unitVal && unitVal !== '—' ? unitVal : '—');
 
             body.innerHTML = `
-                <div class="detail-row">
-                    <span class="detail-label">Tenant</span>
-                    <span class="detail-value" style="font-weight:700;">${c.tenant?.full_name || 'N/A'}</span>
+                <!-- Status Alert Box -->
+                <div class="detail-alert-box ${b.type}">
+                    <div class="detail-alert-title">
+                        ${b.icon}
+                        <span>${escHtml(b.title)}</span>
+                    </div>
+                    <div style="font-size:0.84rem; line-height:1.5; margin-top:3px;">${escHtml(b.desc)}</div>
                 </div>
-                <div class="detail-row">
-                    <span class="detail-label">Property</span>
-                    <span class="detail-value">${c.properties?.property_name || 'N/A'}${c.properties?.unit_number ? ' — Unit ' + c.properties.unit_number : ''}</span>
+
+                <!-- Tenant & Tenancy Summary -->
+                <div class="detail-section-title">Tenant & Tenancy Details</div>
+                <div class="detail-summary-card">
+                    <div class="detail-card-item"><span class="dc-label">Tenant Name</span><span class="dc-val">${escHtml(c.tenant?.full_name || 'N/A')}</span></div>
+                    <div class="detail-card-item"><span class="dc-label">Property</span><span class="dc-val">${escHtml(c.properties?.property_name || 'N/A')}</span></div>
+                    <div class="detail-card-item"><span class="dc-label">Unit Number</span><span class="dc-val">${escHtml(unitStr)}</span></div>
+                    <div class="detail-card-item"><span class="dc-label">Lease Contract</span><span class="dc-val" style="font-family:monospace;">${escHtml(c.lease_records?.lease_number || 'N/A')}</span></div>
                 </div>
-                <div class="detail-row">
-                    <span class="detail-label">Lease</span>
-                    <span class="detail-value" style="font-family:monospace;">${c.lease_records?.lease_number || 'N/A'}</span>
+
+                <!-- Complaint Details -->
+                <div class="detail-section-title">Complaint Information</div>
+                <div class="detail-summary-card" style="margin-bottom:0.75rem;">
+                    <div class="detail-card-item"><span class="dc-label">Category</span><span class="dc-val">${escHtml(catLabel)}</span></div>
+                    <div class="detail-card-item"><span class="dc-label">Submitted Date</span><span class="dc-val">${dateStr}</span></div>
+                    <div class="detail-card-item"><span class="dc-label">Current Status</span><span class="dc-val"><span class="rc-status-pill ${c.status}">${escHtml(c.status.replace('_',' '))}</span></span></div>
+                    ${c.attachment_url ? `
+                    <div class="detail-card-item">
+                        <span class="dc-label">Evidence File</span>
+                        <span class="dc-val">
+                            <a href="${c.attachment_url}" target="_blank" rel="noopener noreferrer" style="color:#0052ea; font-size:0.8125rem; text-decoration:underline;">📎 View Attachment</a>
+                        </span>
+                    </div>` : `
+                    <div class="detail-card-item">
+                        <span class="dc-label">Evidence File</span>
+                        <span class="dc-val" style="color:var(--text-muted); font-size:0.8125rem;">None Attached</span>
+                    </div>`}
                 </div>
-                <hr class="detail-divider">
-                <div class="detail-row">
-                    <span class="detail-label">Category</span>
-                    <span class="detail-value">${CATEGORY_LABELS[c.category] || c.category}</span>
-                </div>
-                <div class="detail-row">
-                    <span class="detail-label">Subject</span>
-                    <span class="detail-value" style="font-weight:600;">${escHtml(c.subject)}</span>
-                </div>
-                <div class="detail-row" style="align-items:start;">
-                    <span class="detail-label">Details</span>
-                    <span class="detail-value" style="white-space:pre-wrap;">${escHtml(c.description)}</span>
-                </div>
-                ${c.attachment_url ? `
-                <div class="detail-row">
-                    <span class="detail-label">Evidence</span>
-                    <span class="detail-value"><a href="${c.attachment_url}" target="_blank" style="color:var(--primary);">View Attachment</a></span>
-                </div>` : ''}
-                <div class="detail-row">
-                    <span class="detail-label">Submitted</span>
-                    <span class="detail-value">${dateStr}</span>
-                </div>
-                <div class="detail-row">
-                    <span class="detail-label">Status</span>
-                    <span class="detail-value"><span class="chip chip-${c.status}">${c.status.replace('_',' ')}</span></span>
-                </div>
+
+                <!-- Statement Description -->
+                <div class="detail-section-title">Tenant Statement & Description</div>
+                <div class="detail-box">${escHtml(c.description || 'No description provided.')}</div>
+
                 ${c.resolution_notes ? `
-                <div class="detail-row" style="align-items:start;">
-                    <span class="detail-label">Resolution</span>
-                    <span class="detail-value" style="background:var(--success-bg);color:var(--success);padding:0.5rem 0.75rem;border-radius:var(--radius-sm);white-space:pre-wrap;">${escHtml(c.resolution_notes)}</span>
+                <div style="margin-top:1.25rem;">
+                    <div class="detail-section-title">Resolution Statement</div>
+                    <div class="detail-box" style="background:#f0fdf4; border-color:#bbf7d0; color:#166534;">${escHtml(c.resolution_notes)}</div>
                 </div>` : ''}
-                <hr class="detail-divider">
-                <div style="font-size:0.78rem;font-weight:700;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:0.5rem;">Status Timeline</div>
+
+                ${c.rejection_reason ? `
+                <div style="margin-top:1.25rem;">
+                    <div class="detail-section-title">Rejection Statement</div>
+                    <div class="detail-box" style="background:#fef2f2; border-color:#fecaca; color:#991b1b;">${escHtml(c.rejection_reason)}</div>
+                </div>` : ''}
+
+                <!-- Status Timeline -->
+                <div class="detail-section-title" style="margin-top:1.25rem;">Resolution Lifecycle Timeline</div>
                 <div class="timeline">${timelineHtml}</div>
             `;
         }
@@ -565,53 +1364,58 @@
             const sec = document.getElementById('actionSection');
             const status = c.status;
 
-            let html = '';
-
             if (['closed', 'rejected'].includes(status)) {
                 sec.innerHTML = '';
                 return;
             }
 
-            html += `<div class="action-section"><div class="action-section-title">Update Complaint Status</div>`;
-            html += `<div id="actionAlertError" class="alert-bar alert-error"></div>`;
-            html += `<div id="actionAlertSuccess" class="alert-bar alert-success"></div>`;
+            let html = `
+                <div class="action-section">
+                    <div class="action-section-title">Update Complaint Status</div>
+                    <div id="actionAlertError" class="alert-bar alert-error"></div>
+                    <div id="actionAlertSuccess" class="alert-bar alert-success"></div>
+            `;
 
             if (status === 'submitted') {
                 html += `
                     <div class="action-buttons-row">
-                        <button class="btn-accept" data-action="under_review">Accept for Review</button>
-                        <button class="btn-reject-pill" data-action="reject_prompt">Reject Complaint</button>
+                        <button type="button" class="btn-modal-primary" data-action="under_review">Accept for Review</button>
+                        <button type="button" class="btn-reject-pill" data-action="reject_prompt">Reject Complaint</button>
                     </div>`;
             } else if (status === 'under_review') {
                 html += `
                     <div class="action-buttons-row">
-                        <button class="btn-progress" data-action="in_progress">Mark In Progress</button>
-                        <button class="btn-reject-pill" data-action="reject_prompt">Reject Complaint</button>
+                        <button type="button" class="btn-progress" data-action="in_progress">Mark In Progress</button>
+                        <button type="button" class="btn-reject-pill" data-action="reject_prompt">Reject Complaint</button>
                     </div>`;
             } else if (status === 'in_progress') {
                 html += `
                     <div style="margin-bottom:0.75rem;">
-                        <label class="form-label" for="resolutionNotes">Resolution Notes (required to resolve)</label>
-                        <textarea id="resolutionNotes" class="form-input" style="height:80px;" placeholder="Describe how the issue was resolved..."></textarea>
+                        <label class="form-label" for="resolutionNotes" style="font-size:0.8125rem; font-weight:700; color:var(--text-secondary); margin-bottom:4px; display:block;">
+                            Resolution Notes <span style="color:#ef4444;">*</span>
+                        </label>
+                        <textarea id="resolutionNotes" class="form-input" style="height:85px; width:100%; resize:vertical;" placeholder="Describe how the complaint issue was addressed and resolved..."></textarea>
                     </div>
                     <div class="action-buttons-row">
-                        <button class="btn-resolve" data-action="resolved">Mark as Resolved</button>
+                        <button type="button" class="btn-resolve" data-action="resolved">Mark as Resolved</button>
                     </div>`;
             } else if (status === 'resolved') {
                 html += `
                     <div class="action-buttons-row">
-                        <button class="btn-close-complaint" data-action="closed">Close Complaint</button>
+                        <button type="button" class="btn-close-complaint" data-action="closed">Close Complaint Case</button>
                     </div>`;
             }
 
-            // Rejection form (hidden, shown on demand)
+            // Rejection form (hidden by default)
             html += `
-                <div id="rejectForm" style="display:none; margin-top:1rem;">
-                    <label class="form-label" for="rejectionReason">Rejection Reason (required)</label>
-                    <textarea id="rejectionReason" class="form-input" style="height:70px;" placeholder="e.g. Duplicate complaint, insufficient information..."></textarea>
-                    <div class="action-buttons-row" style="margin-top:0.5rem;">
-                        <button class="btn-reject-pill" data-action="rejected">Confirm Reject</button>
-                        <button class="btn-close-complaint" data-action="cancel_reject" style="font-size:0.82rem;">Cancel</button>
+                <div id="rejectForm" style="display:none; margin-top:1rem; border-top:1px solid #e2e8f0; padding-top:1rem;">
+                    <label class="form-label" for="rejectionReason" style="font-size:0.8125rem; font-weight:700; color:#dc2626; margin-bottom:4px; display:block;">
+                        Rejection Reason <span style="color:#ef4444;">*</span>
+                    </label>
+                    <textarea id="rejectionReason" class="form-input" style="height:75px; width:100%; resize:vertical;" placeholder="State why this complaint cannot be accepted (e.g. Duplicate issue, unsubstantiated claim)..."></textarea>
+                    <div class="action-buttons-row" style="margin-top:0.65rem;">
+                        <button type="button" class="btn-reject-pill" data-action="rejected" style="background:#dc2626; color:#ffffff;">Confirm Reject</button>
+                        <button type="button" class="btn-modal-cancel" data-action="cancel_reject">Cancel</button>
                     </div>
                 </div>
             </div>`;
@@ -619,30 +1423,33 @@
             sec.innerHTML = html;
         }
 
-        // ── Actions ──────────────────────────────────────────────────────────
-
+        // ── Action Handlers ─────────────────────────────────────────────────
         async function handleAction(action) {
             const errorEl = document.getElementById('actionAlertError');
             const successEl = document.getElementById('actionAlertSuccess');
-            if (errorEl) { errorEl.classList.remove('visible'); }
-            if (successEl) { successEl.classList.remove('visible'); }
+            if (errorEl) errorEl.classList.remove('visible');
+            if (successEl) successEl.classList.remove('visible');
 
             if (action === 'reject_prompt') {
-                document.getElementById('rejectForm').style.display = 'block';
+                const rf = document.getElementById('rejectForm');
+                if (rf) rf.style.display = 'block';
                 return;
             }
             if (action === 'cancel_reject') {
-                document.getElementById('rejectForm').style.display = 'none';
+                const rf = document.getElementById('rejectForm');
+                if (rf) rf.style.display = 'none';
                 return;
             }
 
-            // Build payload
             const payload = { status: action };
 
             if (action === 'rejected') {
                 const reason = document.getElementById('rejectionReason')?.value?.trim();
                 if (!reason || reason.length < 5) {
-                    if (errorEl) { errorEl.textContent = 'Please provide a rejection reason.'; errorEl.classList.add('visible'); }
+                    if (errorEl) {
+                        errorEl.textContent = 'Please provide a clear rejection reason (minimum 5 characters).';
+                        errorEl.classList.add('visible');
+                    }
                     return;
                 }
                 payload.rejection_reason = reason;
@@ -651,14 +1458,17 @@
             if (action === 'resolved') {
                 const notes = document.getElementById('resolutionNotes')?.value?.trim();
                 if (!notes || notes.length < 10) {
-                    if (errorEl) { errorEl.textContent = 'Resolution notes are required (min. 10 characters).'; errorEl.classList.add('visible'); }
+                    if (errorEl) {
+                        errorEl.textContent = 'Resolution notes are required (minimum 10 characters).';
+                        errorEl.classList.add('visible');
+                    }
                     return;
                 }
                 payload.resolution_notes = notes;
             }
 
             if (action === 'closed') {
-                payload.resolution_notes = currentComplaint.resolution_notes || 'Complaint closed.';
+                payload.resolution_notes = currentComplaint.resolution_notes || 'Complaint case completed and closed.';
             }
 
             try {
@@ -669,29 +1479,42 @@
                 });
                 const result = await res.json();
                 if (res.ok) {
-                    if (successEl) { successEl.textContent = result.message || 'Status updated.'; successEl.classList.add('visible'); }
-                    // Refresh modal content
+                    if (successEl) {
+                        successEl.textContent = result.message || 'Status updated successfully.';
+                        successEl.classList.add('visible');
+                    }
                     setTimeout(async () => {
                         closeModal();
                         await fetchComplaints();
-                    }, 900);
+                    }, 800);
                 } else {
-                    if (errorEl) { errorEl.textContent = result.message || 'Update failed.'; errorEl.classList.add('visible'); }
+                    if (errorEl) {
+                        errorEl.textContent = result.message || 'Update failed.';
+                        errorEl.classList.add('visible');
+                    }
                 }
             } catch (err) {
                 console.error(err);
-                if (errorEl) { errorEl.textContent = 'Network error.'; errorEl.classList.add('visible'); }
+                if (errorEl) {
+                    errorEl.textContent = 'Network error during status update.';
+                    errorEl.classList.add('visible');
+                }
             }
         }
 
         function closeModal() {
-            document.getElementById('detailsModal').classList.add('hidden');
+            const modal = document.getElementById('detailsModal');
+            if (modal) {
+                modal.classList.add('hidden');
+                modal.style.display = 'none';
+            }
+            document.body.style.overflow = '';
             currentComplaint = null;
         }
 
         function escHtml(str) {
             if (!str) return '';
-            return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+            return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
         }
     </script>
 </body>

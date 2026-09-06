@@ -6,7 +6,7 @@
     <title>Ratings & Feedback - DomiKnow</title>
     <meta name="description" content="Rate your rental property and landlord on DomiKnow.">
     <link href="../../css/input.css" rel="stylesheet">
-    <link href="../../css/design-system.css?v=20260904-2" rel="stylesheet">
+    <link href="../../css/design-system.css?v=20260905-1" rel="stylesheet">
     <style>
         /* ── Action Button ── */
         .btn-submit-request {
@@ -744,7 +744,7 @@
     </div>
 
     <script src="../../js/auth.js"></script>
-    <script src="../../js/dashboard.js?v=20260904-15"></script>
+    <script src="../../js/dashboard.js?v=20260905-1"></script>
     <script>
         const token = localStorage.getItem('domiknow_token');
 
@@ -826,53 +826,57 @@
             clearAlerts();
             renderCriteriaForm();
             populateLeaseDropdown();
-            document.getElementById('ratingModal').style.display = 'flex';
+            const m = document.getElementById('ratingModal');
+            if (m) m.style.display = 'flex';
             document.body.style.overflow = 'hidden';
         }
         function closeRatingModal() {
-            document.getElementById('ratingModal').style.display = 'none';
+            const m = document.getElementById('ratingModal');
+            if (m) m.style.display = 'none';
             document.body.style.overflow = '';
         }
         function openDetailsModal() {
-            document.getElementById('detailsModal').style.display = 'flex';
+            const m = document.getElementById('detailsModal');
+            if (m) m.style.display = 'flex';
             document.body.style.overflow = 'hidden';
         }
         function closeDetailsModal() {
-            document.getElementById('detailsModal').style.display = 'none';
+            const m = document.getElementById('detailsModal');
+            if (m) m.style.display = 'none';
             document.body.style.overflow = '';
             currentViewRating = null;
         }
 
         // ── Event Delegation ──────────────────────────────────
         function initEventDelegation() {
-            document.getElementById('moduleTabs').addEventListener('click', (e) => {
+            document.getElementById('moduleTabs')?.addEventListener('click', (e) => {
                 const btn = e.target.closest('.m-tab-btn');
                 if (!btn) return;
                 switchTab(btn.dataset.module);
             });
 
-            document.getElementById('openRatingBtn').addEventListener('click', openRatingModal);
-            document.getElementById('closeRatingModalBtn').addEventListener('click', closeRatingModal);
-            document.getElementById('cancelRatingBtn').addEventListener('click', closeRatingModal);
-            document.getElementById('submitRatingBtn').addEventListener('click', handleRatingSubmit);
+            document.getElementById('openRatingBtn')?.addEventListener('click', openRatingModal);
+            document.getElementById('closeRatingModalBtn')?.addEventListener('click', closeRatingModal);
+            document.getElementById('cancelRatingBtn')?.addEventListener('click', closeRatingModal);
+            document.getElementById('submitRatingBtn')?.addEventListener('click', handleRatingSubmit);
 
-            document.getElementById('closeDetailsModalBtn').addEventListener('click', closeDetailsModal);
+            document.getElementById('closeDetailsModalBtn')?.addEventListener('click', closeDetailsModal);
 
-            document.getElementById('ratingModal').addEventListener('click', (e) => {
+            document.getElementById('ratingModal')?.addEventListener('click', (e) => {
                 if (e.target === document.getElementById('ratingModal')) closeRatingModal();
             });
-            document.getElementById('detailsModal').addEventListener('click', (e) => {
+            document.getElementById('detailsModal')?.addEventListener('click', (e) => {
                 if (e.target === document.getElementById('detailsModal')) closeDetailsModal();
             });
 
             // Search input
-            document.getElementById('reviewsSearchInput').addEventListener('input', (e) => {
+            document.getElementById('reviewsSearchInput')?.addEventListener('input', (e) => {
                 searchQuery = (e.target.value || '').trim().toLowerCase();
                 renderRatingsList();
             });
 
             // Reviews list actions (Details / Edit)
-            document.getElementById('reviewsList').addEventListener('click', (e) => {
+            document.getElementById('reviewsList')?.addEventListener('click', (e) => {
                 const actionBtn = e.target.closest('[data-action]');
                 if (!actionBtn) return;
                 const action = actionBtn.dataset.action;
@@ -882,7 +886,7 @@
             });
 
             // Details modal footer actions
-            document.getElementById('detailsModalFoot').addEventListener('click', (e) => {
+            document.getElementById('detailsModalFoot')?.addEventListener('click', (e) => {
                 const btn = e.target.closest('[data-action]');
                 if (!btn) return;
                 const action = btn.dataset.action;

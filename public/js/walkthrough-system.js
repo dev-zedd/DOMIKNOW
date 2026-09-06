@@ -11,84 +11,84 @@
         tenant: {
             label: 'Tenant portal guide',
             steps: [
-                ['.app-brand', 'Welcome to your tenant portal', 'Rental discovery, applications, leases, payments, and support tools stay together in this workspace.'],
-                [() => mobileTarget('.bottom-nav-bar', '.sidebar-menu'), 'Your main navigation', 'Move between rental journey stages here. On mobile, the most important destinations remain within thumb reach.'],
-                ['.tenant-module-intro, .tenant-page-summary', 'Know where you are', 'Each page explains its purpose, the current rental stage, and the most relevant next action.'],
-                ['.main-content-inner', 'Your working area', 'Property results, forms, records, and status updates appear in this main workspace.'],
-                ['.topbar-right', 'Theme and account tools', 'Change the color theme, replay this guide, verify your account identity, or log out from the navigation menu.']
+                [() => mobileTarget('.topbar-left', '.app-brand'), 'Welcome to DomiKnow', 'Your central hub for finding rentals, submitting applications, managing leases, and requesting maintenance.'],
+                [() => mobileTarget('.bottom-nav-bar', '.sidebar-menu'), 'Navigation Menu', 'Quickly browse available rentals, active leases, payment records, maintenance tickets, and reports.'],
+                ['.tenant-module-intro, .tenant-journey, .status-card, .properties-header, .main-content-inner > :first-child', 'Page Overview & Progress', 'Track your current stage in the rental process, view status alerts, and see recommended next actions.'],
+                ['.properties-layout, .feature-grid, .table-container, .main-content-inner', 'Workspace', 'Browse rental listings, review applications, view payment history, and manage maintenance requests here.'],
+                ['.topbar-right', 'Account & Quick Settings', 'Access your profile, notifications, dark mode, replay this guide, or log out from your account menu.']
             ]
         },
         landlord: {
             label: 'Landlord console guide',
             steps: [
-                ['.app-brand', 'Welcome to your landlord console', 'Manage your portfolio, applicants, leases, revenue, maintenance, and compliance workflows here.'],
-                [() => mobileTarget('.bottom-nav-bar', '.sidebar-menu'), 'Your operating navigation', 'Move between property and tenancy workflows here. Additional tools are available under More on mobile.'],
-                ['.landlord-flow, .landlord-module-intro, .main-content-inner', 'Follow the operating flow', 'Page guidance connects the current task to the broader portfolio-to-revenue workflow.'],
-                ['.main-content-inner', 'Manage the current operation', 'Review records, complete forms, make decisions, and monitor status changes in this area.'],
-                ['.topbar-right', 'Theme and account tools', 'Change the theme, replay this guide, verify the signed-in account, or log out safely.']
+                [() => mobileTarget('.topbar-left', '.app-brand'), 'Welcome to Landlord Console', 'Manage your rental properties, tenant applications, active leases, monthly revenue, and maintenance.'],
+                [() => mobileTarget('.bottom-nav-bar', '.sidebar-menu'), 'Navigation Menu', 'Access your property portfolio, review applicants, monitor active leases, track payments, and manage tasks.'],
+                ['.landlord-flow, .landlord-module-intro, .status-card, .properties-header, .main-content-inner > :first-child', 'Workflow & Status', 'Follow the operating workflow to easily manage listings, approve applications, and track lease milestones.'],
+                ['.properties-layout, .table-container, .main-content-inner', 'Operations Workspace', 'Add and edit properties, review tenant documents, manage payment confirmations, and oversee repairs.'],
+                ['.topbar-right', 'Account & Quick Settings', 'Check notifications, switch to dark mode, replay this guide, or log out from your account menu.']
             ]
         },
         maintenance: {
-            label: 'Field operations guide',
+            label: 'Maintenance portal guide',
             steps: [
-                ['.app-brand', 'Welcome to field operations', 'Your landlord-provided account is focused on assigned maintenance work.'],
-                [() => mobileTarget('.bottom-nav-bar', '.sidebar-menu'), 'Your work navigation', 'Move between the work overview and assigned task queue here.'],
-                ['.maintenance-workflow, .maintenance-page-summary', 'Follow every repair stage', 'Move consistently from accepting an assignment through repair reporting and closure.'],
-                ['.main-content-inner', 'Document the work', 'Task details, status updates, materials, evidence, and completion reports belong here.'],
-                ['.topbar-right', 'Theme and account tools', 'Change the theme, replay this guide, confirm your account, or log out.']
+                [() => mobileTarget('.topbar-left', '.app-brand'), 'Welcome to Maintenance Portal', 'View and manage repair requests assigned to you by property landlords.'],
+                [() => mobileTarget('.bottom-nav-bar', '.sidebar-menu'), 'Work Navigation', 'Switch between your overview dashboard, assigned task list, and completed work history.'],
+                ['.maintenance-workflow, .maintenance-page-summary, .status-card, .page-header, .main-content-inner > :first-child', 'Repair Workflow', 'Track repair stages step-by-step: accept assignments, log travel, inspect units, and submit completion reports.'],
+                ['.task-detail-card, .task-list, .table-container, .main-content-inner', 'Task Workspace', 'Update repair status, log materials and costs, add notes, and upload photo evidence of completed work.'],
+                ['.topbar-right', 'Account & Quick Settings', 'Toggle dark mode, check notifications, replay this guide, or log out.']
             ]
         },
         admin: {
-            label: 'Administration guide',
+            label: 'Admin portal guide',
             steps: [
-                ['.app-brand', 'Welcome to platform control', 'Manage access, listing reviews, transactions, cases, policies, and audit records here.'],
-                [() => mobileTarget('#menuToggleBtn', '.sidebar-menu'), 'Administrative navigation', 'Move between operational queues without losing the current review context.'],
-                ['.admin-module-intro, .admin-page-summary', 'Follow the governance flow', 'The page context identifies the current governance stage and relevant next action.'],
-                ['.main-content-inner', 'Review before deciding', 'Evidence, records, filters, and decision controls appear in this working area.'],
-                ['.topbar-right', 'Theme and account tools', 'Change the theme, replay this guide, verify the administrator account, or log out.']
+                [() => mobileTarget('.topbar-left', '.app-brand'), 'Welcome to Admin Dashboard', 'Oversee the DomiKnow platform, verify rental listings, monitor transactions, and manage user accounts.'],
+                [() => mobileTarget('#menuToggleBtn', '.sidebar-menu'), 'Admin Navigation', 'Access user management, listing approvals, financial audits, dispute cases, and system logs.'],
+                ['.admin-module-intro, .admin-page-summary, .status-card, .page-header, .main-content-inner > :first-child', 'Governance & Review Stage', 'View queue summaries, pending verification requests, and key administrative actions for this section.'],
+                ['.table-container, .admin-card, .main-content-inner', 'Management Workspace', 'Review submitted documents, approve or reject listings, resolve disputes, and maintain platform rules.'],
+                ['.topbar-right', 'Account & Quick Settings', 'Toggle dark mode, replay this guide, view your admin profile, or log out.']
             ]
         }
     };
 
     const CONTEXT_TOURS = {
         'public-home': {
-            label: 'DOMIKNOW visitor guide',
+            label: 'Visitor guide',
             steps: [
-                ['.landing-header', 'Welcome to DOMIKNOW', 'Understand the rental process, browse verified listings, and create the right account.'],
-                ['.public-hero, .hero-dark-card', 'Start with verified rental discovery', 'The main action takes you directly to available rentals in the DOMIKNOW service area.'],
-                ['.public-discovery-bridge', 'Preview the map-based experience', 'Compare location, availability, distance, and price before opening the complete listing.'],
-                ['#howItWorks, .how-it-works', 'Understand the rental journey', 'Review how discovery, applications, agreements, payments, and support work before signing up.'],
-                ['.public-feedback-section', 'Read verified resident experiences', 'Public feedback comes from authenticated, lease-connected submissions approved for public visibility.'],
-                ['.public-faq-section', 'Get answers before continuing', 'Review common questions about listings, location access, accounts, applications, and rental terms.'],
-                ['.landing-header .auth-buttons', 'Sign in or create an account', 'Tenants and landlords can create accounts. Maintenance personnel use credentials supplied by their landlord.']
+                ['.landing-header', 'Welcome to DomiKnow', 'Browse verified rental properties, learn how the rental process works, or sign in to your account.'],
+                ['.public-hero-copy, .public-hero', 'Find Your Next Rental', 'Search verified boarding houses, apartments, and rooms in Siniloan, Laguna with transparent rates.'],
+                ['.public-discovery-bridge', 'Interactive Map Preview', 'Compare rental locations, distances from campus or town center, and monthly rates before opening full listings.'],
+                ['#howItWorks .steps-grid, #howItWorks', 'How DomiKnow Works', 'See the rental journey from searching and viewing, to submitting applications, signing digital leases, and paying rent.'],
+                ['.public-feedback-section .public-section-shell, .public-feedback-section', 'Tenant Reviews', 'Read authentic reviews and ratings submitted by verified tenants who lived in these rentals.'],
+                ['.public-faq-section .public-faq-layout, .public-faq-section', 'Frequently Asked Questions', 'Find answers to common questions about properties, accounts, applications, security deposits, and rental rules.'],
+                ['.landing-header .auth-buttons, .landing-header', 'Sign In or Register', 'Create a tenant or landlord account to get started, or sign in if you already have an account.']
             ]
         },
         'public-discovery': {
             label: 'Rental discovery guide',
             steps: [
-                ['.public-workspace-header', 'Browse without losing your way', 'Return home, sign in, change the theme, or replay this guide from the header.'],
-                ['.discovery-controls', 'Filter the rental list', 'Search by property or address, then narrow results by type, price, and availability.'],
-                ['.location-toolbar', 'Search around a real location', 'Use your device location, choose a map point, search near LSPU, or clear the location filter.'],
-                ['.discovery-map-panel', 'Explore through the customized map', 'Select a price marker for a concise rental summary and a link to the full property details.'],
-                ['.discovery-results-panel', 'Compare matching rentals', 'Cards keep the image, availability, capacity, location, price, and detail action together.']
+                ['.public-workspace-header', 'Navigation & Quick Actions', 'Return to the home page, switch between light and dark mode, or sign in from the top header.'],
+                ['.discovery-controls', 'Filter Rentals', 'Search by property name or street, and narrow listings by property type, maximum rent, and barangay.'],
+                ['.location-toolbar', 'Search by Location', 'Find rentals near your current location, click a point on the map, or quickly view rentals near LSPU.'],
+                [() => mobileTarget('.discovery-view-toggle', '.discovery-map-panel'), 'Interactive Map', 'Explore available rentals on the map. Click price markers to see property highlights and view full details.'],
+                ['.discovery-results-panel', 'Available Rentals', 'Browse rental cards showing real-time vacancy, monthly rates, capacity, location, and photos.']
             ]
         },
         'public-property': {
             label: 'Property details guide',
             steps: [
-                ['.public-workspace-header', 'Keep your discovery context', 'Return to rental discovery, sign in, create an account, change the theme, or replay this guide from the header.'],
-                ['.property-image-banner', 'Confirm the listing identity', 'Review the property image, address, verification status, vacancy count, capacity, and community rating before continuing.'],
-                ['#availableSpacesSection', 'Compare actual rentable spaces', 'Availability and pricing come from configured rooms or bedspaces. Select a suitable option before applying.'],
-                ['.domiknow-map-frame', 'Verify the location', 'Use the customized map as location context, then confirm the complete address before entering a lease.'],
-                ['.sticky-card', 'Review cost and continue', 'Check rent and listed charges here. Sign in or create an account only when you are ready to apply.']
+                ['.public-workspace-header, .public-header', 'Header & Navigation', 'Return to rental search, switch color themes, replay this guide, or sign in to your account.'],
+                ['.property-image-banner', 'Property Highlights', 'Review property photos, verified badge, address, available spaces, capacity, and community rating.'],
+                ['#availableSpacesSection, .detail-card', 'Available Units & Spaces', 'Compare available rooms or bedspaces, pricing, capacity, and room amenities before applying.'],
+                ['.domiknow-map-frame', 'Property Location', 'Check the exact property location, nearby landmarks, and barangay address on the interactive map.'],
+                ['.sticky-card', 'Rental Summary & Application', 'Check monthly rent and security deposits, and click Apply when you are ready to submit an application.']
             ]
         },
         auth: {
             label: 'Account access guide',
             steps: [
-                ['.auth-header', 'Secure account access', 'This area explains whether you are signing in, creating an account, verifying access, or recovering a password.'],
-                ['.registration-progress, .auth-card', 'Complete one clear step at a time', 'Required information, validation messages, and progress guidance stay within the account form.'],
-                ['.registration-actions, .auth-card form', 'Review before continuing', 'Use the primary action to continue. Registration includes Back and Next so earlier information remains reviewable.']
+                ['.auth-header', 'Account Access', 'Switch easily between signing in, creating a new account, or recovering your password.'],
+                ['.registration-progress, .auth-card', 'Account Information', 'Enter your account details and credentials. Clear guidelines and validation help you complete each field.'],
+                ['.registration-actions, .auth-card form', 'Submit & Continue', 'Click the primary button to submit your information and securely enter your DomiKnow portal.']
             ]
         }
     };
@@ -100,8 +100,28 @@
     let returnFocus;
     let autoStartTimer;
 
+    function isElementVisible(el) {
+        if (!(el instanceof HTMLElement)) return false;
+        const style = getComputedStyle(el);
+        if (style.display === 'none' || style.visibility === 'hidden' || style.opacity === '0') return false;
+        const rect = el.getBoundingClientRect();
+        if (rect.width < 2 || rect.height < 2) return false;
+        if (rect.right <= 0 || rect.bottom <= 0) return false;
+        return true;
+    }
+
     function mobileTarget(mobileSelector, desktopSelector) {
-        return document.querySelector(window.innerWidth <= MOBILE_BREAKPOINT ? mobileSelector : desktopSelector);
+        const isMobile = window.innerWidth <= MOBILE_BREAKPOINT;
+        const primarySelector = isMobile ? mobileSelector : desktopSelector;
+        const fallbackSelector = isMobile ? desktopSelector : mobileSelector;
+
+        for (const sel of [primarySelector, fallbackSelector]) {
+            const elements = document.querySelectorAll(sel);
+            for (const el of elements) {
+                if (isElementVisible(el)) return el;
+            }
+        }
+        return null;
     }
 
     function normalizeTour(id, source) {
@@ -151,11 +171,18 @@
     }
 
     function resolveTarget(step) {
-        const target = typeof step.selector === 'function' ? step.selector() : document.querySelector(step.selector);
-        if (!(target instanceof HTMLElement)) return null;
-        const style = getComputedStyle(target);
-        const rect = target.getBoundingClientRect();
-        return style.display === 'none' || style.visibility === 'hidden' || rect.width < 2 || rect.height < 2 ? null : target;
+        if (typeof step.selector === 'function') {
+            const target = step.selector();
+            return isElementVisible(target) ? target : null;
+        }
+        const selectors = step.selector.split(',').map(s => s.trim()).filter(Boolean);
+        for (const sel of selectors) {
+            const elements = document.querySelectorAll(sel);
+            for (const el of elements) {
+                if (isElementVisible(el)) return el;
+            }
+        }
+        return null;
     }
 
     function ensureShell() {
@@ -168,10 +195,28 @@
           <div class="dk-tour-mask dk-tour-mask--bottom"></div><div class="dk-tour-mask dk-tour-mask--left"></div>
           <div class="dk-tour-highlight" aria-hidden="true"></div>
           <section class="dk-tour-card" role="dialog" aria-modal="true" aria-labelledby="dkTourTitle" aria-describedby="dkTourDescription" tabindex="-1">
-            <header class="dk-tour-card__header"><span class="dk-tour-card__icon" data-tour-icon aria-hidden="true"></span><div class="dk-tour-card__heading"><p class="dk-tour-card__eyebrow" data-tour-counter></p><p class="dk-tour-card__context" data-tour-context></p></div><button type="button" class="dk-tour-card__close" data-tour-close aria-label="Close walkthrough">&times;</button></header>
-            <div class="dk-tour-card__body"><h2 class="dk-tour-card__title" id="dkTourTitle" data-tour-title></h2><p class="dk-tour-card__description" id="dkTourDescription" data-tour-description></p></div>
+            <header class="dk-tour-card__header">
+              <div class="dk-tour-card__badge">
+                <span class="dk-tour-card__icon" data-tour-icon aria-hidden="true"></span>
+                <span class="dk-tour-card__eyebrow" data-tour-counter></span>
+                <span class="dk-tour-card__dot" aria-hidden="true">&bull;</span>
+                <span class="dk-tour-card__context" data-tour-context></span>
+              </div>
+              <button type="button" class="dk-tour-card__close" data-tour-close aria-label="Close guide">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+              </button>
+            </header>
+            <div class="dk-tour-card__body">
+              <h2 class="dk-tour-card__title" id="dkTourTitle" data-tour-title></h2>
+              <p class="dk-tour-card__description" id="dkTourDescription" data-tour-description></p>
+            </div>
             <div class="dk-tour-progress" data-tour-progress aria-hidden="true"></div>
-            <footer class="dk-tour-card__footer"><button type="button" class="dk-tour-button dk-tour-button--quiet" data-tour-skip>Skip</button><span class="dk-tour-card__spacer"></span><button type="button" class="dk-tour-button" data-tour-back>Back</button><button type="button" class="dk-tour-button dk-tour-button--primary" data-tour-next>Next</button></footer>
+            <footer class="dk-tour-card__footer">
+              <button type="button" class="dk-tour-button dk-tour-button--quiet" data-tour-skip>Skip</button>
+              <span class="dk-tour-card__spacer"></span>
+              <button type="button" class="dk-tour-button" data-tour-back>Back</button>
+              <button type="button" class="dk-tour-button dk-tour-button--primary" data-tour-next>Next</button>
+            </footer>
           </section>`;
         document.body.appendChild(root);
         shell = {
@@ -181,7 +226,7 @@
             title: root.querySelector('[data-tour-title]'), description: root.querySelector('[data-tour-description]'), progress: root.querySelector('[data-tour-progress]'),
             close: root.querySelector('[data-tour-close]'), skip: root.querySelector('[data-tour-skip]'), back: root.querySelector('[data-tour-back]'), next: root.querySelector('[data-tour-next]')
         };
-        shell.icon.innerHTML = window.domiknowIcon ? window.domiknowIcon('sparkle') : '?';
+        shell.icon.innerHTML = '<svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l2.4 7.2L22 12l-7.6 2.8L12 22l-2.4-7.2L2 12l7.6-2.8z"/></svg>';
         shell.close.addEventListener('click', () => finish(true));
         shell.skip.addEventListener('click', () => finish(true));
         shell.back.addEventListener('click', previous);
@@ -190,31 +235,75 @@
         return shell;
     }
 
+    let trackingRafId = null;
+
     function spotlight(rect) {
-        const vw = innerWidth, vh = innerHeight;
-        const top = Math.max(0, rect.top - TARGET_PADDING), left = Math.max(0, rect.left - TARGET_PADDING);
-        const right = Math.min(vw, rect.right + TARGET_PADDING), bottom = Math.min(vh, rect.bottom + TARGET_PADDING);
-        shell.masks.top.style.height = `${top}px`;
-        Object.assign(shell.masks.left.style, { top: `${top}px`, width: `${left}px`, height: `${bottom - top}px` });
-        Object.assign(shell.masks.right.style, { top: `${top}px`, width: `${vw - right}px`, height: `${bottom - top}px` });
-        shell.masks.bottom.style.height = `${vh - bottom}px`;
-        Object.assign(shell.highlight.style, { top: `${top}px`, left: `${left}px`, width: `${right - left}px`, height: `${bottom - top}px` });
+        const top = rect.top - TARGET_PADDING;
+        const left = rect.left - TARGET_PADDING;
+        const width = rect.width + (TARGET_PADDING * 2);
+        const height = rect.height + (TARGET_PADDING * 2);
+
+        Object.assign(shell.highlight.style, {
+            top: `${top}px`,
+            left: `${left}px`,
+            width: `${width}px`,
+            height: `${height}px`
+        });
+    }
+
+    function isNavigationBar(target, rect) {
+        if (!target) return false;
+        if (target.closest('.landing-header, header, nav, .topbar, .topbar-left, .topbar-right, .app-brand, .public-workspace-header, .public-header, .auth-buttons')) {
+            return true;
+        }
+        if (rect && rect.top <= 15 && rect.bottom <= 120 && rect.width >= window.innerWidth * 0.35) {
+            return true;
+        }
+        return false;
     }
 
     function positionCard(rect) {
-        const gap = 16, edge = 16, width = shell.card.offsetWidth || 390, height = shell.card.offsetHeight || 300;
-        if (innerWidth <= 640) {
-            shell.card.dataset.cardPosition = rect.bottom > innerHeight * .58 ? 'top' : 'bottom';
+        const gap = 12, edge = 16;
+        const width = shell.card.offsetWidth || 480;
+        const height = shell.card.offsetHeight || 128;
+        const vw = window.innerWidth;
+        const vh = window.innerHeight;
+
+        if (vw <= 640) {
+            const placeAtTop = rect.top >= height + 24;
+            shell.card.dataset.cardPosition = placeAtTop ? 'top' : 'bottom';
             shell.card.style.top = shell.card.style.left = '';
             return;
         }
         delete shell.card.dataset.cardPosition;
-        let left, top;
-        if (rect.right + gap + width <= innerWidth - edge) { left = rect.right + gap; top = rect.top + (rect.height - height) / 2; }
-        else if (rect.left - gap - width >= edge) { left = rect.left - gap - width; top = rect.top + (rect.height - height) / 2; }
-        else if (rect.bottom + gap + height <= innerHeight - edge) { left = rect.left + (rect.width - width) / 2; top = rect.bottom + gap; }
-        else { left = rect.left + (rect.width - width) / 2; top = rect.top - gap - height; }
-        Object.assign(shell.card.style, { left: `${Math.max(edge, Math.min(left, innerWidth - width - edge))}px`, top: `${Math.max(edge, Math.min(top, innerHeight - height - edge))}px`, right: 'auto', bottom: 'auto' });
+
+        // Horizontally center the description modal on the screen
+        const centeredLeft = Math.max(edge, Math.min((vw - width) / 2, vw - width - edge));
+        const topDefault = 12; // Standard top center position
+
+        let top;
+        const step = activeSteps[activeIndex];
+        const target = step?.target;
+        const isNav = isNavigationBar(target, rect);
+        const isTenant = activeTour?.id === 'tenant' || window.location.pathname.toLowerCase().includes('/tenant/') || Boolean(document.querySelector('.dashboard-layout-tenant'));
+
+        if (isTenant) {
+            // In tenant portal: always place the description modal at the bottom part of the screen
+            top = Math.max(edge, vh - height - edge);
+        } else if (isNav) {
+            // Only when the navigation bar is highlighted: place directly below it
+            top = Math.min(rect.bottom + gap, vh - height - edge);
+        } else {
+            // For all other sections (e.g. public home): always place at the top center of the screen
+            top = topDefault;
+        }
+
+        Object.assign(shell.card.style, {
+            left: `${centeredLeft}px`,
+            top: `${top}px`,
+            right: 'auto',
+            bottom: 'auto'
+        });
     }
 
     function renderProgress() {
@@ -226,25 +315,86 @@
         });
     }
 
+    function updateTargetPosition() {
+        const step = activeSteps[activeIndex];
+        const target = step?.target;
+        if (!activeTour || !target?.isConnected || shell.root.hidden) return;
+        const rect = target.getBoundingClientRect();
+        spotlight(rect);
+        positionCard(rect);
+    }
+
+    function startPositionTracking(durationMs = 1000) {
+        cancelAnimationFrame(trackingRafId);
+        const startTime = performance.now();
+        function frame(now) {
+            updateTargetPosition();
+            if (now - startTime < durationMs && activeTour && !shell.root.hidden) {
+                trackingRafId = requestAnimationFrame(frame);
+            }
+        }
+        trackingRafId = requestAnimationFrame(frame);
+    }
+
+    function scrollToCenterTarget(target) {
+        if (!target) return;
+        const vh = window.innerHeight;
+
+        const rect = target.getBoundingClientRect();
+        const targetPageTop = rect.top + window.scrollY;
+        const targetHeight = target.offsetHeight || rect.height;
+
+        // If target is the navigation bar at the top of the page, keep at scroll 0
+        if (isNavigationBar(target, rect) || targetPageTop < 80) {
+            window.scrollTo({
+                top: 0,
+                behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth'
+            });
+            return;
+        }
+
+        // Center the highlighted section in the viewport so both top and bottom parts are fully visible
+        let desiredScrollY;
+        if (targetHeight >= vh) {
+            desiredScrollY = targetPageTop - 12;
+        } else {
+            desiredScrollY = targetPageTop - Math.max(0, (vh - targetHeight) / 2);
+        }
+
+        const maxScroll = Math.max(0, document.documentElement.scrollHeight - vh);
+        desiredScrollY = Math.max(0, Math.min(desiredScrollY, maxScroll));
+
+        window.scrollTo({
+            top: desiredScrollY,
+            behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth'
+        });
+    }
+
     function showStep() {
         const step = activeSteps[activeIndex];
         if (!step) return finish(true);
         const target = resolveTarget(step) || step.target;
         if (!target?.isConnected) { activeSteps.splice(activeIndex, 1); return showStep(); }
         step.target = target;
-        target.scrollIntoView({ block: 'center', inline: 'nearest', behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
-        setTimeout(() => {
-            const rect = target.getBoundingClientRect();
-            spotlight(rect);
-            shell.counter.textContent = `Step ${activeIndex + 1} of ${activeSteps.length}`;
-            shell.context.textContent = activeTour.label;
-            shell.title.textContent = step.title;
-            shell.description.textContent = step.description;
-            shell.back.hidden = activeIndex === 0;
-            shell.skip.hidden = activeIndex === activeSteps.length - 1;
-            shell.next.textContent = activeIndex === activeSteps.length - 1 ? 'Finish' : 'Next';
-            renderProgress(); positionCard(rect); shell.card.focus();
-        }, 260);
+
+        shell.counter.textContent = `Step ${activeIndex + 1} of ${activeSteps.length}`;
+        shell.context.textContent = activeTour.label;
+        shell.title.textContent = step.title;
+        shell.description.textContent = step.description;
+        shell.back.hidden = activeIndex === 0;
+        shell.skip.hidden = activeIndex === activeSteps.length - 1;
+        shell.next.textContent = activeIndex === activeSteps.length - 1 ? 'Finish' : 'Next';
+        renderProgress();
+
+        // Update immediately for initial render
+        updateTargetPosition();
+
+        // Center the section in the visible part of the page below the top card
+        scrollToCenterTarget(target);
+
+        // Continuously update position on every frame throughout the smooth scroll
+        startPositionTracking(1000);
+        shell.card.focus();
     }
 
     function start(options = {}) {
@@ -258,6 +408,7 @@
     }
 
     function finish(remember) {
+        cancelAnimationFrame(trackingRafId);
         if (!shell || shell.root.hidden) return;
         if (remember && activeTour) rememberCompletion(activeTour.id);
         shell.root.hidden = true; document.body.classList.remove('dk-tour-open');
@@ -283,7 +434,7 @@
         if (document.querySelector('[data-walkthrough-replay]') || !getContext()) return;
         const button = document.createElement('button');
         button.type = 'button'; button.className = 'dk-tour-replay'; button.dataset.walkthroughReplay = '';
-        button.setAttribute('aria-label', 'Play the DOMIKNOW walkthrough'); button.title = 'Play walkthrough';
+        button.setAttribute('aria-label', 'Play the DOMIKNOW guide'); button.title = 'Play guide';
         button.innerHTML = window.domiknowIcon ? window.domiknowIcon('play') : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="m10 8 6 4-6 4Z"/></svg>';
         button.addEventListener('click', () => start({ force: true }));
         const host = document.querySelector('.topbar-right, .public-workspace-actions, .landing-header .auth-buttons, .public-header .login-prompt');
@@ -316,11 +467,8 @@
         setTimeout(() => observer.disconnect(), 15000);
         document.addEventListener('domiknow:shell-ready', scheduleAutoStart);
         document.addEventListener('domiknow:property-ready', () => scheduleAutoStart(300));
-        addEventListener('resize', () => {
-            const target = activeSteps[activeIndex]?.target;
-            if (!activeTour || !target?.isConnected) return;
-            const rect = target.getBoundingClientRect(); spotlight(rect); positionCard(rect);
-        });
+        window.addEventListener('resize', updateTargetPosition, { passive: true });
+        window.addEventListener('scroll', updateTargetPosition, { passive: true });
     }
 
     window.DomiKnowWalkthrough = Object.freeze({ start, replay: () => start({ force: true }), close: () => finish(false) });
