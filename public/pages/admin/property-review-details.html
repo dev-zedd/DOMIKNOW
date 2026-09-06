@@ -1,355 +1,842 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Verify Property - DomiKnow</title>
     <link href="../../css/input.css" rel="stylesheet">
+    <link href="../../css/design-system.css" rel="stylesheet">
+    <link href="../../css/admin.css" rel="stylesheet">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link href="../../css/map-system.css?v=20260823-1" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="../../js/map-system.js?v=20260823-1" defer></script>
+    <script src="../../js/ui.js" defer></script>
     <style>
-        .details-grid {
-            display: grid;
-            grid-template-columns: 2fr 1fr;
+        /* ── Remove duplicate top breadcrumbs (matching landlord & tenant portals) ── */
+        .dk-breadcrumbs,
+        [data-domiknow-breadcrumbs],
+        .breadcrumb-nav {
+            display: none !important;
+        }
+
+        /* ── Single Column Property Review Details Layout ── */
+        .admin-review-details-page {
+            width: 100%;
+            padding: 0 0 3.5rem 0;
+        }
+
+        .review-details-container {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
             gap: 1.5rem;
-            margin-top: 1.5rem;
         }
-        @media (max-width: 900px) {
-            .details-grid {
-                grid-template-columns: 1fr;
-            }
+
+        /* ── Back Navigation Bar (matching landlord & tenant portals) ── */
+        .review-back-nav {
+            margin-bottom: 0.25rem;
         }
-        .prop-section-card {
-            background-color: var(--bg-secondary);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-lg);
-            padding: 1.5rem;
-            box-shadow: var(--shadow-md);
-            margin-bottom: 1.5rem;
+
+        .review-back-link {
+            display: inline-flex !important;
+            align-items: center !important;
+            gap: 8px !important;
+            color: var(--color-action-primary, #0355f3) !important;
+            font-size: 0.875rem !important;
+            font-weight: 650 !important;
+            text-decoration: none !important;
+            transition: opacity 0.15s ease, transform 0.15s ease !important;
         }
-        .section-header-flex {
+
+        .review-back-link:hover {
+            opacity: 0.85;
+            transform: translateX(-3px);
+            text-decoration: underline !important;
+        }
+
+
+        /* ── Hero Status Card ── */
+        .review-hero-card {
+            background: var(--color-bg-surface, #ffffff);
+            border: 1px solid var(--color-border-default, #e2e8f0);
+            border-radius: 16px;
+            padding: 24px 28px;
+            box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .review-hero-main {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            max-width: 700px;
+        }
+
+        .review-hero-badges {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .prop-type-pill {
+            display: inline-flex;
+            align-items: center;
+            background: #f1f5f9;
+            color: #334155;
+            padding: 4px 10px;
+            border-radius: 999px;
+            font-size: 0.72rem;
+            font-weight: 750;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            border: 1px solid #e2e8f0;
+        }
+
+        .review-hero-title {
+            font-size: 1.65rem;
+            font-weight: 850;
+            color: var(--color-text-primary, #0f172a);
+            margin: 0;
+            line-height: 1.25;
+            letter-spacing: -0.02em;
+        }
+
+        .review-hero-location {
+            font-size: 0.9rem;
+            color: #64748b;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* ── Unified Single-Column Review Cards ── */
+        .review-card {
+            background: var(--color-bg-surface, #ffffff);
+            border: 1px solid var(--color-border-default, #e2e8f0);
+            border-radius: 16px;
+            padding: 24px 28px;
+            box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04), 0 4px 12px rgba(15, 23, 42, 0.02);
+            transition: border-color 0.15s ease;
+            width: 100%;
+        }
+
+        .review-card:hover {
+            border-color: #cbd5e1;
+        }
+
+        .review-card-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 1px solid var(--border-color);
-            padding-bottom: 0.75rem;
-            margin-bottom: 1.25rem;
+            margin-bottom: 20px;
+            padding-bottom: 14px;
+            border-bottom: 1px solid var(--color-divider, #f1f5f9);
         }
-        .section-header-flex h3 {
+
+        .review-card-title-group {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .review-card-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: var(--color-bg-subtle, #f1f5f9);
+            color: var(--color-action-primary, #0355f3);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .review-card-title {
+            font-size: 1.05rem;
+            font-weight: 750;
+            color: var(--color-text-primary, #0f172a);
             margin: 0;
-            font-size: 1.25rem;
+            letter-spacing: -0.01em;
         }
-        .info-block {
-            margin-bottom: 1.25rem;
+
+        .review-card-step-badge {
+            font-size: 0.72rem;
+            font-weight: 700;
+            color: #64748b;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 999px;
+            padding: 3px 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
         }
-        .info-lbl {
-            font-size: 0.75rem;
+
+        .review-section-subtitle {
+            font-size: 0.85rem;
+            color: var(--color-text-muted, #64748b);
+            margin: -8px 0 16px;
+            line-height: 1.45;
+        }
+
+        /* ── Key-Value Fields ── */
+        .review-field-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 18px 24px;
+        }
+
+        .review-field-item {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .review-field-full {
+            grid-column: 1 / -1;
+        }
+
+        .review-field-label {
+            font-size: 0.72rem;
+            font-weight: 750;
+            color: #64748b;
             text-transform: uppercase;
             letter-spacing: 0.05em;
-            color: var(--text-muted);
-            font-weight: 700;
-            margin-bottom: 0.25rem;
         }
-        .info-val {
-            font-size: 0.9375rem;
+
+        .review-field-value {
+            font-size: 0.95rem;
             font-weight: 600;
-            color: var(--text-primary);
+            color: var(--color-text-primary, #0f172a);
+            line-height: 1.45;
+            word-break: break-word;
         }
-        .image-gallery-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
-            gap: 1rem;
-            margin-bottom: 1.5rem;
+
+        .review-field-highlight {
+            font-size: 1.15rem;
+            font-weight: 800;
+            color: var(--color-action-primary, #0355f3);
         }
-        .gallery-item {
-            position: relative;
-            border-radius: var(--radius-md);
-            border: 1px solid var(--border-color);
+
+        .review-field-desc {
+            font-size: 0.9375rem;
+            color: var(--color-text-secondary, #475569);
+            line-height: 1.6;
+            margin: 0;
+            background: #f8fafc;
+            padding: 14px 16px;
+            border-radius: 10px;
+            border: 1px solid #e2e8f0;
+        }
+
+        /* ── Map Container ── */
+        .review-map-section {
+            margin-top: 18px;
+        }
+
+        .review-map-container {
+            height: 320px;
+            border-radius: 12px;
+            border: 1px solid var(--color-border-default, #e2e8f0);
             overflow: hidden;
-            height: 100px;
+            position: relative;
+            z-index: 1;
         }
-        .gallery-img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
+
+        /* ── Amenities Badges ── */
+        .review-amenities-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
         }
-        .main-badge {
-            position: absolute;
-            bottom: 4px;
-            left: 4px;
-            background-color: var(--success);
-            color: white;
-            font-size: 0.6rem;
-            font-weight: 700;
-            padding: 0.15rem 0.4rem;
-            border-radius: var(--radius-full);
-            text-transform: uppercase;
+
+        .badge-amenity {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: #f0fdf4;
+            color: #166534;
+            border: 1px solid #bbf7d0;
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 0.8125rem;
+            font-weight: 600;
         }
+
+        /* ── House Rules ── */
+        .review-rules-text {
+            font-size: 0.9375rem;
+            color: var(--color-text-secondary, #475569);
+            line-height: 1.6;
+            margin: 0;
+            white-space: pre-line;
+            background: #f8fafc;
+            padding: 14px 16px;
+            border-radius: 10px;
+            border: 1px solid #e2e8f0;
+        }
+
+        /* ── Document Slot Items ── */
         .doc-list {
             display: flex;
             flex-direction: column;
-            gap: 0.75rem;
-            margin-bottom: 1rem;
+            gap: 12px;
         }
-        .doc-item {
+
+        .doc-slot-card {
+            border: 1px solid var(--color-border-default, #e2e8f0);
+            border-radius: 12px;
+            padding: 16px 18px;
+            background: var(--color-bg-surface, #ffffff);
+            transition: all 0.15s ease;
+        }
+
+        .doc-slot-card:hover {
+            border-color: #cbd5e1;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+        }
+
+        .doc-slot-header {
+            font-weight: 750;
+            font-size: 0.8125rem;
+            color: var(--color-action-primary, #0355f3);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .doc-slot-body {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 0.75rem 1rem;
-            background-color: var(--bg-primary);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-md);
+            flex-wrap: wrap;
+            gap: 10px;
         }
-        .doc-info {
+
+        .doc-slot-meta {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.875rem;
+        }
+
+        .doc-slot-link {
+            color: var(--color-text-primary, #0f172a);
+            font-weight: 650;
+            text-decoration: none;
+            transition: color 0.15s ease;
+        }
+
+        .doc-slot-link:hover {
+            color: var(--color-action-primary, #0355f3);
+            text-decoration: underline;
+        }
+
+        .doc-slot-subtext {
+            font-size: 0.72rem;
+            color: #94a3b8;
+            display: block;
+            margin-top: 3px;
+        }
+
+        /* ── Photo Gallery Grid ── */
+        .review-gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 16px;
+        }
+
+        .photo-slot-card {
+            border: 1px solid var(--color-border-default, #e2e8f0);
+            border-radius: 12px;
+            overflow: hidden;
+            background: var(--color-bg-surface, #ffffff);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+            transition: all 0.2s ease;
+        }
+
+        .photo-slot-card:hover {
+            border-color: #cbd5e1;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+        }
+
+        .photo-slot-image-wrap {
+            position: relative;
+            height: 180px;
+            width: 100%;
+            background-color: #f8fafc;
+        }
+
+        .photo-slot-image-wrap img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            cursor: pointer;
+        }
+
+        .photo-slot-empty {
             display: flex;
             flex-direction: column;
-            gap: 0.15rem;
-        }
-        .doc-title {
-            font-weight: 700;
-            font-size: 0.875rem;
-        }
-        .doc-meta {
-            font-size: 0.75rem;
-            color: var(--text-muted);
-        }
-        .compliance-box {
-            background-color: var(--warning-bg);
-            border: 1px solid var(--warning);
-            border-radius: var(--radius-md);
-            padding: 1rem;
-            margin-bottom: 1.5rem;
-            font-size: 0.875rem;
-        }
-        .compliance-box.compliant {
-            background-color: var(--success-bg);
-            border-color: var(--success);
-            color: #065f46;
-        }
-        .compliance-rule {
-            display: flex;
             align-items: center;
-            gap: 0.5rem;
-            margin-top: 0.5rem;
-            font-weight: 600;
-        }
-        .decision-panel {
+            justify-content: center;
+            height: 100%;
+            color: #94a3b8;
             background-color: #f8fafc;
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-lg);
-            padding: 1.5rem;
         }
-        .detail-label {
+
+        .photo-slot-label {
+            padding: 10px 12px;
             font-size: 0.75rem;
-            font-weight: 600;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            margin-bottom: 0.25rem;
+            font-weight: 700;
+            text-align: center;
+            color: var(--color-text-primary, #0f172a);
+            border-top: 1px solid var(--color-border-default, #e2e8f0);
+            background-color: #f8fafc;
         }
-        .detail-value {
-            font-size: 0.9375rem;
-            font-weight: 600;
-            color: var(--text-primary);
+
+        /* ── Verification Decision Panel ── */
+        .review-decision-card {
+            border: 2px solid #e2e8f0;
+        }
+
+        .review-card-icon--decision {
+            background: #eff6ff;
+            color: #0355f3;
+        }
+
+        .review-decision-summary {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 16px 20px;
+            margin-bottom: 1rem;
+        }
+
+        .review-rejection-msg {
+            font-size: 0.9rem;
+            color: #b91c1c;
+            font-style: italic;
+            background-color: #fef2f2;
+            padding: 10px 14px;
+            border: 1px dashed #f87171;
+            border-radius: 8px;
+            margin: 8px 0;
+            line-height: 1.5;
+        }
+
+        .review-audit-meta {
+            font-size: 0.78rem;
+            color: #64748b;
+            margin-top: 8px;
+            font-weight: 500;
+        }
+
+        .review-textarea {
+            width: 100%;
+            border-radius: 10px;
+            padding: 12px;
+            font-size: 0.875rem;
+            border: 1px solid #cbd5e1;
+            transition: border-color 0.15s ease;
+        }
+
+        .review-textarea:focus {
+            border-color: #0355f3;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(3, 85, 243, 0.1);
+        }
+
+        .review-action-btns {
+            display: flex;
+            gap: 12px;
+            margin-top: 1.25rem;
+        }
+
+        .btn-decision {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px 20px;
+            border-radius: 10px;
+            font-size: 0.875rem;
+            font-weight: 700;
+            cursor: pointer;
+            border: none;
+            transition: all 0.18s ease;
+            flex: 1;
+        }
+
+        .btn-decision--reject {
+            background: #fef2f2;
+            color: #dc2626;
+            border: 1px solid #fecaca;
+        }
+
+        .btn-decision--reject:hover {
+            background: #fee2e2;
+            border-color: #fca5a5;
+            transform: translateY(-1px);
+        }
+
+        .btn-decision--approve {
+            background: #059669;
+            color: #ffffff;
+            border: 1px solid #059669;
+            box-shadow: 0 2px 6px rgba(5, 150, 105, 0.25);
+        }
+
+        .btn-decision--approve:hover {
+            background: #047857;
+            border-color: #047857;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(5, 150, 105, 0.3);
+        }
+
+        /* ── Status Badges ── */
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 0.75rem;
+            font-weight: 750;
+            padding: 4px 10px;
+            border-radius: 999px;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .status-badge.status-active,
+        .status-badge.approved,
+        .status-badge.accepted {
+            background: #ecfdf5 !important;
+            color: #059669 !important;
+            border: 1px solid #a7f3d0 !important;
+        }
+
+        .status-badge.status-pending,
+        .status-badge.pending_review,
+        .status-badge.pending {
+            background: #fffbeb !important;
+            color: #d97706 !important;
+            border: 1px solid #fde68a !important;
+        }
+
+        .status-badge.status-rejected,
+        .status-badge.rejected {
+            background: #fef2f2 !important;
+            color: #dc2626 !important;
+            border: 1px solid #fecaca !important;
+        }
+
+        @media (max-width: 640px) {
+            .review-card {
+                padding: 18px 20px;
+            }
+
+            .review-hero-card {
+                padding: 18px 20px;
+            }
+
+            .review-action-btns {
+                flex-direction: column;
+            }
+
+            .review-gallery-grid {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
-    <link href="../../css/design-system.css" rel="stylesheet">
-    <script src="../../js/ui.js" defer></script>
 </head>
-<body class="app-loading" data-role="admin" data-page-title="Property Evidence Review">
-    <!-- Navbar -->
-    <nav class="navbar navbar-admin">
-        <div class="navbar-container">
-            <div class="navbar-brand-group">
-                <a href="overview.html" style="text-decoration: none;"><span class="navbar-logo">DomiKnow</span></a>
-                <span class="navbar-badge navbar-badge-admin">Admin</span>
+
+<body class="app-loading" data-role="admin" data-page-title="Verify Property Registration">
+    <!-- Main Content Container -->
+    <main class="dashboard-container admin-review-details-page" aria-labelledby="appPageTitle">
+        <div class="review-details-container">
+            <!-- Back Navigation Bar -->
+            <div class="review-back-nav">
+                <a href="property-review.html" class="review-back-link">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <line x1="19" y1="12" x2="5" y2="12"></line>
+                        <polyline points="12 19 5 12 12 5"></polyline>
+                    </svg>
+                    <span>Back to Review Queue</span>
+                </a>
             </div>
-            <div class="navbar-menu">
-                <a href="overview.html" class="navbar-menu-link">Overview</a>
-                <a href="users.html" class="navbar-menu-link">Users</a>
-                <a href="property-review.html" class="navbar-menu-link active">Property Review</a>
-                <a href="payments.html" class="navbar-menu-link">Payment Verification</a>
-                <span class="navbar-user-welcome">Welcome, <span class="user-name">User</span></span>
-                <button id="logoutBtn" class="navbar-btn">Logout</button>
+
+            <!-- Operational Feedback Banner -->
+            <div id="generalFeedback" class="alert alert-success hidden" role="status" aria-live="polite"></div>
+
+            <!-- Card 0: Hero Header / Registration Status -->
+            <div class="review-hero-card">
+                <div class="review-hero-main">
+                    <div class="review-hero-badges">
+                        <span id="viewPropTypeHeaderBadge" class="prop-type-pill">PROPERTY</span>
+                        <span id="propertyStatusBadge" class="status-badge status-pending">PENDING REVIEW</span>
+                    </div>
+                    <h1 id="viewPropNameHeader" class="review-hero-title">Loading property...</h1>
+                    <p id="viewHeroSubtitle" class="review-hero-location">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                            <circle cx="12" cy="10" r="3"></circle>
+                        </svg>
+                        <span id="viewHeroLocationText">Siniloan, Laguna</span>
+                    </p>
+                </div>
             </div>
-        </div>
-    </nav>
 
-    <!-- Main Content -->
-    <main class="dashboard-container">
-        <div class="nav-back">
-            <a href="property-review.html" class="nav-back-link">← Back to Review Queue</a>
-        </div>
-
-        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-top: 1rem;">
-            <div>
-                <h2>Verify Property Registration</h2>
-                <p style="color: var(--text-secondary);">Audit license numbers, tax declarations, and structural suitability details.</p>
-            </div>
-            <span id="propertyStatusBadge" class="status-badge">PENDING REVIEW</span>
-        </div>
-
-        <div id="generalFeedback" class="alert alert-success hidden"></div>
-
-        <div class="details-grid">
-            <!-- Left Column: Step 1 Property Details (Sections 1 to 6) -->
-            <div class="details-left">
-                <div id="viewDetailsCard">
-                    <!-- Section 1. Basic Information -->
-                    <div class="prop-section-card">
-                        <div class="section-header-flex">
-                            <h3>Section 1. Basic Information</h3>
+            <!-- Card 1: Section 1. Basic Information -->
+            <div class="review-card">
+                <div class="review-card-header">
+                    <div class="review-card-title-group">
+                        <div class="review-card-icon">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                <polyline points="14 2 14 8 20 8"></polyline>
+                                <line x1="16" y1="13" x2="8" y2="13"></line>
+                                <line x1="16" y1="17" x2="8" y2="17"></line>
+                                <polyline points="10 9 9 9 8 9"></polyline>
+                            </svg>
                         </div>
-                        <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 1.25rem; margin-bottom: 1.25rem;">
-                            <div>
-                                <div class="detail-label">Property Name</div>
-                                <div id="viewPropName" style="font-size: 1.25rem; font-weight: 800; color: var(--primary);">-</div>
-                            </div>
-                            <div>
-                                <div class="detail-label">Property Type</div>
-                                <div id="viewPropType" class="detail-value">-</div>
-                            </div>
-                        </div>
-                        <div>
-                            <div class="detail-label">Property Description</div>
-                            <p id="viewDescription" style="color: var(--text-secondary); line-height: 1.6; margin: 0;">No description provided.</p>
-                        </div>
+                        <h2 class="review-card-title">Section 1. Basic Information</h2>
                     </div>
-
-                    <!-- Section 2. Property Location -->
-                    <div class="prop-section-card">
-                        <div class="section-header-flex">
-                            <h3>Section 2. Property Location (Siniloan, Laguna)</h3>
-                        </div>
-                        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1.25rem; margin-bottom: 1.25rem;">
-                            <div>
-                                <div class="detail-label">Barangay</div>
-                                <div id="viewBarangay" class="detail-value">-</div>
-                            </div>
-                            <div>
-                                <div class="detail-label">Street / Purok / Sitio</div>
-                                <div id="viewAddress" class="detail-value">-</div>
-                            </div>
-                            <div>
-                                <div class="detail-label">Landmark (Optional)</div>
-                                <div id="viewLandmark" class="detail-value">-</div>
-                            </div>
-                        </div>
-                        <div style="margin-bottom: 0.5rem;">
-                            <div class="detail-label">Pin Location on Map</div>
-                        </div>
-                        <div id="landlordMap" style="height: 240px; border-radius: var(--radius-md); border: 1px solid var(--border-color); z-index: 1;"></div>
+                    <span class="review-card-step-badge">Step 1</span>
+                </div>
+                <div class="review-field-grid">
+                    <div class="review-field-item">
+                        <div class="review-field-label">Property Name</div>
+                        <div id="viewPropName" class="review-field-value review-field-highlight">-</div>
                     </div>
-
-                    <!-- Section 3. Contact Information -->
-                    <div class="prop-section-card">
-                        <div class="section-header-flex">
-                            <h3>Section 3. Contact Information (Auto-filled from Landlord Account)</h3>
-                        </div>
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem;">
-                            <div>
-                                <div class="detail-label">Contact Number</div>
-                                <div id="viewContactPhone" class="detail-value" style="color: var(--landlord); font-size: 1.05rem;">-</div>
-                            </div>
-                            <div>
-                                <div class="detail-label">Email Address</div>
-                                <div id="viewContactEmail" class="detail-value" style="font-size: 1.05rem;">-</div>
-                            </div>
-                        </div>
+                    <div class="review-field-item">
+                        <div class="review-field-label">Property Type</div>
+                        <div id="viewPropType" class="review-field-value">-</div>
                     </div>
-
-                    <!-- Section 4. Property Information (Building Specs) -->
-                    <div class="prop-section-card">
-                        <div class="section-header-flex">
-                            <h3>Section 4. Property Information</h3>
-                        </div>
-                        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1.25rem;">
-                            <div>
-                                <div class="detail-label">Total Number of Floors</div>
-                                <div id="viewTotalFloors" class="detail-value" style="font-size: 1.1rem;">-</div>
-                            </div>
-                            <div>
-                                <div class="detail-label">Default Maximum Occupants per Unit</div>
-                                <div id="viewTotalUnits" class="detail-value" style="font-size: 1.1rem;">-</div>
-                            </div>
-                            <div>
-                                <div class="detail-label">Total Building Capacity</div>
-                                <div id="viewTotalCapacity" class="detail-value" style="font-size: 1.1rem;">-</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Section 5. Shared Amenities -->
-                    <div class="prop-section-card">
-                        <div class="section-header-flex">
-                            <h3>Section 5. Shared Amenities</h3>
-                        </div>
-                        <div id="viewAmenities" style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
-                            <!-- List of amenities loaded dynamically -->
-                        </div>
-                    </div>
-
-                    <!-- Section 6. Property Rules -->
-                    <div class="prop-section-card">
-                        <div class="section-header-flex">
-                            <h3>Section 6. Property Rules & Guidelines</h3>
-                        </div>
-                        <p id="viewHouseRules" style="color: var(--text-secondary); line-height: 1.6; white-space: pre-line; margin: 0;">No specific rules submitted.</p>
+                    <div class="review-field-item review-field-full">
+                        <div class="review-field-label">Property Description</div>
+                        <p id="viewDescription" class="review-field-desc">No description provided.</p>
                     </div>
                 </div>
             </div>
 
-            <!-- Right Column: Step 2 Legal Documents & Step 3 Property Photos -->
-            <div class="details-right">
-                <!-- Step 2: Upload Documents -->
-                <div class="prop-section-card">
-                    <div class="section-header-flex">
-                        <h3>Step 2. Legal Verification Certificates</h3>
+            <!-- Card 2: Section 2. Property Location -->
+            <div class="review-card">
+                <div class="review-card-header">
+                    <div class="review-card-title-group">
+                        <div class="review-card-icon">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                                <circle cx="12" cy="10" r="3"></circle>
+                            </svg>
+                        </div>
+                        <h2 class="review-card-title">Section 2. Property Location (Siniloan, Laguna)</h2>
                     </div>
-                    <div id="documentList" class="doc-list">
-                        <!-- Rendered dynamically -->
+                    <span class="review-card-step-badge">Coordinates &amp; Map</span>
+                </div>
+                <div class="review-field-grid">
+                    <div class="review-field-item">
+                        <div class="review-field-label">Barangay</div>
+                        <div id="viewBarangay" class="review-field-value">-</div>
+                    </div>
+                    <div class="review-field-item">
+                        <div class="review-field-label">Street / Purok / Sitio</div>
+                        <div id="viewAddress" class="review-field-value">-</div>
+                    </div>
+                    <div class="review-field-item">
+                        <div class="review-field-label">Landmark (Optional)</div>
+                        <div id="viewLandmark" class="review-field-value">-</div>
+                    </div>
+                </div>
+                <div class="review-map-section">
+                    <div class="review-field-label" style="margin-bottom: 8px;">Pin Location on Map</div>
+                    <div id="landlordMap" class="review-map-container"></div>
+                </div>
+            </div>
+
+            <!-- Card 3: Section 3. Contact Information -->
+            <div class="review-card">
+                <div class="review-card-header">
+                    <div class="review-card-title-group">
+                        <div class="review-card-icon">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                <circle cx="12" cy="7" r="4"></circle>
+                            </svg>
+                        </div>
+                        <h2 class="review-card-title">Section 3. Landlord Contact Information</h2>
+                    </div>
+                    <span class="review-card-step-badge">Landlord Account</span>
+                </div>
+                <div class="review-field-grid">
+                    <div class="review-field-item">
+                        <div class="review-field-label">Contact Number</div>
+                        <div id="viewContactPhone" class="review-field-value review-field-highlight">-</div>
+                    </div>
+                    <div class="review-field-item">
+                        <div class="review-field-label">Email Address</div>
+                        <div id="viewContactEmail" class="review-field-value">-</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 4: Section 4. Property Information (Building Specs) -->
+            <div class="review-card">
+                <div class="review-card-header">
+                    <div class="review-card-title-group">
+                        <div class="review-card-icon">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+                                <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+                            </svg>
+                        </div>
+                        <h2 class="review-card-title">Section 4. Property Information &amp; Building Capacity</h2>
+                    </div>
+                    <span class="review-card-step-badge">Building Specs</span>
+                </div>
+                <div class="review-field-grid">
+                    <div class="review-field-item">
+                        <div class="review-field-label">Total Number of Floors</div>
+                        <div id="viewTotalFloors" class="review-field-value">-</div>
+                    </div>
+                    <div class="review-field-item">
+                        <div class="review-field-label">Default Max Occupants per Unit</div>
+                        <div id="viewTotalUnits" class="review-field-value">-</div>
+                    </div>
+                    <div class="review-field-item">
+                        <div class="review-field-label">Total Building Capacity</div>
+                        <div id="viewTotalCapacity" class="review-field-value">-</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 5: Section 5. Shared Amenities -->
+            <div class="review-card">
+                <div class="review-card-header">
+                    <div class="review-card-title-group">
+                        <div class="review-card-icon">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path>
+                            </svg>
+                        </div>
+                        <h2 class="review-card-title">Section 5. Shared Amenities</h2>
+                    </div>
+                    <span class="review-card-step-badge">Facilities</span>
+                </div>
+                <div id="viewAmenities" class="review-amenities-container">
+                    <!-- Loaded dynamically -->
+                </div>
+            </div>
+
+            <!-- Card 6: Section 6. Property Rules -->
+            <div class="review-card">
+                <div class="review-card-header">
+                    <div class="review-card-title-group">
+                        <div class="review-card-icon">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                            </svg>
+                        </div>
+                        <h2 class="review-card-title">Section 6. Property Rules &amp; Guidelines</h2>
+                    </div>
+                    <span class="review-card-step-badge">Policies</span>
+                </div>
+                <p id="viewHouseRules" class="review-rules-text">No specific rules submitted.</p>
+            </div>
+
+            <!-- Card 7: Step 2. Legal Verification Certificates -->
+            <div class="review-card">
+                <div class="review-card-header">
+                    <div class="review-card-title-group">
+                        <div class="review-card-icon">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                <polyline points="14 2 14 8 20 8"></polyline>
+                                <path d="M9 15l2 2 4-4"></path>
+                            </svg>
+                        </div>
+                        <h2 class="review-card-title">Step 2. Legal Verification Certificates</h2>
+                    </div>
+                    <span class="review-card-step-badge">Compliance Documents</span>
+                </div>
+                <p class="review-section-subtitle">Official documents and proof of ownership submitted by the landlord for regulatory auditing.</p>
+                <div id="documentList" class="doc-list">
+                    <!-- Rendered dynamically -->
+                </div>
+            </div>
+
+            <!-- Card 8: Step 3. Property Building Photos -->
+            <div class="review-card">
+                <div class="review-card-header">
+                    <div class="review-card-title-group">
+                        <div class="review-card-icon">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                                <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                                <polyline points="21 15 16 10 5 21"></polyline>
+                            </svg>
+                        </div>
+                        <h2 class="review-card-title">Step 3. Property Building Photos</h2>
+                    </div>
+                    <span class="review-card-step-badge">Visual Inspection</span>
+                </div>
+                <p class="review-section-subtitle">Submitted visual evidence covering building exterior, common areas, rooms, and facilities.</p>
+                <div id="imageGallery" class="review-gallery-grid">
+                    <!-- Rendered dynamically -->
+                </div>
+            </div>
+
+            <!-- Card 9: Verification Decision Panel -->
+            <div class="review-card review-decision-card">
+                <div class="review-card-header">
+                    <div class="review-card-title-group">
+                        <div class="review-card-icon review-card-icon--decision">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M9 11l3 3L22 4"></path>
+                                <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
+                            </svg>
+                        </div>
+                        <h2 class="review-card-title">Verification Decision</h2>
+                    </div>
+                    <span class="review-card-step-badge">Audit Action</span>
+                </div>
+
+                <!-- If reviewed, display status info -->
+                <div id="reviewDisplayPanel" class="hidden">
+                    <div class="review-decision-summary">
+                        <div id="rejectionReasonBlock">
+                            <div class="review-field-label" style="color: #b91c1c; margin-bottom: 4px;">Rejection Reason</div>
+                            <p id="rejectionReasonText" class="review-rejection-msg">-</p>
+                        </div>
+                        <div id="reviewedByText" class="review-audit-meta">Reviewed by -</div>
                     </div>
                 </div>
 
-                <!-- Step 3: Property Photos -->
-                <div class="prop-section-card">
-                    <div class="section-header-flex">
-                        <h3>Step 3. Property Building Photos</h3>
+                <!-- If pending review, display action controls -->
+                <div id="decisionControls">
+                    <div class="form-group" style="margin-bottom: 1.25rem;">
+                        <label for="rejectionRemarks" class="review-field-label" style="display: block; margin-bottom: 8px;">
+                            Rejection Reason Remarks <span style="font-weight: 500; text-transform: none; color: #64748b;">(Required if rejecting)</span>
+                        </label>
+                        <textarea id="rejectionRemarks" rows="3" placeholder="If rejecting, state structural errors, missing licenses, coordinate discrepancies, or issues here..." class="form-input form-textarea review-textarea"></textarea>
                     </div>
-                    <div id="imageGallery" style="display: flex; flex-direction: column; gap: 1rem;">
-                        <!-- Rendered dynamically -->
-                    </div>
-                </div>
-
-                <!-- Action Panel -->
-                <div class="decision-panel">
-                    <h3 class="profile-card-title" style="margin-bottom: 0.75rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem;">Verification Decision</h3>
-                    
-                    <!-- If reviewed, display status info -->
-                    <div id="reviewDisplayPanel" class="hidden" style="margin-bottom: 1rem;">
-                        <div class="info-lbl">Rejection Reason (if any)</div>
-                        <p id="rejectionReasonText" style="font-size: 0.875rem; color: #b91c1c; font-style: italic; background-color: var(--error-bg); padding: 0.5rem; border: 1px dashed var(--error); border-radius: var(--radius-sm);">-</p>
-                        <div id="reviewedByText" style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.5rem;">Reviewed by -</div>
-                    </div>
-
-                    <!-- If pending review, display action buttons -->
-                    <div id="decisionControls">
-                        <div class="form-group">
-                            <label for="rejectionRemarks" class="form-label">Rejection Reason Remarks</label>
-                            <textarea id="rejectionRemarks" rows="3" placeholder="If rejecting, state structural errors, missing licenses, or coordinates discrepancies here..." class="form-textarea"></textarea>
-                        </div>
-                        <div style="display: flex; gap: 0.75rem; margin-top: 1rem;">
-                            <button id="btnReject" class="btn-primary" style="display: inline-flex; align-items: center; justify-content: center; gap: 4px; background-color: var(--error); padding: 0.6rem; font-weight: 700; width: 100%;">
-                                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                                Reject
-                            </button>
-                            <button id="btnApprove" class="btn-primary" style="display: inline-flex; align-items: center; justify-content: center; gap: 4px; background-color: var(--success); padding: 0.6rem; font-weight: 700; width: 100%;">
-                                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                                Approve
-                            </button>
-                        </div>
+                    <div class="review-action-btns">
+                        <button type="button" id="btnReject" class="btn-decision btn-decision--reject">
+                            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                            <span>Reject Property</span>
+                        </button>
+                        <button type="button" id="btnApprove" class="btn-decision btn-decision--approve">
+                            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+                            <span>Approve &amp; Publish</span>
+                        </button>
                     </div>
                 </div>
             </div>
@@ -383,7 +870,7 @@
             DomiknowMap.observeContainer(adminMap, mapContainer);
 
             fetchPropertyReviewDetails();
-            
+
             // Attach event listeners to buttons
             document.getElementById('btnApprove').addEventListener('click', () => submitDecision(true));
             document.getElementById('btnReject').addEventListener('click', () => submitDecision(false));
@@ -423,19 +910,30 @@
             const badge = document.getElementById('propertyStatusBadge');
             if (badge) {
                 badge.className = 'status-badge';
-                badge.textContent = prop.status.replace('_', ' ').toUpperCase();
+                badge.textContent = (prop.status || 'pending').replace(/_/g, ' ').toUpperCase();
                 if (prop.status === 'approved') badge.classList.add('status-active');
                 else if (prop.status === 'rejected') badge.classList.add('status-rejected');
                 else badge.classList.add('status-pending');
             }
 
-            // Specs
+            // Hero Header
+            const headerTitle = document.getElementById('viewPropNameHeader');
+            if (headerTitle) headerTitle.textContent = prop.property_name || 'Unnamed Property';
+
+            const typeHeaderBadge = document.getElementById('viewPropTypeHeaderBadge');
+            if (typeHeaderBadge) typeHeaderBadge.textContent = (prop.property_type || 'Property').replace(/_/g, ' ').toUpperCase();
+
+            const heroLoc = document.getElementById('viewHeroLocationText');
+            if (heroLoc) heroLoc.textContent = prop.barangay ? `Brgy. ${prop.barangay}, Siniloan, Laguna` : 'Siniloan, Laguna';
+
+            // Section 1 Specs
             document.getElementById('viewPropName').textContent = prop.property_name || '-';
             document.getElementById('viewPropType').textContent = (prop.property_type || '-').replace(/_/g, ' ').toUpperCase();
             document.getElementById('viewDescription').textContent = prop.description || 'No description provided.';
-            
+
+            // Section 2 Location
             document.getElementById('viewBarangay').textContent = prop.barangay || '-';
-            
+
             let rawAddr = prop.address || '-';
             let landmarkVal = prop.landmark || '-';
             if (rawAddr.includes('(Near ')) {
@@ -446,9 +944,11 @@
             document.getElementById('viewAddress').textContent = rawAddr;
             document.getElementById('viewLandmark').textContent = landmarkVal;
 
+            // Section 3 Contact
             document.getElementById('viewContactPhone').textContent = prop.landlord_phone || 'N/A';
             document.getElementById('viewContactEmail').textContent = prop.landlord_email || 'N/A';
 
+            // Section 4 Building Specs
             document.getElementById('viewTotalFloors').textContent = Number(prop.total_floors) > 0
                 ? `${Number(prop.total_floors)} floor${Number(prop.total_floors) === 1 ? '' : 's'}`
                 : 'Not provided';
@@ -459,7 +959,7 @@
                 ? `${Number(prop.total_capacity)} persons`
                 : 'Not provided';
 
-            // Amenities Tags
+            // Section 5 Amenities Tags
             const amenitiesContainer = document.getElementById('viewAmenities');
             if (amenitiesContainer) {
                 amenitiesContainer.innerHTML = '';
@@ -468,19 +968,15 @@
                     amenities.forEach(a => {
                         const tag = document.createElement('span');
                         tag.className = 'badge-amenity';
-                        tag.style.margin = '0';
-                        tag.style.display = 'inline-flex';
-                        tag.style.alignItems = 'center';
-                        tag.style.gap = '4px';
-                        tag.innerHTML = `<svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="color: var(--success);"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg> ${domiknowEscapeHtml(a)}`;
+                        tag.innerHTML = `<svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="color: #059669;"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg> ${domiknowEscapeHtml(a)}`;
                         amenitiesContainer.appendChild(tag);
                     });
                 } else {
-                    amenitiesContainer.innerHTML = '<p style="color: var(--text-muted); font-size: 0.8125rem; font-style: italic;">No shared amenities specified.</p>';
+                    amenitiesContainer.innerHTML = '<p style="color: var(--color-text-muted, #64748b); font-size: 0.8125rem; font-style: italic; margin: 0;">No shared amenities specified.</p>';
                 }
             }
 
-            // Rules
+            // Section 6 Rules
             document.getElementById('viewHouseRules').textContent = prop.house_rules || 'No specific rules submitted.';
 
             // Decision display
@@ -488,11 +984,12 @@
             const controlsPanel = document.getElementById('decisionControls');
 
             if (prop.status === 'approved' || prop.status === 'rejected') {
+                const rejectionBlock = document.getElementById('rejectionReasonBlock');
                 if (prop.status === 'rejected' && prop.rejection_reason) {
                     document.getElementById('rejectionReasonText').textContent = prop.rejection_reason;
-                    document.getElementById('rejectionReasonText').style.display = 'block';
+                    if (rejectionBlock) rejectionBlock.style.display = 'block';
                 } else {
-                    document.getElementById('rejectionReasonText').style.display = 'none';
+                    if (rejectionBlock) rejectionBlock.style.display = 'none';
                 }
 
                 const reviewer = prop.admin_reviewed_by || 'Administrator';
@@ -524,7 +1021,7 @@
             ];
 
             let nonMainIndex = 0;
-            slots.forEach((slot, index) => {
+            slots.forEach((slot) => {
                 let matchedImg = null;
                 if (slot.isMain) {
                     matchedImg = images.find(img => img.is_main) || null;
@@ -539,30 +1036,25 @@
 
                 const slotDiv = document.createElement('div');
                 slotDiv.className = 'photo-slot-card';
-                slotDiv.style.border = '1px solid var(--border-color)';
-                slotDiv.style.borderRadius = 'var(--radius-md)';
-                slotDiv.style.overflow = 'hidden';
-                slotDiv.style.backgroundColor = 'var(--bg-primary)';
-                slotDiv.style.position = 'relative';
 
                 let imgHtml = '';
                 if (matchedImg) {
                     const imageUrl = domiknowSafeExternalUrl(matchedImg.image_url);
-                    imgHtml = `<a href="${imageUrl}" target="_blank" rel="noopener noreferrer" aria-label="Open ${domiknowEscapeHtml(slot.label)}"><img src="${imageUrl}" alt="${domiknowEscapeHtml(slot.label)}" style="width: 100%; height: 180px; object-fit: cover; display: block; cursor: pointer;"></a>`;
+                    imgHtml = `<a href="${imageUrl}" target="_blank" rel="noopener noreferrer" aria-label="Open ${domiknowEscapeHtml(slot.label)}"><img src="${imageUrl}" alt="${domiknowEscapeHtml(slot.label)}" loading="lazy"></a>`;
                 } else {
                     imgHtml = `
-                        <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 180px; color: var(--text-muted); background-color: var(--bg-secondary);">
-                            <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="margin-bottom: 6px;"><path stroke-linecap="round" stroke-linejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                            <span style="font-size: 0.75rem;">No photo submitted</span>
+                        <div class="photo-slot-empty">
+                            <svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24" style="margin-bottom: 6px;"><path stroke-linecap="round" stroke-linejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                            <span style="font-size: 0.75rem; font-weight: 500;">No photo submitted</span>
                         </div>
                     `;
                 }
 
                 slotDiv.innerHTML = `
-                    <div style="position: relative; height: 180px; width: 100%;">
+                    <div class="photo-slot-image-wrap">
                         ${imgHtml}
                     </div>
-                    <div style="padding: 0.5rem; font-size: 0.75rem; font-weight: 700; text-align: center; color: var(--text-primary); border-top: 1px solid var(--border-color); background-color: var(--bg-secondary);">
+                    <div class="photo-slot-label">
                         ${slot.label.toUpperCase()}
                     </div>
                 `;
@@ -585,7 +1077,7 @@
             ];
 
             let legalDocSeen = 0;
-            slots.forEach((slot, index) => {
+            slots.forEach((slot) => {
                 let matchedDoc = null;
                 if (slot.type === 'legal_document') {
                     const legalDocs = docs.filter(d => d.document_type === 'legal_document');
@@ -596,41 +1088,38 @@
                 }
 
                 const slotDiv = document.createElement('div');
-                slotDiv.style.border = '1px solid var(--border-color)';
-                slotDiv.style.borderRadius = 'var(--radius-md)';
-                slotDiv.style.padding = '1rem';
-                slotDiv.style.backgroundColor = 'var(--bg-primary)';
-                slotDiv.style.marginBottom = '1rem';
+                slotDiv.className = 'doc-slot-card';
 
                 let docContentHtml = '';
                 if (matchedDoc) {
-                    const sizeKB = (matchedDoc.file_size / 1024).toFixed(0);
-                    const uploadedDate = new Date(matchedDoc.uploaded_at).toLocaleDateString();
+                    const sizeKB = matchedDoc.file_size ? (matchedDoc.file_size / 1024).toFixed(0) : '0';
+                    const uploadedDate = matchedDoc.uploaded_at ? new Date(matchedDoc.uploaded_at).toLocaleDateString() : 'N/A';
                     
                     let docBadge = 'status-pending';
                     if (matchedDoc.status === 'accepted') docBadge = 'status-active';
                     if (matchedDoc.status === 'rejected') docBadge = 'status-rejected';
 
                     docContentHtml = `
-                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.75rem;">
+                        <div class="doc-slot-body">
                             <div>
-                                <span class="doc-meta" style="display: inline-flex; align-items: center; gap: 4px;">
-                                    <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                                    <a href="${domiknowSafeExternalUrl(matchedDoc.file_url)}" target="_blank" rel="noopener noreferrer" style="color: var(--text-secondary); text-decoration: underline; font-weight: 600;">${domiknowEscapeHtml(matchedDoc.file_name)}</a> (${sizeKB} KB)
+                                <span class="doc-slot-meta">
+                                    <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="color: var(--color-action-primary, #0355f3); flex-shrink: 0;"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                                    <a href="${domiknowSafeExternalUrl(matchedDoc.file_url)}" target="_blank" rel="noopener noreferrer" class="doc-slot-link">${domiknowEscapeHtml(matchedDoc.file_name || 'Document')}</a>
+                                    <span style="color: #64748b; font-size: 0.8125rem;">(${sizeKB} KB)</span>
                                 </span>
-                                <span class="doc-meta" style="font-size: 0.6875rem; display: block; margin-top: 0.15rem; margin-left: 18px;">Submitted on ${uploadedDate}</span>
+                                <span class="doc-slot-subtext">Submitted on ${uploadedDate}</span>
                             </div>
                             <span class="status-badge ${docBadge}">${domiknowEscapeHtml(String(matchedDoc.status || 'pending').toUpperCase())}</span>
                         </div>
                     `;
                 } else {
                     docContentHtml = `
-                        <p style="color: var(--text-muted); font-size: 0.8125rem; font-style: italic; margin: 0 0 0.75rem 0;">No document submitted</p>
+                        <p style="color: var(--color-text-muted, #94a3b8); font-size: 0.8125rem; font-style: italic; margin: 0;">No document submitted for this requirement.</p>
                     `;
                 }
 
                 slotDiv.innerHTML = `
-                    <div style="font-weight: 700; font-size: 0.8125rem; color: var(--primary); margin-bottom: 0.5rem;">
+                    <div class="doc-slot-header">
                         ${slot.label.toUpperCase()}
                     </div>
                     ${docContentHtml}
@@ -665,16 +1154,16 @@
         }
 
         function checkCompliance() {
-            // Keep simple placeholder so main flow callers don't fail
+            // Keep placeholder so existing flow callers don't fail
         }
 
         async function submitDecision(approve) {
             const btnApprove = document.getElementById('btnApprove');
             const btnReject = document.getElementById('btnReject');
-            const remarks = document.getElementById('rejectionRemarks').value;
+            const remarks = document.getElementById('rejectionRemarks').value.trim();
 
             if (!approve && !remarks) {
-                alert('Please enter a rejection reason remarks first.');
+                alert('Please enter rejection reason remarks first.');
                 return;
             }
 
@@ -735,4 +1224,5 @@
         }
     </script>
 </body>
+
 </html>

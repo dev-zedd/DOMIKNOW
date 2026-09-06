@@ -23,18 +23,15 @@ test('unknown browser and API routes have separate 404 recovery responses', () =
     assert.match(notFoundPage, /id="mainContent"/);
 });
 
-test('admin overview exposes live, accessible operational analytics', () => {
-    const overview = read('public/pages/admin/overview.html');
+test('admin user directory exposes live, accessible operational controls and table layout', () => {
+    const usersPage = read('public/pages/admin/users.html');
     const adminScript = read('public/js/admin.js');
 
-    assert.match(overview, /id="adminWorkloadChart"/);
-    assert.match(overview, /id="adminCaseChart"/);
-    assert.match(overview, /id="adminAnalyticsRefresh"/);
-    assert.match(adminScript, /renderOverviewAnalytics/);
-    assert.match(adminScript, /aria-valuenow/);
-    assert.match(adminScript, /availableSources/);
-    assert.match(adminScript, /Unavailable/);
-    assert.match(adminScript, /partial data/);
+    assert.match(usersPage, /id="usersTableBody"/);
+    assert.match(usersPage, /id="actionFeedback"/);
+    assert.match(usersPage, /admin-table-card/);
+    assert.match(adminScript, /addDirectoryControls/);
+    assert.match(adminScript, /admin-table-role-filter/);
 });
 
 test('detail pages receive contextual breadcrumbs and public property onboarding', () => {

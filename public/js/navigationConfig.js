@@ -87,14 +87,6 @@ const NAVIGATION_CONFIG = {
     {
       section: 'Command Center',
       items: [
-        { label: 'Overview', href: 'overview.html' },
-        { label: 'Notifications', href: 'notifications.html' },
-        { label: 'My Profile', href: 'profile.html' }
-      ]
-    },
-    {
-      section: 'Access & Listings',
-      items: [
         { label: 'User Access', href: 'users.html' },
         { label: 'Property Approvals', href: 'property-review.html' }
       ]

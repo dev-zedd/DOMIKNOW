@@ -6,170 +6,36 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Manage Users - DomiKnow</title>
     <link href="../../css/input.css" rel="stylesheet">
-    <style>
-        .table-card {
-            background-color: var(--bg-secondary);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-lg);
-            padding: 1.5rem;
-            box-shadow: var(--shadow-md);
-            overflow-x: auto;
-            margin-bottom: 2rem;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            text-align: left;
-            font-size: 0.9375rem;
-        }
-
-        th {
-            font-weight: 700;
-            color: var(--text-secondary);
-            padding: 0.75rem 1rem;
-            border-bottom: 2px solid var(--border-color);
-            text-transform: uppercase;
-            font-size: 0.75rem;
-            letter-spacing: 0.05em;
-        }
-
-        td {
-            padding: 1rem;
-            border-bottom: 1px solid var(--border-color);
-            color: var(--text-primary);
-        }
-
-        tr:hover td {
-            background-color: var(--bg-primary);
-        }
-
-        .action-group {
-            display: flex;
-            gap: 0.5rem;
-            flex-wrap: wrap;
-        }
-
-        .btn-action {
-            display: inline-flex;
-            align-items: center;
-            padding: 0.375rem 0.75rem;
-            font-size: 0.75rem;
-            font-weight: 600;
-            border-radius: var(--radius-sm);
-            border: 1px solid var(--border-color);
-            background-color: var(--bg-secondary);
-            cursor: pointer;
-            transition: all var(--transition-fast);
-        }
-
-        .btn-action-approve {
-            background-color: var(--success-bg);
-            color: var(--success);
-            border-color: rgba(16, 185, 129, 0.2);
-        }
-
-        .btn-action-approve:hover {
-            background-color: var(--success);
-            color: white;
-        }
-
-        .btn-action-reject {
-            background-color: var(--error-bg);
-            color: var(--error);
-            border-color: rgba(239, 68, 68, 0.2);
-        }
-
-        .btn-action-reject:hover {
-            background-color: var(--error);
-            color: white;
-        }
-
-        .btn-action-disable {
-            background-color: #f1f5f9;
-            color: var(--text-secondary);
-            border-color: #cbd5e1;
-        }
-
-        .btn-action-disable:hover {
-            background-color: var(--text-secondary);
-            color: white;
-        }
-
-        .btn-action-reactivate {
-            background-color: var(--primary-light);
-            color: var(--primary);
-            border-color: rgba(99, 102, 241, 0.2);
-        }
-
-        .btn-action-reactivate:hover {
-            background-color: var(--primary);
-            color: white;
-        }
-
-        .nav-back {
-            margin-bottom: 1.5rem;
-        }
-
-        .nav-back-link {
-            text-decoration: none;
-            color: var(--text-secondary);
-            font-weight: 600;
-            font-size: 0.875rem;
-            transition: color var(--transition-fast);
-        }
-
-        .nav-back-link:hover {
-            color: var(--primary);
-        }
-    </style>
     <link href="../../css/design-system.css" rel="stylesheet">
+    <link href="../../css/admin.css" rel="stylesheet">
     <script src="../../js/ui.js" defer></script>
 </head>
 
 <body class="app-loading" data-role="admin" data-page-title="User Access">
-    <!-- Navbar -->
-    <nav class="navbar navbar-admin">
-        <div class="navbar-container">
-            <div class="navbar-brand-group">
-                <a href="overview.html" style="text-decoration: none;"><span class="navbar-logo">DomiKnow</span></a>
-                <span class="navbar-badge navbar-badge-admin">Admin</span>
-            </div>
-            <div class="navbar-menu">
-                <a href="overview.html" class="navbar-menu-link">Overview</a>
-                <a href="users.html" class="navbar-menu-link active">Users</a>
-                <a href="property-review.html" class="navbar-menu-link">Property Review</a>
-                <a href="payments.html" class="navbar-menu-link">Payment Verification</a>
-                <span class="navbar-user-welcome">Welcome, <span class="user-name">User</span></span>
-                <button id="logoutBtn" class="navbar-btn">Logout</button>
-            </div>
-        </div>
-    </nav>
+    <main class="dashboard-container admin-users-page" aria-labelledby="appPageTitle">
+        <!-- Status Feedback Notification -->
+        <div id="actionFeedback" class="alert alert-success hidden" role="status" aria-live="polite"></div>
 
-    <!-- Main Content -->
-    <main class="dashboard-container">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
-            <h2>User Directory Management</h2>
-            <div id="actionFeedback" class="alert alert-success hidden" style="margin-bottom: 0; padding: 0.5rem 1rem;">
-            </div>
-        </div>
-
-        <div class="table-card">
-            <table>
+        <!-- Users Table Card -->
+        <div class="table-card admin-table-card">
+            <table class="admin-data-table admin-record-table">
                 <thead>
                     <tr>
-                        <th>Name</th>
-                        <th>Email</th>
-                        <th>Role</th>
-                        <th>Verified</th>
-                        <th>Account Status</th>
-                        <th>Registered Date</th>
-                        <th>Actions</th>
+                        <th style="width: 22%;">User</th>
+                        <th style="width: 24%;">Email</th>
+                        <th style="width: 11%; text-align: center;">Role</th>
+                        <th style="width: 12%; text-align: center;">Verified</th>
+                        <th style="width: 12%; text-align: center;">Account Status</th>
+                        <th style="width: 11%; text-align: center;">Registered Date</th>
+                        <th style="width: 175px; min-width: 175px; text-align: right;">Actions</th>
                     </tr>
                 </thead>
                 <tbody id="usersTableBody">
                     <tr>
-                        <td colspan="7" style="text-align: center; color: var(--text-muted);">Loading system users...
+                        <td colspan="7">
+                            <div class="admin-table-loading">
+                                <span>Loading system users…</span>
+                            </div>
                         </td>
                     </tr>
                 </tbody>
@@ -194,7 +60,7 @@
                 });
 
                 if (!response.ok) {
-                    tableBody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: var(--error);">Failed to load users. Check permissions.</td></tr>`;
+                    tableBody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: var(--color-error-text); padding: 32px 16px;">Failed to load users. Check permissions.</td></tr>`;
                     return;
                 }
 
@@ -202,7 +68,7 @@
                 const users = result.data || [];
 
                 if (users.length === 0) {
-                    tableBody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: var(--text-muted);">No users found in system database.</td></tr>`;
+                    tableBody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: var(--color-text-muted); padding: 36px 16px;">No users found in system database.</td></tr>`;
                     return;
                 }
 
@@ -210,48 +76,61 @@
                 users.forEach(user => {
                     const row = document.createElement('tr');
 
-                    // Format role badge
+                    // Format role badge class
                     let roleBadgeClass = 'navbar-badge-tenant';
                     if (user.role === 'landlord') roleBadgeClass = 'navbar-badge-landlord';
                     if (user.role === 'maintenance') roleBadgeClass = 'navbar-badge-maintenance';
                     if (user.role === 'admin') roleBadgeClass = 'navbar-badge-admin';
 
-                    // Format status badge
+                    // Format status badge class
                     let statusClass = 'status-pending';
                     if (user.account_status === 'active') statusClass = 'status-active';
                     if (user.account_status === 'disabled') statusClass = 'status-rejected';
                     if (user.account_status === 'rejected') statusClass = 'status-rejected';
 
                     // Format date
-                    const regDate = new Date(user.created_at).toLocaleDateString(undefined, {
+                    const regDate = user.created_at ? new Date(user.created_at).toLocaleDateString(undefined, {
                         year: 'numeric', month: 'short', day: 'numeric'
-                    });
+                    }) : '—';
+
+                    // Avatar Initial
+                    const displayName = user.full_name || user.email || 'User';
+                    const avatarInitial = (displayName.charAt(0) || 'U').toUpperCase();
 
                     // Build action buttons HTML
                     let actionsHtml = '';
                     if (user.role !== 'admin') {
                         if (user.account_status === 'pending') {
-                            actionsHtml += `<button data-user-id="${user.id}" data-action="active" class="btn-action btn-action-approve">Approve</button>`;
-                            actionsHtml += `<button data-user-id="${user.id}" data-action="rejected" class="btn-action btn-action-reject">Reject</button>`;
+                            actionsHtml += `<button type="button" data-user-id="${user.id}" data-action="active" class="btn-action btn-action-approve"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg><span>Approve</span></button>`;
+                            actionsHtml += `<button type="button" data-user-id="${user.id}" data-action="rejected" class="btn-action btn-action-reject"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg><span>Reject</span></button>`;
                         } else if (user.account_status === 'active') {
-                            actionsHtml += `<button data-user-id="${user.id}" data-action="disabled" class="btn-action btn-action-disable">Disable</button>`;
+                            actionsHtml += `<button type="button" data-user-id="${user.id}" data-action="disabled" class="btn-action btn-action-disable"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg><span>Disable</span></button>`;
                         } else if (user.account_status === 'disabled' || user.account_status === 'rejected') {
-                            actionsHtml += `<button data-user-id="${user.id}" data-action="active" class="btn-action btn-action-reactivate">Reactivate</button>`;
+                            actionsHtml += `<button type="button" data-user-id="${user.id}" data-action="active" class="btn-action btn-action-reactivate"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg><span>Reactivate</span></button>`;
                         }
                     } else {
-                        actionsHtml = `<span style="font-size: 0.75rem; color: var(--text-muted); font-style: italic;">No actions for Admin</span>`;
+                        actionsHtml = `<span class="admin-badge-protected"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg><span>Administrator</span></span>`;
                     }
 
                     row.innerHTML = `
-                        <td style="font-weight: 600;">${domiknowEscapeHtml(user.full_name)}</td>
-                        <td>${domiknowEscapeHtml(user.email)}</td>
-                        <td><span class="navbar-badge ${roleBadgeClass}">${domiknowEscapeHtml(user.role)}</span></td>
-                        <td style="font-weight: 600; color: ${user.is_verified ? 'var(--success)' : 'var(--error)'};">
-                            ${user.is_verified ? '✓ Yes' : '✗ No'}
+                        <td>
+                            <div class="user-identity-cell">
+                                <span class="user-avatar-badge user-avatar-badge--${domiknowEscapeHtml(user.role || 'default')}" aria-hidden="true">${avatarInitial}</span>
+                                <strong class="user-name-text">${domiknowEscapeHtml(user.full_name || 'Unnamed')}</strong>
+                            </div>
                         </td>
-                        <td><span class="status-badge ${statusClass}">${domiknowEscapeHtml(user.account_status)}</span></td>
-                        <td>${regDate}</td>
-                        <td><div class="action-group">${actionsHtml}</div></td>
+                        <td><span class="user-email-text">${domiknowEscapeHtml(user.email)}</span></td>
+                        <td style="text-align: center;"><span class="navbar-badge ${roleBadgeClass}">${domiknowEscapeHtml(user.role)}</span></td>
+                        <td style="text-align: center;">
+                            <span class="verify-chip verify-chip--${user.is_verified ? 'yes' : 'no'}">
+                                ${user.is_verified 
+                                    ? '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg> Verified' 
+                                    : '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg> Unverified'}
+                            </span>
+                        </td>
+                        <td style="text-align: center;"><span class="status-badge ${statusClass}">${domiknowEscapeHtml(user.account_status)}</span></td>
+                        <td style="text-align: center;"><span class="user-date-text">${regDate}</span></td>
+                        <td style="text-align: right;"><div class="action-group" style="justify-content: flex-end;">${actionsHtml}</div></td>
                     `;
 
                     tableBody.appendChild(row);
@@ -269,7 +148,7 @@
 
             } catch (err) {
                 console.error('Error loading directory:', err);
-                tableBody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: var(--error);">Error contacting registration service.</td></tr>`;
+                tableBody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: var(--color-error-text); padding: 32px 16px;">Error contacting registration service.</td></tr>`;
             }
         }
 
@@ -302,7 +181,7 @@
                 });
 
                 if (response.ok) {
-                    feedbackEl.textContent = `User successfully marked as ${newStatus}.`;
+                    feedbackEl.textContent = `User account successfully updated to ${newStatus}.`;
                     feedbackEl.classList.remove('hidden');
                     setTimeout(() => feedbackEl.classList.add('hidden'), 4000);
                     loadUsers();

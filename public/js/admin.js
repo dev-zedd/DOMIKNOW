@@ -11,11 +11,6 @@
 
     
     const PAGE_META = {
-        'overview.html': {
-            eyebrow: 'Operational command center',
-            description: 'See the queues that need administrative attention, then move into the correct review surface before taking action.',
-            action: { label: 'Open case triage', href: 'reports.html' }
-        },
         'users.html': {
             eyebrow: 'Identity & access',
             description: 'Approve legitimate role requests, disable compromised access, and preserve a clear account-status history.',
@@ -69,7 +64,7 @@
     };
 
     function currentPage() {
-        return window.location.pathname.split('/').pop() || 'overview.html';
+        return window.location.pathname.split('/').pop() || 'users.html';
     }
 
     function createSummary(meta) {
@@ -92,31 +87,14 @@
             const action = document.createElement('a');
             action.href = meta.action.href;
             action.className = `admin-summary-action${meta.action.secondary ? ' secondary' : ''}`;
-            action.textContent = meta.action.label;
+            action.innerHTML = `<span>${meta.action.label}</span><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>`;
             summary.appendChild(action);
         }
         return summary;
     }
 
     function createGovernanceFlow(activeStage) {
-        if (!activeStage) return null;
-        const nav = document.createElement('nav');
-        nav.className = 'admin-governance-flow';
-        nav.setAttribute('aria-label', 'Administrative control flow');
-
-        GOVERNANCE_STAGES.forEach((stage, index) => {
-            const link = document.createElement('a');
-            link.href = stage.href;
-            link.className = `admin-governance-step${stage.key === activeStage ? ' active' : ''}`;
-            if (stage.key === activeStage) link.setAttribute('aria-current', 'step');
-            const number = document.createElement('span');
-            number.textContent = String(index + 1);
-            const label = document.createElement('strong');
-            label.textContent = stage.label;
-            link.append(number, label);
-            nav.appendChild(link);
-        });
-        return nav;
+        return null;
     }
 
     function enhanceAdminContent(content, page) {
@@ -212,6 +190,23 @@
         search.placeholder = config.placeholder;
         search.setAttribute('aria-label', config.placeholder);
 
+        let roleFilter = null;
+        if (page === 'users.html') {
+            roleFilter = document.createElement('select');
+            roleFilter.className = 'form-input admin-table-role-filter';
+            roleFilter.setAttribute('aria-label', 'Filter by role');
+            const allRoles = document.createElement('option');
+            allRoles.value = '';
+            allRoles.textContent = 'All roles';
+            roleFilter.appendChild(allRoles);
+            ['tenant', 'landlord', 'maintenance', 'admin'].forEach(r => {
+                const opt = document.createElement('option');
+                opt.value = r;
+                opt.textContent = formatLabel(r);
+                roleFilter.appendChild(opt);
+            });
+        }
+
         const status = document.createElement('select');
         status.className = 'form-input admin-table-status-filter';
         status.setAttribute('aria-label', 'Filter by status');
@@ -229,18 +224,26 @@
         const count = document.createElement('span');
         count.className = 'admin-table-result-count';
         count.setAttribute('aria-live', 'polite');
-        controls.append(search, status, count);
+        if (roleFilter) {
+            controls.append(search, roleFilter, status, count);
+        } else {
+            controls.append(search, status, count);
+        }
         table.parentElement?.insertBefore(controls, table);
 
         const filterRows = () => {
             const query = search.value.trim().toLowerCase();
             const statusValue = status.value;
+            const roleValue = roleFilter ? roleFilter.value.toLowerCase() : '';
             let visible = 0;
             table.querySelectorAll('tbody tr').forEach(row => {
                 if (row.querySelector('[colspan]')) return;
                 const text = row.textContent.toLowerCase();
                 const badgeText = row.querySelector('.status-badge')?.textContent.trim().toLowerCase() || '';
-                const matches = (!query || text.includes(query)) && (!statusValue || badgeText.includes(statusValue));
+                const roleBadgeText = row.querySelector('.navbar-badge, .role-badge')?.textContent.trim().toLowerCase() || '';
+                const matches = (!query || text.includes(query)) &&
+                                (!statusValue || badgeText.includes(statusValue)) &&
+                                (!roleValue || roleBadgeText.includes(roleValue));
                 row.hidden = !matches;
                 if (matches) visible += 1;
             });
@@ -249,6 +252,7 @@
 
         search.addEventListener('input', filterRows);
         status.addEventListener('change', filterRows);
+        if (roleFilter) roleFilter.addEventListener('change', filterRows);
         const body = table.tBodies[0];
         if (body) new MutationObserver(filterRows).observe(body, { childList: true });
         filterRows();
@@ -493,7 +497,7 @@
         copy.append(title, meta);
         const action = document.createElement('span');
         action.className = 'admin-queue-action';
-        action.textContent = 'Review';
+        action.innerHTML = `<span>Review</span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>`;
         link.append(kind, copy, action);
         return link;
     }
@@ -512,28 +516,15 @@
         document.body.setAttribute('data-admin-page', page.replace('.html', ''));
         const intro = document.createElement('div');
         intro.className = 'admin-module-intro';
-        if (meta.showSummary !== false) intro.appendChild(createSummary(meta));
+        if (meta.showSummary === true) intro.appendChild(createSummary(meta));
         const flow = createGovernanceFlow(meta.stage);
         if (flow) intro.appendChild(flow);
-        const breadcrumbs = content.querySelector(':scope > [data-domiknow-breadcrumbs]');
-        if (breadcrumbs) breadcrumbs.insertAdjacentElement('afterend', intro);
-        else content.insertBefore(intro, content.firstChild);
-        enhanceAdminContent(content, page);
-        if (page === 'overview.html') {
-            const refreshAnalytics = document.getElementById('adminAnalyticsRefresh');
-            if (refreshAnalytics && !refreshAnalytics.dataset.bound) {
-                refreshAnalytics.dataset.bound = 'true';
-                refreshAnalytics.addEventListener('click', async () => {
-                    window.DomiKnowLoading?.setButton(refreshAnalytics, true, 'Refreshing...');
-                    try {
-                        await loadOverview();
-                    } finally {
-                        window.DomiKnowLoading?.setButton(refreshAnalytics, false);
-                    }
-                });
-            }
-            loadOverview();
+        if (intro.childNodes.length > 0) {
+            const breadcrumbs = content.querySelector(':scope > [data-domiknow-breadcrumbs]');
+            if (breadcrumbs) breadcrumbs.insertAdjacentElement('afterend', intro);
+            else content.insertBefore(intro, content.firstChild);
         }
+        enhanceAdminContent(content, page);
     }
 
     if (document.readyState === 'loading') {

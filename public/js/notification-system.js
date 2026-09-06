@@ -107,11 +107,11 @@
         }
         if (type.includes('lease')) {
             if (role === 'tenant' || role === 'landlord') return { href: `${prefix}/leases.html`, label: 'Open leases' };
-            return { href: role === 'admin' ? `${prefix}/overview.html` : `${prefix}/tasks.html`, label: 'Open workspace' };
+            return { href: role === 'admin' ? `${prefix}/users.html` : `${prefix}/tasks.html`, label: 'Open workspace' };
         }
         if (type.includes('reservation') || type.includes('application')) {
             if (role === 'tenant' || role === 'landlord') return { href: `${prefix}/applications.html`, label: 'Open applications' };
-            return { href: role === 'admin' ? `${prefix}/overview.html` : `${prefix}/tasks.html`, label: 'Open workspace' };
+            return { href: role === 'admin' ? `${prefix}/users.html` : `${prefix}/tasks.html`, label: 'Open workspace' };
         }
         if (type.includes('report')) {
             if (role === 'maintenance') return { href: `${prefix}/dashboard.html`, label: 'Open dashboard' };
@@ -125,7 +125,7 @@
         }
         if (type.includes('rating') || type.includes('feedback')) {
             if (role === 'tenant' || role === 'landlord') return { href: `${prefix}/feedback.html`, label: 'Open ratings and feedback' };
-            return { href: role === 'admin' ? `${prefix}/overview.html` : `${prefix}/dashboard.html`, label: 'Open feedback' };
+            return { href: role === 'admin' ? `${prefix}/reports.html` : `${prefix}/dashboard.html`, label: 'Open feedback' };
         }
         if (type.includes('payment') || type.includes('billing')) {
             if (role === 'tenant') return { href: `${prefix}/billings.html`, label: 'Open billings and payments' };
@@ -140,7 +140,7 @@
         if (type.includes('maintenance') || type.includes('task')) {
             if (role === 'maintenance') return { href: `${prefix}/tasks.html`, label: 'Open assigned tasks' };
             if (role === 'tenant' || role === 'landlord') return { href: `${prefix}/maintenance.html`, label: 'Open maintenance' };
-            return { href: `${prefix}/overview.html`, label: 'Open overview' };
+            return { href: role === 'admin' ? `${prefix}/users.html` : `${prefix}/dashboard.html`, label: 'Open workspace' };
         }
         if (type.includes('admin') || type.includes('policy') || type.includes('suspension')) {
             if (role === 'tenant') return { href: `${prefix}/policy-violations.html`, label: 'Review account notices' };

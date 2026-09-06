@@ -253,7 +253,7 @@ async function handleLogin(e) {
                 if (role === 'tenant') window.location.href = '../tenant/properties.html';
                 else if (role === 'landlord') window.location.href = '../landlord/properties.html';
                 else if (role === 'maintenance') window.location.href = '../maintenance/dashboard.html';
-                else if (role === 'admin') window.location.href = '../admin/overview.html';
+                else if (role === 'admin') window.location.href = '../admin/users.html';
             }
         } else {
             const errorMsg = result.message || 'Login failed';

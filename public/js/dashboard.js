@@ -42,7 +42,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         return;
     }
     if (path.includes('/admin/reservations.html')) {
-        window.location.href = '/pages/admin/overview.html';
+        window.location.href = '/pages/admin/users.html';
         return;
     }
 
@@ -83,7 +83,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             const landingPagesByRole = {
                 tenant: '/pages/tenant/properties.html',
                 landlord: '/pages/landlord/properties.html',
-                admin: '/pages/admin/overview.html',
+                admin: '/pages/admin/users.html',
                 maintenance: '/pages/maintenance/dashboard.html'
             };
             window.location.href = landingPagesByRole[user.role] || '/pages/auth/login.html';
@@ -131,8 +131,8 @@ function populateDashboardUI(user) {
 
     const avatar = document.querySelector('.topbar-avatar');
     if (avatar) {
-        const fallbackInitial = (user && user.role === 'landlord') ? 'L' : 'T';
-        const fallbackName = (user && user.role === 'landlord') ? 'Landlord' : 'Tenant';
+        const fallbackInitial = (user && user.role === 'landlord') ? 'L' : (user && user.role === 'admin') ? 'A' : 'T';
+        const fallbackName = (user && user.role === 'landlord') ? 'Landlord' : (user && user.role === 'admin') ? 'Admin' : 'Tenant';
         const initials = String(user.full_name || fallbackName)
             .trim()
             .split(/\s+/)
@@ -424,14 +424,6 @@ function renderNewDashboardLayout(user) {
             {
                 section: 'Command Center',
                 items: [
-                    { label: 'Overview', href: 'overview.html' },
-                    { label: 'Notifications', href: 'notifications.html' },
-                    { label: 'My Profile', href: 'profile.html' }
-                ]
-            },
-            {
-                section: 'Access & Listings',
-                items: [
                     { label: 'User Access', href: 'users.html' },
                     { label: 'Property Approvals', href: 'property-review.html' }
                 ]
@@ -515,7 +507,7 @@ function renderNewDashboardLayout(user) {
     };
     const activeNavigationFilename = parentNavigationPages[role]?.[currentPageFilename] || currentPageFilename;
     const roleLabel = role.charAt(0).toUpperCase() + role.slice(1);
-    const shellUserName = (user && user.full_name) ? user.full_name : 'Checking account...';
+    const shellUserName = (user && user.full_name) ? user.full_name : (role === 'landlord' ? 'Landlord' : role === 'admin' ? 'Admin' : 'Tenant');
 
     if (role === 'tenant') {
         const tenantGroups = [
@@ -646,6 +638,63 @@ function renderNewDashboardLayout(user) {
                 </nav>
             </aside>
         `;
+    } else if (role === 'admin') {
+        const adminGroups = [
+            {
+                section: 'Command Center',
+                items: [
+                    { label: 'User Access', href: 'users.html', icon: 'User Access' },
+                    { label: 'Property Approvals', href: 'property-review.html', icon: 'Property Approvals' }
+                ]
+            },
+            {
+                section: 'Platform Monitoring',
+                items: [
+                    { label: 'Payment Verification', href: 'payments.html', icon: 'Payment Verification' }
+                ]
+            },
+            {
+                section: 'Trust & Governance',
+                items: [
+                    { label: 'Case Triage', href: 'reports.html', icon: 'Case Triage' },
+                    { label: 'Policies', href: 'policy-management.html', icon: 'Policies' },
+                    { label: 'Audit Trail', href: 'audit-logs.html', icon: 'Audit Trail' }
+                ]
+            }
+        ];
+
+        sidebarHtml = `
+            <aside class="sidebar sidebar-admin" id="domiknowSidebar" aria-label="Admin navigation">
+                <div class="sidebar-logo-container">
+                    <div class="app-brand" aria-label="DOMIKNOW">
+                        <span class="app-brand-mark" aria-hidden="true">D</span>
+                        <span class="admin-brand-copy">
+                            <span class="app-brand-name">DOMI<span class="app-brand-accent">KNOW</span></span>
+                        </span>
+                    </div>
+                </div>
+                <nav class="sidebar-menu" aria-label="Primary navigation">
+        `;
+
+        let adminItemIndex = 0;
+        adminGroups.forEach(group => {
+            sidebarHtml += `<div class="sidebar-section-title">${group.section}</div>`;
+            group.items.forEach(item => {
+                const isActive = activeNavigationFilename === item.href;
+                adminItemIndex++;
+                sidebarHtml += `
+                    <a href="${item.href}" class="sidebar-link ${isActive ? 'active' : ''}" ${isActive ? 'aria-current="page"' : ''} style="--sidebar-item-index: ${adminItemIndex};">
+                        ${getLinkIcon(item.icon)}
+                        <span>${item.label}</span>
+                    </a>
+                `;
+            });
+        });
+
+        sidebarHtml += `
+                </nav>
+            </aside>
+        `;
     } else if (role === 'maintenance') {
         const maintenanceItems = [
             { label: 'Work overview', href: 'dashboard.html', icon: 'Dashboard' },
@@ -745,11 +794,11 @@ function renderNewDashboardLayout(user) {
                     <button type="button" id="menuToggleBtn" class="mobile-menu-toggle topbar-action" aria-label="Open navigation" aria-controls="domiknowSidebar" aria-expanded="false">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/></svg>
                     </button>
-                    ${(role === 'tenant' || role === 'landlord') ? `
+                    ${(role === 'tenant' || role === 'landlord' || role === 'admin') ? `
                     <h1 class="sr-only" id="appPageTitle">${pageTitle}</h1>
                     ` : `
                     <div class="topbar-heading">
-                        <span class="topbar-context">${role === 'maintenance' ? 'Field operations' : role === 'admin' ? 'Platform control center' : `${roleLabel} workspace`}</span>
+                        <span class="topbar-context">${role === 'maintenance' ? 'Field operations' : `${roleLabel} workspace`}</span>
                         <h1 class="topbar-title" id="appPageTitle">${pageTitle}</h1>
                     </div>
                     `}
@@ -759,15 +808,15 @@ function renderNewDashboardLayout(user) {
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
                         <span class="notification-trigger__badge" data-notification-badge hidden>0</span>
                     </button>
-                    ${(role !== 'tenant' && role !== 'landlord') ? `
+                    ${(role !== 'tenant' && role !== 'landlord' && role !== 'admin') ? `
                     <button type="button" class="topbar-action theme-toggle" data-theme-toggle aria-label="Toggle color theme" aria-pressed="false" title="Toggle color theme">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.66 6.34l1.41-1.41"/></svg>
                     </button>
                     ` : ''}
-                    ${(role === 'tenant' || role === 'landlord') ? `
+                    ${(role === 'tenant' || role === 'landlord' || role === 'admin') ? `
                     <div class="topbar-account-dropdown" id="topbarAccountDropdown">
                         <button type="button" class="topbar-avatar-btn" id="profileDropdownBtn" aria-expanded="false" aria-haspopup="true" aria-label="Open account menu" title="Account menu">
-                            <span class="topbar-avatar" aria-hidden="true">${shellUserName.trim().charAt(0).toUpperCase() || (role === 'landlord' ? 'L' : 'T')}</span>
+                            <span class="topbar-avatar" aria-hidden="true">${shellUserName.trim().charAt(0).toUpperCase() || (role === 'landlord' ? 'L' : role === 'admin' ? 'A' : 'T')}</span>
                         </button>
                         <div class="topbar-dropdown-menu" id="profileDropdownMenu" role="menu" aria-labelledby="profileDropdownBtn" hidden>
                             <a href="/pages/${role}/profile.html" class="topbar-dropdown-item ${activeNavigationFilename === 'profile.html' ? 'active' : ''}" id="dropdownProfileLink" role="menuitem">
