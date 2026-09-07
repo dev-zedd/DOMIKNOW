@@ -348,7 +348,7 @@
         }
 
         .btn-reject:hover {
-            background-color: #fee2e2;
+            background-color: var(--color-error-bg);
             border-color: #fca5a5;
         }
 
@@ -487,7 +487,7 @@
                     <div class="info-grid-2">
                         <div class="info-block">
                             <div class="info-lbl">Desired Move-in Date</div>
-                            <div id="desiredMoveIn" class="info-val" style="color: var(--color-action-primary); font-size: 1.1rem; font-weight: 700;">-</div>
+                            <div id="desiredMoveIn" class="info-val" style="color: var(--color-link); font-size: 1.1rem; font-weight: 700;">-</div>
                         </div>
                         <div class="info-block">
                             <div class="info-lbl">Date Submitted</div>
@@ -508,7 +508,7 @@
                     <div class="info-grid-2">
                         <div class="info-block">
                             <div class="info-lbl">Property Name</div>
-                            <div id="propName" class="info-val" style="color: var(--color-action-primary); font-size: 1.05rem;">-</div>
+                            <div id="propName" class="info-val" style="color: var(--color-link); font-size: 1.05rem;">-</div>
                         </div>
                         <div class="info-block">
                             <div class="info-lbl">Address</div>
@@ -533,8 +533,8 @@
 
                     <div id="targetUnitContainer" class="hidden" style="margin-top: 1rem; border-top: 1px dashed var(--color-border-default); padding-top: 1rem;">
                         <div class="info-block">
-                            <div class="info-lbl" style="color: var(--color-action-primary);">Target Room / Bed Space</div>
-                            <div id="targetRoomVal" class="info-val" style="font-weight: 700; font-size: 1.1rem; color: var(--color-action-primary);">-</div>
+                            <div class="info-lbl" style="color: var(--color-link);">Target Room / Bed Space</div>
+                            <div id="targetRoomVal" class="info-val" style="font-weight: 700; font-size: 1.1rem; color: var(--color-link);">-</div>
                         </div>
                     </div>
                 </div>
@@ -629,9 +629,9 @@
                         <div style="margin-top: 0.75rem;">
                             <span class="info-lbl" style="font-size: 0.6875rem;">Quick Remark Presets:</span>
                             <div class="preset-chips">
-                                <button type="button" class="preset-chip" onclick="applyRemarkPreset('All documents verified and application approved. Welcome!')">✓ Verified & Approved</button>
-                                <button type="button" class="preset-chip" onclick="applyRemarkPreset('Pending security deposit payment and signed contract.')">⏳ Deposit Pending</button>
-                                <button type="button" class="preset-chip" onclick="applyRemarkPreset('Application rejected due to incomplete requirements.')">✕ Incomplete Requirements</button>
+                                <button type="button" class="preset-chip" onclick="applyRemarkPreset('All documents verified and application approved. Welcome!')"><span data-icon="check" aria-hidden="true"></span> Verified & Approved</button>
+                                <button type="button" class="preset-chip" onclick="applyRemarkPreset('Pending security deposit payment and signed contract.')"><span data-icon="clock" aria-hidden="true"></span> Deposit Pending</button>
+                                <button type="button" class="preset-chip" onclick="applyRemarkPreset('Application rejected due to incomplete requirements.')"><span data-icon="x" aria-hidden="true"></span> Incomplete Requirements</button>
                             </div>
                         </div>
 
@@ -772,7 +772,7 @@
 
                 container.innerHTML = `
                     <div style="margin-bottom: 1rem; padding: 0.75rem 1rem; background-color: var(--color-bg-subtle); border-radius: var(--radius-md); border: 1px solid var(--color-border-default);">
-                        <strong style="color: var(--color-text-primary); font-size: 0.95rem;">✓ Verified Platform Rental History</strong>
+                        <strong style="color: var(--color-text-primary); font-size: 0.95rem;"><span data-icon="check" aria-hidden="true"></span> Verified Platform Rental History</strong>
                         <div style="font-size: 0.8rem; color: var(--color-text-secondary); margin-top: 0.25rem;">Applicant has active or completed tenancy agreements registered on Domiknow.</div>
                     </div>
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin-bottom: 1rem;">
@@ -859,7 +859,7 @@
                 <div style="text-align: center; padding: 1.75rem 1rem;">
                     <div style="margin-bottom: 0.5rem;">
                         <span class="status-badge status-active" style="font-size: 0.85rem; padding: 0.5rem 1rem; font-weight: 700; border-radius: var(--radius-md);">
-                            ✓ First-Time Renter
+                            <span data-icon="check" aria-hidden="true"></span> First-Time Renter
                         </span>
                     </div>
                     <p style="font-size: 0.875rem; color: var(--color-text-secondary); max-width: 440px; margin: 0.5rem auto 0 auto; line-height: 1.5;">
@@ -883,33 +883,33 @@
             // Group 1: Rental History Values
             let prevRentalsVal = '';
             if (leases.length > 0) {
-                prevRentalsVal = `<span style="color: var(--color-success-text); font-weight: 700;">✓ ${leases.length} Platform Lease(s) on Record</span>`;
+                prevRentalsVal = `<span style="color: var(--color-success-text); font-weight: 700;"><span data-icon="check" aria-hidden="true"></span> ${leases.length} Platform Lease(s) on Record</span>`;
             } else if (screening && screening.previous_rental_history) {
                 const hist = String(screening.previous_rental_history).toLowerCase();
                 if (hist === 'positive') {
-                    prevRentalsVal = `<span style="color: var(--color-success-text); font-weight: 700;">✓ Positive (Applicant Declared)</span>`;
+                    prevRentalsVal = `<span style="color: var(--color-success-text); font-weight: 700;"><span data-icon="check" aria-hidden="true"></span> Positive (Applicant Declared)</span>`;
                 } else if (hist === 'negative') {
-                    prevRentalsVal = `<span style="color: var(--color-error-text); font-weight: 700;">⚠ Negative (Applicant Declared)</span>`;
+                    prevRentalsVal = `<span style="color: var(--color-error-text); font-weight: 700;"><span data-icon="warning" aria-hidden="true"></span> Negative (Applicant Declared)</span>`;
                 } else {
-                    prevRentalsVal = `<span class="status-badge status-active" style="font-weight: 700;">✓ First-Time / Neutral</span>`;
+                    prevRentalsVal = `<span class="status-badge status-active" style="font-weight: 700;"><span data-icon="check" aria-hidden="true"></span> First-Time / Neutral</span>`;
                 }
             } else {
-                prevRentalsVal = `<span class="status-badge status-active" style="font-weight: 700;">✓ First-Time Renter</span>`;
+                prevRentalsVal = `<span class="status-badge status-active" style="font-weight: 700;"><span data-icon="check" aria-hidden="true"></span> First-Time Renter</span>`;
             }
 
             let leaseCompVal = '';
             if (leases.length > 0) {
                 const terminated = leases.filter(l => l.lease_status === 'terminated' || l.lease_status === 'cancelled');
                 if (terminated.length > 0) {
-                    leaseCompVal = `<span style="color: var(--color-error-text); font-weight: 700;">✕ ${terminated.length} Interrupted / Terminated Early</span>`;
+                    leaseCompVal = `<span style="color: var(--color-error-text); font-weight: 700;"><span data-icon="x" aria-hidden="true"></span> ${terminated.length} Interrupted / Terminated Early</span>`;
                 } else {
-                    leaseCompVal = `<span style="color: var(--color-success-text); font-weight: 700;">✓ In Good Standing (${leases.length} Active / Completed)</span>`;
+                    leaseCompVal = `<span style="color: var(--color-success-text); font-weight: 700;"><span data-icon="check" aria-hidden="true"></span> In Good Standing (${leases.length} Active / Completed)</span>`;
                 }
             } else if (screening) {
                 if (String(screening.previous_rental_history).toLowerCase() === 'negative') {
-                    leaseCompVal = `<span style="color: var(--color-error-text); font-weight: 700;">✕ Interrupted</span>`;
+                    leaseCompVal = `<span style="color: var(--color-error-text); font-weight: 700;"><span data-icon="x" aria-hidden="true"></span> Interrupted</span>`;
                 } else {
-                    leaseCompVal = `<span style="color: var(--color-success-text); font-weight: 700;">✓ Completed in Good Standing</span>`;
+                    leaseCompVal = `<span style="color: var(--color-success-text); font-weight: 700;"><span data-icon="check" aria-hidden="true"></span> Completed in Good Standing</span>`;
                 }
             } else {
                 leaseCompVal = `<span style="color: var(--color-text-muted);">N/A (First-Time Renter)</span>`;
@@ -917,27 +917,27 @@
 
             let balanceVal = '';
             if (unpaid > 0) {
-                balanceVal = `<span style="color: var(--color-error-text); font-weight: 700;">⚠ ₱${unpaid.toLocaleString('en-PH', {minimumFractionDigits: 2})} Overdue (${tenantHistory.unpaid_bills_count} Bill)</span>`;
+                balanceVal = `<span style="color: var(--color-error-text); font-weight: 700;"><span data-icon="warning" aria-hidden="true"></span> ₱${unpaid.toLocaleString('en-PH', {minimumFractionDigits: 2})} Overdue (${tenantHistory.unpaid_bills_count} Bill)</span>`;
             } else {
-                balanceVal = `<span style="color: var(--color-success-text); font-weight: 700;">✓ ₱0.00 (No Overdue Balances)</span>`;
+                balanceVal = `<span style="color: var(--color-success-text); font-weight: 700;"><span data-icon="check" aria-hidden="true"></span> ₱0.00 (No Overdue Balances)</span>`;
             }
 
             let conditionVal = '';
             if (screening && String(screening.previous_rental_history).toLowerCase() === 'negative') {
-                conditionVal = `<span style="color: var(--color-error-text); font-weight: 700;">⚠ Damage / Issues Reported</span>`;
+                conditionVal = `<span style="color: var(--color-error-text); font-weight: 700;"><span data-icon="warning" aria-hidden="true"></span> Damage / Issues Reported</span>`;
             } else if (leases.length > 0) {
-                conditionVal = `<span style="color: var(--color-success-text); font-weight: 700;">✓ Clean Move-Out / Well Maintained</span>`;
+                conditionVal = `<span style="color: var(--color-success-text); font-weight: 700;"><span data-icon="check" aria-hidden="true"></span> Clean Move-Out / Well Maintained</span>`;
             } else if (screening) {
-                conditionVal = `<span style="color: var(--color-success-text); font-weight: 700;">✓ Good / Minor Wear</span>`;
+                conditionVal = `<span style="color: var(--color-success-text); font-weight: 700;"><span data-icon="check" aria-hidden="true"></span> Good / Minor Wear</span>`;
             } else {
                 conditionVal = `<span style="color: var(--color-text-muted);">N/A (First-Time Renter)</span>`;
             }
 
             let ratingVal = '';
             if (Number(tenantObj.landlord_average_rating) > 0) {
-                ratingVal = `<span style="color: var(--color-warning-text); font-weight: 700;">★ ${Number(tenantObj.landlord_average_rating).toFixed(1)} / 5.0 (${tenantObj.landlord_rating_count || 1} reviews)</span>`;
+                ratingVal = `<span style="color: var(--color-warning-text); font-weight: 700;"><span data-icon="star" aria-hidden="true"></span> ${Number(tenantObj.landlord_average_rating).toFixed(1)} / 5.0 (${tenantObj.landlord_rating_count || 1} reviews)</span>`;
             } else if (screening && screening.payment_behavior_score) {
-                ratingVal = `<span style="color: var(--color-success-text); font-weight: 700;">✓ Satisfactory (${screening.payment_behavior_score} / 100 Rating)</span>`;
+                ratingVal = `<span style="color: var(--color-success-text); font-weight: 700;"><span data-icon="check" aria-hidden="true"></span> Satisfactory (${screening.payment_behavior_score} / 100 Rating)</span>`;
             } else {
                 ratingVal = `<span style="color: var(--color-text-muted);">No platform ratings yet</span>`;
             }
@@ -951,30 +951,26 @@
 
             let reportsVal = '';
             if (vios.length > 0) {
-                reportsVal = `<span style="color: var(--color-error-text); font-weight: 700;">⚠ ${vios.length} Violation(s) Reported</span>`;
+                reportsVal = `<span style="color: var(--color-error-text); font-weight: 700;"><span data-icon="warning" aria-hidden="true"></span> ${vios.length} Violation(s) Reported</span>`;
             } else {
-                reportsVal = `<span style="color: var(--color-success-text); font-weight: 700;">✓ 0 Reports (Clean Record)</span>`;
+                reportsVal = `<span style="color: var(--color-success-text); font-weight: 700;"><span data-icon="check" aria-hidden="true"></span> 0 Reports (Clean Record)</span>`;
             }
 
             // Group 2: Document Verification
             const validIdDoc = docs.find(d => ['valid_id', 'student_id', 'parent_guardian_id'].includes(d.document_type));
             const idDocVal = validIdDoc
-                ? `<a href="${validIdDoc.file_url}" target="_blank" style="color: var(--color-action-primary); font-weight: 700; text-decoration: underline;">
-                     ✓ Uploaded (${domiknowEscapeHtml(validIdDoc.file_name)})
-                   </a>`
-                : `<span style="color: var(--color-warning-text); font-weight: 700;">⚠ Missing Government / Student ID</span>`;
+                ? `${domiknowDocumentLink(validIdDoc.file_url, validIdDoc.file_name)}`
+                : `<span style="color: var(--color-warning-text); font-weight: 700;"><span data-icon="warning" aria-hidden="true"></span> Missing Government / Student ID</span>`;
 
             const incomeDoc = docs.find(d => ['proof_of_income', 'certificate_of_registration'].includes(d.document_type));
             const incomeDocVal = incomeDoc
-                ? `<a href="${incomeDoc.file_url}" target="_blank" style="color: var(--color-action-primary); font-weight: 700; text-decoration: underline;">
-                     ✓ Uploaded (${domiknowEscapeHtml(incomeDoc.file_name)})
-                   </a>`
-                : `<span style="color: var(--color-warning-text); font-weight: 700;">⚠ Missing Proof of Income</span>`;
+                ? `${domiknowDocumentLink(incomeDoc.file_url, incomeDoc.file_name)}`
+                : `<span style="color: var(--color-warning-text); font-weight: 700;"><span data-icon="warning" aria-hidden="true"></span> Missing Proof of Income</span>`;
 
             const empCertDoc = docs.find(d => d.document_type === 'other' && (d.file_name || '').toLowerCase().includes('employment'));
             let empCertDocVal = '';
             if (empCertDoc) {
-                empCertDocVal = `<a href="${empCertDoc.file_url}" target="_blank" style="color: var(--color-action-primary); font-weight: 700; text-decoration: underline;">✓ Uploaded (${domiknowEscapeHtml(empCertDoc.file_name)})</a>`;
+                empCertDocVal = `${domiknowDocumentLink(empCertDoc.file_url, empCertDoc.file_name)}`;
             } else if (screening && (screening.employment_status || screening.monthly_income)) {
                 const emp = screening.employment_status ? screening.employment_status.replace(/_/g, ' ').toUpperCase() : 'DECLARED';
                 const inc = Number(screening.monthly_income) > 0 ? `₱${Number(screening.monthly_income).toLocaleString('en-PH')}/mo` : '';
@@ -988,9 +984,7 @@
             if (otherDocs.length > 0) {
                 otherDocsVal = otherDocs.map(d => `
                     <div style="margin-bottom:0.25rem;">
-                        <a href="${d.file_url}" target="_blank" style="color: var(--color-action-primary); font-weight: 600; text-decoration: underline;">
-                            ${domiknowEscapeHtml(d.file_name)}
-                        </a>
+                        ${domiknowDocumentLink(d.file_url, d.file_name)}
                     </div>
                 `).join('');
             }
@@ -1001,23 +995,23 @@
             let recVal = '';
 
             if (screening && screening.screening_score !== null && screening.screening_score !== undefined) {
-                scoreVal = `<strong style="color: var(--color-action-primary); font-size: 1.05rem;">${screening.screening_score} / 100</strong>`;
+                scoreVal = `<strong style="color: var(--color-link); font-size: 1.05rem;">${screening.screening_score} / 100</strong>`;
                 const label = String(screening.screening_result_label || '').toLowerCase();
                 if (label === 'low_risk') {
                     riskVal = `<span class="status-badge status-active">Low Risk</span>`;
                     recVal = screening.screening_remarks
                         ? `<span style="color: var(--color-success-text); font-weight: 700;">${domiknowEscapeHtml(screening.screening_remarks)}</span>`
-                        : `<span style="color: var(--color-success-text); font-weight: 700;">✓ Recommended for Approval</span>`;
+                        : `<span style="color: var(--color-success-text); font-weight: 700;"><span data-icon="check" aria-hidden="true"></span> Recommended for Approval</span>`;
                 } else if (label === 'moderate_risk') {
                     riskVal = `<span class="status-badge status-pending">Moderate Risk</span>`;
                     recVal = screening.screening_remarks
                         ? `<span style="color: var(--color-warning-text); font-weight: 700;">${domiknowEscapeHtml(screening.screening_remarks)}</span>`
-                        : `<span style="color: var(--color-warning-text); font-weight: 700;">⏳ Review Documents Before Approval</span>`;
+                        : `<span style="color: var(--color-warning-text); font-weight: 700;"><span data-icon="clock" aria-hidden="true"></span> Review Documents Before Approval</span>`;
                 } else {
                     riskVal = `<span class="status-badge status-rejected">High Risk</span>`;
                     recVal = screening.screening_remarks
                         ? `<span style="color: var(--color-error-text); font-weight: 700;">${domiknowEscapeHtml(screening.screening_remarks)}</span>`
-                        : `<span style="color: var(--color-error-text); font-weight: 700;">⚠ Requires Manual Review & Follow-up</span>`;
+                        : `<span style="color: var(--color-error-text); font-weight: 700;"><span data-icon="warning" aria-hidden="true"></span> Requires Manual Review & Follow-up</span>`;
                 }
             } else {
                 // Dynamically evaluate based on verified platform criteria
@@ -1027,17 +1021,17 @@
                 if (tenantObj.contact_number || tenantObj.is_verified) computedScore += 15;
                 if (vios.length === 0 && unpaid === 0) computedScore += 15;
 
-                scoreVal = `<strong style="color: var(--color-action-primary); font-size: 1.05rem;">${computedScore} / 100</strong>`;
+                scoreVal = `<strong style="color: var(--color-link); font-size: 1.05rem;">${computedScore} / 100</strong>`;
 
                 if (computedScore >= 80) {
                     riskVal = `<span class="status-badge status-active">Low Risk</span>`;
-                    recVal = `<span style="color: var(--color-success-text); font-weight: 700;">✓ Recommended for Approval (Credentials Verified)</span>`;
+                    recVal = `<span style="color: var(--color-success-text); font-weight: 700;"><span data-icon="check" aria-hidden="true"></span> Recommended for Approval (Credentials Verified)</span>`;
                 } else if (computedScore >= 50) {
                     riskVal = `<span class="status-badge status-pending">Moderate Risk</span>`;
-                    recVal = `<span style="color: var(--color-warning-text); font-weight: 700;">⏳ Review Attached Documents</span>`;
+                    recVal = `<span style="color: var(--color-warning-text); font-weight: 700;"><span data-icon="clock" aria-hidden="true"></span> Review Attached Documents</span>`;
                 } else {
                     riskVal = `<span class="status-badge status-rejected">High Risk</span>`;
-                    recVal = `<span style="color: var(--color-error-text); font-weight: 700;">⚠ Missing Required Credentials</span>`;
+                    recVal = `<span style="color: var(--color-error-text); font-weight: 700;"><span data-icon="warning" aria-hidden="true"></span> Missing Required Credentials</span>`;
                 }
             }
 
@@ -1045,7 +1039,7 @@
             tbody.innerHTML = `
                 <!-- Group 1: Rental History -->
                 <tr style="background-color: var(--color-bg-subtle, #f1f5f9); border-bottom: 2px solid var(--color-border-default);">
-                    <td colspan="3" style="padding: 0.75rem 1rem; font-weight: 800; color: var(--color-action-primary); font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.05em;">
+                    <td colspan="3" style="padding: 0.75rem 1rem; font-weight: 800; color: var(--color-link); font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.05em;">
                         1. Rental History
                     </td>
                 </tr>
@@ -1087,7 +1081,7 @@
 
                 <!-- Group 2: Application Documents -->
                 <tr style="background-color: var(--color-bg-subtle, #f1f5f9); border-bottom: 2px solid var(--color-border-default);">
-                    <td colspan="3" style="padding: 0.75rem 1rem; font-weight: 800; color: var(--color-action-primary); font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.05em;">
+                    <td colspan="3" style="padding: 0.75rem 1rem; font-weight: 800; color: var(--color-link); font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.05em;">
                         2. Application Documents
                     </td>
                 </tr>
@@ -1114,7 +1108,7 @@
 
                 <!-- Group 3: Screening Review -->
                 <tr style="background-color: var(--color-bg-subtle, #f1f5f9); border-bottom: 2px solid var(--color-border-default);">
-                    <td colspan="3" style="padding: 0.75rem 1rem; font-weight: 800; color: var(--color-action-primary); font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.05em;">
+                    <td colspan="3" style="padding: 0.75rem 1rem; font-weight: 800; color: var(--color-link); font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.05em;">
                         3. Screening Review
                     </td>
                 </tr>
@@ -1250,12 +1244,10 @@
                 item.className = 'doc-item';
                 item.innerHTML = `
                     <div class="doc-info">
-                        <span class="doc-title">${doc.document_type.replace('_', ' ').toUpperCase()}</span>
-                        <span class="doc-meta"><a href="${doc.file_url}" target="_blank">${doc.file_name}</a> (${sizeKB} KB)</span>
+                        <span class="doc-title">${domiknowEscapeHtml(String(doc.document_type || 'Document').replace(/_/g, ' ').toUpperCase())}</span>
+                        <span class="doc-meta">${domiknowDocumentLink(doc.file_url, doc.file_name)} (${sizeKB} KB)</span>
                     </div>
-                    <a href="${doc.file_url}" target="_blank" style="color: var(--color-action-primary); font-weight: 700; font-size: 0.775rem; text-decoration: none; display: inline-flex; align-items: center; gap: 0.25rem;">
-                        <span>View</span> &nearr;
-                    </a>
+                    ${domiknowDocumentLink(doc.file_url, 'View')}
                 `;
                 container.appendChild(item);
             });

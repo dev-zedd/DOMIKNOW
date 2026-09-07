@@ -21,6 +21,13 @@ const paymentController = {
                 return responseHelper.error(res, 'All details (billing, amount, method, reference, and file proof payload) are required.');
             }
 
+            const amount = Number(payment_amount);
+            if (!['number', 'string'].includes(typeof payment_amount) ||
+                !/^\d+(\.\d{1,2})?$/.test(String(payment_amount).trim()) ||
+                !Number.isFinite(amount) || amount <= 0 || !Number.isSafeInteger(Math.round(amount * 100))) {
+                return responseHelper.error(res, 'Enter a payment amount greater than zero with at most two decimal places.');
+            }
+
             // 2. Validate billing record belongs to tenant
             const { data: billing, error: billingErr } = await supabase
                 .from('billing_records')
@@ -81,7 +88,7 @@ const paymentController = {
                 tenant_id: tenantId,
                 landlord_id: billing.landlord_id,
                 property_id: billing.property_id,
-                payment_amount: parseFloat(payment_amount),
+                payment_amount: amount,
                 payment_method: sanitizedMethod,
                 payment_reference_number,
                 payment_proof_url: uploadResult.url,
@@ -177,7 +184,7 @@ const paymentController = {
 
         } catch (error) {
             console.error('Verify payment error:', error);
-            return responseHelper.error(res, 'Failed to update payment status', error, 500);
+            return responseHelper.error(res, error.statusCode ? error.message : 'Failed to update payment status', error, error.statusCode || 500);
         }
     }
 };

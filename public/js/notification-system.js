@@ -355,10 +355,13 @@
         content.className = 'notification-item__content';
         const title = document.createElement('h3');
         title.className = 'notification-item__title';
-        title.textContent = notification.title || 'System notification';
+        // Older stored notifications may still include decorative pictographs.
+        // Their category already supplies the corresponding SVG icon.
+        const plainNotificationText = value => String(value || '').replace(/[\p{Extended_Pictographic}\uFE0F\u200D]/gu, '').replace(/\s{2,}/g, ' ').trim();
+        title.textContent = plainNotificationText(notification.title) || 'System notification';
         const message = document.createElement('p');
         message.className = 'notification-item__message';
-        message.textContent = notification.message || 'A new update is available.';
+        message.textContent = plainNotificationText(notification.message) || 'A new update is available.';
         const meta = document.createElement('div');
         meta.className = 'notification-item__meta';
         const type = document.createElement('span');

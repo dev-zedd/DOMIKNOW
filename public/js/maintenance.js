@@ -13,13 +13,12 @@
         'dashboard.html': {
             eyebrow: 'Field operations',
             description: 'Check account readiness, open assigned work, and follow the same documented process for every property visit.',
-            action: { label: 'Open task queue', href: 'tasks.html' },
-            showFlow: true
+            showFlow: false
         },
         'tasks.html': {
             eyebrow: 'Work queue',
             description: 'Prioritize new offers and active repairs, then keep each task status current from acceptance through closure.',
-            showFlow: true
+            showFlow: false
         },
         'task-details.html': {
             eyebrow: 'Active work order',
@@ -136,6 +135,32 @@
         });
     }
 
+    async function loadWorkSummary() {
+        const status = document.getElementById('workSummaryStatus');
+        if (!status) return;
+        try {
+            const response = await fetch('/api/maintenance/requests/worker', {
+                headers: { Authorization: `Bearer ${localStorage.getItem('domiknow_token')}` }
+            });
+            if (!response.ok) throw new Error('Summary unavailable');
+            const result = await response.json();
+            if (!Array.isArray(result.data)) throw new Error('Invalid summary');
+            const groups = { offers: ['assigned'], active: ['accepted', 'travelling', 'arrived', 'repairing'], review: ['completed', 'verified'], closed: ['closed'] };
+            Object.entries(groups).forEach(([key, states]) => {
+                document.querySelector(`[data-work-count="${key}"]`).textContent = result.data.filter(task => states.includes(task.status)).length;
+            });
+            status.textContent = `${result.data.length} assigned tasks. Open the queue to review details.`;
+        } catch (_) {
+            status.textContent = 'Your work summary could not be loaded. ';
+            const retry = document.createElement('button');
+            retry.type = 'button';
+            retry.className = 'btn btn-secondary';
+            retry.textContent = 'Try again';
+            retry.addEventListener('click', () => { retry.disabled = true; loadWorkSummary(); }, { once: true });
+            status.appendChild(retry);
+        }
+    }
+
     function initialize() {
         const layout = document.querySelector('.dashboard-layout-maintenance');
         const content = layout && layout.querySelector('.main-content-inner');
@@ -155,6 +180,7 @@
         else content.insertBefore(intro, content.firstChild);
 
         enhanceTaskContent();
+        loadWorkSummary();
         if (meta.dynamicFlow) observeTaskStatus();
     }
 

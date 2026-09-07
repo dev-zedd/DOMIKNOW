@@ -55,7 +55,7 @@
             width: 44px;
             height: 44px;
             border-radius: 50%;
-            background-color: white;
+            background-color: var(--color-bg-surface);
             border: 2px solid var(--border-color);
             display: flex;
             justify-content: center;
@@ -90,13 +90,13 @@
             transform: translateX(-50%);
         }
         .step-circle.active .step-lbl {
-            color: var(--primary);
+            color: var(--color-link);
         }
         .step-circle.completed .step-lbl {
             color: #10b981;
         }
         .wizard-card {
-            background-color: white;
+            background-color: var(--color-bg-surface);
             border: 1px solid rgba(15, 73, 83, 0.06);
             border-radius: 24px;
             padding: 2.5rem;
@@ -118,14 +118,14 @@
             object-fit: cover;
         }
         .doc-suggestions {
-            background-color: #f8fafc;
-            border: 1px solid #e2e8f0;
+            background-color: var(--color-bg-canvas);
+            border: 1px solid var(--color-border-default);
             padding: 1.25rem;
             border-radius: 12px;
             font-size: 0.875rem;
             margin-bottom: 1.75rem;
             line-height: 1.6;
-            color: #334155;
+            color: var(--color-text-secondary);
         }
         .upload-row {
             display: flex;
@@ -155,7 +155,7 @@
         .form-label {
             font-weight: 700;
             font-size: 0.8125rem;
-            color: var(--primary);
+            color: var(--color-link);
             margin-bottom: 0.5rem;
             display: block;
             text-transform: uppercase;
@@ -170,7 +170,7 @@
             transition: all 0.2s;
             width: 100%;
             box-sizing: border-box;
-            background-color: white;
+            background-color: var(--color-bg-surface);
         }
 
         .form-input:focus, .form-select:focus, .form-textarea:focus {
@@ -206,8 +206,8 @@
         }
 
         .doc-upload-section.uploaded {
-            border-color: #a7f3d0;
-            background-color: #f0fdf4;
+            border-color: var(--color-success-border);
+            background-color: var(--color-success-bg);
         }
 
         .upload-status-badge {
@@ -256,7 +256,7 @@
             <div class="wizard-card">
                 <!-- Step 1: Form details -->
                 <div id="stepFormContainer">
-                    <h3 style="margin-top: 0; margin-bottom: 0.5rem; color: var(--primary);">Submit Rental Application</h3>
+                    <h3 style="margin-top: 0; margin-bottom: 0.5rem; color: var(--color-link);">Submit Rental Application</h3>
                     <p style="color: var(--text-secondary); margin-bottom: 1.5rem; font-size: 0.875rem;">Fill in your desired occupancy target details to register this application.</p>
 
                     <!-- Property Quick Preview -->
@@ -277,14 +277,14 @@
 
                         <div style="display: flex; gap: 0.5rem; justify-content: flex-end; margin-top: 1.5rem;">
                             <a href="properties.html" class="navbar-btn" style="text-decoration: none;">Cancel</a>
-                            <button type="submit" id="btnSubmitApp" class="btn-primary" style="width: auto; padding: 0.75rem 2rem;">Next: Upload Verification Files ➔</button>
+                            <button type="submit" id="btnSubmitApp" class="btn-primary" style="width: auto; padding: 0.75rem 2rem;">Next: Upload Verification Files <span data-icon="arrow" aria-hidden="true"></span></button>
                         </div>
                     </form>
                 </div>
 
                 <!-- Step 2: Upload Documents -->
                 <div id="stepUploadContainer" class="hidden">
-                    <h3 style="margin-top: 0; margin-bottom: 0.5rem; color: var(--primary);">Upload Required Verification Documents</h3>
+                    <h3 style="margin-top: 0; margin-bottom: 0.5rem; color: var(--color-link);">Upload Required Verification Documents</h3>
                     <p style="color: var(--text-secondary); margin-bottom: 1.5rem; font-size: 0.875rem;">Please upload all required documents below. Each section corresponds to one requirement from the landlord.</p>
 
                     <div id="suggestionsBox" class="doc-suggestions">
@@ -299,7 +299,7 @@
                             <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.75rem;">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
                                 <span class="form-label" style="margin: 0; font-size: 0.875rem;">Identity Verification</span>
-                                <span style="font-size: 0.75rem; color: #ef4444; font-weight: 800; margin-left: auto;">REQUIRED</span>
+                                <span style="font-size: 0.75rem; color: var(--color-error-text); font-weight: 800; margin-left: auto;">REQUIRED</span>
                             </div>
                             <p style="font-size: 0.8125rem; color: var(--text-muted); margin: 0 0 0.5rem 0;">Valid government-issued ID (Driver's License, Passport, National ID, etc.)</p>
                             <div style="display: flex; gap: 0.75rem; align-items: center;">
@@ -314,7 +314,7 @@
                             <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.75rem;">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
                                 <span class="form-label" style="margin: 0; font-size: 0.875rem;">Proof of Income</span>
-                                <span style="font-size: 0.75rem; color: #ef4444; font-weight: 800; margin-left: auto;">REQUIRED</span>
+                                <span style="font-size: 0.75rem; color: var(--color-error-text); font-weight: 800; margin-left: auto;">REQUIRED</span>
                             </div>
                             <p style="font-size: 0.8125rem; color: var(--text-muted); margin: 0 0 0.5rem 0;">Payslip, Certificate of Employment, Business Permit, or ITR</p>
                             <div style="display: flex; gap: 0.75rem; align-items: center;">
@@ -348,11 +348,11 @@
 
                 <!-- Step 3: Finished successfully -->
                 <div id="stepFinishedContainer" class="hidden" style="text-align: center; padding: 2rem 0;">
-                    <span style="font-size: 4rem; display: block; margin-bottom: 1rem;">🎉</span>
+                    <span style="font-size: 4rem; display: block; margin-bottom: 1rem;"><span data-icon="check" aria-hidden="true"></span></span>
                     <h2 style="color: #10b981; margin-bottom: 0.5rem; font-weight: 800;">Application Submitted Successfully!</h2>
                     <p style="color: var(--text-secondary); max-width: 450px; margin: 0 auto 2rem auto; line-height: 1.6;">Your landlord verification package has been submitted as pending review. The landlord has been notified and will audit your credentials.</p>
                     
-                    <a href="applications.html" class="btn-primary" style="width: auto; padding: 0.75rem 2rem; text-decoration: none; background-color: var(--primary);">📄 View My Applications</a>
+                    <a href="applications.html" class="btn-primary" style="width: auto; padding: 0.75rem 2rem; text-decoration: none; background-color: var(--primary);"><span data-icon="note" aria-hidden="true"></span> View My Applications</a>
                 </div>
             </div>
         </div>
@@ -455,10 +455,10 @@
                 div.innerHTML = `
                     <img src="${previewImageUrl}" class="prop-thumb" alt="${domiknowEscapeHtml(currentProperty.property_name || 'Property')}">
                     <div style="display: flex; flex-direction: column; justify-content: center; gap: 0.25rem;">
-                        <h4 style="margin: 0; color: var(--primary);">${domiknowEscapeHtml(currentProperty.property_name || 'Property')}</h4>
+                        <h4 style="margin: 0; color: var(--color-link);">${domiknowEscapeHtml(currentProperty.property_name || 'Property')}</h4>
                         <span style="font-size: 0.75rem; color: var(--text-secondary);">${domiknowEscapeHtml(currentProperty.barangay || 'Location not specified')}, Siniloan, Laguna</span>
                         ${unitTag}
-                        <span style="font-weight: 700; font-size: 0.875rem; color: var(--landlord);">${rentDisplay}</span>
+                        <span style="font-weight: 700; font-size: 0.875rem; color: var(--color-link);">${rentDisplay}</span>
                     </div>
                 `;
 
@@ -538,7 +538,7 @@
                 await window.domiknowAlert({ variant: 'danger', eyebrow: 'Connection interrupted', title: 'Application not submitted', message: 'The application was not submitted. Check your connection and try again.' });
             } finally {
                 btn.disabled = false;
-                btn.textContent = 'Next: Upload Verification Files ➔';
+                domiknowSetIconText(btn, 'arrow', 'Next: Upload Verification Files ');
             }
         }
 
@@ -607,7 +607,7 @@
                     // Mark section as uploaded
                     section.classList.add('uploaded');
                     statusDiv.innerHTML = `
-                        <span class="upload-status-badge" style="background-color: #ecfdf5; color: #065f46;">
+                        <span class="upload-status-badge" style="background-color: var(--color-success-bg); color: var(--color-success-text);">
                             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
                             ${domiknowEscapeHtml(file.name)} uploaded successfully
                         </span>

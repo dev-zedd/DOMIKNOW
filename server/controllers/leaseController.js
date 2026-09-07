@@ -1,3 +1,4 @@
+const { validateLeaseTerms } = require('../utils/leaseValidation');
 const leaseModel = require('../models/leaseModel');
 const landlordModel = require('../models/landlordModel');
 const userModel = require('../models/userModel');
@@ -24,7 +25,9 @@ const leaseController = {
                 return responseHelper.error(res, 'Application ID, lease start/end dates, monthly rent, security deposit, advance payment, and due day are required.');
             }
 
-            const parsedDueDay = parseInt(payment_due_day);
+            const validationError = validateLeaseTerms(req.body);
+            if (validationError) return responseHelper.error(res, validationError);
+            const parsedDueDay = Number(payment_due_day);
             if (isNaN(parsedDueDay) || parsedDueDay < 1 || parsedDueDay > 28) {
                 return responseHelper.error(res, 'Payment due day must be between 1 and 28.');
             }
@@ -103,7 +106,7 @@ const leaseController = {
                 await notificationModel.create({
                     user_id: application.tenant_id,
                     type: 'lease_created',
-                    title: 'New Digital Lease Agreement Prepared 📄',
+                    title: 'New Digital Lease Agreement Prepared',
                     message: `Landlord has issued a digital lease contract (${lease.lease_number}) for property "${application.property_name || 'your unit'}". Please review and sign.`,
                     reference_id: lease.id
                 });
@@ -136,7 +139,9 @@ const leaseController = {
                 return responseHelper.error(res, 'Lease start/end dates, monthly rent, security deposit, advance payment, and due day are required.');
             }
 
-            const parsedDueDay = parseInt(payment_due_day);
+            const validationError = validateLeaseTerms(req.body);
+            if (validationError) return responseHelper.error(res, validationError);
+            const parsedDueDay = Number(payment_due_day);
             if (isNaN(parsedDueDay) || parsedDueDay < 1 || parsedDueDay > 28) {
                 return responseHelper.error(res, 'Payment due day must be between 1 and 28.');
             }
@@ -188,7 +193,7 @@ const leaseController = {
 
         } catch (error) {
             console.error('Update lease details error:', error);
-            return responseHelper.error(res, error.message || 'Failed to update lease details', error, 500);
+            return responseHelper.error(res, error.message || 'Failed to update lease details', error, error.statusCode || 500);
         }
     },
 
@@ -244,7 +249,7 @@ const leaseController = {
             const { signature_name } = req.body;
             const tenantId = req.user.id;
 
-            if (!signature_name || signature_name.trim() === '') {
+            if (typeof signature_name !== 'string' || signature_name.trim() === '') {
                 return responseHelper.error(res, 'Electronic signature name is required to accept the lease agreement.');
             }
 
@@ -264,7 +269,7 @@ const leaseController = {
                 await notificationModel.create({
                     user_id: acceptedLease.landlord_id,
                     type: 'lease_signed',
-                    title: 'Lease Contract Signed 🖊️',
+                    title: 'Lease Contract Signed',
                     message: `Tenant ${tenantUser.full_name || 'Tenant'} has electronically signed the lease agreement (${acceptedLease.lease_number}).`,
                     reference_id: id
                 });
@@ -353,7 +358,7 @@ const leaseController = {
 
         } catch (error) {
             console.error('Accept lease error:', error);
-            return responseHelper.error(res, error.message || 'Failed to accept lease agreement', error, 500);
+            return responseHelper.error(res, error.message || 'Failed to accept lease agreement', error, error.statusCode || 500);
         }
     },
 
@@ -376,7 +381,7 @@ const leaseController = {
 
         } catch (error) {
             console.error('Reject lease error:', error);
-            return responseHelper.error(res, error.message || 'Failed to reject lease agreement', error, 500);
+            return responseHelper.error(res, error.message || 'Failed to reject lease agreement', error, error.statusCode || 500);
         }
     },
     async respondLease(req, res) {

@@ -160,7 +160,7 @@
                             ${(app.unit || app.property_units) ? `<div style="font-size: 0.75rem; color: var(--text-muted); font-weight: 600;">Room: ${(app.unit || app.property_units).unit_number}${(app.bed || app.unit_beds) ? ` - ${(app.bed || app.unit_beds).bed_label}` : ''}</div>` : ''}
                         </td>
                         <td style="font-weight: 600;">${moveInDate}</td>
-                        <td style="text-align: center; font-weight: 700; color: var(--primary);">${app.document_count || 0}</td>
+                        <td style="text-align: center; font-weight: 700; color: var(--color-link);">${app.document_count || 0}</td>
                         <td>${submittedDate}</td>
                         <td><span class="status-badge ${statusClass}">${app.status}</span></td>
                         <td>

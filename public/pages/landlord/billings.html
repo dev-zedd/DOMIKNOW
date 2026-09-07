@@ -12,7 +12,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 1px solid #e2e8f0;
+            border-bottom: 1px solid var(--color-border-default);
             margin-bottom: 1.5rem;
             gap: 16px;
             flex-wrap: wrap;
@@ -22,17 +22,16 @@
             align-items: center;
             gap: 22px;
             overflow-x: auto;
-            scrollbar-width: none;
+            scrollbar-width: thin;
             padding-bottom: 12px;
         }
-        .billings-tabs-bar::-webkit-scrollbar { display: none; }
         .m-tab-btn {
             background: none !important;
             border: none !important;
             padding: 4px 0 !important;
             font-size: 0.9375rem !important;
             font-weight: 700 !important;
-            color: #64748b !important;
+            color: var(--color-text-muted) !important;
             cursor: pointer;
             display: inline-flex;
             align-items: center;
@@ -44,11 +43,11 @@
             min-height: auto !important;
         }
         .m-tab-btn:hover {
-            color: #0052ea !important;
+            color: var(--color-link) !important;
             background: none !important;
         }
         .m-tab-btn.active {
-            color: #0052ea !important;
+            color: var(--color-link) !important;
             font-weight: 800 !important;
             border-bottom: none !important;
             background: none !important;
@@ -61,12 +60,12 @@
             left: 0;
             right: 0;
             height: 2.5px;
-            background: #0052ea;
+            background: var(--color-action-primary);
             border-radius: 2px;
         }
         .tab-count {
-            background: #e2e8f0;
-            color: #475569;
+            background: var(--color-bg-subtle);
+            color: var(--color-text-secondary);
             font-size: 0.6875rem;
             font-weight: 700;
             padding: 2px 7px;
@@ -74,18 +73,18 @@
             line-height: 1.2;
         }
         .m-tab-btn.active .tab-count {
-            background: #eff6ff;
-            color: #0052ea;
+            background: var(--color-info-bg);
+            color: var(--color-link);
         }
 
         .btn-verify-payments {
-            background: #ffffff;
-            border: 1px solid #cbd5e1;
+            background: var(--color-bg-surface);
+            border: 1px solid var(--color-border-strong);
             border-radius: 8px;
             padding: 8px 18px;
             font-weight: 700;
             font-size: 0.875rem;
-            color: #0f172a;
+            color: var(--color-text-primary);
             display: inline-flex;
             align-items: center;
             gap: 8px;
@@ -97,9 +96,9 @@
             margin-bottom: 12px;
         }
         .btn-verify-payments:hover {
-            background: #f8fafc;
-            border-color: #94a3b8;
-            color: #0f172a;
+            background: var(--color-bg-canvas);
+            border-color: var(--color-border-strong);
+            color: var(--color-text-primary);
             text-decoration: none;
         }
 
@@ -297,7 +296,7 @@
             border-top: 2px solid var(--border-color);
             font-weight: 800;
             font-size: 1.15rem;
-            color: var(--landlord);
+            color: var(--color-link);
             margin-top: 0.5rem;
             padding-top: 0.75rem;
         }
@@ -725,12 +724,12 @@
                 const status = b.billing_status;
                 const dueDate = new Date(b.due_date);
 
+                totalRevenue += Number(b.paid_amount ?? (status === 'paid' ? b.total_amount : 0));
                 if (status === 'paid') {
                     paidCount++;
-                    totalRevenue += parseFloat(b.total_amount || 0);
                 } else if (status === 'waiting_verification') {
                     pendingVerifyCount++;
-                } else if (status === 'overdue' || (status === 'pending_payment' && dueDate < today)) {
+                } else if (status === 'overdue' || (['pending_payment', 'unpaid', 'partially_paid'].includes(status) && dueDate < today)) {
                     overdueCount++;
                 }
             });
@@ -775,7 +774,7 @@
 
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
-                    <td style="font-weight:700;font-family:monospace;color:var(--primary);">${lease.lease_number || 'DRAFT'}</td>
+                    <td style="font-weight:700;font-family:monospace;color: var(--color-link);">${lease.lease_number || 'DRAFT'}</td>
                     <td style="font-weight:600;">${tenantName}</td>
                     <td>${propertyName}</td>
                     <td style="font-weight:700;">₱${rentVal.toLocaleString(undefined, { minimumFractionDigits:2 })}</td>
@@ -827,7 +826,7 @@
 
                 if (statusLabel === 'paid') badgeClass = 'status-active';
                 else if (statusLabel === 'cancelled') badgeClass = 'status-rejected';
-                else if (statusLabel === 'overdue' || (statusLabel === 'pending_payment' && new Date(bill.due_date) < today)) {
+                else if (statusLabel === 'overdue' || (['pending_payment', 'unpaid', 'partially_paid'].includes(statusLabel) && new Date(bill.due_date) < today)) {
                     statusLabel = 'overdue';
                     badgeClass = 'status-rejected';
                 }
@@ -847,7 +846,7 @@
 
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
-                    <td style="font-weight:700;color:var(--primary);">${bill.billing_month}</td>
+                    <td style="font-weight:700;color: var(--color-link);">${bill.billing_month}</td>
                     <td>
                         <div style="font-weight:700;">${tenantName}</div>
                         <div style="font-size:0.75rem;color:var(--text-muted);">${propertyName}</div>
@@ -931,7 +930,7 @@
                     el.value = 0;
                     el.disabled = false;
                     if (container) container.style.display = 'flex';
-                    if (lbl) lbl.innerHTML = `${labelText} <span style="font-size:0.75rem;color:var(--landlord);font-weight:700;">(Billed Separately)</span>`;
+                    if (lbl) lbl.innerHTML = `${labelText} <span style="font-size:0.75rem;color: var(--color-link);font-weight:700;">(Billed Separately)</span>`;
                 }
             };
 
@@ -1005,7 +1004,7 @@
                     el.value = val;
                     el.disabled = false;
                     if (container) container.style.display = 'flex';
-                    if (lbl) lbl.innerHTML = `${labelText} <span style="font-size:0.75rem;color:var(--landlord);font-weight:700;">(Billed Separately)</span>`;
+                    if (lbl) lbl.innerHTML = `${labelText} <span style="font-size:0.75rem;color: var(--color-link);font-weight:700;">(Billed Separately)</span>`;
                 }
             };
 
@@ -1214,17 +1213,17 @@
 
                 // 2. Water
                 if (!isInc('water') || water > 0) {
-                    breakdownRows.push(`<div class="calc-row"><span>Water Utility Charge <small style="color:var(--landlord);font-weight:700;">(Billed Separately)</small></span><span>₱${water.toLocaleString(undefined, {minimumFractionDigits:2})}</span></div>`);
+                    breakdownRows.push(`<div class="calc-row"><span>Water Utility Charge <small style="color: var(--color-link);font-weight:700;">(Billed Separately)</small></span><span>₱${water.toLocaleString(undefined, {minimumFractionDigits:2})}</span></div>`);
                 }
 
                 // 3. Electricity
                 if (!isInc('electricity') || electricity > 0) {
-                    breakdownRows.push(`<div class="calc-row"><span>Electricity Utility Charge <small style="color:var(--landlord);font-weight:700;">(Billed Separately)</small></span><span>₱${electricity.toLocaleString(undefined, {minimumFractionDigits:2})}</span></div>`);
+                    breakdownRows.push(`<div class="calc-row"><span>Electricity Utility Charge <small style="color: var(--color-link);font-weight:700;">(Billed Separately)</small></span><span>₱${electricity.toLocaleString(undefined, {minimumFractionDigits:2})}</span></div>`);
                 }
 
                 // 4. Internet
                 if (!isInc('internet') || internet > 0) {
-                    breakdownRows.push(`<div class="calc-row"><span>Internet Subscription Charge <small style="color:var(--landlord);font-weight:700;">(Billed Separately)</small></span><span>₱${internet.toLocaleString(undefined, {minimumFractionDigits:2})}</span></div>`);
+                    breakdownRows.push(`<div class="calc-row"><span>Internet Subscription Charge <small style="color: var(--color-link);font-weight:700;">(Billed Separately)</small></span><span>₱${internet.toLocaleString(undefined, {minimumFractionDigits:2})}</span></div>`);
                 }
 
                 // 5. Parking
@@ -1235,12 +1234,12 @@
                 // 6. Security Deposit & Advance / Other Charges
                 if (isMoveInBill || (!isInc('association_fee') && (other > 0 || isMoveInBill))) {
                     const label = isMoveInBill ? 'Security Deposit & Advance Payment' : 'Other Charges / Association Fee';
-                    breakdownRows.push(`<div class="calc-row"><span style="${isMoveInBill ? 'font-weight:700;color:var(--landlord);' : ''}">${label}</span><span style="font-weight:700;">₱${other.toLocaleString(undefined, {minimumFractionDigits:2})}</span></div>`);
+                    breakdownRows.push(`<div class="calc-row"><span style="${isMoveInBill ? 'font-weight:700;color: var(--color-link);' : ''}">${label}</span><span style="font-weight:700;">₱${other.toLocaleString(undefined, {minimumFractionDigits:2})}</span></div>`);
                 }
 
                 // 7. Late Penalty
                 if (penalty > 0) {
-                    breakdownRows.push(`<div class="calc-row"><span style="color:#ef4444;font-weight:700;">Late Penalty Fine</span><span style="color:#ef4444;font-weight:700;">₱${penalty.toLocaleString(undefined, {minimumFractionDigits:2})}</span></div>`);
+                    breakdownRows.push(`<div class="calc-row"><span style="color: var(--color-error-text);font-weight:700;">Late Penalty Fine</span><span style="color: var(--color-error-text);font-weight:700;">₱${penalty.toLocaleString(undefined, {minimumFractionDigits:2})}</span></div>`);
                 }
 
                 // 8. Total Amount Due

@@ -133,14 +133,14 @@
         .radio-card.selected {
             background-color: rgba(220, 252, 231, 0.4);
             border-color: var(--success);
-            color: var(--success-text);
+            color: var(--color-success-text);
             font-weight: 600;
         }
 
         .radio-card.selected-not {
             background-color: rgba(254, 226, 226, 0.4);
             border-color: var(--error);
-            color: var(--error-text);
+            color: var(--color-error-text);
             font-weight: 600;
         }
 
@@ -307,7 +307,7 @@
                         </div>
                         <div class="info-item" style="flex-direction:column;align-items:flex-start;gap:0.15rem;margin-top:0.25rem;padding-top:0.5rem;border-top:1px dashed var(--border-color);">
                             <span class="info-label" style="display:inline-flex;align-items:center;gap:0.3rem;"><svg class="svg-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--text-muted);"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg> Desired Move-in Date</span>
-                            <span id="infoTenantDesiredMoveIn" class="info-value" style="color:var(--landlord);font-size:0.9rem;">-</span>
+                            <span id="infoTenantDesiredMoveIn" class="info-value" style="color: var(--color-link);font-size:0.9rem;">-</span>
                             <span style="font-size:0.68rem;color:var(--text-muted);margin-top:0.1rem;">Lease start date cannot be earlier than this.</span>
                         </div>
                     </div>
@@ -327,14 +327,14 @@
                         </div>
                         <div class="info-item">
                             <span class="info-label">Unit Number</span>
-                            <span id="infoUnitNumber" class="info-value" style="color: var(--landlord); font-weight:700;">-</span>
+                            <span id="infoUnitNumber" class="info-value" style="color: var(--color-link); font-weight:700;">-</span>
                         </div>
                         <div class="info-item" style="flex-direction: column; align-items: flex-start; text-align: left; gap: 0.15rem;">
                             <span class="info-label">Complete Address</span>
                             <span id="infoPropertyAddress" style="font-weight: 500; font-size: 0.8rem; color: var(--text-secondary);"></span>
                         </div>
                         <div class="info-item" style="flex-direction: column; align-items: flex-start; text-align: left; gap: 0.25rem; margin-top: 0.5rem; padding-top: 0.5rem; border-top: 1px dashed var(--border-color);">
-                            <span class="info-label" style="display:inline-flex;align-items:center;gap:0.3rem;"><svg class="svg-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--landlord);"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path></svg> Included Amenities</span>
+                            <span class="info-label" style="display:inline-flex;align-items:center;gap:0.3rem;"><svg class="svg-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--color-link);"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path></svg> Included Amenities</span>
                             <div id="infoAmenitiesChips" style="display:flex;flex-wrap:wrap;gap:0.25rem;margin-top:0.15rem;">
                                 <span style="font-size:0.75rem;color:var(--text-muted);">-</span>
                             </div>
@@ -346,11 +346,11 @@
             <!-- Right Side: Landlord Input Form -->
             <div class="form-panel">
                 <form id="leaseForm">
-                    <h3 style="margin-top: 0; margin-bottom: 1.5rem; color: var(--landlord); border-bottom: 2px solid var(--border-color); padding-bottom: 0.5rem;">Agreement Specifications</h3>
+                    <h3 style="margin-top: 0; margin-bottom: 1.5rem; color: var(--color-link); border-bottom: 2px solid var(--border-color); padding-bottom: 0.5rem;">Agreement Specifications</h3>
 
                     <!-- Tenant Rejection Concern Banner -->
                     <div id="tenantConcernBanner" class="hidden" style="background:rgba(239, 68, 68, 0.08);border:1px solid rgba(239, 68, 68, 0.25);border-radius:var(--radius-md);padding:1rem;margin-bottom:1.5rem;">
-                        <div style="font-weight:700;color:#ef4444;font-size:0.9rem;display:flex;align-items:center;gap:0.4rem;margin-bottom:0.35rem;">
+                        <div style="font-weight:700;color: var(--color-error-text);font-size:0.9rem;display:flex;align-items:center;gap:0.4rem;margin-bottom:0.35rem;">
                             <svg class="svg-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
                             Tenant's Rejection Appeal & Concerns
                         </div>
@@ -403,9 +403,9 @@
 
                     <!-- ── REQUIRED SECTION: UTILITIES CONFIGURATION ── -->
                     <div style="background:var(--bg-secondary);border:1px solid var(--border-color);border-radius:var(--radius-lg);padding:1.25rem;margin-top:1.5rem;margin-bottom:1.5rem;">
-                        <h4 style="color:var(--landlord);margin-top:0;margin-bottom:0.4rem;display:flex;align-items:center;gap:0.4rem;">
+                        <h4 style="color: var(--color-link);margin-top:0;margin-bottom:0.4rem;display:flex;align-items:center;gap:0.4rem;">
                             <svg class="svg-icon" width="18" height="18" viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path></svg>
-                            Utilities Configuration <span style="color:#ef4444;">*</span>
+                            Utilities Configuration <span style="color: var(--color-error-text);">*</span>
                         </h4>
                         <p style="font-size:0.8rem;color:var(--text-secondary);margin-bottom:1.25rem;line-height:1.4;">
                             Specify how each utility is handled. This arrangement legally governs monthly billing generation and utility monitoring for the entire lease term.
@@ -415,7 +415,7 @@
                             <!-- Electricity -->
                             <div style="background:var(--bg-primary);border:1px solid var(--border-color);border-radius:var(--radius-md);padding:1rem;">
                                 <div style="font-weight:700;font-size:0.85rem;margin-bottom:0.6rem;display:flex;align-items:center;gap:0.35rem;color:var(--text-primary);">
-                                    <svg class="svg-icon" width="15" height="15" viewBox="0 0 24 24" style="color:#f59e0b;"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path></svg>
+                                    <svg class="svg-icon" width="15" height="15" viewBox="0 0 24 24" style="color: var(--color-warning-text);"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path></svg>
                                     Electricity Setup
                                 </div>
                                 <label style="display:flex;align-items:center;gap:0.4rem;font-size:0.8rem;margin-bottom:0.4rem;cursor:pointer;color:var(--text-secondary);">
@@ -431,7 +431,7 @@
                             <!-- Water -->
                             <div style="background:var(--bg-primary);border:1px solid var(--border-color);border-radius:var(--radius-md);padding:1rem;">
                                 <div style="font-weight:700;font-size:0.85rem;margin-bottom:0.6rem;display:flex;align-items:center;gap:0.35rem;color:var(--text-primary);">
-                                    <svg class="svg-icon" width="15" height="15" viewBox="0 0 24 24" style="color:#3b82f6;"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"></path></svg>
+                                    <svg class="svg-icon" width="15" height="15" viewBox="0 0 24 24" style="color: var(--color-link);"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"></path></svg>
                                     Water Setup
                                 </div>
                                 <label style="display:flex;align-items:center;gap:0.4rem;font-size:0.8rem;margin-bottom:0.4rem;cursor:pointer;color:var(--text-secondary);">
@@ -463,7 +463,7 @@
                             <!-- Association Fee -->
                             <div style="background:var(--bg-primary);border:1px solid var(--border-color);border-radius:var(--radius-md);padding:1rem;">
                                 <div style="font-weight:700;font-size:0.85rem;margin-bottom:0.6rem;display:flex;align-items:center;gap:0.35rem;color:var(--text-primary);">
-                                    <svg class="svg-icon" width="15" height="15" viewBox="0 0 24 24" style="color:var(--color-action-primary);" aria-hidden="true"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg>
+                                    <svg class="svg-icon" width="15" height="15" viewBox="0 0 24 24" style="color: var(--color-link);" aria-hidden="true"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg>
                                     Association Fee Setup
                                 </div>
                                 <label style="display:flex;align-items:center;gap:0.4rem;font-size:0.8rem;margin-bottom:0.4rem;cursor:pointer;color:var(--text-secondary);">
@@ -494,7 +494,7 @@
 
                     <!-- Included Property & Building Amenities Section -->
                     <div style="background:var(--bg-secondary);border:1px solid var(--border-color);border-radius:var(--radius-lg);padding:1.25rem;margin-top:1.5rem;margin-bottom:1.5rem;">
-                        <h4 style="color:var(--landlord);margin-top:0;margin-bottom:0.4rem;display:flex;align-items:center;gap:0.4rem;">
+                        <h4 style="color: var(--color-link);margin-top:0;margin-bottom:0.4rem;display:flex;align-items:center;gap:0.4rem;">
                             <svg class="svg-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path></svg>
                             Included Property Amenities & Facilities
                         </h4>
@@ -635,7 +635,7 @@
             card.innerHTML = `
                 <div style="font-weight:700;font-size:0.85rem;margin-bottom:0.6rem;display:flex;align-items:center;justify-content:space-between;color:var(--text-primary);">
                     <div style="display:flex;align-items:center;gap:0.35rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
-                        <svg class="svg-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--landlord);flex-shrink:0;"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+                        <svg class="svg-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--color-link);flex-shrink:0;"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
                         <span>${cleanName} Setup</span>
                         <input type="hidden" class="custom-util-name" value="${cleanName}">
                     </div>
@@ -717,7 +717,7 @@
             const isAllowed = value === 'Allowed';
 
             const actionOrBadge = isLocked 
-                ? `<span style="font-size:0.68rem;background:rgba(37, 99, 235, 0.08);color:var(--landlord);border:1px solid rgba(37, 99, 235, 0.25);padding:0.15rem 0.45rem;border-radius:4px;font-weight:700;display:inline-flex;align-items:center;gap:0.25rem;" title="Configured during Property Registration (Immutable)"><svg class="svg-icon" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg> Registered Rule</span>`
+                ? `<span style="font-size:0.68rem;background:rgba(37, 99, 235, 0.08);color: var(--color-link);border:1px solid rgba(37, 99, 235, 0.25);padding:0.15rem 0.45rem;border-radius:4px;font-weight:700;display:inline-flex;align-items:center;gap:0.25rem;" title="Configured during Property Registration (Immutable)"><svg class="svg-icon" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg> Registered Rule</span>`
                 : `<button type="button" class="remove-custom-policy-btn" title="Remove Policy" style="background:none;border:none;color:var(--text-muted);cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0.15rem;line-height:1;border-radius:4px;flex-shrink:0;" onmouseover="this.style.color='#ef4444';this.style.background='rgba(239,68,68,0.1)';" onmouseout="this.style.color='var(--text-muted)';this.style.background='none';">
                         <svg class="svg-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
                    </button>`;
@@ -725,7 +725,7 @@
             card.innerHTML = `
                 <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.4rem;gap:0.5rem;">
                     <label class="form-label" style="margin-bottom:0;font-weight:700;font-size:0.85rem;color:var(--text-primary);display:flex;align-items:center;gap:0.3rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
-                        <svg class="svg-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--landlord);flex-shrink:0;"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                        <svg class="svg-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--color-link);flex-shrink:0;"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
                         <span>${safeName}</span>
                         <input type="hidden" class="custom-policy-name" value="${safeName}">
                     </label>
@@ -1144,12 +1144,12 @@
 
             if (amenList.length > 0) {
                 if (infoAmenContainer) {
-                    infoAmenContainer.innerHTML = amenList.map(a => `<span style="display:inline-flex;align-items:center;gap:0.3rem;font-size:0.7rem;background:var(--color-action-primary-subtle);color:var(--color-action-primary);border:1px solid var(--color-action-focus);padding:0.12rem 0.45rem;border-radius:4px;font-weight:600;"><span data-icon="sparkle"></span>${a}</span>`).join('');
+                    infoAmenContainer.innerHTML = amenList.map(a => `<span style="display:inline-flex;align-items:center;gap:0.3rem;font-size:0.7rem;background:var(--color-action-primary-subtle);color: var(--color-link);border:1px solid var(--color-action-focus);padding:0.12rem 0.45rem;border-radius:4px;font-weight:600;"><span data-icon="sparkle"></span>${a}</span>`).join('');
                 }
                 if (formAmenContainer) {
                     formAmenContainer.innerHTML = amenList.map(a => `
                         <div style="background:var(--bg-primary);border:1px solid var(--border-color);border-radius:var(--radius-md);padding:0.45rem 0.75rem;font-size:0.82rem;font-weight:700;color:var(--text-primary);display:inline-flex;align-items:center;gap:0.4rem;">
-                            <svg class="svg-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="color:var(--landlord);"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                            <svg class="svg-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="color: var(--color-link);"><polyline points="20 6 9 17 4 12"></polyline></svg>
                             <span>${a}</span>
                         </div>
                     `).join('');

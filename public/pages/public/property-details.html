@@ -57,7 +57,7 @@
             border: 1.5px solid var(--border-color);
             border-radius: 12px;
             text-decoration: none;
-            color: var(--primary);
+            color: var(--color-link);
             font-weight: 700;
             font-size: 0.875rem;
             transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
@@ -94,7 +94,7 @@
 
         .btn-login {
             background: transparent;
-            color: var(--primary);
+            color: var(--color-link);
             border: 2px solid var(--primary);
         }
 
@@ -168,7 +168,7 @@
         }
 
         .property-image-placeholder {
-            color: var(--primary);
+            color: var(--color-link);
             text-align: center;
         }
 
@@ -183,7 +183,7 @@
         .detail-section-title {
             font-size: 1.25rem;
             font-weight: 700;
-            color: var(--primary);
+            color: var(--color-link);
             margin-bottom: 1.25rem;
             padding-bottom: 0.5rem;
             border-bottom: 2px solid var(--soft-pink);
@@ -239,12 +239,12 @@
         .info-pill-val {
             font-size: 0.9375rem;
             font-weight: 800;
-            color: var(--primary);
+            color: var(--color-link);
         }
 
         .amenity-tag {
             background: var(--bg-color);
-            color: var(--primary);
+            color: var(--color-link);
             padding: 0.5rem 1rem;
             border-radius: 12px;
             font-size: 0.875rem;
@@ -283,7 +283,7 @@
         .login-notice-title {
             font-weight: 800;
             font-size: 1.125rem;
-            color: var(--primary);
+            color: var(--color-link);
             display: flex;
             align-items: center;
             gap: 0.5rem;
@@ -367,7 +367,7 @@
                     <img id="propertyHeroMedia" alt="" hidden>
                     <div class="property-image-placeholder">
                         <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
-                        <h4 style="margin-top: 1rem; font-weight: 700; color: var(--primary);">Property Image</h4>
+                        <h4 style="margin-top: 1rem; font-weight: 700; color: var(--color-link);">Property Image</h4>
                     </div>
                 </div>
 
@@ -375,7 +375,7 @@
                 <div class="detail-card">
                     <div class="property-title-row">
                         <div>
-                            <h1 id="propertyName" style="font-size: 2.25rem; font-weight: 800; color: var(--primary); line-height: 1.2; margin-bottom: 0.5rem;">Property Name</h1>
+                            <h1 id="propertyName" style="font-size: 2.25rem; font-weight: 800; color: var(--color-link); line-height: 1.2; margin-bottom: 0.5rem;">Property Name</h1>
                             <div class="property-address-row">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--accent);"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
                                 <span id="address">Address, Barangay, Siniloan</span>
@@ -504,11 +504,11 @@
                     <div style="border-top: 1px solid var(--border-color); padding-top: 1.25rem;">
                         <div style="font-size: 0.75rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 0.5rem;">Listed by Landlord</div>
                         <div style="display: flex; align-items: center; gap: 0.75rem;">
-                            <div style="width: 36px; height: 36px; border-radius: 50%; background: var(--soft-pink); display: flex; align-items: center; justify-content: center; color: var(--primary); font-weight: 800; font-size: 0.875rem;" id="landlordInitials">
+                            <div style="width: 36px; height: 36px; border-radius: 50%; background: var(--soft-pink); display: flex; align-items: center; justify-content: center; color: var(--color-link); font-weight: 800; font-size: 0.875rem;" id="landlordInitials">
                                 L
                             </div>
                             <div>
-                                <div id="landlordName" style="font-size: 0.875rem; font-weight: 700; color: var(--primary);">-</div>
+                                <div id="landlordName" style="font-size: 0.875rem; font-weight: 700; color: var(--color-link);">-</div>
                                 <div style="font-size: 0.75rem; color: var(--text-muted);">Verified Owner</div>
                             </div>
                         </div>
@@ -572,7 +572,7 @@
                 const noticeCard = document.querySelector('.login-notice');
                 if (noticeCard) {
                     noticeCard.innerHTML = `
-                        <div class="login-notice-title" style="color: var(--primary);">
+                        <div class="login-notice-title" style="color: var(--color-link);">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
                             Ready to Apply
                         </div>
@@ -756,7 +756,7 @@
                 property.amenities.forEach(amenity => {
                     const tag = document.createElement('span');
                     tag.className = 'amenity-tag';
-                    tag.textContent = `✓ ${amenity}`;
+                    domiknowSetIconText(tag, 'check', `${amenity}`);
                     amenitiesDiv.appendChild(tag);
                 });
             } else {
@@ -893,7 +893,7 @@
                 const marker = document.createElement('span');
                 marker.className = 'property-rule-item__marker';
                 marker.setAttribute('aria-hidden', 'true');
-                marker.textContent = '✓';
+                domiknowSetIconText(marker, 'check', '');
                 const text = document.createElement('span');
                 text.textContent = rule;
                 item.append(marker, text);

@@ -15,7 +15,7 @@
             gap: 0.5rem;
             font-size: 0.875rem;
             font-weight: 600;
-            color: var(--primary, #0355F3);
+            color: var(--color-link, #0355F3);
             text-decoration: none;
             margin-bottom: 1.25rem;
             transition: opacity 0.15s ease, transform 0.15s ease;
@@ -92,7 +92,7 @@
         }
 
         .section-icon {
-            color: var(--primary, #0355F3);
+            color: var(--color-link, #0355F3);
             display: inline-flex;
             align-items: center;
         }
@@ -140,7 +140,7 @@
         .info-cell-value svg {
             width: 15px;
             height: 15px;
-            color: var(--primary, #0355F3);
+            color: var(--color-link, #0355F3);
         }
         .info-full { grid-column: span 2; }
         @media (max-width: 600px) { .info-full { grid-column: span 1; } }
@@ -164,21 +164,21 @@
             border-radius: 999px; text-transform: uppercase; letter-spacing: 0.04em;
         }
         .badge::before { content:''; width:6px; height:6px; border-radius:50%; background:currentColor; }
-        .badge-pending    { background:rgba(245,158,11,.12); color:#d97706; }
-        .badge-approved   { background:rgba(3,85,243,.12); color:#0355F3; }
-        .badge-assigned   { background:rgba(3,85,243,.12); color:#0355F3; }
-        .badge-accepted   { background:rgba(3,85,243,.12); color:#0355F3; }
+        .badge-pending    { background:rgba(245,158,11,.12); color: var(--color-warning-text); }
+        .badge-approved   { background:rgba(3,85,243,.12); color: var(--color-link); }
+        .badge-assigned   { background:rgba(3,85,243,.12); color: var(--color-link); }
+        .badge-accepted   { background:rgba(3,85,243,.12); color: var(--color-link); }
         .badge-repairing  { background:rgba(234,88,12,.12); color:#ea580c; }
         .badge-travelling { background:rgba(234,88,12,.12); color:#ea580c; }
         .badge-arrived    { background:rgba(234,88,12,.12); color:#ea580c; }
         .badge-completed  { background:rgba(16,185,129,.12); color:#10b981; }
         .badge-verified   { background:rgba(16,185,129,.12); color:#10b981; }
-        .badge-closed     { background:rgba(100,116,139,.12); color:#475569; }
-        .badge-rejected   { background:rgba(239,68,68,.12);  color:#ef4444; }
+        .badge-closed     { background:rgba(100,116,139,.12); color: var(--color-text-secondary); }
+        .badge-rejected   { background:rgba(239,68,68,.12);  color: var(--color-error-text); }
         .badge-prio-low       { background:rgba(16,185,129,.12); color:#10b981; }
-        .badge-prio-medium    { background:rgba(245,158,11,.12); color:#d97706; }
+        .badge-prio-medium    { background:rgba(245,158,11,.12); color: var(--color-warning-text); }
         .badge-prio-high      { background:rgba(234,88,12,.12); color:#ea580c; }
-        .badge-prio-emergency { background:rgba(239,68,68,.12);  color:#ef4444; }
+        .badge-prio-emergency { background:rgba(239,68,68,.12);  color: var(--color-error-text); }
 
         /* ── Worker chip ───────────────────────────────────── */
         .worker-chip {
@@ -212,7 +212,7 @@
             background: var(--bg-primary); border: 1px solid var(--border-color);
             border-radius: var(--radius-md); padding: 1.15rem; margin-top: 1rem;
         }
-        .cost-val { font-size: 1.25rem; font-weight: 800; color: var(--primary, #0355F3); margin-top: 0.15rem; }
+        .cost-val { font-size: 1.25rem; font-weight: 800; color: var(--color-link, #0355F3); margin-top: 0.15rem; }
 
         /* ── Timeline ──────────────────────────────────────── */
         .timeline {
@@ -252,13 +252,13 @@
             transform: translateY(-1px);
         }
         .btn-reject {
-            background: #fef2f2; color: #dc2626;
-            border-color: #fecaca;
+            background: var(--color-error-bg); color: var(--color-error-text);
+            border-color: var(--color-error-border);
         }
         .btn-reject:hover {
-            background: #fee2e2;
+            background: var(--color-error-bg);
             border-color: #f87171;
-            color: #b91c1c;
+            color: var(--color-error-text);
         }
         .btn-rework {
             background: #fff7ed; color: #c2410c;
@@ -308,7 +308,7 @@
             margin-bottom: 0.85rem;
         }
         .alert-ok  { background:rgba(16,185,129,.09); color:#10b981; border:1px solid rgba(16,185,129,.22); }
-        .alert-err { background:rgba(239,68,68,.09);  color:#ef4444; border:1px solid rgba(239,68,68,.22);  }
+        .alert-err { background:rgba(239,68,68,.09);  color: var(--color-error-text); border:1px solid rgba(239,68,68,.22);  }
 
         /* ── Req info pill row ─────────────────────────────── */
         .pill-row { display:flex; flex-wrap:wrap; gap:0.5rem; margin-top:0.6rem; }
@@ -321,7 +321,7 @@
         .pill svg {
             width: 13px;
             height: 13px;
-            color: var(--primary, #0355F3);
+            color: var(--color-link, #0355F3);
         }
 
         /* Sticky sidebar */
@@ -407,10 +407,10 @@
             transition: all 0.15s ease;
         }
         .worker-modal-tab:hover {
-            color: var(--primary, #0355F3);
+            color: var(--color-link, #0355F3);
         }
         .worker-modal-tab.active {
-            color: var(--primary, #0355F3);
+            color: var(--color-link, #0355F3);
             border-bottom-color: var(--primary, #0355F3);
             font-weight: 750;
         }
@@ -426,12 +426,12 @@
             transition: border-color 0.15s ease;
         }
         .worker-manage-card:hover {
-            border-color: #cbd5e1;
+            border-color: var(--color-border-strong);
         }
         .btn-delete-worker {
-            background: #fef2f2;
-            border: 1px solid #fecaca;
-            color: #dc2626;
+            background: var(--color-error-bg);
+            border: 1px solid var(--color-error-border);
+            color: var(--color-error-text);
             padding: 6px 12px;
             border-radius: 6px;
             font-size: 0.78rem;
@@ -444,16 +444,16 @@
             transition: all 0.15s ease;
         }
         .btn-delete-worker:hover {
-            background: #fee2e2;
+            background: var(--color-error-bg);
             border-color: #f87171;
-            color: #b91c1c;
+            color: var(--color-error-text);
         }
         [data-theme="dark"] .worker-manage-card {
             background: var(--bg-primary, #0f172a);
             border-color: var(--border-color, #334155);
         }
         [data-theme="dark"] .worker-modal-tab.active {
-            color: #60a5fa;
+            color: var(--color-link);
             border-bottom-color: #60a5fa;
         }
         [data-theme="dark"] .btn-delete-worker {
@@ -519,7 +519,7 @@
                 </div>
                 <div id="sideDueDateRow" class="hidden" style="text-align: right;">
                     <div class="info-cell-label">Target Completion</div>
-                    <div class="info-cell-value" id="sideDueDate" style="color: var(--primary); font-weight: 750;">—</div>
+                    <div class="info-cell-value" id="sideDueDate" style="color: var(--color-link); font-weight: 750;">—</div>
                 </div>
             </div>
 
@@ -597,8 +597,8 @@
 
                 <!-- Rejection reason -->
                 <div id="rejectionBanner" class="hidden" style="margin-top: 1.25rem; background: rgba(239,68,68,.08); border: 1px solid rgba(239,68,68,.25); border-radius: var(--radius-sm); padding: 0.9rem 1rem;">
-                    <div style="font-size: 0.68rem; font-weight: 800; text-transform: uppercase; color: #ef4444; margin-bottom: 0.3rem; letter-spacing: 0.07em;">Rejection Reason</div>
-                    <div style="font-size: 0.875rem; color: #ef4444;" id="rejectionText"></div>
+                    <div style="font-size: 0.68rem; font-weight: 800; text-transform: uppercase; color: var(--color-error-text); margin-bottom: 0.3rem; letter-spacing: 0.07em;">Rejection Reason</div>
+                    <div style="font-size: 0.875rem; color: var(--color-error-text);" id="rejectionText"></div>
                 </div>
             </div>
 
@@ -958,7 +958,7 @@
                         <div class="form-group">
                             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.35rem; flex-wrap:wrap; gap:4px;">
                                 <label class="form-label" for="workerSelect" style="margin-bottom:0;">${icon} Select ${trade}</label>
-                                <button type="button" id="openManageWorkersBtnDetail" style="background:none; border:none; color:var(--primary, #0355F3); font-size:0.78rem; font-weight:700; cursor:pointer; text-decoration:none;">Manage Workers</button>
+                                <button type="button" id="openManageWorkersBtnDetail" style="background:none; border:none; color: var(--color-link, #0355F3); font-size:0.78rem; font-weight:700; cursor:pointer; text-decoration:none;">Manage Workers</button>
                             </div>
                             <select id="workerSelect" class="form-input" required>
                                 <option value="">— Loading available workers… —</option>
@@ -1229,13 +1229,13 @@
                     return `
                         <div class="worker-manage-card">
                             <div style="display: flex; align-items: center; gap: 0.85rem; min-width: 0;">
-                                <div style="width: 40px; height: 40px; border-radius: 50%; background: #0355F3; color: #ffffff; display: flex; align-items: center; justify-content: center; font-weight: 750; font-size: 0.85rem; flex-shrink: 0; letter-spacing: 0.5px;">
+                                <div style="width: 40px; height: 40px; border-radius: 50%; background: var(--color-action-primary); color: #ffffff; display: flex; align-items: center; justify-content: center; font-weight: 750; font-size: 0.85rem; flex-shrink: 0; letter-spacing: 0.5px;">
                                     ${initials}
                                 </div>
                                 <div style="min-width: 0;">
                                     <div style="font-weight: 750; font-size: 0.925rem; color: var(--text-primary); display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
                                         <span>${nameOnly}</span>
-                                        ${tradeOnly ? `<span style="font-size: 0.72rem; padding: 2px 8px; border-radius: 9999px; background: rgba(3, 85, 243, 0.1); color: var(--primary, #0355F3); font-weight: 600;">${tradeOnly}</span>` : ''}
+                                        ${tradeOnly ? `<span style="font-size: 0.72rem; padding: 2px 8px; border-radius: 9999px; background: rgba(3, 85, 243, 0.1); color: var(--color-link, #0355F3); font-weight: 600;">${tradeOnly}</span>` : ''}
                                     </div>
                                     <div style="font-size: 0.775rem; color: var(--text-muted); margin-top: 3px;">
                                         ${w.email} ${w.contact_number ? '· ' + w.contact_number : ''}
@@ -1408,7 +1408,7 @@
                 </button>
             </div>
 
-            <div id="workerAlertErrDetail" style="display: none; background: rgba(239,68,68,.1); color: #ef4444; border: 1px solid rgba(239,68,68,.3); padding: 0.65rem 1rem; border-radius: 6px; font-size: 0.83rem; margin-bottom: 1rem; flex-shrink: 0;"></div>
+            <div id="workerAlertErrDetail" style="display: none; background: rgba(239,68,68,.1); color: var(--color-error-text); border: 1px solid rgba(239,68,68,.3); padding: 0.65rem 1rem; border-radius: 6px; font-size: 0.83rem; margin-bottom: 1rem; flex-shrink: 0;"></div>
             <div id="workerAlertOkDetail" style="display: none; background: rgba(16,185,129,.1); color: #10b981; border: 1px solid rgba(16,185,129,.3); padding: 0.65rem 1rem; border-radius: 6px; font-size: 0.83rem; margin-bottom: 1rem; flex-shrink: 0;"></div>
 
             <!-- View 1: Active Workers List & Delete -->

@@ -207,7 +207,7 @@
     <div id="verifyModal" class="modal hidden">
         <div class="modal-content">
             <div class="modal-header">
-                <h3 style="color: var(--primary); margin:0;">Audit Payment Submission</h3>
+                <h3 style="color: var(--color-link); margin:0;">Audit Payment Submission</h3>
                 <button id="closeModalBtn" class="modal-close" type="button" aria-label="Close payment audit">&times;</button>
             </div>
             <div id="modalErrorMessage" class="status-badge status-rejected hidden" style="width:100%; margin-bottom: 1rem; padding: 0.75rem;"></div>
@@ -220,7 +220,7 @@
                     <div style="font-size:0.95rem; color:var(--text-secondary); border-bottom:1px solid var(--border-color); padding-bottom:0.75rem; margin-bottom:0.75rem;">
                         <p style="margin-bottom:0.25rem;"><strong>Tenant Name:</strong> <span id="auditTenant">Name</span></p>
                         <p style="margin-bottom:0.25rem;"><strong>Ref Code:</strong> <span id="auditRef" style="font-family:monospace; font-weight:600;">Code</span></p>
-                        <p style="margin-bottom:0.25rem;"><strong>Amount Paid:</strong> <span id="auditAmount" style="color:var(--landlord); font-weight:700;">₱0.00</span></p>
+                        <p style="margin-bottom:0.25rem;"><strong>Amount Paid:</strong> <span id="auditAmount" style="color: var(--color-link); font-weight:700;">₱0.00</span></p>
                     </div>
                 </div>
 
@@ -331,7 +331,7 @@
                         </td>
                         <td>
                             <div style="font-weight: 600;">${pay.properties?.property_name || 'Property'}</div>
-                            <div style="font-size:0.75rem; color:var(--primary); font-weight:700;">Month: ${pay.billing_records?.billing_month || 'N/A'}</div>
+                            <div style="font-size:0.75rem; color: var(--color-link); font-weight:700;">Month: ${pay.billing_records?.billing_month || 'N/A'}</div>
                         </td>
                         <td style="font-weight:700; color:var(--text-primary);">₱${amount}</td>
                         <td style="text-transform: capitalize;">${pay.payment_method.replace('_', ' ')}</td>

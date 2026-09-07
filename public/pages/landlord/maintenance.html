@@ -11,20 +11,19 @@
             align-items: center;
             gap: 20px;
             overflow-x: auto;
-            scrollbar-width: none;
+            scrollbar-width: thin;
             padding-bottom: 12px;
             width: 100%;
             border-bottom: 1px solid var(--border-color, #e2e8f0);
             margin-bottom: 1.5rem;
         }
-        .maintenance-tabs-bar::-webkit-scrollbar { display: none; }
         .m-tab-btn {
             background: none !important;
             border: none !important;
             padding: 4px 0 !important;
             font-size: 0.875rem !important;
             font-weight: 600 !important;
-            color: #64748b !important;
+            color: var(--color-text-muted) !important;
             cursor: pointer;
             display: inline-flex;
             align-items: center;
@@ -37,11 +36,11 @@
             outline: none;
         }
         .m-tab-btn:hover {
-            color: #0052ea !important;
+            color: var(--color-link) !important;
             background: none !important;
         }
         .m-tab-btn.active {
-            color: #0052ea !important;
+            color: var(--color-link) !important;
             font-weight: 750 !important;
             border-bottom: none !important;
             background: none !important;
@@ -54,12 +53,12 @@
             left: 0;
             right: 0;
             height: 2.5px;
-            background: #0052ea;
+            background: var(--color-action-primary);
             border-radius: 2px 2px 0 0;
         }
         .tab-count {
-            background: #e2e8f0;
-            color: #475569;
+            background: var(--color-bg-subtle);
+            color: var(--color-text-secondary);
             font-size: 0.6875rem;
             font-weight: 700;
             padding: 2px 7px;
@@ -67,8 +66,8 @@
             line-height: 1.2;
         }
         .m-tab-btn.active .tab-count {
-            background: #eff6ff;
-            color: #0052ea;
+            background: var(--color-info-bg);
+            color: var(--color-link);
         }
 
         .list-card {
@@ -104,13 +103,13 @@
         }
 
         .btn-add-worker {
-            background: #ffffff;
-            border: 1px solid #cbd5e1;
+            background: var(--color-bg-surface);
+            border: 1px solid var(--color-border-strong);
             border-radius: 8px;
             padding: 7px 16px;
             font-weight: 700;
             font-size: 0.875rem;
-            color: #0f172a;
+            color: var(--color-text-primary);
             display: inline-flex;
             align-items: center;
             gap: 8px;
@@ -121,9 +120,9 @@
             text-decoration: none;
         }
         .btn-add-worker:hover {
-            background: #f8fafc;
-            border-color: #94a3b8;
-            color: #0052ea;
+            background: var(--color-bg-canvas);
+            border-color: var(--color-border-strong);
+            color: var(--color-link);
         }
 
         table {
@@ -140,7 +139,7 @@
             text-transform: uppercase;
             font-size: 0.72rem;
             letter-spacing: 0.05em;
-            background: #f8fafc;
+            background: var(--color-bg-canvas);
         }
         td {
             padding: 1.15rem 1rem;
@@ -169,9 +168,9 @@
             box-shadow: none !important;
         }
         .action-btn.btn-view:hover {
-            background: #dbeafe !important;
+            background: var(--color-info-bg) !important;
             border-color: #93c5fd !important;
-            color: #1e40af !important;
+            color: var(--color-link) !important;
         }
 
         /* Dark mode styling */
@@ -182,15 +181,15 @@
         }
         [data-theme="dark"] .btn-add-worker:hover {
             background: var(--bg-primary, #0f172a);
-            color: #60a5fa;
+            color: var(--color-link);
             border-color: #60a5fa;
         }
         [data-theme="dark"] .m-tab-btn {
-            color: #94a3b8 !important;
+            color: var(--color-text-muted) !important;
         }
         [data-theme="dark"] .m-tab-btn:hover,
         [data-theme="dark"] .m-tab-btn.active {
-            color: #60a5fa !important;
+            color: var(--color-link) !important;
         }
         [data-theme="dark"] .m-tab-btn.active::after {
             background: #60a5fa;
@@ -201,7 +200,7 @@
         }
         [data-theme="dark"] .m-tab-btn.active .tab-count {
             background: rgba(59, 130, 246, 0.2);
-            color: #60a5fa;
+            color: var(--color-link);
         }
         [data-theme="dark"] th {
             background: var(--bg-primary, #0f172a);
@@ -233,10 +232,10 @@
             transition: all 0.15s ease;
         }
         .worker-modal-tab:hover {
-            color: var(--primary, #0355F3);
+            color: var(--color-link, #0355F3);
         }
         .worker-modal-tab.active {
-            color: var(--primary, #0355F3);
+            color: var(--color-link, #0355F3);
             border-bottom-color: var(--primary, #0355F3);
             font-weight: 750;
         }
@@ -252,12 +251,12 @@
             transition: border-color 0.15s ease;
         }
         .worker-manage-card:hover {
-            border-color: #cbd5e1;
+            border-color: var(--color-border-strong);
         }
         .btn-delete-worker {
-            background: #fef2f2;
-            border: 1px solid #fecaca;
-            color: #dc2626;
+            background: var(--color-error-bg);
+            border: 1px solid var(--color-error-border);
+            color: var(--color-error-text);
             padding: 6px 12px;
             border-radius: 6px;
             font-size: 0.78rem;
@@ -270,16 +269,16 @@
             transition: all 0.15s ease;
         }
         .btn-delete-worker:hover {
-            background: #fee2e2;
+            background: var(--color-error-bg);
             border-color: #f87171;
-            color: #b91c1c;
+            color: var(--color-error-text);
         }
         [data-theme="dark"] .worker-manage-card {
             background: var(--bg-primary, #0f172a);
             border-color: var(--border-color, #334155);
         }
         [data-theme="dark"] .worker-modal-tab.active {
-            color: #60a5fa;
+            color: var(--color-link);
             border-bottom-color: #60a5fa;
         }
         [data-theme="dark"] .btn-delete-worker {
@@ -409,7 +408,7 @@
                 </button>
             </div>
 
-            <div id="workerAlertErr" style="display: none; background: rgba(239,68,68,.1); color: #ef4444; border: 1px solid rgba(239,68,68,.3); padding: 0.65rem 1rem; border-radius: 6px; font-size: 0.83rem; margin-bottom: 1rem; flex-shrink: 0;"></div>
+            <div id="workerAlertErr" style="display: none; background: rgba(239,68,68,.1); color: var(--color-error-text); border: 1px solid rgba(239,68,68,.3); padding: 0.65rem 1rem; border-radius: 6px; font-size: 0.83rem; margin-bottom: 1rem; flex-shrink: 0;"></div>
             <div id="workerAlertOk" style="display: none; background: rgba(16,185,129,.1); color: #10b981; border: 1px solid rgba(16,185,129,.3); padding: 0.65rem 1rem; border-radius: 6px; font-size: 0.83rem; margin-bottom: 1rem; flex-shrink: 0;"></div>
 
             <!-- View 1: Active Workers List & Delete -->
@@ -734,13 +733,13 @@
                     return `
                         <div class="worker-manage-card">
                             <div style="display: flex; align-items: center; gap: 0.85rem; min-width: 0;">
-                                <div style="width: 40px; height: 40px; border-radius: 50%; background: #0355F3; color: #ffffff; display: flex; align-items: center; justify-content: center; font-weight: 750; font-size: 0.85rem; flex-shrink: 0; letter-spacing: 0.5px;">
+                                <div style="width: 40px; height: 40px; border-radius: 50%; background: var(--color-action-primary); color: #ffffff; display: flex; align-items: center; justify-content: center; font-weight: 750; font-size: 0.85rem; flex-shrink: 0; letter-spacing: 0.5px;">
                                     ${initials}
                                 </div>
                                 <div style="min-width: 0;">
                                     <div style="font-weight: 750; font-size: 0.925rem; color: var(--text-primary); display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
                                         <span>${nameOnly}</span>
-                                        ${tradeOnly ? `<span style="font-size: 0.72rem; padding: 2px 8px; border-radius: 9999px; background: rgba(3, 85, 243, 0.1); color: var(--primary, #0355F3); font-weight: 600;">${tradeOnly}</span>` : ''}
+                                        ${tradeOnly ? `<span style="font-size: 0.72rem; padding: 2px 8px; border-radius: 9999px; background: rgba(3, 85, 243, 0.1); color: var(--color-link, #0355F3); font-weight: 600;">${tradeOnly}</span>` : ''}
                                     </div>
                                     <div style="font-size: 0.775rem; color: var(--text-muted); margin-top: 3px;">
                                         ${w.email} ${w.contact_number ? '· ' + w.contact_number : ''}
@@ -871,7 +870,7 @@
                     </td>
                     <td style="font-weight:600; color:var(--text-primary);">${req.users?.full_name || '—'}</td>
                     <td>
-                        <div style="font-weight:700; color:var(--primary);">${req.issue_title}</div>
+                        <div style="font-weight:700; color: var(--color-link);">${req.issue_title}</div>
                         <div style="font-size:0.75rem; color:var(--text-muted); margin-top:2px;">${schedDisplay}</div>
                     </td>
                     <td style="text-transform: capitalize;">${req.issue_category}</td>

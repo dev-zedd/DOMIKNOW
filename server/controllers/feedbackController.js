@@ -31,8 +31,8 @@ const feedbackController = {
                 return responseHelper.error(res, 'Property ID, lease ID, rating, and feedback type are required.');
             }
 
-            const parsedRating = parseInt(rating);
-            if (isNaN(parsedRating) || parsedRating < 1 || parsedRating > 5) {
+            const parsedRating = Number(rating);
+            if (!['string', 'number'].includes(typeof rating) || !Number.isInteger(parsedRating) || parsedRating < 1 || parsedRating > 5) {
                 return responseHelper.error(res, 'Rating must be an integer between 1 and 5.');
             }
 

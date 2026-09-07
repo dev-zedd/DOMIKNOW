@@ -110,7 +110,7 @@ const reservationController = {
                     await notificationModel.create({
                         user_id: record.tenant_id,
                         type: 'reservation_approved',
-                        title: 'Unit Reservation Approved! 🎉',
+                        title: 'Unit Reservation Approved!',
                         message: `Your reservation request for property "${record.property_name || 'rental unit'}" has been approved by the landlord!`,
                         reference_id: id
                     });

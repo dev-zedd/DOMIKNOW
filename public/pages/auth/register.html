@@ -19,7 +19,7 @@
         body {
             font-family: Inter, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             background-color: var(--bg-primary);
-            color: var(--primary);
+            color: var(--color-link);
         }
 
         .auth-page {
@@ -46,7 +46,7 @@
             display: inline-flex;
             align-items: center;
             gap: 0.5rem;
-            color: var(--primary);
+            color: var(--color-link);
             font-weight: 700;
             text-decoration: none;
             font-size: 0.875rem;
@@ -75,7 +75,7 @@
 
         .auth-logo {
             font-family: inherit;
-            color: var(--primary);
+            color: var(--color-link);
             font-weight: 800;
             font-size: 2.5rem;
             letter-spacing: -0.03em;
@@ -95,7 +95,7 @@
         }
 
         .auth-link:hover {
-            color: var(--primary);
+            color: var(--color-link);
         }
 
         .auth-card {
@@ -111,7 +111,7 @@
         .form-label {
             font-weight: 700;
             font-size: 0.8125rem;
-            color: var(--primary);
+            color: var(--color-link);
             margin-bottom: 0.5rem;
             display: block;
             text-transform: uppercase;
@@ -248,15 +248,15 @@
                     <legend class="sr-only">Choose your account role</legend>
                     <label class="role-choice">
                         <input type="radio" name="role" value="tenant" checked required>
-                        <span class="role-choice__icon" aria-hidden="true">T</span>
+                        <span class="role-choice__icon" aria-hidden="true"><span data-icon="user"></span></span>
                         <span><strong>Tenant</strong><small>Find a home, apply, manage leases, bills, and requests.</small></span>
-                        <span class="role-choice__check" aria-hidden="true">✓</span>
+                        <span class="role-choice__check" aria-hidden="true"><span data-icon="check" aria-hidden="true"></span></span>
                     </label>
                     <label class="role-choice">
                         <input type="radio" name="role" value="landlord" required>
-                        <span class="role-choice__icon" aria-hidden="true">L</span>
+                        <span class="role-choice__icon" aria-hidden="true"><span data-icon="building"></span></span>
                         <span><strong>Landlord</strong><small>Publish rentals and manage applications, leases, and billing.</small></span>
-                        <span class="role-choice__check" aria-hidden="true">✓</span>
+                        <span class="role-choice__check" aria-hidden="true"><span data-icon="check" aria-hidden="true"></span></span>
                     </label>
                 </fieldset>
             </section>

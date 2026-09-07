@@ -110,7 +110,7 @@ body.app-ready .main-content-inner,
 .auth-logo {
   font-size: 2.25rem;
   font-weight: 800;
-  color: var(--primary);
+  color: var(--color-link);
   letter-spacing: -0.05em;
   margin-bottom: 0.5rem;
   background: none;
@@ -123,7 +123,7 @@ body.app-ready .main-content-inner,
 }
 
 .auth-link {
-  color: var(--primary);
+  color: var(--color-link);
   text-decoration: none;
   font-weight: 600;
   transition: color var(--transition-fast);
@@ -254,7 +254,7 @@ h1, h2, h3, h4 {
 }
 
 .btn-secondary:hover {
-  color: var(--primary);
+  color: var(--color-link);
 }
 
 /* Alerts / Notifications */
@@ -331,7 +331,7 @@ h1, h2, h3, h4 {
 .navbar-logo {
   font-size: 1.5rem;
   font-weight: 800;
-  color: var(--primary);
+  color: var(--color-link);
   letter-spacing: -0.04em;
   background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
   -webkit-background-clip: text;
@@ -350,17 +350,17 @@ h1, h2, h3, h4 {
 
 .navbar-badge-tenant {
   background-color: var(--tenant-bg);
-  color: var(--tenant);
+  color: var(--color-link);
 }
 
 .navbar-badge-landlord {
   background-color: var(--landlord-bg);
-  color: var(--landlord);
+  color: var(--color-link);
 }
 
 .navbar-badge-maintenance {
   background-color: var(--maintenance-bg);
-  color: var(--maintenance);
+  color: var(--color-link);
 }
 
 .navbar-badge-admin {
@@ -385,12 +385,12 @@ h1, h2, h3, h4 {
 }
 
 .navbar-menu-link:hover, .navbar-menu-link.active {
-  color: var(--primary);
+  color: var(--color-link);
 }
 
-.navbar-tenant .navbar-menu-link:hover, .navbar-tenant .navbar-menu-link.active { color: var(--tenant); }
-.navbar-landlord .navbar-menu-link:hover, .navbar-landlord .navbar-menu-link.active { color: var(--landlord); }
-.navbar-maintenance .navbar-menu-link:hover, .navbar-maintenance .navbar-menu-link.active { color: var(--maintenance); }
+.navbar-tenant .navbar-menu-link:hover, .navbar-tenant .navbar-menu-link.active { color: var(--color-link); }
+.navbar-landlord .navbar-menu-link:hover, .navbar-landlord .navbar-menu-link.active { color: var(--color-link); }
+.navbar-maintenance .navbar-menu-link:hover, .navbar-maintenance .navbar-menu-link.active { color: var(--color-link); }
 .navbar-admin .navbar-menu-link:hover, .navbar-admin .navbar-menu-link.active { color: #334155; }
 
 .navbar-right {
@@ -1273,7 +1273,7 @@ h1, h2, h3, h4 {
 }
 
 .file-action-link {
-  color: var(--primary);
+  color: var(--color-link);
   text-decoration: none;
   font-weight: 700;
   font-size: 0.8125rem;
@@ -1708,7 +1708,7 @@ h1, h2, h3, h4 {
 
 .sidebar-toggle-btn:hover {
   background-color: #f8fafc;
-  color: var(--tenant);
+  color: var(--color-link);
   transform: scale(1.1);
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.08);
 }
@@ -1795,7 +1795,7 @@ h1, h2, h3, h4 {
 .sidebar-tenant .panel-new-link {
   font-size: 0.7rem;
   font-weight: 600;
-  color: var(--tenant);
+  color: var(--color-link);
   text-decoration: none;
 }
 
@@ -1900,7 +1900,7 @@ h1, h2, h3, h4 {
 }
 
 .sidebar-tenant .sidebar-group.group-active .sidebar-group-header {
-  color: var(--tenant);
+  color: var(--color-link);
 }
 
 /* Collapsed Group Header adjustment */
@@ -1946,12 +1946,12 @@ h1, h2, h3, h4 {
 }
 
 .sidebar-tenant .sidebar-sub-link:hover {
-  color: var(--tenant);
+  color: var(--color-link);
   background-color: var(--tenant-bg);
 }
 
 .sidebar-tenant .sidebar-sub-link.active {
-  color: var(--tenant);
+  color: var(--color-link);
   font-weight: 700;
   background-color: var(--tenant-bg);
 }
@@ -2182,7 +2182,7 @@ h1, h2, h3, h4 {
 }
 
 .profile-popover .popover-menu-item:hover svg {
-  color: var(--tenant);
+  color: var(--color-link);
 }
 
 .profile-popover .popover-menu-divider {

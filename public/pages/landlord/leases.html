@@ -34,7 +34,7 @@
         .contract-textarea { background-color: var(--bg-primary); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 0.85rem 1rem; font-size: 0.875rem; color: var(--text-secondary); line-height: 1.6; white-space: pre-wrap; }
         .signature-sheet { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; padding: 1.5rem; background-color: var(--bg-primary); border: 1px solid var(--border-color); border-radius: var(--radius-md); }
         .signature-box { text-align: center; border-top: 1px dashed var(--border-color); padding-top: 1rem; margin-top: 1.5rem; }
-        .signature-name { font-family: 'Brush Script MT', cursive; font-size: 1.8rem; color: var(--primary); }
+        .signature-name { font-family: 'Brush Script MT', cursive; font-size: 1.8rem; color: var(--color-link); }
         .sig-date { font-size: 0.72rem; color: var(--text-muted); margin-top: 0.25rem; }
 
         .parties-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
@@ -45,13 +45,13 @@
 
         /* Action button aligned in header (consistent with tenant portal & properties.html) */
         .btn-draft-lease {
-            background: #ffffff;
-            border: 1px solid #cbd5e1;
+            background: var(--color-bg-surface);
+            border: 1px solid var(--color-border-strong);
             border-radius: 8px;
             padding: 8px 18px;
             font-weight: 700;
             font-size: 0.875rem;
-            color: #0f172a;
+            color: var(--color-text-primary);
             display: inline-flex;
             align-items: center;
             gap: 8px;
@@ -62,9 +62,9 @@
             text-decoration: none;
         }
         .btn-draft-lease:hover {
-            background: #f8fafc;
-            border-color: #94a3b8;
-            color: #0f172a;
+            background: var(--color-bg-canvas);
+            border-color: var(--color-border-strong);
+            color: var(--color-text-primary);
             text-decoration: none;
         }
     </style>
@@ -232,7 +232,7 @@
 
                     const tr = document.createElement('tr');
                     tr.innerHTML = `
-                        <td style="font-weight:700;font-family:monospace;color:var(--primary);">${lease.lease_number || 'DRAFT'}</td>
+                        <td style="font-weight:700;font-family:monospace;color: var(--color-link);">${lease.lease_number || 'DRAFT'}</td>
                         <td>
                             <div style="font-weight:700;">${propName}</div>
                             ${targetUnitText ? `<div style="font-size:0.75rem;color:var(--accent);font-weight:700;">${targetUnitText}</div>` : `<div style="font-size:0.75rem;color:var(--text-muted);">${propAddr}</div>`}
@@ -250,7 +250,7 @@
                         <td>
                             <span class="status-badge ${statusClass}">${statusLabel}</span>
                             ${lease.lease_status === 'rejected' && lease.terms_and_conditions ? `
-                                <div style="font-size:0.75rem;color:#ef4444;margin-top:0.35rem;font-weight:600;max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="Tenant Concern Note: ${(lease.terms_and_conditions).replace(/"/g, '&quot;')}">
+                                <div style="font-size:0.75rem;color: var(--color-error-text);margin-top:0.35rem;font-weight:600;max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="Tenant Concern Note: ${(lease.terms_and_conditions).replace(/"/g, '&quot;')}">
                                     <span data-icon="message"></span> Note: ${(lease.terms_and_conditions).replace(/</g, '&lt;').replace(/>/g, '&gt;')}
                                 </div>
                             ` : ''}
@@ -265,7 +265,7 @@
 
             } catch (err) {
                 console.error('fetchLandlordLeases error:', err);
-                document.getElementById('leasesTableBody').innerHTML = `<tr><td colspan="8" style="text-align:center;color:#ef4444;">Connection error loading leases.</td></tr>`;
+                document.getElementById('leasesTableBody').innerHTML = `<tr><td colspan="8" style="text-align:center;color: var(--color-error-text);">Connection error loading leases.</td></tr>`;
             }
         }
 
@@ -273,7 +273,7 @@
             if (typeof uConfig === 'object' && !Array.isArray(uConfig) && uConfig !== null) {
                 const fmtSetup = (val) => val === 'included' 
                     ? '<span class="status-badge status-active" style="font-size:0.75rem;">Included in Monthly Rent</span>' 
-                    : '<span class="status-badge status-pending" style="font-size:0.75rem;background:rgba(99,102,241,0.1);color:var(--primary);border:1px solid rgba(99,102,241,0.25);">Billed Separately</span>';
+                    : '<span class="status-badge status-pending" style="font-size:0.75rem;background:rgba(99,102,241,0.1);color: var(--color-link);border:1px solid rgba(99,102,241,0.25);">Billed Separately</span>';
                 
                 let customHTML = '';
                 if (Array.isArray(uConfig.custom_utilities) && uConfig.custom_utilities.length > 0) {
@@ -292,13 +292,13 @@
                     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:0.75rem;margin-top:0.5rem;">
                         <div style="background:var(--bg-primary);padding:0.75rem;border-radius:var(--radius-md);border:1px solid var(--border-color);">
                             <div style="font-size:0.75rem;color:var(--text-muted);font-weight:700;display:flex;align-items:center;gap:0.25rem;">
-                                <svg class="svg-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:#f59e0b;"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path></svg> Electricity
+                                <svg class="svg-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--color-warning-text);"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path></svg> Electricity
                             </div>
                             <div style="margin-top:0.3rem;">${fmtSetup(uConfig.electricity || 'separate')}</div>
                         </div>
                         <div style="background:var(--bg-primary);padding:0.75rem;border-radius:var(--radius-md);border:1px solid var(--border-color);">
                             <div style="font-size:0.75rem;color:var(--text-muted);font-weight:700;display:flex;align-items:center;gap:0.25rem;">
-                                <svg class="svg-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:#3b82f6;"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"></path></svg> Water
+                                <svg class="svg-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--color-link);"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"></path></svg> Water
                             </div>
                             <div style="margin-top:0.3rem;">${fmtSetup(uConfig.water || 'separate')}</div>
                         </div>
@@ -310,7 +310,7 @@
                         </div>
                         <div style="background:var(--bg-primary);padding:0.75rem;border-radius:var(--radius-md);border:1px solid var(--border-color);">
                             <div style="font-size:0.75rem;color:var(--text-muted);font-weight:700;display:flex;align-items:center;gap:0.25rem;">
-                                <svg class="svg-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--color-action-primary);" aria-hidden="true"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg> Association Fee
+                                <svg class="svg-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--color-link);" aria-hidden="true"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg> Association Fee
                             </div>
                             <div style="margin-top:0.3rem;">${fmtSetup(uConfig.association_fee || 'separate')}</div>
                         </div>
@@ -332,7 +332,7 @@
 
             try {
                 const res = await fetch(`/api/leases/${leaseId}`, { headers: { 'Authorization': `Bearer ${token}` } });
-                if (!res.ok) { content.innerHTML = `<div style="text-align:center;padding:2rem;color:#ef4444;">Failed to load lease. (${res.status})</div>`; return; }
+                if (!res.ok) { content.innerHTML = `<div style="text-align:center;padding:2rem;color: var(--color-error-text);">Failed to load lease. (${res.status})</div>`; return; }
 
                 const { data: lease } = await res.json();
 
@@ -361,7 +361,7 @@
                     <!-- Tenant Concern / Appeal Alert -->
                     ${lease.lease_status === 'rejected' && lease.terms_and_conditions ? `
                         <div style="background:rgba(239, 68, 68, 0.08);border:1px solid rgba(239, 68, 68, 0.25);border-radius:var(--radius-md);padding:1rem;margin-bottom:1.5rem;">
-                            <div style="font-weight:700;color:#ef4444;font-size:0.9rem;display:flex;align-items:center;gap:0.4rem;margin-bottom:0.35rem;">
+                            <div style="font-weight:700;color: var(--color-error-text);font-size:0.9rem;display:flex;align-items:center;gap:0.4rem;margin-bottom:0.35rem;">
                                 <svg class="svg-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
                                 Tenant Appeal & Rejection Concerns
                             </div>
@@ -392,7 +392,7 @@
                         <div class="contract-section-title">Leased Property</div>
                         <div class="contract-grid">
                             <div class="contract-item"><span class="contract-label">Property Name</span><span class="contract-value">${prop.property_name || '—'}</span></div>
-                            <div class="contract-item"><span class="contract-label">Unit Number</span><span class="contract-value" style="color:var(--landlord);">${
+                            <div class="contract-item"><span class="contract-label">Unit Number</span><span class="contract-value" style="color: var(--color-link);">${
                                 lease.property_units ? `Room ${lease.property_units.unit_number}${lease.unit_beds ? ` (Bed Space: ${lease.unit_beds.bed_label})` : ''}` : 'N/A'
                             }</span></div>
                             <div class="contract-item"><span class="contract-label">Property Type</span><span class="contract-value">${(prop.property_type || '').replace(/_/g,' ').toUpperCase() || '—'}</span></div>
@@ -410,7 +410,7 @@
                             <div class="contract-item"><span class="contract-label">Lease Start</span><span class="contract-value">${start}</span></div>
                             <div class="contract-item"><span class="contract-label">Lease End</span><span class="contract-value">${end}</span></div>
                             <div class="contract-item"><span class="contract-label">Duration</span><span class="contract-value">${months} Month(s)</span></div>
-                            <div class="contract-item"><span class="contract-label">Monthly Rent</span><span class="contract-value" style="color:var(--landlord);">₱${rent}</span></div>
+                            <div class="contract-item"><span class="contract-label">Monthly Rent</span><span class="contract-value" style="color: var(--color-link);">₱${rent}</span></div>
                             <div class="contract-item"><span class="contract-label">Security Deposit</span><span class="contract-value">₱${deposit}</span></div>
                             <div class="contract-item"><span class="contract-label">Advance Payment</span><span class="contract-value">₱${advance}</span></div>
                             <div class="contract-item"><span class="contract-label">Payment Due</span><span class="contract-value">${lease.payment_due_day || 5}th of every month</span></div>
@@ -434,7 +434,7 @@
                                 <div style="display:flex;flex-wrap:wrap;gap:0.4rem;margin-top:0.5rem;">
                                     ${amenList.map(a => `
                                         <div style="background:var(--bg-primary);border:1px solid var(--border-color);border-radius:var(--radius-md);padding:0.4rem 0.75rem;font-size:0.8rem;font-weight:700;color:var(--text-primary);display:inline-flex;align-items:center;gap:0.35rem;">
-                                            <svg class="svg-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="color:var(--landlord);"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                            <svg class="svg-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="color: var(--color-link);"><polyline points="20 6 9 17 4 12"></polyline></svg>
                                             <span>${a}</span>
                                         </div>
                                     `).join('')}
@@ -519,7 +519,7 @@
 
             } catch (err) {
                 console.error('openContract error:', err);
-                content.innerHTML = `<div style="text-align:center;padding:2rem;color:#ef4444;">Unexpected error loading contract.</div>`;
+                content.innerHTML = `<div style="text-align:center;padding:2rem;color: var(--color-error-text);">Unexpected error loading contract.</div>`;
             }
         }
 
@@ -607,7 +607,7 @@
                     
                     const existingLease = leasedAppMap[app.id] || (app.tenant_id ? (leasedAppMap[app.tenant_id + '_' + app.property_id] || leasedAppMap[app.tenant_id]) : null);
 
-                    let statusBadge = `<span class="status-badge status-active" style="font-size:0.72rem;background:#d1fae5;color:#065f46;">APPROVED - READY FOR LEASE</span>`;
+                    let statusBadge = `<span class="status-badge status-active" style="font-size:0.72rem;background: var(--color-success-bg);color: var(--color-success-text);">APPROVED - READY FOR LEASE</span>`;
 
                     if (existingLease) {
                         statusBadge = `<span class="status-badge" style="font-size:0.72rem;background:#e0e7ff;color:#3730a3;">LEASE CREATED (${existingLease.lease_status.toUpperCase()})</span>`;

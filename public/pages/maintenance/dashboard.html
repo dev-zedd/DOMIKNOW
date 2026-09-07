@@ -50,27 +50,17 @@
             </div>
         </div>
 
-        <!-- Profile Placeholder -->
-        <div class="profile-card">
-            <h3 class="profile-card-title">Your account</h3>
-            <div class="profile-info-row">
-                <p><strong>Name:</strong> <span class="user-name">Loading...</span></p>
-            </div>
-            <p class="profile-card-footer"><a href="profile.html" class="btn-secondary">Manage profile and security</a></p>
-        </div>
-
-        <!-- Features Grid -->
-        <div class="feature-grid feature-grid-2">
-            <!-- Feature Card 1 -->
-            <div class="feature-card">
-                <div class="feature-card-header">
-                    <h3 class="feature-card-title">Task queue</h3>
-                    <span class="feature-card-badge">Assigned work</span>
-                </div>
-                <p class="feature-card-desc">Review new offers, update active work, and open completed work orders.</p>
-                <a href="tasks.html" class="feature-card-btn">Open task queue</a>
-            </div>
-        </div>
+        <section class="maintenance-overview-grid" aria-label="Your work at a glance">
+            <a class="maintenance-overview-card" href="tasks.html"><span>New offers</span><strong data-work-count="offers">?</strong><small>Assignments ready for review</small></a>
+            <a class="maintenance-overview-card" href="tasks.html"><span>Active work</span><strong data-work-count="active">?</strong><small>Accepted and ongoing repairs</small></a>
+            <a class="maintenance-overview-card" href="tasks.html"><span>Awaiting confirmation</span><strong data-work-count="review">?</strong><small>Reports submitted or verified</small></a>
+            <a class="maintenance-overview-card" href="tasks.html"><span>Closed tasks</span><strong data-work-count="closed">?</strong><small>Confirmed completed work</small></a>
+        </section>
+        <p id="workSummaryStatus" role="status">Loading your work summary...</p>
+        <section class="maintenance-overview-actions">
+            <div><h2>Your task queue</h2><p>Review new offers, coordinate visits and submit repair reports.</p></div>
+            <a href="tasks.html" class="btn btn-primary">Open task queue</a>
+        </section>
     </main>
 
     <script src="../../js/auth.js"></script>

@@ -111,7 +111,7 @@
             padding: 0.75rem;
             margin-bottom: 1rem;
             font-size: 0.8125rem;
-            color: #b91c1c;
+            color: var(--color-error-text);
         }
         .prop-actions {
             margin-top: auto;
@@ -136,13 +136,13 @@
         }
         /* ── Register Property Action Button (consistent with tenant portal) ── */
         .btn-register-property {
-            background: #ffffff;
-            border: 1px solid #cbd5e1;
+            background: var(--color-bg-surface);
+            border: 1px solid var(--color-border-strong);
             border-radius: 8px;
             padding: 8px 18px;
             font-weight: 700;
             font-size: 0.875rem;
-            color: #0f172a;
+            color: var(--color-text-primary);
             display: inline-flex;
             align-items: center;
             gap: 8px;
@@ -154,9 +154,9 @@
             margin-bottom: 12px;
         }
         .btn-register-property:hover {
-            background: #f8fafc;
-            border-color: #94a3b8;
-            color: #0f172a;
+            background: var(--color-bg-canvas);
+            border-color: var(--color-border-strong);
+            color: var(--color-text-primary);
             text-decoration: none;
         }
 
@@ -165,7 +165,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 1px solid #e2e8f0;
+            border-bottom: 1px solid var(--color-border-default);
             margin-bottom: 1.5rem;
             gap: 16px;
             flex-wrap: wrap;
@@ -175,17 +175,16 @@
             align-items: center;
             gap: 22px;
             overflow-x: auto;
-            scrollbar-width: none;
+            scrollbar-width: thin;
             padding-bottom: 12px;
         }
-        .properties-tabs-bar::-webkit-scrollbar { display: none; }
         .m-tab-btn {
             background: none;
             border: none;
             padding: 4px 0;
             font-size: 0.9375rem;
             font-weight: 700;
-            color: #64748b;
+            color: var(--color-text-muted);
             cursor: pointer;
             display: inline-flex;
             align-items: center;
@@ -195,10 +194,10 @@
             white-space: nowrap;
         }
         .m-tab-btn:hover {
-            color: #0052ea;
+            color: var(--color-link);
         }
         .m-tab-btn.active {
-            color: #0052ea;
+            color: var(--color-link);
             font-weight: 800;
         }
         .m-tab-btn.active::after {
@@ -208,12 +207,12 @@
             left: 0;
             right: 0;
             height: 2.5px;
-            background: #0052ea;
+            background: var(--color-action-primary);
             border-radius: 2px;
         }
         .tab-count {
-            background: #e2e8f0;
-            color: #475569;
+            background: var(--color-bg-subtle);
+            color: var(--color-text-secondary);
             font-size: 0.6875rem;
             font-weight: 700;
             padding: 2px 7px;
@@ -221,8 +220,8 @@
             line-height: 1.2;
         }
         .m-tab-btn.active .tab-count {
-            background: #eff6ff;
-            color: #0052ea;
+            background: var(--color-info-bg);
+            color: var(--color-link);
         }
     </style>
     <link href="../../css/design-system.css" rel="stylesheet">
@@ -431,7 +430,7 @@
                         <div class="prop-body">
                             <div class="prop-name">${prop.property_name}</div>
 
-                            <div style="font-size: 0.78rem; font-weight: 700; color: var(--landlord); text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 0.5rem;">
+                            <div style="font-size: 0.78rem; font-weight: 700; color: var(--color-link); text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 0.5rem;">
                                 ${typeLabel}
                             </div>
 

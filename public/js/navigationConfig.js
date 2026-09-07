@@ -87,14 +87,15 @@ const NAVIGATION_CONFIG = {
     {
       section: 'Command Center',
       items: [
-        { label: 'User Access', href: 'users.html' },
+        { label: 'Descriptive Analytics', href: 'analytics.html', icon: 'Dashboard' },
+                    { label: 'User Access', href: 'users.html' },
         { label: 'Property Approvals', href: 'property-review.html' }
       ]
     },
     {
       section: 'Platform Monitoring',
       items: [
-        { label: 'Payment Verification', href: 'payments.html' }
+        { label: 'Payment Monitoring', href: 'payments.html' }
       ]
     },
     {

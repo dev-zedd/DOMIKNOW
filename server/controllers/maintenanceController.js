@@ -576,6 +576,21 @@ const maintenanceController = {
                 return responseHelper.error(res, 'A completion report can only be submitted while the task is in repair.');
             }
 
+            const validCost = value => ['string', 'number'].includes(typeof value)
+                && /^\d+(?:\.\d{1,2})?$/.test(String(value).trim())
+                && Number.isSafeInteger(Math.round(Number(value) * 100));
+            const laborValue = labor_cost == null || labor_cost === '' ? 0 : labor_cost;
+            const materialRows = materials == null ? [] : materials;
+            if (!validCost(laborValue) || !Array.isArray(materialRows) || materialRows.some(item =>
+                !item || typeof item.material_name !== 'string' || !item.material_name.trim()
+                || !['string', 'number'].includes(typeof item.quantity)
+                || !/^\d+$/.test(String(item.quantity)) || !Number.isSafeInteger(Number(item.quantity)) || Number(item.quantity) < 1
+                || !validCost(item.cost))) {
+                return responseHelper.error(res, 'Enter nonnegative costs with at most two decimal places and positive whole-number material quantities.');
+            }
+            const materialCentavos = materialRows.reduce((total, item) => total + Math.round(Number(item.cost) * 100) * Number(item.quantity), 0);
+            if (!Number.isSafeInteger(materialCentavos)) return responseHelper.error(res, 'The material total is too large.');
+
             // Upload photos if provided
             let beforePhotoUrl = null;
             let afterPhotoUrl = null;
@@ -595,26 +610,18 @@ const maintenanceController = {
             }
 
             // Save materials
-            let calculatedMaterialCost = 0.00;
-            if (Array.isArray(materials) && materials.length > 0) {
-                await maintenanceModel.deleteRequestMaterials(id); // reset existing entries
-                for (const m of materials) {
-                    if (m.material_name && m.quantity && m.cost) {
-                        const costVal = parseFloat(m.cost);
-                        const qtyVal = parseInt(m.quantity);
-                        calculatedMaterialCost += (costVal * qtyVal);
-
-                        await maintenanceModel.addMaterial({
-                            maintenance_request_id: id,
-                            material_name: m.material_name,
-                            quantity: qtyVal,
-                            cost: costVal
-                        });
-                    }
-                }
+            const calculatedMaterialCost = materialCentavos / 100;
+            await maintenanceModel.deleteRequestMaterials(id);
+            for (const material of materialRows) {
+                await maintenanceModel.addMaterial({
+                    maintenance_request_id: id,
+                    material_name: material.material_name.trim(),
+                    quantity: Number(material.quantity),
+                    cost: Number(material.cost)
+                });
             }
 
-            const parsedLaborCost = parseFloat(labor_cost || 0.00);
+            const parsedLaborCost = Number(laborValue);
 
             // Create completion report
             const materialsListStr = Array.isArray(materials) 

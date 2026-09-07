@@ -13,7 +13,7 @@
 
     function starsFor(value) {
         const rounded = Math.round(clampRating(value));
-        return `${'★'.repeat(rounded)}${'☆'.repeat(5 - rounded)}`;
+        return Array.from({ length: 5 }, (_, index) => `<span class="rating-star${index < rounded ? ' is-filled' : ''}">${window.domiknowIcon('star')}</span>`).join('');
     }
 
     function feedbackDate(value) {
@@ -36,7 +36,7 @@
         const mark = document.createElement('span');
         mark.className = 'public-feedback-card__mark';
         mark.setAttribute('aria-hidden', 'true');
-        mark.innerHTML = window.domiknowIcon ? window.domiknowIcon('shield') : '✓';
+        mark.innerHTML = window.domiknowIcon('shield');
         const identityCopy = document.createElement('span');
         const identityTitle = document.createElement('strong');
         identityTitle.textContent = 'Verified tenant';
@@ -53,7 +53,7 @@
 
         const stars = document.createElement('div');
         stars.className = 'public-feedback-card__stars';
-        stars.textContent = starsFor(rating);
+        stars.innerHTML = starsFor(rating);
         stars.setAttribute('aria-hidden', 'true');
 
         const quote = document.createElement('blockquote');
@@ -120,7 +120,7 @@
 
             if (!feedback.length) {
                 score.textContent = '—';
-                stars.textContent = '☆☆☆☆☆';
+                stars.innerHTML = starsFor(0);
                 count.textContent = 'No public reviews yet';
                 showFeedbackState(
                     grid,
@@ -134,12 +134,12 @@
 
             const average = feedback.reduce((sum, item) => sum + clampRating(item.rating), 0) / feedback.length;
             score.textContent = average.toFixed(1);
-            stars.textContent = starsFor(average);
+            stars.innerHTML = starsFor(average);
             count.textContent = `${feedback.length} verified ${feedback.length === 1 ? 'experience' : 'experiences'} shown`;
             grid.replaceChildren(...feedback.map(createFeedbackCard));
         } catch (error) {
             score.textContent = '—';
-            stars.textContent = '☆☆☆☆☆';
+            stars.innerHTML = starsFor(0);
             count.textContent = 'Feedback temporarily unavailable';
             showFeedbackState(grid, 'Experiences could not be loaded', 'Please try again. Rental discovery remains available while feedback reconnects.', true);
         } finally {

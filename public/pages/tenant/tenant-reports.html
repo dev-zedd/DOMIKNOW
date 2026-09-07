@@ -55,9 +55,9 @@
 
         /* ── Severity badges ── */
         .sev-minor    { background:rgba(16,185,129,.12);color:#10b981;border:1px solid rgba(16,185,129,.25); }
-        .sev-moderate { background:rgba(245,158,11,.12);color:#d97706;border:1px solid rgba(245,158,11,.25); }
+        .sev-moderate { background:rgba(245,158,11,.12);color: var(--color-warning-text);border:1px solid rgba(245,158,11,.25); }
         .sev-major    { background:rgba(249,115,22,.12);color:#ea580c;border:1px solid rgba(249,115,22,.25); }
-        .sev-critical { background:rgba(239,68,68,.12); color:#ef4444;border:1px solid rgba(239,68,68,.25); }
+        .sev-critical { background:rgba(239,68,68,.12); color: var(--color-error-text);border:1px solid rgba(239,68,68,.25); }
 
         /* ── Empty state ── */
         .empty-state {
@@ -205,18 +205,18 @@
     </nav>
 
     <main class="dashboard-container">
-        <h2>📋 Reports Against Me</h2>
+        <h2><span data-icon="clipboard" aria-hidden="true"></span> Reports Against Me</h2>
         <p style="color:var(--text-secondary);margin-bottom:.5rem;">
             These are formal incident reports filed by your landlord(s). They are under admin review and <strong>will not immediately affect your account</strong> until approved.
         </p>
 
         <div style="background:rgba(99,102,241,0.07);border:1px solid rgba(99,102,241,0.2);border-radius:var(--radius-md);padding:.85rem 1.25rem;margin-bottom:1.5rem;font-size:.875rem;color:var(--text-secondary);">
-            💡 <strong>Your rights:</strong> While a report is <em>Pending Review</em>, you can submit your explanation to present your side of the story.
+            <span data-icon="note" aria-hidden="true"></span> <strong>Your rights:</strong> While a report is <em>Pending Review</em>, you can submit your explanation to present your side of the story.
         </div>
 
         <div class="list-card" id="reportsContainer">
             <div class="empty-state">
-                <div class="empty-icon">⏳</div>
+                <div class="empty-icon"><span data-icon="clock" aria-hidden="true"></span></div>
                 <div>Loading your reports...</div>
             </div>
         </div>
@@ -230,7 +230,7 @@
                     <h3 style="margin:0;" id="mTitle">Report Detail</h3>
                     <div style="font-size:.78rem;color:var(--text-muted);margin-top:.2rem;" id="mSubtitle"></div>
                 </div>
-                <button type="button" class="modal-close-btn" id="modalCloseBtn" onclick="closeModal()" title="Close">✕</button>
+                <button type="button" class="modal-close-btn" id="modalCloseBtn" onclick="closeModal()" title="Close"><span data-icon="x" aria-hidden="true"></span></button>
             </div>
 
             <div class="modal-body">
@@ -239,7 +239,7 @@
 
                 <!-- Incident -->
                 <div class="detail-section">
-                    <div class="detail-title">📌 Incident Details</div>
+                    <div class="detail-title"><span data-icon="pin" aria-hidden="true"></span> Incident Details</div>
                     <div class="detail-grid" style="margin-bottom:1rem;">
                         <div class="detail-item"><span class="detail-label">Category</span><span class="detail-value" id="mCategory">—</span></div>
                         <div class="detail-item"><span class="detail-label">Incident Date</span><span class="detail-value" id="mIncidentDate">—</span></div>
@@ -252,23 +252,23 @@
 
                 <!-- Evidence (only shown after admin review) -->
                 <div class="detail-section" id="mEvidenceSection">
-                    <div class="detail-title">📎 Evidence</div>
+                    <div class="detail-title"><span data-icon="paperclip" aria-hidden="true"></span> Evidence</div>
                     <div id="mEvidence"></div>
                 </div>
 
                 <!-- Admin Decision -->
                 <div class="detail-section" id="mDecisionSection" style="display:none;">
-                    <div class="detail-title">⚖️ Admin Decision</div>
+                    <div class="detail-title"><span data-icon="scales" aria-hidden="true"></span> Admin Decision</div>
                     <div id="mAdminRemarks" style="background:var(--bg-primary);border:1px solid var(--border-color);border-radius:var(--radius-md);padding:1rem;font-size:.875rem;color:var(--text-secondary);line-height:1.6;"></div>
                 </div>
 
                 <!-- Your Explanation -->
                 <div class="detail-section" id="mExplanationSection">
-                    <div class="detail-title">💬 Your Explanation</div>
+                    <div class="detail-title"><span data-icon="message" aria-hidden="true"></span> Your Explanation</div>
 
                     <!-- Already submitted -->
                     <div id="mExplanationSubmitted" style="display:none;background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.25);border-radius:var(--radius-md);padding:1rem;">
-                        <div style="font-size:.72rem;font-weight:700;color:#10b981;margin-bottom:.5rem;">✅ YOU SUBMITTED AN EXPLANATION</div>
+                        <div style="font-size:.72rem;font-weight:700;color:#10b981;margin-bottom:.5rem;"><span data-icon="check" aria-hidden="true"></span> YOU SUBMITTED AN EXPLANATION</div>
                         <div id="mExplanationText" style="font-size:.875rem;color:var(--text-secondary);line-height:1.7;white-space:pre-wrap;"></div>
                         <div id="mExplanationDate" style="font-size:.72rem;color:var(--text-muted);margin-top:.5rem;"></div>
                     </div>
@@ -278,8 +278,8 @@
                         <p style="font-size:.85rem;color:var(--text-secondary);margin-bottom:1rem;">
                             Share your side of the story. This will be visible to the admin reviewer. You can only submit <strong>once</strong>.
                         </p>
-                        <div id="explanationError" style="display:none;background:rgba(239,68,68,0.1);color:#ef4444;border:1px solid rgba(239,68,68,0.25);border-radius:var(--radius-md);padding:.7rem 1rem;font-size:.85rem;margin-bottom:.75rem;"></div>
-                        <label class="form-label" for="explanationText">Your Explanation <span style="color:#ef4444;">*</span></label>
+                        <div id="explanationError" style="display:none;background:rgba(239,68,68,0.1);color: var(--color-error-text);border:1px solid rgba(239,68,68,0.25);border-radius:var(--radius-md);padding:.7rem 1rem;font-size:.85rem;margin-bottom:.75rem;"></div>
+                        <label class="form-label" for="explanationText">Your Explanation <span style="color: var(--color-error-text);">*</span></label>
                         <textarea id="explanationText" class="form-input" placeholder="Explain what happened from your perspective..."></textarea>
                         <button type="button" id="submitExplanationBtn" class="btn-primary">
                             Submit My Explanation
@@ -339,7 +339,7 @@
                 if (!reports.length) {
                     container.innerHTML = `
                         <div class="empty-state">
-                            <div class="empty-icon">✅</div>
+                            <div class="empty-icon"><span data-icon="check" aria-hidden="true"></span></div>
                             <div style="font-weight:700;font-size:1.1rem;margin-bottom:.4rem;">No reports filed against you</div>
                             <div style="font-size:.875rem;">You have a clean record. Keep it up!</div>
                         </div>
@@ -356,12 +356,12 @@
                         <div class="report-item-left">
                             <div class="report-category">${capWords(r.report_category)}</div>
                             <div class="report-meta">
-                                <span>📅 Incident: ${fmtDate(r.incident_date)}</span>
-                                <span>🏠 ${r.properties?.property_name || '—'} · Unit ${r.properties?.unit_number || '—'}</span>
-                                <span>👤 Reported by: ${r.landlord?.full_name || '—'}</span>
-                                <span>📋 Filed: ${fmtDate(r.created_at)}</span>
+                                <span><span data-icon="calendar" aria-hidden="true"></span> Incident: ${fmtDate(r.incident_date)}</span>
+                                <span><span data-icon="roof" aria-hidden="true"></span> ${r.properties?.property_name || '—'} · Unit ${r.properties?.unit_number || '—'}</span>
+                                <span><span data-icon="user" aria-hidden="true"></span> Reported by: ${r.landlord?.full_name || '—'}</span>
+                                <span><span data-icon="clipboard" aria-hidden="true"></span> Filed: ${fmtDate(r.created_at)}</span>
                             </div>
-                            ${r.tenant_explanation ? '<div style="margin-top:.4rem;font-size:.72rem;color:#10b981;font-weight:700;">✅ You submitted an explanation</div>' : ''}
+                            ${r.tenant_explanation ? '<div style="margin-top:.4rem;font-size:.72rem;color:#10b981;font-weight:700;"><span data-icon="check" aria-hidden="true"></span> You submitted an explanation</div>' : ''}
                         </div>
                         <div class="report-item-right">
                             <span class="status-badge ${statusClass(r.status)}">${statusLabel(r.status)}</span>
@@ -374,7 +374,7 @@
 
             } catch (err) {
                 console.error(err);
-                container.innerHTML = `<div class="empty-state"><div class="empty-icon">⚠️</div><div>Failed to load reports. Please try again.</div></div>`;
+                container.innerHTML = `<div class="empty-state"><div class="empty-icon"><span data-icon="warning" aria-hidden="true"></span></div><div>Failed to load reports. Please try again.</div></div>`;
             }
         }
 
@@ -403,19 +403,19 @@
 
                 // Status banner
                 const bannerColors = {
-                    pending_admin_review: 'background:rgba(245,158,11,.1);color:#d97706;border:1px solid rgba(245,158,11,.3);',
-                    approved:             'background:rgba(239,68,68,.1);color:#ef4444;border:1px solid rgba(239,68,68,.3);',
+                    pending_admin_review: 'background:rgba(245,158,11,.1);color: var(--color-warning-text);border:1px solid rgba(245,158,11,.3);',
+                    approved:             'background:rgba(239,68,68,.1);color: var(--color-error-text);border:1px solid rgba(239,68,68,.3);',
                     rejected:             'background:rgba(16,185,129,.1);color:#10b981;border:1px solid rgba(16,185,129,.3);',
-                    needs_more_evidence:  'background:rgba(99,102,241,.1);color:var(--primary);border:1px solid rgba(99,102,241,.3);'
+                    needs_more_evidence:  'background:rgba(99,102,241,.1);color: var(--color-link);border:1px solid rgba(99,102,241,.3);'
                 };
                 const bannerMessages = {
-                    pending_admin_review: '⏳ This report is currently pending admin review. No action has been taken yet.',
-                    approved:             '⚠️ This report has been approved by admin. It is now part of your tenant record.',
-                    rejected:             '✅ This report was rejected by admin. No action will be taken against you.',
-                    needs_more_evidence:  '📎 The admin has requested more evidence from the landlord. Review is ongoing.'
+                    pending_admin_review: 'This report is currently pending admin review. No action has been taken yet.',
+                    approved: 'This report has been approved by admin. It is now part of your tenant record.',
+                    rejected: 'This report was rejected by admin. No action will be taken against you.',
+                    needs_more_evidence: 'The admin has requested more evidence from the landlord. Review is ongoing.'
                 };
                 $('mStatusBanner').style.cssText = bannerColors[r.status] || bannerColors.pending_admin_review;
-                $('mStatusBanner').textContent   = bannerMessages[r.status] || statusLabel(r.status);
+                domiknowSetIconText($('mStatusBanner'), ({ approved: 'warning', rejected: 'check', needs_more_evidence: 'paperclip' })[r.status] || 'clock', bannerMessages[r.status] || statusLabel(r.status));
 
                 // Incident info
                 $('mCategory').textContent    = capWords(r.report_category);
@@ -469,7 +469,7 @@
             evidence.forEach(ev => {
                 const isImage = ev.file_type?.startsWith('image/');
                 const isVideo = ev.file_type?.startsWith('video/');
-                const icon = isImage ? '' : isVideo ? '🎥' : ev.file_type === 'application/pdf' ? '📄' : '📎';
+                const icon = isImage ? '' : isVideo ? '<span data-icon="video" aria-hidden="true"></span>' : ev.file_type === 'application/pdf' ? '<span data-icon="note" aria-hidden="true"></span>' : '<span data-icon="paperclip" aria-hidden="true"></span>';
                 const media = isImage
                     ? `<img src="${ev.file_url}" alt="${ev.file_name}" loading="lazy">`
                     : `<div class="ev-icon-box">${icon}</div>`;
@@ -520,7 +520,7 @@
                     $('mExplanationSubmitted').style.display = 'block';
                     $('mExplanationText').textContent = explanation;
                     $('mExplanationDate').textContent = `Submitted: ${new Date().toLocaleString('en-PH')}`;
-                    showToast('✅ Your explanation has been submitted successfully.', 'success');
+                    showToast('Your explanation has been submitted successfully.', 'success');
                     fetchReports(); // refresh list
                 } else {
                     errEl.textContent = json.message || 'Failed to submit explanation.';

@@ -1,8 +1,8 @@
 /* DOMIKNOW landlord module — portfolio and rental operations workspace. */
 
 .dashboard-layout-landlord {
-  --landlord-sidebar-width: 272px;
-  --landlord-content-width: 1420px;
+  --landlord-sidebar-width: var(--sidebar-width);
+  --landlord-content-width: var(--content-max);
 }
 
 .dashboard-layout-landlord .sidebar-landlord {
@@ -51,7 +51,7 @@
   align-items: center;
   border: 0 !important;
   background: var(--color-action-primary-subtle) !important;
-  color: var(--color-action-primary) !important;
+  color: var(--color-link) !important;
   font-size: 0.6875rem !important;
   font-weight: 700 !important;
   letter-spacing: 0.04em;
@@ -147,7 +147,7 @@ body[data-role="landlord"] *::-webkit-scrollbar-track,
   border: 1px solid transparent !important;
   border-radius: 10px !important;
   box-shadow: none !important;
-  color: #64748b !important;
+  color: var(--color-text-muted) !important;
   font-weight: 600 !important;
   display: flex !important;
   align-items: center !important;
@@ -178,34 +178,34 @@ body[data-role="landlord"] *::-webkit-scrollbar-track,
   width: 18px;
   height: 18px;
   flex: 0 0 18px;
-  color: #94a3b8;
+  color: var(--color-text-muted);
   transition: transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1), color 0.2s ease;
 }
 
 .dashboard-layout-landlord .sidebar-link:hover {
-  border-color: #e2e8f0 !important;
-  background: #f8fafc !important;
-  color: #0f172a !important;
+  border-color: var(--color-border-default) !important;
+  background: var(--color-bg-canvas) !important;
+  color: var(--color-text-primary) !important;
   transform: translateX(4px) !important;
 }
 
 .dashboard-layout-landlord .sidebar-link:hover .nav-icon,
 .dashboard-layout-landlord .sidebar-link:hover svg {
   transform: scale(1.15);
-  color: #0052ea;
+  color: var(--color-link);
 }
 
 .dashboard-layout-landlord .sidebar-link.active {
   border-color: rgba(0, 82, 234, 0.16) !important;
-  background: #eff6ff !important;
-  color: #0052ea !important;
+  background: var(--color-info-bg) !important;
+  color: var(--color-link) !important;
   font-weight: 700 !important;
   box-shadow: 0 1px 3px rgba(0, 82, 234, 0.06) !important;
 }
 
 .dashboard-layout-landlord .sidebar-link.active .nav-icon,
 .dashboard-layout-landlord .sidebar-link.active svg {
-  color: #0052ea !important;
+  color: var(--color-link) !important;
   transform: scale(1.06);
 }
 
@@ -267,163 +267,12 @@ body[data-role="landlord"] *::-webkit-scrollbar-track,
   border: 2px solid color-mix(in srgb, var(--color-action-primary) 35%, var(--color-border-default));
   border-radius: 50% !important;
   background: var(--color-action-primary-subtle);
-  color: var(--color-action-primary);
+  color: var(--color-link);
   font-size: 0.8125rem;
   font-weight: 800;
   letter-spacing: 0.02em;
   overflow: hidden;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
-}
-
-.dashboard-layout-landlord .topbar-account-dropdown {
-  position: relative;
-  display: flex;
-  align-items: center;
-}
-
-.dashboard-layout-landlord .topbar-avatar-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 2px;
-  background: transparent;
-  border: 2px solid transparent;
-  border-radius: 50%;
-  cursor: pointer;
-  transition: transform var(--transition-fast), border-color var(--transition-fast), box-shadow var(--transition-fast);
-}
-
-.dashboard-layout-landlord .topbar-avatar-btn:hover {
-  transform: scale(1.05);
-  border-color: var(--color-action-primary);
-}
-
-.dashboard-layout-landlord .topbar-avatar-btn:focus-visible {
-  outline: none;
-  border-color: var(--color-action-primary);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-action-primary) 28%, transparent);
-}
-
-.dashboard-layout-landlord .topbar-right > .dk-tour-replay,
-.dashboard-layout-landlord .topbar-right > .theme-toggle {
-  display: none !important;
-}
-
-.dashboard-layout-landlord .topbar-dropdown-menu {
-  position: absolute;
-  top: calc(100% + 8px);
-  right: 0;
-  min-width: 190px;
-  width: max-content;
-  background: var(--color-bg-surface);
-  border: 1px solid var(--color-border-default);
-  border-radius: var(--radius-lg, 12px);
-  box-shadow: var(--shadow-dropdown);
-  padding: 6px;
-  z-index: 1100;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  animation: landlordDropdownFadeIn 0.16s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.dashboard-layout-landlord .topbar-dropdown-menu[hidden] {
-  display: none !important;
-}
-
-@keyframes landlordDropdownFadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(-6px) scale(0.97);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
-
-.dashboard-layout-landlord .topbar-dropdown-item,
-.dashboard-layout-landlord .topbar-dropdown-menu .topbar-dropdown-item,
-.dashboard-layout-landlord .topbar-dropdown-menu [data-theme-toggle] {
-  display: flex !important;
-  align-items: center !important;
-  justify-content: flex-start !important;
-  gap: 12px !important;
-  width: 100% !important;
-  min-width: 100% !important;
-  height: auto !important;
-  min-height: 40px !important;
-  padding: 9px 12px !important;
-  border: none !important;
-  border-radius: var(--radius-md, 8px) !important;
-  background: transparent !important;
-  color: var(--color-text-primary) !important;
-  box-shadow: none !important;
-  text-decoration: none !important;
-  font-size: 0.875rem !important;
-  font-weight: 500 !important;
-  cursor: pointer !important;
-  text-align: left !important;
-  white-space: nowrap !important;
-  transition: background-color var(--transition-fast), color var(--transition-fast) !important;
-}
-
-.dashboard-layout-landlord .topbar-dropdown-item .dropdown-item-icon {
-  display: inline-flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  width: 20px !important;
-  height: 20px !important;
-  flex-shrink: 0 !important;
-  color: var(--color-text-secondary) !important;
-  transition: color var(--transition-fast) !important;
-}
-
-.dashboard-layout-landlord .topbar-dropdown-item svg {
-  width: 18px !important;
-  height: 18px !important;
-  flex-shrink: 0 !important;
-  color: inherit !important;
-}
-
-.dashboard-layout-landlord .topbar-dropdown-item:hover,
-.dashboard-layout-landlord .topbar-dropdown-item:focus-visible,
-.dashboard-layout-landlord .topbar-dropdown-item.active {
-  background: var(--color-bg-subtle, rgba(0, 0, 0, 0.05)) !important;
-  color: var(--color-action-primary) !important;
-  outline: none !important;
-}
-
-.dashboard-layout-landlord .topbar-dropdown-item:hover .dropdown-item-icon,
-.dashboard-layout-landlord .topbar-dropdown-item:focus-visible .dropdown-item-icon,
-.dashboard-layout-landlord .topbar-dropdown-item.active .dropdown-item-icon {
-  color: var(--color-action-primary) !important;
-}
-
-.dashboard-layout-landlord .topbar-dropdown-divider {
-  height: 1px;
-  background: var(--color-divider, var(--color-border-default));
-  margin: 4px 4px;
-}
-
-.dashboard-layout-landlord .topbar-dropdown-logout,
-.dashboard-layout-landlord .topbar-dropdown-menu .topbar-dropdown-logout {
-  color: var(--color-error-text, #ef4444) !important;
-}
-
-.dashboard-layout-landlord .topbar-dropdown-logout .dropdown-item-icon {
-  color: var(--color-error-text, #ef4444) !important;
-}
-
-.dashboard-layout-landlord .topbar-dropdown-logout:hover,
-.dashboard-layout-landlord .topbar-dropdown-logout:focus-visible {
-  background: color-mix(in srgb, var(--color-error-text, #ef4444) 10%, transparent) !important;
-  color: var(--color-error-text, #ef4444) !important;
-}
-
-.dashboard-layout-landlord .topbar-dropdown-logout:hover .dropdown-item-icon,
-.dashboard-layout-landlord .topbar-dropdown-logout:focus-visible .dropdown-item-icon {
-  color: var(--color-error-text, #ef4444) !important;
 }
 
 .dashboard-layout-landlord .topbar-account-copy {
@@ -463,7 +312,7 @@ body[data-role="landlord"] *::-webkit-scrollbar-track,
 
 .landlord-page-eyebrow {
   margin: 0 0 5px;
-  color: var(--color-action-primary);
+  color: var(--color-link);
   font-size: 0.75rem;
   font-weight: 750;
   letter-spacing: 0.075em;
@@ -511,7 +360,7 @@ body[data-role="landlord"] *::-webkit-scrollbar-track,
 .landlord-summary-action.secondary:hover {
   border-color: var(--color-action-primary);
   background: var(--color-action-primary-subtle);
-  color: var(--color-action-primary) !important;
+  color: var(--color-link) !important;
 }
 
 /* ── Back Navigation Link (consistent with tenant portal lease-details) ── */
@@ -523,7 +372,7 @@ body[data-role="landlord"] *::-webkit-scrollbar-track,
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  color: var(--color-action-primary, #0355f3);
+  color: var(--color-link, #0355f3);
   font-size: 0.875rem;
   font-weight: 600;
   text-decoration: none;
@@ -577,7 +426,7 @@ body[data-landlord-page] :where(.dk-breadcrumbs, [data-domiknow-breadcrumbs], .b
 
 .landlord-flow-step.active {
   background: var(--color-action-primary-subtle);
-  color: var(--color-action-primary) !important;
+  color: var(--color-link) !important;
 }
 
 .landlord-flow-step.active::after {
@@ -878,7 +727,7 @@ body[data-landlord-page] :where(.dk-breadcrumbs, [data-domiknow-breadcrumbs], .b
 .dashboard-layout-landlord :where(.tab-btn, .filter-btn).active {
   border-color: var(--color-action-primary) !important;
   background: var(--color-action-primary-subtle) !important;
-  color: var(--color-action-primary) !important;
+  color: var(--color-link) !important;
 }
 
 body[data-landlord-page="reports"] :where(.chat-head-fab, .chat-head-modal-header, .chat-head-toggle, #chatHeadSendBtn) {
@@ -1046,7 +895,7 @@ body[data-landlord-page="leases"] .app-card {
   .dashboard-layout-landlord .bottom-nav-item.active,
   .dashboard-layout-landlord .bottom-nav-item[aria-current="page"] {
     background: var(--color-action-primary-subtle) !important;
-    color: var(--color-action-primary) !important;
+    color: var(--color-link) !important;
   }
 
   .dashboard-layout-landlord .bottom-nav-item svg {
@@ -1271,7 +1120,7 @@ body[data-landlord-page="application-details"] :where(.info-lbl, .doc-meta) {
 body[data-landlord-page="application-details"] .btn-back-arrow:hover {
   border-color: var(--color-action-primary) !important;
   background: var(--color-action-primary-subtle) !important;
-  color: var(--color-action-primary) !important;
+  color: var(--color-link) !important;
 }
 
 body[data-landlord-page="application-details"] ::-webkit-scrollbar-track {

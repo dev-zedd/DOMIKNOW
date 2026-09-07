@@ -57,7 +57,7 @@
 }
 
 .public-hero-copy .hero-eyebrow {
-  color: var(--color-action-primary);
+  color: var(--color-link);
   font-size: var(--font-size-label-sm);
   font-weight: 800;
   letter-spacing: 0.1em;
@@ -321,7 +321,7 @@
 }
 
 .section-eyebrow {
-  color: var(--color-action-primary);
+  color: var(--color-link);
   font-size: var(--font-size-label-sm);
   font-weight: 700;
   letter-spacing: 0.08em;
@@ -473,7 +473,7 @@
 }
 
 .leaflet-control-zoom a:hover {
-  color: var(--color-action-primary);
+  color: var(--color-link);
   background: var(--color-bg-hover);
 }
 

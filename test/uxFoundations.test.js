@@ -40,7 +40,8 @@ test('detail pages receive contextual breadcrumbs and public property onboarding
 
     assert.match(dashboardScript, /ensureContextBreadcrumbs/);
     assert.match(dashboardScript, /aria-label', 'Breadcrumb'/);
-    assert.match(dashboardScript, /data-domiknow-page-style/);
+    assert.match(dashboardScript, /initDashboardNavigation/);
+    assert.doesNotMatch(dashboardScript, /history\.pushState|__domiknowPageEnv/);
     assert.match(dashboardScript, /legacyBreadcrumb\.removeAttribute\('style'\)/);
     assert.match(walkthroughScript, /'public-property'/);
     assert.match(walkthroughScript, /#availableSpacesSection/);

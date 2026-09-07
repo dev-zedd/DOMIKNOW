@@ -12,7 +12,7 @@ async function checkAndApplyOverduePenalties(userId, isLandlord = true) {
         let query = supabase
             .from('billing_records')
             .select('*, lease_records(id, late_fee_amount, grace_period)')
-            .in('billing_status', ['pending_payment', 'unpaid', 'overdue']);
+            .in('billing_status', ['pending_payment', 'unpaid', 'partially_paid', 'overdue']);
 
         if (isLandlord) {
             query = query.eq('landlord_id', userId);

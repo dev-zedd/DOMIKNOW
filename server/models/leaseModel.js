@@ -191,7 +191,7 @@ const leaseModel = {
 
         // Allow update only if pending or rejected
         if (checkData.lease_status !== 'pending_tenant_acceptance' && checkData.lease_status !== 'rejected') {
-            throw new Error('Only leases that are pending acceptance or rejected can be modified.');
+            throw Object.assign(new Error('Only leases that are pending acceptance or rejected can be modified.'), { statusCode: 409 });
         }
 
         const { data, error } = await supabase
@@ -200,11 +200,12 @@ const leaseModel = {
                 ...leaseData,
                 updated_at: new Date()
             })
-            .eq('id', id)
+            .eq('id', id).eq('landlord_id', landlordId).eq('lease_status', checkData.lease_status)
             .select()
-            .single();
+            .maybeSingle();
 
         if (error) throw error;
+        if (!data) throw Object.assign(new Error('The lease changed during this request. Refresh and try again.'), { statusCode: 409 });
         return data;
     },
 
@@ -221,7 +222,7 @@ const leaseModel = {
         if (!lease) return null;
 
         if (lease.lease_status !== 'pending_tenant_acceptance') {
-            throw new Error('This lease is not pending acceptance.');
+            throw Object.assign(new Error('This lease is not pending acceptance.'), { statusCode: 409 });
         }
 
         const { data, error } = await supabase
@@ -232,11 +233,12 @@ const leaseModel = {
                 tenant_signature_date: new Date(),
                 updated_at: new Date()
             })
-            .eq('id', id)
+            .eq('id', id).eq('tenant_id', tenantId).eq('lease_status', lease.lease_status)
             .select()
-            .single();
+            .maybeSingle();
 
         if (error) throw error;
+        if (!data) throw Object.assign(new Error('The lease changed during this request. Refresh and try again.'), { statusCode: 409 });
         return data;
     },
 
@@ -253,7 +255,7 @@ const leaseModel = {
         if (!lease) return null;
 
         if (lease.lease_status !== 'pending_tenant_acceptance') {
-            throw new Error('This lease is not pending acceptance.');
+            throw Object.assign(new Error('This lease is not pending acceptance.'), { statusCode: 409 });
         }
 
         const { data, error } = await supabase
@@ -265,11 +267,12 @@ const leaseModel = {
                 terms_and_conditions: tenantNotes,
                 updated_at: new Date()
             })
-            .eq('id', id)
+            .eq('id', id).eq('tenant_id', tenantId).eq('lease_status', lease.lease_status)
             .select()
-            .single();
+            .maybeSingle();
 
         if (error) throw error;
+        if (!data) throw Object.assign(new Error('The lease changed during this request. Refresh and try again.'), { statusCode: 409 });
         return data;
     },
 
@@ -303,11 +306,12 @@ const leaseModel = {
                 lease_status: status,
                 updated_at: new Date()
             })
-            .eq('id', id)
+            .eq('id', id).eq('landlord_id', landlordId).eq('lease_status', lease.lease_status)
             .select()
-            .single();
+            .maybeSingle();
 
         if (error) throw error;
+        if (!data) throw Object.assign(new Error('The lease changed during this request. Refresh and try again.'), { statusCode: 409 });
         return data;
     },
 

@@ -10,13 +10,13 @@
     <style>
         /* ── Modern Disputes Page Styles (Matches maintenance.html) ── */
         .btn-submit-request {
-            background: #ffffff;
-            border: 1px solid #cbd5e1;
+            background: var(--color-bg-surface);
+            border: 1px solid var(--color-border-strong);
             border-radius: 8px;
             padding: 8px 18px;
             font-weight: 700;
             font-size: 0.875rem;
-            color: #0f172a;
+            color: var(--color-text-primary);
             display: inline-flex;
             align-items: center;
             gap: 8px;
@@ -26,8 +26,8 @@
             white-space: nowrap;
         }
         .btn-submit-request:hover {
-            background: #f8fafc;
-            border-color: #94a3b8;
+            background: var(--color-bg-canvas);
+            border-color: var(--color-border-strong);
         }
 
         /* ── Tabs & Action Header Row ── */
@@ -35,7 +35,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 1px solid #e2e8f0;
+            border-bottom: 1px solid var(--color-border-default);
             margin-bottom: 16px;
             gap: 16px;
             flex-wrap: wrap;
@@ -45,17 +45,17 @@
             align-items: center;
             gap: 22px;
             overflow-x: auto;
-            scrollbar-width: none;
+            scrollbar-width: thin;
             padding-bottom: 12px;
         }
-        .maintenance-tabs-bar::-webkit-scrollbar { display: none; }
+
         .m-tab-btn {
             background: none;
             border: none;
             padding: 4px 0;
             font-size: 0.9375rem;
             font-weight: 700;
-            color: #64748b;
+            color: var(--color-text-muted);
             cursor: pointer;
             display: inline-flex;
             align-items: center;
@@ -65,10 +65,10 @@
             white-space: nowrap;
         }
         .m-tab-btn:hover {
-            color: #0052ea;
+            color: var(--color-link);
         }
         .m-tab-btn.active {
-            color: #0052ea;
+            color: var(--color-link);
             font-weight: 800;
         }
         .m-tab-btn.active::after {
@@ -78,12 +78,12 @@
             left: 0;
             right: 0;
             height: 2.5px;
-            background: #0052ea;
+            background: var(--color-action-primary);
             border-radius: 2px;
         }
         .tab-count {
-            background: #e2e8f0;
-            color: #475569;
+            background: var(--color-bg-subtle);
+            color: var(--color-text-secondary);
             font-size: 0.6875rem;
             font-weight: 700;
             padding: 2px 7px;
@@ -91,8 +91,8 @@
             line-height: 1.2;
         }
         .m-tab-btn.active .tab-count {
-            background: #eff6ff;
-            color: #0052ea;
+            background: var(--color-info-bg);
+            color: var(--color-link);
         }
 
         /* ── Ledger Controls Bar ── */
@@ -114,20 +114,20 @@
             left: 14px;
             top: 50%;
             transform: translateY(-50%);
-            color: #94a3b8;
+            color: var(--color-text-muted);
             pointer-events: none;
             z-index: 1;
         }
         .ledger-search-box input {
             padding: 8px 14px 8px 40px !important;
             padding-left: 40px !important;
-            border: 1px solid #cbd5e1;
+            border: 1px solid var(--color-border-strong);
             border-radius: 8px;
             font-size: 0.875rem;
-            color: #0f172a;
+            color: var(--color-text-primary);
             width: 260px;
             max-width: 100%;
-            background: #ffffff;
+            background: var(--color-bg-surface);
             outline: none;
             transition: border-color 0.15s ease, box-shadow 0.15s ease;
         }
@@ -146,12 +146,12 @@
         }
         .ledger-select {
             padding: 8px 30px 8px 14px;
-            border: 1px solid #cbd5e1;
+            border: 1px solid var(--color-border-strong);
             border-radius: 8px;
             font-size: 0.8125rem;
             font-weight: 600;
-            color: #334155;
-            background: #ffffff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23475569' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E") no-repeat right 10px center;
+            color: var(--color-text-secondary);
+            background: var(--color-bg-surface) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23475569' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E") no-repeat right 10px center;
             -webkit-appearance: none;
             -moz-appearance: none;
             appearance: none;
@@ -187,12 +187,12 @@
         body .request-card,
         div.request-card,
         html body .request-card {
-            background: #ffffff;
-            border: 1px solid #e2e8f0 !important;
-            border-left: 1px solid #e2e8f0 !important;
+            background: var(--color-bg-surface);
+            border: 1px solid var(--color-border-default) !important;
+            border-left: 1px solid var(--color-border-default) !important;
             border-left-width: 1px !important;
             border-left-style: solid !important;
-            border-left-color: #e2e8f0 !important;
+            border-left-color: var(--color-border-default) !important;
             border-radius: 12px;
             padding: 16px 20px;
             display: flex;
@@ -208,11 +208,11 @@
         body .request-card:hover,
         div.request-card:hover,
         html body .request-card:hover {
-            border: 1px solid #cbd5e1 !important;
-            border-left: 1px solid #cbd5e1 !important;
+            border: 1px solid var(--color-border-strong) !important;
+            border-left: 1px solid var(--color-border-strong) !important;
             border-left-width: 1px !important;
             border-left-style: solid !important;
-            border-left-color: #cbd5e1 !important;
+            border-left-color: var(--color-border-strong) !important;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
             transform: translateY(-1px);
         }
@@ -227,9 +227,9 @@
             width: 44px;
             height: 44px;
             border-radius: 10px;
-            background: #eff6ff;
-            border: 1px solid #bfdbfe;
-            color: #0052ea;
+            background: var(--color-info-bg);
+            border: 1px solid var(--color-info-border);
+            color: var(--color-link);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -244,7 +244,7 @@
         .rc-title {
             font-size: 0.95rem;
             font-weight: 700;
-            color: #0f172a;
+            color: var(--color-text-primary);
             margin-bottom: 3px;
             white-space: nowrap;
             overflow: hidden;
@@ -252,24 +252,24 @@
         }
         .rc-subtitle {
             font-size: 0.8125rem;
-            color: #64748b;
+            color: var(--color-text-muted);
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
         }
         .rc-assigned-group {
             min-width: 140px;
-            border-left: 1px solid #f1f5f9;
+            border-left: 1px solid var(--color-divider);
             padding-left: 16px;
         }
         .rc-priority-group {
             min-width: 130px;
-            border-left: 1px solid #f1f5f9;
+            border-left: 1px solid var(--color-divider);
             padding-left: 16px;
         }
         .rc-col-label {
             font-size: 0.75rem;
-            color: #64748b;
+            color: var(--color-text-muted);
             font-weight: 500;
         }
         .rc-col-label.uppercase {
@@ -281,7 +281,7 @@
         .rc-col-val {
             font-size: 0.9375rem;
             font-weight: 700;
-            color: #0f172a;
+            color: var(--color-text-primary);
             margin-top: 2px;
             white-space: nowrap;
             overflow: hidden;
@@ -304,31 +304,31 @@
         }
         .rc-status-pill.closed,
         .rc-status-pill.resolved {
-            background: #ecfdf5;
-            color: #059669;
-            border: 1px solid #a7f3d0;
+            background: var(--color-success-bg);
+            color: var(--color-success-text);
+            border: 1px solid var(--color-success-border);
         }
         .rc-status-pill.submitted,
         .rc-status-pill.pending {
-            background: #fefce8;
-            color: #854d0e;
-            border: 1px solid #fef08a;
+            background: var(--color-warning-bg);
+            color: var(--color-warning-text);
+            border: 1px solid var(--color-warning-border);
         }
         .rc-status-pill.under_review,
         .rc-status-pill.inprogress,
         .rc-status-pill.in_progress {
-            background: #eff6ff;
-            color: #1e40af;
-            border: 1px solid #bfdbfe;
+            background: var(--color-info-bg);
+            color: var(--color-link);
+            border: 1px solid var(--color-info-border);
         }
         .rc-status-pill.rejected {
-            background: #fef2f2;
-            color: #991b1b;
-            border: 1px solid #fecaca;
+            background: var(--color-error-bg);
+            color: var(--color-error-text);
+            border: 1px solid var(--color-error-border);
         }
         .rc-tag-pill {
-            background: #f1f5f9;
-            color: #475569;
+            background: var(--color-bg-subtle);
+            color: var(--color-text-secondary);
             font-size: 0.6875rem;
             font-weight: 600;
             padding: 4px 8px;
@@ -336,7 +336,7 @@
             font-family: inherit;
         }
         .rc-chevron {
-            color: #94a3b8;
+            color: var(--color-text-muted);
             display: flex;
             align-items: center;
             margin-left: 4px;
@@ -356,9 +356,9 @@
         .empty-state {
             text-align: center;
             padding: 3.5rem 1rem;
-            color: #64748b;
-            background: #ffffff;
-            border: 1px solid #e2e8f0;
+            color: var(--color-text-muted);
+            background: var(--color-bg-surface);
+            border: 1px solid var(--color-border-default);
             border-radius: 12px;
         }
         .empty-state .ei {
@@ -370,7 +370,7 @@
         .empty-state p {
             font-size: 0.9375rem;
             font-weight: 600;
-            color: #64748b;
+            color: var(--color-text-muted);
             margin: 0;
         }
 
@@ -389,8 +389,8 @@
             padding: 1.5rem;
         }
         .modal-container {
-            background-color: #ffffff;
-            border: 1px solid #e2e8f0;
+            background-color: var(--color-bg-surface);
+            border: 1px solid var(--color-border-default);
             border-radius: 16px;
             width: 100%;
             max-width: 580px;
@@ -407,11 +407,11 @@
         }
         .modal-header {
             padding: 1.25rem 1.75rem;
-            border-bottom: 1px solid #f1f5f9;
+            border-bottom: 1px solid var(--color-divider);
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
-            background-color: #ffffff;
+            background-color: var(--color-bg-surface);
             position: sticky;
             top: 0;
             z-index: 10;
@@ -419,13 +419,13 @@
         .modal-header-title {
             font-size: 1.25rem;
             font-weight: 800;
-            color: #0f172a;
+            color: var(--color-text-primary);
             margin: 0;
             line-height: 1.2;
         }
         .modal-header-subtitle {
             font-size: 0.875rem;
-            color: #64748b;
+            color: var(--color-text-muted);
             font-weight: 500;
             margin-top: 4px;
         }
@@ -436,11 +436,11 @@
         }
         .modal-footer {
             padding: 1.25rem 1.75rem;
-            border-top: 1px solid #f1f5f9;
+            border-top: 1px solid var(--color-divider);
             display: flex;
             justify-content: flex-end;
             align-items: center;
-            background-color: #ffffff;
+            background-color: var(--color-bg-surface);
             gap: 12px;
             position: sticky;
             bottom: 0;
@@ -450,7 +450,7 @@
             background: transparent;
             border: none;
             cursor: pointer;
-            color: #64748b;
+            color: var(--color-text-muted);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -459,15 +459,15 @@
             transition: background 0.15s ease, color 0.15s ease;
         }
         .modal-close-x:hover {
-            background: #f1f5f9;
-            color: #0f172a;
+            background: var(--color-bg-subtle);
+            color: var(--color-text-primary);
         }
 
         /* Modal Action Buttons */
         .btn-modal-cancel {
-            background: #ffffff;
-            border: 1px solid #e2e8f0;
-            color: #0f172a;
+            background: var(--color-bg-surface);
+            border: 1px solid var(--color-border-default);
+            color: var(--color-text-primary);
             font-size: 0.875rem;
             font-weight: 600;
             padding: 9px 22px;
@@ -477,11 +477,11 @@
             text-decoration: none;
         }
         .btn-modal-cancel:hover {
-            background: #f8fafc;
-            border-color: #cbd5e1;
+            background: var(--color-bg-canvas);
+            border-color: var(--color-border-strong);
         }
         .btn-modal-primary {
-            background: #0052ea;
+            background: var(--color-action-primary);
             border: 1px solid #0052ea;
             color: #ffffff;
             font-size: 0.875rem;
@@ -515,17 +515,17 @@
             display: block;
             font-size: 0.8125rem;
             font-weight: 700;
-            color: #334155;
+            color: var(--color-text-secondary);
             margin-bottom: 6px;
         }
         .form-input {
             width: 100%;
-            border: 1px solid #e2e8f0;
+            border: 1px solid var(--color-border-default);
             border-radius: 8px;
             padding: 9px 12px;
             font-size: 0.875rem;
-            color: #0f172a;
-            background: #ffffff;
+            color: var(--color-text-primary);
+            background: var(--color-bg-surface);
             outline: none;
             box-sizing: border-box;
             transition: border-color 0.15s ease, box-shadow 0.15s ease;
@@ -540,7 +540,7 @@
             font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 0.05em;
-            color: #64748b;
+            color: var(--color-text-muted);
             margin: 1.25rem 0 0.5rem 0;
             border-left: none !important;
             padding-left: 0 !important;
@@ -556,8 +556,8 @@
             justify-content: space-between;
             gap: 16px;
             padding: 12px 16px;
-            background: #f8fafc;
-            border: 1px solid #e2e8f0;
+            background: var(--color-bg-canvas);
+            border: 1px solid var(--color-border-default);
             border-radius: 10px;
             margin-bottom: 1.25rem;
         }
@@ -571,16 +571,16 @@
             font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 0.05em;
-            color: #64748b;
+            color: var(--color-text-muted);
         }
         .m-lease-card-val {
             font-size: 0.9375rem;
             font-weight: 700;
-            color: #0f172a;
+            color: var(--color-text-primary);
         }
         .m-lease-card-sub {
             font-size: 0.75rem;
-            color: #64748b;
+            color: var(--color-text-muted);
         }
         .m-lease-meta {
             display: flex;
@@ -610,10 +610,10 @@
             align-items: center;
             justify-content: center;
             padding: 9px 10px;
-            border: 1px solid #e2e8f0;
+            border: 1px solid var(--color-border-default);
             border-radius: 8px;
-            background: #ffffff;
-            color: #475569;
+            background: var(--color-bg-surface);
+            color: var(--color-text-secondary);
             font-size: 0.8125rem;
             font-weight: 600;
             cursor: pointer;
@@ -622,23 +622,23 @@
             user-select: none;
         }
         .cat-card:hover {
-            border-color: #cbd5e1;
-            background: #f8fafc;
-            color: #0f172a;
+            border-color: var(--color-border-strong);
+            background: var(--color-bg-canvas);
+            color: var(--color-text-primary);
         }
         .cat-card.selected {
             border-color: #0052ea !important;
-            background: #eff6ff !important;
-            color: #0052ea !important;
+            background: var(--color-info-bg) !important;
+            color: var(--color-link) !important;
             font-weight: 700 !important;
         }
 
         /* Upload Zone */
         .upload-zone {
-            border: 1px dashed #cbd5e1;
+            border: 1px dashed var(--color-border-strong);
             border-radius: 8px;
             padding: 16px;
-            background: #f8fafc;
+            background: var(--color-bg-canvas);
             cursor: pointer;
             transition: all 0.15s ease;
             position: relative;
@@ -646,7 +646,7 @@
         }
         .upload-zone:hover, .upload-zone.dragover {
             border-color: #0052ea;
-            background: #eff6ff;
+            background: var(--color-info-bg);
         }
         .upload-zone input[type="file"] {
             position: absolute;
@@ -671,18 +671,18 @@
         .upload-zone-title {
             font-size: 0.8125rem;
             font-weight: 600;
-            color: #0f172a;
+            color: var(--color-text-primary);
         }
         .upload-zone-hint {
             font-size: 0.75rem;
-            color: #64748b;
+            color: var(--color-text-muted);
         }
         .upload-preview {
             display: flex;
             align-items: center;
             gap: 10px;
-            background: #f8fafc;
-            border: 1px solid #e2e8f0;
+            background: var(--color-bg-canvas);
+            border: 1px solid var(--color-border-default);
             border-radius: 8px;
             padding: 8px 12px;
             margin-top: 8px;
@@ -690,7 +690,7 @@
         .upload-preview-name {
             font-size: 0.8125rem;
             font-weight: 600;
-            color: #0f172a;
+            color: var(--color-text-primary);
             flex: 1;
             overflow: hidden;
             text-overflow: ellipsis;
@@ -700,7 +700,7 @@
             background: none;
             border: none;
             cursor: pointer;
-            color: #dc2626;
+            color: var(--color-error-text);
             font-size: 1rem;
             padding: 0 4px;
         }
@@ -714,18 +714,18 @@
             margin-bottom: 1rem;
         }
         .form-alert.err {
-            background: #fef2f2;
-            color: #dc2626;
-            border: 1px solid #fecaca;
+            background: var(--color-error-bg);
+            color: var(--color-error-text);
+            border: 1px solid var(--color-error-border);
         }
         .form-alert.ok {
-            background: #f0fdf4;
-            color: #16a34a;
-            border: 1px solid #bbf7d0;
+            background: var(--color-success-bg);
+            color: var(--color-success-text);
+            border: 1px solid var(--color-success-border);
         }
         .val-hint {
             font-size: 0.75rem;
-            color: #dc2626;
+            color: var(--color-error-text);
             margin-top: 4px;
             display: none;
             font-weight: 500;
@@ -736,8 +736,8 @@
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 16px 20px;
-            background: #ffffff;
-            border: 1px solid #e2e8f0;
+            background: var(--color-bg-surface);
+            border: 1px solid var(--color-border-default);
             border-radius: 12px;
             padding: 16px 18px;
             margin-bottom: 1.25rem;
@@ -755,20 +755,20 @@
         }
         .dc-label {
             font-size: 0.75rem;
-            color: #64748b;
+            color: var(--color-text-muted);
             font-weight: 500;
         }
         .dc-val {
             font-size: 0.875rem;
             font-weight: 700;
-            color: #0f172a;
+            color: var(--color-text-primary);
         }
         .detail-section-title {
             font-size: 0.75rem;
             font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 0.05em;
-            color: #64748b;
+            color: var(--color-text-muted);
             margin: 1.25rem 0 0.5rem 0;
             border-left: none !important;
             padding-left: 0 !important;
@@ -777,12 +777,12 @@
             margin-top: 0;
         }
         .detail-box {
-            background: #f8fafc;
-            border: 1px solid #e2e8f0;
+            background: var(--color-bg-canvas);
+            border: 1px solid var(--color-border-default);
             border-radius: 10px;
             padding: 12px 16px;
             font-size: 0.875rem;
-            color: #334155;
+            color: var(--color-text-secondary);
             line-height: 1.6;
             white-space: pre-wrap;
             word-break: break-word;
@@ -795,14 +795,14 @@
             line-height: 1.5;
         }
         .detail-alert-box.danger {
-            background: #fef2f2;
-            border: 1px solid #fecaca;
-            color: #991b1b;
+            background: var(--color-error-bg);
+            border: 1px solid var(--color-error-border);
+            color: var(--color-error-text);
         }
         .detail-alert-box.info {
-            background: #eff6ff;
-            border: 1px solid #bfdbfe;
-            color: #1e40af;
+            background: var(--color-info-bg);
+            border: 1px solid var(--color-info-border);
+            color: var(--color-link);
         }
         .detail-alert-title {
             font-size: 0.75rem;
@@ -815,8 +815,8 @@
             display: inline-block;
             border-radius: 8px;
             overflow: hidden;
-            border: 1px solid #e2e8f0;
-            background: #f8fafc;
+            border: 1px solid var(--color-border-default);
+            background: var(--color-bg-canvas);
             transition: transform 0.15s ease, box-shadow 0.15s ease;
             max-width: 100%;
         }
@@ -843,17 +843,17 @@
             width: fit-content;
         }
         .detail-pill.submitted,
-        .detail-pill.pending { background: #fffbeb; color: #b45309; border: 1px solid #fde68a; }
+        .detail-pill.pending { background: var(--color-warning-bg); color: var(--color-warning-text); border: 1px solid var(--color-warning-border); }
         .detail-pill.under_review,
         .detail-pill.inprogress,
-        .detail-pill.in_progress { background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; }
+        .detail-pill.in_progress { background: var(--color-info-bg); color: var(--color-link); border: 1px solid var(--color-info-border); }
         .detail-pill.resolved,
-        .detail-pill.completed { background: #f0fdf4; color: #15803d; border: 1px solid #bbf7d0; }
-        .detail-pill.closed { background: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; }
-        .detail-pill.rejected { background: #fef2f2; color: #b91c1c; border: 1px solid #fecaca; }
+        .detail-pill.completed { background: var(--color-success-bg); color: var(--color-success-text); border: 1px solid var(--color-success-border); }
+        .detail-pill.closed { background: var(--color-bg-subtle); color: var(--color-text-secondary); border: 1px solid var(--color-border-strong); }
+        .detail-pill.rejected { background: var(--color-error-bg); color: var(--color-error-text); border: 1px solid var(--color-error-border); }
 
         .detail-timeline {
-            border-left: 2px solid #e2e8f0;
+            border-left: 2px solid var(--color-border-default);
             padding-left: 1.25rem;
             margin-left: 0.5rem;
             display: flex;
@@ -877,7 +877,7 @@
             box-shadow: 0 0 0 1px #e2e8f0;
         }
         .detail-timeline-item.active::before {
-            background: #0052ea;
+            background: var(--color-action-primary);
             box-shadow: 0 0 0 2px #bfdbfe;
         }
         .detail-timeline-item.done::before {
@@ -886,12 +886,12 @@
         .detail-timeline-meta {
             font-size: 0.75rem;
             font-weight: 600;
-            color: #64748b;
+            color: var(--color-text-muted);
             margin-bottom: 2px;
         }
         .detail-timeline-note {
             font-size: 0.84375rem;
-            color: #0f172a;
+            color: var(--color-text-primary);
             line-height: 1.4;
         }
     </style>
@@ -976,7 +976,7 @@
                 <div id="formSuccess" class="form-alert ok"  style="display:none;"></div>
 
                 <!-- No Lease Warning -->
-                <div id="noLeaseWarning" style="display:none; background:#fef2f2; border:1px solid #fecaca; border-radius:8px; padding:1rem; text-align:center; color:#dc2626; font-size:0.875rem; font-weight:600; margin-bottom:1rem;">
+                <div id="noLeaseWarning" style="display:none; background: var(--color-error-bg); border: 1px solid var(--color-error-border); border-radius:8px; padding:1rem; text-align:center; color: var(--color-error-text); font-size:0.875rem; font-weight:600; margin-bottom:1rem;">
                     No active or past lease contracts found. You need a lease contract to submit complaints.
                 </div>
 
@@ -1004,7 +1004,7 @@
                     </div>
 
                     <!-- Category -->
-                    <div class="form-section-title">Complaint Category <span style="color:#dc2626;">*</span></div>
+                    <div class="form-section-title">Complaint Category <span style="color: var(--color-error-text);">*</span></div>
                     <input type="hidden" id="complaintCategory" required>
                     <div class="cat-grid" id="catGrid">
                         <div class="cat-card" data-cat="billing_concern">Billing</div>
@@ -1020,14 +1020,14 @@
                     <!-- Details -->
                     <div class="form-section-title">Details</div>
                     <div class="form-group">
-                        <label class="form-label" for="complaintSubject">Subject <span style="color:#dc2626;">*</span></label>
+                        <label class="form-label" for="complaintSubject">Subject <span style="color: var(--color-error-text);">*</span></label>
                         <input type="text" id="complaintSubject" class="form-input" placeholder="e.g. Unresolved Water Meter Overcharge" minlength="5" required>
                     </div>
 
                     <div class="form-group">
-                        <label class="form-label" for="complaintDescription">Description <span style="color:#dc2626;">*</span></label>
+                        <label class="form-label" for="complaintDescription">Description <span style="color: var(--color-error-text);">*</span></label>
                         <textarea id="complaintDescription" class="form-input" rows="3" placeholder="Describe what happened in detail, including dates and any prior discussions..." style="resize:vertical; min-height:80px;" minlength="20" required></textarea>
-                        <div style="font-size:0.75rem; color:#64748b; text-align:right; margin-top:4px;" id="descCharCount">Minimum 20 characters required</div>
+                        <div style="font-size:0.75rem; color: var(--color-text-muted); text-align:right; margin-top:4px;" id="descCharCount">Minimum 20 characters required</div>
                     </div>
 
                     <!-- Attachment Upload -->
@@ -1046,7 +1046,7 @@
                     </div>
                     <div id="uploadPreview" class="upload-preview" style="display:none;">
                         <span class="upload-preview-name" id="previewName"></span>
-                        <button type="button" class="upload-remove" id="removeFileBtn" title="Remove file">✕</button>
+                        <button type="button" class="upload-remove" id="removeFileBtn" title="Remove file"><span data-icon="x" aria-hidden="true"></span></button>
                     </div>
                 </form>
             </div>
@@ -1377,7 +1377,7 @@
             if (filtered.length === 0) {
                 list.innerHTML = `
                     <div class="empty-state">
-                        <div class="ei">📋</div>
+                        <div class="ei"><span data-icon="clipboard" aria-hidden="true"></span></div>
                         <p>No complaints found matching your filter.</p>
                     </div>`;
                 return;
@@ -1443,7 +1443,7 @@
         }
 
         function showListError(msg) {
-            document.getElementById('complaintsList').innerHTML = `<div class="empty-state"><div class="ei">⚠️</div><p>${domiknowEscapeHtml(msg)}</p></div>`;
+            document.getElementById('complaintsList').innerHTML = `<div class="empty-state"><div class="ei"><span data-icon="warning" aria-hidden="true"></span></div><p>${domiknowEscapeHtml(msg)}</p></div>`;
         }
 
         // ── Render Details Content (Zero Loading Animation) ───
@@ -1491,7 +1491,7 @@
 
                 <div style="margin-bottom:1.25rem;">
                     <div class="detail-section-title">Complaint</div>
-                    <div style="font-size:0.9375rem; font-weight:700; color:#0f172a; margin-bottom:6px;">${domiknowEscapeHtml(c.subject || 'Complaint')}</div>
+                    <div style="font-size:0.9375rem; font-weight:700; color: var(--color-text-primary); margin-bottom:6px;">${domiknowEscapeHtml(c.subject || 'Complaint')}</div>
                     <div class="detail-box">${domiknowEscapeHtml(c.description || 'No description provided.')}</div>
                 </div>
             `;
@@ -1544,11 +1544,11 @@
                         <div class="detail-section-title">History</div>
                         <div class="detail-timeline">
                             <div class="detail-timeline-item done">
-                                <div class="detail-timeline-meta">${domiknowEscapeHtml(dateStr)} &middot; <span style="font-weight:700; color:#0f172a;">Submitted</span></div>
+                                <div class="detail-timeline-meta">${domiknowEscapeHtml(dateStr)} &middot; <span style="font-weight:700; color: var(--color-text-primary);">Submitted</span></div>
                                 <div class="detail-timeline-note">Complaint filed by tenant.</div>
                             </div>
                             <div class="detail-timeline-item active">
-                                <div class="detail-timeline-meta" style="color:#dc2626;"><span style="font-weight:700;">Rejected</span></div>
+                                <div class="detail-timeline-meta" style="color: var(--color-error-text);"><span style="font-weight:700;">Rejected</span></div>
                                 <div class="detail-timeline-note">${domiknowEscapeHtml(c.rejection_reason || 'Complaint rejected.')}</div>
                             </div>
                         </div>
@@ -1574,7 +1574,7 @@
 
                     html += `
                         <div class="detail-timeline-item ${cls}">
-                            <div class="detail-timeline-meta">${domiknowEscapeHtml(timeText)} &middot; <span style="text-transform:capitalize; font-weight:700; color:#0f172a;">${domiknowEscapeHtml(step.replace(/_/g, ' '))}</span></div>
+                            <div class="detail-timeline-meta">${domiknowEscapeHtml(timeText)} &middot; <span style="text-transform:capitalize; font-weight:700; color: var(--color-text-primary);">${domiknowEscapeHtml(step.replace(/_/g, ' '))}</span></div>
                             <div class="detail-timeline-note">${log?.notes ? domiknowEscapeHtml(log.notes) : (isActive ? 'Currently at this stage.' : (isDone ? 'Completed.' : 'Awaiting next steps.'))}</div>
                         </div>
                     `;
@@ -1617,7 +1617,7 @@
             } catch (err) {
                 console.error(err);
                 if (!cached) {
-                    document.getElementById('detailsBody').innerHTML = `<div class="empty-state"><div class="ei">⚠️</div><p>Failed to load complaint details.</p></div>`;
+                    document.getElementById('detailsBody').innerHTML = `<div class="empty-state"><div class="ei"><span data-icon="warning" aria-hidden="true"></span></div><p>Failed to load complaint details.</p></div>`;
                 }
             }
         }
@@ -1722,8 +1722,8 @@
             `;
         }
 
-        function showError(msg)   { const el = document.getElementById('formError');   el.textContent = '⚠️ ' + msg; el.style.display = 'block'; }
-        function showSuccess(msg) { const el = document.getElementById('formSuccess'); el.textContent = '✓ ' + msg;  el.style.display = 'block'; }
+        function showError(msg)   { const el = document.getElementById('formError');   domiknowSetIconText(el, 'warning', '' + msg); el.style.display = 'block'; }
+        function showSuccess(msg) { const el = document.getElementById('formSuccess'); domiknowSetIconText(el, 'check', '' + msg);  el.style.display = 'block'; }
         function clearAlerts()    { document.getElementById('formError').style.display = 'none'; document.getElementById('formSuccess').style.display = 'none'; }
 
         function fileToBase64(file) {

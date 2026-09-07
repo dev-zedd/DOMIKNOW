@@ -1,8 +1,8 @@
 /* DomiKnow admin module — platform governance and trust operations workspace. */
 
 .dashboard-layout-admin {
-  --admin-sidebar-width: 272px;
-  --admin-content-width: 1460px;
+  --admin-sidebar-width: var(--sidebar-width);
+  --admin-content-width: var(--content-max);
 }
 
 .dashboard-layout-admin .sidebar-admin {
@@ -133,7 +133,7 @@ body[data-role="admin"] *::-webkit-scrollbar-track,
   border: 1px solid transparent !important;
   border-radius: 10px !important;
   box-shadow: none !important;
-  color: #64748b !important;
+  color: var(--color-text-muted) !important;
   font-weight: 600 !important;
   display: flex !important;
   align-items: center !important;
@@ -164,33 +164,33 @@ body[data-role="admin"] *::-webkit-scrollbar-track,
   width: 18px;
   height: 18px;
   flex: 0 0 18px;
-  color: #94a3b8;
+  color: var(--color-text-muted);
   transition: transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1), color 0.2s ease;
 }
 
 .dashboard-layout-admin .sidebar-link:hover {
-  border-color: #e2e8f0 !important;
-  background: #f8fafc !important;
-  color: #0f172a !important;
+  border-color: var(--color-border-default) !important;
+  background: var(--color-bg-canvas) !important;
+  color: var(--color-text-primary) !important;
   transform: translateX(4px) !important;
 }
 
 .dashboard-layout-admin .sidebar-link:hover .nav-icon,
 .dashboard-layout-admin .sidebar-link:hover svg {
   transform: scale(1.15);
-  color: #0052ea;
+  color: var(--color-link);
 }
 
 .dashboard-layout-admin .sidebar-link.active {
   border-color: rgba(0, 82, 234, 0.16) !important;
-  background: #eff6ff !important;
-  color: #0052ea !important;
+  background: var(--color-info-bg) !important;
+  color: var(--color-link) !important;
   box-shadow: 0 1px 3px rgba(0, 82, 234, 0.06) !important;
 }
 
 .dashboard-layout-admin .sidebar-link.active .nav-icon,
 .dashboard-layout-admin .sidebar-link.active svg {
-  color: #0052ea !important;
+  color: var(--color-link) !important;
 }
 
 .dashboard-layout-admin .sidebar-link.active::before,
@@ -218,158 +218,12 @@ body[data-role="admin"] *::-webkit-scrollbar-track,
   border: 2px solid color-mix(in srgb, var(--color-action-primary) 35%, var(--color-border-default));
   border-radius: 50% !important;
   background: var(--color-action-primary-subtle);
-  color: var(--color-action-primary);
+  color: var(--color-link);
   font-size: 0.8125rem;
   font-weight: 800;
   letter-spacing: 0.02em;
   overflow: hidden;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
-}
-
-.dashboard-layout-admin .topbar-account-dropdown {
-  position: relative;
-  display: flex;
-  align-items: center;
-}
-
-.dashboard-layout-admin .topbar-avatar-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 2px;
-  background: transparent;
-  border: 2px solid transparent;
-  border-radius: 50%;
-  cursor: pointer;
-  transition: transform var(--transition-fast), border-color var(--transition-fast), box-shadow var(--transition-fast);
-}
-
-.dashboard-layout-admin .topbar-avatar-btn:hover {
-  transform: scale(1.05);
-  border-color: var(--color-action-primary);
-}
-
-.dashboard-layout-admin .topbar-avatar-btn:focus-visible {
-  outline: none;
-  border-color: var(--color-action-primary);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-action-primary) 28%, transparent);
-}
-
-.dashboard-layout-admin .topbar-right > .dk-tour-replay,
-.dashboard-layout-admin .topbar-right > .theme-toggle {
-  display: none !important;
-}
-
-.dashboard-layout-admin .topbar-dropdown-menu {
-  position: absolute;
-  top: calc(100% + 8px);
-  right: 0;
-  min-width: 190px;
-  width: max-content;
-  background: var(--color-bg-surface);
-  border: 1px solid var(--color-border-default);
-  border-radius: var(--radius-lg, 12px);
-  box-shadow: var(--shadow-dropdown);
-  padding: 6px;
-  z-index: 1100;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  animation: adminDropdownFadeIn 0.16s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.dashboard-layout-admin .topbar-dropdown-menu[hidden] {
-  display: none !important;
-}
-
-@keyframes adminDropdownFadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(-6px) scale(0.97);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
-
-.dashboard-layout-admin .topbar-dropdown-item,
-.dashboard-layout-admin .topbar-dropdown-menu .topbar-dropdown-item,
-.dashboard-layout-admin .topbar-dropdown-menu [data-theme-toggle] {
-  display: flex !important;
-  align-items: center !important;
-  justify-content: flex-start !important;
-  gap: 12px !important;
-  width: 100% !important;
-  min-width: 100% !important;
-  height: auto !important;
-  min-height: 40px !important;
-  padding: 9px 12px !important;
-  border: none !important;
-  border-radius: var(--radius-md, 8px) !important;
-  background: transparent !important;
-  color: var(--color-text-primary) !important;
-  box-shadow: none !important;
-  text-decoration: none !important;
-  font-size: 0.875rem !important;
-  font-weight: 500 !important;
-  cursor: pointer !important;
-  text-align: left !important;
-  white-space: nowrap !important;
-  transition: background-color var(--transition-fast), color var(--transition-fast) !important;
-}
-
-.dashboard-layout-admin .topbar-dropdown-item .dropdown-item-icon {
-  display: inline-flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  width: 20px !important;
-  height: 20px !important;
-  flex-shrink: 0 !important;
-  color: var(--color-text-secondary) !important;
-  transition: color var(--transition-fast) !important;
-}
-
-.dashboard-layout-admin .topbar-dropdown-item svg {
-  width: 18px !important;
-  height: 18px !important;
-  flex-shrink: 0 !important;
-  color: inherit !important;
-}
-
-.dashboard-layout-admin .topbar-dropdown-item:hover,
-.dashboard-layout-admin .topbar-dropdown-item:focus-visible,
-.dashboard-layout-admin .topbar-dropdown-item.active {
-  background: var(--color-bg-subtle, rgba(0, 0, 0, 0.05)) !important;
-  color: var(--color-action-primary) !important;
-  outline: none !important;
-}
-
-.dashboard-layout-admin .topbar-dropdown-item:hover .dropdown-item-icon,
-.dashboard-layout-admin .topbar-dropdown-item:focus-visible .dropdown-item-icon,
-.dashboard-layout-admin .topbar-dropdown-item.active .dropdown-item-icon {
-  color: var(--color-action-primary) !important;
-}
-
-.dashboard-layout-admin .topbar-dropdown-divider {
-  height: 1px;
-  background: var(--color-divider, var(--color-border-default));
-  margin: 4px 4px;
-}
-
-.dashboard-layout-admin .topbar-dropdown-logout,
-.dashboard-layout-admin .topbar-dropdown-menu .topbar-dropdown-logout {
-  color: var(--color-error-text, #ef4444) !important;
-}
-
-.dashboard-layout-admin .topbar-dropdown-logout .dropdown-item-icon {
-  color: var(--color-error-text, #ef4444) !important;
-}
-
-.dashboard-layout-admin .topbar-dropdown-logout:hover,
-.dashboard-layout-admin .topbar-dropdown-logout:focus-visible {
-  background: color-mix(in srgb, var(--color-error-text, #ef4444) 10%, transparent) !important;
-  color: var(--color-error-text, #ef4444) !important;
 }
 
 .dashboard-layout-admin .main-content-inner {
@@ -398,7 +252,7 @@ body[data-role="admin"] *::-webkit-scrollbar-track,
   padding: 4px 10px;
   border-radius: 999px;
   background: var(--color-action-primary-subtle);
-  color: var(--color-action-primary);
+  color: var(--color-link);
   font-size: 0.6875rem;
   font-weight: 750;
   letter-spacing: 0.06em;
@@ -408,7 +262,7 @@ body[data-role="admin"] *::-webkit-scrollbar-track,
 
 .admin-panel-eyebrow {
   margin: 0 0 5px;
-  color: var(--color-action-primary);
+  color: var(--color-link);
   font-size: 0.75rem;
   font-weight: 750;
   letter-spacing: 0.075em;
@@ -465,7 +319,7 @@ body[data-role="admin"] *::-webkit-scrollbar-track,
 .admin-secondary-action:hover {
   border-color: var(--color-action-primary);
   background: var(--color-action-primary-subtle);
-  color: var(--color-action-primary) !important;
+  color: var(--color-link) !important;
   box-shadow: 0 4px 12px rgba(0, 82, 234, 0.12);
 }
 
@@ -494,7 +348,7 @@ body[data-role="admin"] *::-webkit-scrollbar-track,
 }
 
 .dashboard-layout-admin .nav-back-link {
-  color: var(--color-action-primary) !important;
+  color: var(--color-link) !important;
   font-weight: 700 !important;
 }
 
@@ -725,7 +579,7 @@ body[data-admin-page="policy-management"] #toastBanner[data-state="error"] {
 
 .user-avatar-badge--tenant {
   background: rgba(3, 85, 243, 0.1);
-  color: #0355f3;
+  color: var(--color-link);
   border-color: rgba(3, 85, 243, 0.2);
 }
 
@@ -737,7 +591,7 @@ body[data-admin-page="policy-management"] #toastBanner[data-state="error"] {
 
 .user-avatar-badge--maintenance {
   background: rgba(217, 119, 6, 0.1);
-  color: #d97706;
+  color: var(--color-warning-text);
   border-color: rgba(217, 119, 6, 0.2);
 }
 
@@ -781,7 +635,7 @@ body[data-admin-page="policy-management"] #toastBanner[data-state="error"] {
 
 .dashboard-layout-admin .navbar-badge-tenant {
   background: rgba(3, 85, 243, 0.08) !important;
-  color: #0355f3 !important;
+  color: var(--color-link) !important;
   border: 1px solid rgba(3, 85, 243, 0.2) !important;
 }
 
@@ -793,7 +647,7 @@ body[data-admin-page="policy-management"] #toastBanner[data-state="error"] {
 
 .dashboard-layout-admin .navbar-badge-maintenance {
   background: rgba(217, 119, 6, 0.08) !important;
-  color: #d97706 !important;
+  color: var(--color-warning-text) !important;
   border: 1px solid rgba(217, 119, 6, 0.2) !important;
 }
 
@@ -817,7 +671,7 @@ body[data-admin-page="policy-management"] #toastBanner[data-state="error"] {
 
 .verify-chip--yes {
   background: rgba(16, 185, 129, 0.08);
-  color: #059669;
+  color: var(--color-success-text);
   border: 1px solid rgba(16, 185, 129, 0.2);
 }
 
@@ -855,19 +709,19 @@ body[data-admin-page="policy-management"] #toastBanner[data-state="error"] {
 
 .dashboard-layout-admin .status-pending {
   background: rgba(245, 158, 11, 0.1) !important;
-  color: #b45309 !important;
+  color: var(--color-warning-text) !important;
   border: 1px solid rgba(245, 158, 11, 0.25) !important;
 }
 
 .dashboard-layout-admin .status-active {
   background: rgba(16, 185, 129, 0.1) !important;
-  color: #047857 !important;
+  color: var(--color-success-text) !important;
   border: 1px solid rgba(16, 185, 129, 0.25) !important;
 }
 
 .dashboard-layout-admin .status-rejected {
   background: rgba(239, 68, 68, 0.1) !important;
-  color: #b91c1c !important;
+  color: var(--color-error-text) !important;
   border: 1px solid rgba(239, 68, 68, 0.25) !important;
 }
 
@@ -901,7 +755,7 @@ body[data-admin-page="policy-management"] #toastBanner[data-state="error"] {
 
 .dashboard-layout-admin .btn-action-approve {
   background: rgba(16, 185, 129, 0.09) !important;
-  color: #059669 !important;
+  color: var(--color-success-text) !important;
   border: 1px solid rgba(16, 185, 129, 0.28) !important;
 }
 
@@ -914,7 +768,7 @@ body[data-admin-page="policy-management"] #toastBanner[data-state="error"] {
 
 .dashboard-layout-admin .btn-action-reject {
   background: rgba(239, 68, 68, 0.06) !important;
-  color: #dc2626 !important;
+  color: var(--color-error-text) !important;
   border: 1px solid rgba(239, 68, 68, 0.25) !important;
 }
 
@@ -932,20 +786,20 @@ body[data-admin-page="policy-management"] #toastBanner[data-state="error"] {
 }
 
 .dashboard-layout-admin .btn-action-disable:hover {
-  background: #e2e8f0 !important;
-  color: #1e293b !important;
-  border-color: #94a3b8 !important;
+  background: var(--color-bg-subtle) !important;
+  color: var(--color-text-primary) !important;
+  border-color: var(--color-border-strong) !important;
   box-shadow: 0 2px 6px rgba(100, 116, 139, 0.2) !important;
 }
 
 .dashboard-layout-admin .btn-action-reactivate {
   background: rgba(3, 85, 243, 0.08) !important;
-  color: #0355f3 !important;
+  color: var(--color-link) !important;
   border: 1px solid rgba(3, 85, 243, 0.25) !important;
 }
 
 .dashboard-layout-admin .btn-action-reactivate:hover {
-  background: #0355f3 !important;
+  background: var(--color-action-primary) !important;
   color: #ffffff !important;
   border-color: #0355f3 !important;
   box-shadow: 0 2px 6px rgba(3, 85, 243, 0.25) !important;
@@ -980,9 +834,9 @@ body[data-admin-page="policy-management"] #toastBanner[data-state="error"] {
   display: flex;
   align-items: center;
   gap: 10px;
-  background: #ecfdf5;
-  border: 1px solid #a7f3d0;
-  color: #065f46;
+  background: var(--color-success-bg);
+  border: 1px solid var(--color-success-border);
+  color: var(--color-success-text);
   box-shadow: 0 2px 8px rgba(16, 185, 129, 0.1);
   animation: feedbackSlideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
@@ -1033,12 +887,12 @@ body[data-admin-page="policy-management"] #toastBanner[data-state="error"] {
 }
 
 .review-tab-btn:hover {
-  color: var(--color-action-primary, #0355f3) !important;
+  color: var(--color-link, #0355f3) !important;
   background: none !important;
 }
 
 .review-tab-btn.active {
-  color: var(--color-action-primary, #0355f3) !important;
+  color: var(--color-link, #0355f3) !important;
   font-weight: 750 !important;
   background: none !important;
   box-shadow: none !important;
@@ -1073,7 +927,7 @@ body[data-admin-page="policy-management"] #toastBanner[data-state="error"] {
 
 .review-tab-btn.active .review-tab-count {
   background: rgba(3, 85, 243, 0.1);
-  color: var(--color-action-primary, #0355f3);
+  color: var(--color-link, #0355f3);
 }
 
 /* Fallback segmented control support */
@@ -1149,7 +1003,7 @@ body[data-admin-page="policy-management"] #toastBanner[data-state="error"] {
   padding: 2px 7px;
   border-radius: 6px;
   background: rgba(3, 85, 243, 0.08);
-  color: #0355f3;
+  color: var(--color-link);
   font-size: 0.6875rem;
   font-weight: 700;
   text-transform: capitalize;
@@ -1206,7 +1060,7 @@ body[data-admin-page="policy-management"] #toastBanner[data-state="error"] {
 .property-location-cell svg {
   flex-shrink: 0;
   margin-top: 2px;
-  color: var(--color-action-primary, #0355f3);
+  color: var(--color-link, #0355f3);
 }
 
 /* Document Chip */
@@ -1224,13 +1078,13 @@ body[data-admin-page="policy-management"] #toastBanner[data-state="error"] {
 
 .doc-chip--has-docs {
   background: rgba(16, 185, 129, 0.08);
-  color: #059669;
+  color: var(--color-success-text);
   border: 1px solid rgba(16, 185, 129, 0.22);
 }
 
 .doc-chip--no-docs {
   background: rgba(245, 158, 11, 0.08);
-  color: #d97706;
+  color: var(--color-warning-text);
   border: 1px solid rgba(245, 158, 11, 0.22);
 }
 
@@ -1315,7 +1169,7 @@ body[data-admin-page="policy-management"] #toastBanner[data-state="error"] {
   border: 1px solid var(--color-border-default);
   border-radius: 14px;
   background: var(--color-bg-surface);
-  box-shadow: var(--shadow-xs);
+  box-shadow: var(--shadow-card);
 }
 
 .audit-filter-panel {
@@ -1342,7 +1196,7 @@ body[data-admin-page="policy-management"] #toastBanner[data-state="error"] {
 
 .audit-panel-eyebrow {
   margin: 0 0 4px;
-  color: var(--color-action-primary);
+  color: var(--color-link);
   font-size: 0.6875rem;
   font-weight: 800;
   letter-spacing: 0.075em;
@@ -1372,7 +1226,7 @@ body[data-admin-page="policy-management"] #toastBanner[data-state="error"] {
 .audit-reset-button:hover {
   border-color: var(--color-action-primary);
   background: var(--color-action-primary-subtle);
-  color: var(--color-action-primary);
+  color: var(--color-link);
 }
 
 .audit-filter-form {
@@ -1516,7 +1370,7 @@ body[data-admin-page="policy-management"] #toastBanner[data-state="error"] {
 .audit-role-badge--admin {
   border-color: color-mix(in srgb, var(--color-action-primary) 30%, transparent);
   background: var(--color-action-primary-subtle);
-  color: var(--color-action-primary);
+  color: var(--color-link);
 }
 
 .audit-role-badge--tenant {
@@ -1545,7 +1399,7 @@ body[data-admin-page="policy-management"] #toastBanner[data-state="error"] {
   border: 1px solid color-mix(in srgb, var(--color-action-primary) 18%, var(--color-border-default));
   border-radius: 6px;
   background: var(--color-action-primary-subtle);
-  color: var(--color-action-primary);
+  color: var(--color-link);
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
   font-size: 0.6875rem;
   font-weight: 750;
@@ -1614,7 +1468,7 @@ body[data-admin-page="policy-management"] #toastBanner[data-state="error"] {
   transition: background 0.25s ease;
 }
 
-.admin-priority-card--users:hover::after { background: #0355f3; }
+.admin-priority-card--users:hover::after { background: var(--color-action-primary); }
 .admin-priority-card--properties:hover::after { background: #7c3aed; }
 .admin-priority-card--reports:hover::after { background: #d97706; }
 .admin-priority-card--payments:hover::after { background: #10b981; }
@@ -1653,7 +1507,7 @@ body[data-admin-page="policy-management"] #toastBanner[data-state="error"] {
 
 .kpi-icon-box--blue {
   background: rgba(3, 85, 243, 0.1);
-  color: #0355f3;
+  color: var(--color-link);
   border: 1px solid rgba(3, 85, 243, 0.18);
 }
 
@@ -1665,7 +1519,7 @@ body[data-admin-page="policy-management"] #toastBanner[data-state="error"] {
 
 .kpi-icon-box--amber {
   background: rgba(217, 119, 6, 0.1);
-  color: #d97706;
+  color: var(--color-warning-text);
   border: 1px solid rgba(217, 119, 6, 0.18);
 }
 
@@ -1723,7 +1577,7 @@ body[data-admin-page="policy-management"] #toastBanner[data-state="error"] {
   border-top: 1px solid var(--color-border-subtle, rgba(0, 0, 0, 0.05));
   font-size: 0.75rem;
   font-weight: 700;
-  color: var(--color-action-primary);
+  color: var(--color-link);
   transition: gap 0.2s ease, color 0.2s ease;
 }
 
@@ -1929,7 +1783,7 @@ body[data-admin-page="policy-management"] #toastBanner[data-state="error"] {
 .metric-highlight strong,
 .admin-analytics-panel__heading > strong {
   display: block;
-  color: var(--color-action-primary);
+  color: var(--color-link);
   font-size: 1.75rem;
   font-weight: 800;
   letter-spacing: -0.04em;
@@ -2147,7 +2001,7 @@ body[data-admin-page="policy-management"] #toastBanner[data-state="error"] {
   gap: 6px;
   font-size: 0.78rem;
   font-weight: 700;
-  color: var(--color-action-primary);
+  color: var(--color-link);
   text-decoration: none !important;
   transition: gap 0.2s ease, color 0.2s ease;
 }
@@ -2203,7 +2057,7 @@ body[data-admin-page="policy-management"] #toastBanner[data-state="error"] {
 
 .admin-queue-kind--case {
   background: rgba(239, 68, 68, 0.1);
-  color: #dc2626;
+  color: var(--color-error-text);
   border: 1px solid rgba(239, 68, 68, 0.2);
 }
 
@@ -2215,7 +2069,7 @@ body[data-admin-page="policy-management"] #toastBanner[data-state="error"] {
 
 .admin-queue-kind--access {
   background: rgba(3, 85, 243, 0.1);
-  color: #0355f3;
+  color: var(--color-link);
   border: 1px solid rgba(3, 85, 243, 0.2);
 }
 
@@ -2248,7 +2102,7 @@ body[data-admin-page="policy-management"] #toastBanner[data-state="error"] {
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  color: var(--color-action-primary);
+  color: var(--color-link);
   font-size: 0.78rem;
   font-weight: 750;
   transition: gap 0.2s ease;
@@ -2274,13 +2128,13 @@ body[data-admin-page="policy-management"] #toastBanner[data-state="error"] {
 .admin-queue-empty[data-state="warning"] {
   border-color: rgba(245, 158, 11, 0.4);
   background: rgba(245, 158, 11, 0.06);
-  color: #92400e;
+  color: var(--color-warning-text);
 }
 
 .admin-queue-empty[data-state="error"] {
   border-color: rgba(239, 68, 68, 0.4);
   background: rgba(239, 68, 68, 0.06);
-  color: #b91c1c;
+  color: var(--color-error-text);
 }
 
 /* 5. Decision Standard Control Panel */
@@ -2438,7 +2292,7 @@ body[data-admin-page="policy-management"] #toastBanner[data-state="error"] {
 
 [data-theme="dark"] .kpi-icon-box--blue {
   background: rgba(3, 85, 243, 0.2);
-  color: #60a5fa;
+  color: var(--color-link);
   border-color: rgba(96, 165, 250, 0.25);
 }
 
@@ -2474,7 +2328,7 @@ body[data-admin-page="policy-management"] #toastBanner[data-state="error"] {
 
 [data-theme="dark"] .admin-queue-kind--access {
   background: rgba(3, 85, 243, 0.2);
-  color: #60a5fa;
+  color: var(--color-link);
   border-color: rgba(3, 85, 243, 0.3);
 }
 
@@ -2512,7 +2366,7 @@ body[data-admin-page="policy-management"] #toastBanner[data-state="error"] {
 
 [data-theme="dark"] .verify-chip--no {
   background: rgba(255, 255, 255, 0.05);
-  color: #94a3b8;
+  color: var(--color-text-muted);
   border-color: rgba(255, 255, 255, 0.1);
 }
 
@@ -2545,7 +2399,7 @@ body[data-admin-page="policy-management"] #toastBanner[data-state="error"] {
 
 [data-theme="dark"] .review-tab-btn.active {
   background: rgba(255, 255, 255, 0.1);
-  color: #60a5fa;
+  color: var(--color-link);
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
 }
 

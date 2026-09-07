@@ -110,7 +110,7 @@
   display: flex;
   flex-wrap: wrap;
   gap: var(--space-3);
-  margin-top: var(--space-7);
+  margin-top: var(--space-8);
 }
 
 .error-page-actions .btn { min-height: 48px; }
@@ -149,7 +149,7 @@
   place-items: center;
   border-radius: 11px;
   background: var(--color-action-primary-subtle);
-  color: var(--color-action-primary);
+  color: var(--color-link);
 }
 
 .error-page-recovery :where(svg, .ui-icon) { width: 19px; height: 19px; }

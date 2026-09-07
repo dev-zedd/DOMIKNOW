@@ -25,7 +25,7 @@
             transition: color 0.15s ease;
         }
         .back-link:hover {
-            color: var(--landlord);
+            color: var(--color-link);
         }
 
         .page-hero {
@@ -47,7 +47,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            color: #ef4444;
+            color: var(--color-error-text);
             flex-shrink: 0;
         }
         .hero-text h2 {
@@ -88,7 +88,7 @@
             letter-spacing: 0.01em;
         }
         .card-section-title svg {
-            color: var(--landlord);
+            color: var(--color-link);
         }
 
         /* ── Autofill Lease Display ────────────────────────── */
@@ -213,8 +213,8 @@
         .severity-card.selected[data-v="moderate"] {
             border-color: #f59e0b; background: rgba(245, 158, 11, 0.08);
         }
-        .severity-card.selected[data-v="moderate"] .severity-title { color: #d97706; }
-        .severity-card.selected[data-v="moderate"] .severity-icon { background: rgba(245, 158, 11, 0.18); color: #d97706; }
+        .severity-card.selected[data-v="moderate"] .severity-title { color: var(--color-warning-text); }
+        .severity-card.selected[data-v="moderate"] .severity-icon { background: rgba(245, 158, 11, 0.18); color: var(--color-warning-text); }
 
         .severity-card.selected[data-v="major"] {
             border-color: #f97316; background: rgba(249, 115, 22, 0.08);
@@ -225,8 +225,8 @@
         .severity-card.selected[data-v="critical"] {
             border-color: #ef4444; background: rgba(239, 68, 68, 0.08);
         }
-        .severity-card.selected[data-v="critical"] .severity-title { color: #ef4444; }
-        .severity-card.selected[data-v="critical"] .severity-icon { background: rgba(239, 68, 68, 0.18); color: #ef4444; }
+        .severity-card.selected[data-v="critical"] .severity-title { color: var(--color-error-text); }
+        .severity-card.selected[data-v="critical"] .severity-icon { background: rgba(239, 68, 68, 0.18); color: var(--color-error-text); }
 
         /* ── Evidence Drag and Drop Zone ───────────────────── */
         .upload-zone {
@@ -256,7 +256,7 @@
             height: 48px;
             border-radius: 50%;
             background: rgba(14, 165, 233, 0.1);
-            color: var(--landlord);
+            color: var(--color-link);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -303,7 +303,7 @@
             height: 42px;
             border-radius: var(--radius-sm);
             background: rgba(14, 165, 233, 0.1);
-            color: var(--landlord);
+            color: var(--color-link);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -356,7 +356,7 @@
         }
         .form-alert.error {
             background: rgba(239, 68, 68, 0.1);
-            color: #ef4444;
+            color: var(--color-error-text);
             border: 1px solid rgba(239, 68, 68, 0.25);
         }
         .form-alert.success {
@@ -379,7 +379,7 @@
             line-height: 1.5;
         }
         .disclaimer-icon {
-            color: #ef4444;
+            color: var(--color-error-text);
             flex-shrink: 0;
             margin-top: 0.1rem;
         }
@@ -403,7 +403,7 @@
         }
         .btn-cancel:hover {
             border-color: var(--landlord);
-            color: var(--landlord);
+            color: var(--color-link);
         }
         .btn-submit {
             display: inline-flex;
@@ -555,7 +555,7 @@
             <!-- ── SECTION 2: Incident Specifications ── -->
             <div class="form-card">
                 <div class="card-section-title">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="color:#ef4444;">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--color-error-text);">
                         <polygon points="7.86 2 16.14 2 22 7.86 22 16.14 16.14 22 7.86 22 2 16.14 2 7.86 7.86 2"></polygon>
                         <line x1="12" y1="8" x2="12" y2="12"></line>
                         <line x1="12" y1="16" x2="12.01" y2="16"></line>
@@ -565,7 +565,7 @@
 
                 <div class="form-grid-2">
                     <div class="form-group">
-                        <label class="form-label" for="reportCategory">Report Category <span style="color:#ef4444;">*</span></label>
+                        <label class="form-label" for="reportCategory">Report Category <span style="color: var(--color-error-text);">*</span></label>
                         <select id="reportCategory" class="form-input" required>
                             <option value="">-- Select Incident Category --</option>
                             <option value="non_payment">Non-payment of Rent</option>
@@ -582,20 +582,20 @@
                     </div>
 
                     <div class="form-group">
-                        <label class="form-label" for="incidentDate">Date of Incident <span style="color:#ef4444;">*</span></label>
+                        <label class="form-label" for="incidentDate">Date of Incident <span style="color: var(--color-error-text);">*</span></label>
                         <input type="date" id="incidentDate" class="form-input" required>
                     </div>
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label" for="incidentDescription">Detailed Description <span style="color:#ef4444;">*</span></label>
+                    <label class="form-label" for="incidentDescription">Detailed Description <span style="color: var(--color-error-text);">*</span></label>
                     <textarea id="incidentDescription" class="form-input" rows="4" style="resize:vertical; min-height:110px;"
                         placeholder="Describe the incident in detail — what occurred, specific lease terms violated, time, location, and involved parties..." required></textarea>
                     <div id="descCharCount" style="font-size:0.72rem; color:var(--text-muted); text-align:right; margin-top:0.35rem;">0 characters</div>
                 </div>
 
                 <div class="form-group" style="margin-bottom:0;">
-                    <label class="form-label">Severity Level <span style="color:#ef4444;">*</span></label>
+                    <label class="form-label">Severity Level <span style="color: var(--color-error-text);">*</span></label>
                     <div class="severity-cards" id="severityCards">
 
                         <div class="severity-card" data-v="minor">
@@ -662,7 +662,7 @@
 
                 <div id="evidencePreviewGrid" class="evidence-preview-grid"></div>
 
-                <div id="otherCategoryNote" style="display:none; margin-top:1rem; padding:0.8rem 1rem; background:rgba(245,158,11,0.1); border:1px solid rgba(245,158,11,0.3); border-radius:var(--radius-md); font-size:0.825rem; color:#b45309;">
+                <div id="otherCategoryNote" style="display:none; margin-top:1rem; padding:0.8rem 1rem; background:rgba(245,158,11,0.1); border:1px solid rgba(245,158,11,0.3); border-radius:var(--radius-md); font-size:0.825rem; color: var(--color-warning-text);">
                     <strong>Note:</strong> When filing under "Other Violation" without uploaded files, your incident description must be at least 50 characters long.
                 </div>
             </div>
@@ -729,7 +729,7 @@
                 landlordLeases = json.data || [];
 
                 if (landlordLeases.length === 0) {
-                    $('leaseLoading').innerHTML = `<span style="color:#ef4444; font-weight:700;">No active or past lease contracts found. You can only file a report against a tenant who has a lease with you.</span>`;
+                    $('leaseLoading').innerHTML = `<span style="color: var(--color-error-text); font-weight:700;">No active or past lease contracts found. You can only file a report against a tenant who has a lease with you.</span>`;
                     return;
                 }
 

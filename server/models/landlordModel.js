@@ -460,32 +460,42 @@ const landlordModel = {
     },
 
     async updateApplicationStatus(id, landlordId, status, remarks) {
-        // Enforce application ownership check
+        const conflict = message => Object.assign(new Error(message), { statusCode: 409 });
         const { data: application, error: checkError } = await supabase
-            .from('tenant_applications')
-            .select('id, landlord_id')
-            .eq('id', id)
-            .maybeSingle();
-
+            .from('tenant_applications').select('id, landlord_id, status, unit_id, bed_id')
+            .eq('id', id).eq('landlord_id', landlordId).maybeSingle();
         if (checkError) throw checkError;
-        if (!application || application.landlord_id !== landlordId) {
-            return null;
+        if (!application) return null;
+        if (application.status !== 'pending') throw conflict('This application has already been reviewed. Refresh the application.');
+
+        // A pending application owns no inventory. Rejecting it must never
+        // release a room or bed reserved/occupied by another tenant.
+        const inventoryTable = application.bed_id ? 'unit_beds' : application.unit_id ? 'property_units' : null;
+        const inventoryId = application.bed_id || application.unit_id;
+        let reserved = false;
+        if (status === 'approved' && inventoryTable) {
+            const { data: slot, error } = await supabase.from(inventoryTable)
+                .update({ status: 'reserved' }).eq('id', inventoryId).eq('status', 'available')
+                .select('id').maybeSingle();
+            if (error) throw error;
+            if (!slot) throw conflict('This room or bed is no longer available. Refresh the application before deciding.');
+            reserved = true;
         }
-
-        const { data, error } = await supabase
-            .from('tenant_applications')
-            .update({
-                status,
-                landlord_remarks: remarks,
-                reviewed_at: new Date(),
-                updated_at: new Date()
-            })
-            .eq('id', id)
-            .select()
-            .single();
-
-        if (error) throw error;
-        return data;
+        try {
+            const { data, error } = await supabase.from('tenant_applications')
+                .update({ status, landlord_remarks: remarks, reviewed_at: new Date(), updated_at: new Date() })
+                .eq('id', id).eq('landlord_id', landlordId).eq('status', 'pending').select().maybeSingle();
+            if (error) throw error;
+            if (!data) throw conflict('This application was reviewed by another request. Refresh the application.');
+            return data;
+        } catch (error) {
+            if (reserved) {
+                const { error: rollbackError } = await supabase.from(inventoryTable)
+                    .update({ status: 'available' }).eq('id', inventoryId).eq('status', 'reserved');
+                if (rollbackError) error.message += ' The inventory reservation could not be released; contact support.';
+            }
+            throw error;
+        }
     },
 
     async deleteProperty(id, landlordId) {

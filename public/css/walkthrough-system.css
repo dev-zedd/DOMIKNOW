@@ -40,7 +40,7 @@
   padding: 2px 8px 2px 5px;
   border-radius: 999px;
   background: var(--color-action-primary-subtle);
-  color: var(--color-action-primary);
+  color: var(--color-link);
   max-width: calc(100% - 32px);
 }
 
@@ -62,7 +62,7 @@
 
 .dk-tour-card__eyebrow {
   margin: 0;
-  color: var(--color-action-primary);
+  color: var(--color-link);
   font-size: 0.68rem;
   font-weight: 800;
   letter-spacing: .06em;
@@ -254,7 +254,7 @@
 .dk-tour-replay:hover {
   border-color: var(--color-border-strong);
   background: var(--color-bg-hover);
-  color: var(--color-action-primary);
+  color: var(--color-link);
   transform: scale(1.04);
 }
 

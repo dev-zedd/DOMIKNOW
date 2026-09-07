@@ -5,8 +5,8 @@
  */
 
 .dashboard-layout-tenant {
-  --tenant-sidebar-width: 272px;
-  --tenant-content-width: 1360px;
+  --tenant-sidebar-width: var(--sidebar-width);
+  --tenant-content-width: var(--content-max);
 }
 
 .dashboard-layout-tenant .sidebar-tenant {
@@ -55,7 +55,7 @@
   align-items: center;
   border: 0 !important;
   background: var(--color-action-primary-subtle) !important;
-  color: var(--color-action-primary) !important;
+  color: var(--color-link) !important;
   font-size: 0.6875rem !important;
   font-weight: 700 !important;
   letter-spacing: 0.04em;
@@ -70,54 +70,11 @@
   justify-content: center;
 }
 
-/* Completely hide all scrollbars on the tenant portal side for a clean, sleek look */
-html[data-tenant-portal],
-html:has(body[data-role="tenant"]),
-body[data-role="tenant"],
-body[data-role="tenant"] *,
-.dashboard-layout-tenant,
-.dashboard-layout-tenant *,
-.dashboard-layout-tenant .sidebar,
-.dashboard-layout-tenant .sidebar-tenant,
-.dashboard-layout-tenant #domiknowSidebar,
-.sidebar-tenant,
-.sidebar-tenant .sidebar-menu,
-.dashboard-layout-tenant .nav-sheet {
-  scrollbar-width: none !important;
-  -ms-overflow-style: none !important;
+/* Keep overflow discoverable for preferences, tables, and keyboard users. */
+.dashboard-layout-tenant {
+  scrollbar-color: var(--color-border-strong) var(--color-bg-surface);
 }
 
-html[data-tenant-portal]::-webkit-scrollbar,
-html:has(body[data-role="tenant"])::-webkit-scrollbar,
-body[data-role="tenant"]::-webkit-scrollbar,
-body[data-role="tenant"] *::-webkit-scrollbar,
-.dashboard-layout-tenant::-webkit-scrollbar,
-.dashboard-layout-tenant *::-webkit-scrollbar,
-.dashboard-layout-tenant .sidebar::-webkit-scrollbar,
-.dashboard-layout-tenant .sidebar *::-webkit-scrollbar,
-.dashboard-layout-tenant .sidebar-tenant::-webkit-scrollbar,
-.dashboard-layout-tenant #domiknowSidebar::-webkit-scrollbar,
-.sidebar-tenant::-webkit-scrollbar,
-.sidebar-tenant .sidebar-menu::-webkit-scrollbar,
-.dashboard-layout-tenant .nav-sheet::-webkit-scrollbar {
-  display: none !important;
-  width: 0 !important;
-  height: 0 !important;
-  background: transparent !important;
-}
-
-html[data-tenant-portal]::-webkit-scrollbar-thumb,
-html:has(body[data-role="tenant"])::-webkit-scrollbar-thumb,
-body[data-role="tenant"]::-webkit-scrollbar-thumb,
-body[data-role="tenant"] *::-webkit-scrollbar-thumb,
-.dashboard-layout-tenant::-webkit-scrollbar-thumb,
-.dashboard-layout-tenant *::-webkit-scrollbar-thumb,
-.dashboard-layout-tenant .sidebar::-webkit-scrollbar-thumb,
-.dashboard-layout-tenant .sidebar *::-webkit-scrollbar-thumb {
-  display: none !important;
-  background: transparent !important;
-  border: none !important;
-}
 
 html[data-tenant-portal]::-webkit-scrollbar-track,
 html:has(body[data-role="tenant"])::-webkit-scrollbar-track,
@@ -153,7 +110,7 @@ body[data-role="tenant"] *::-webkit-scrollbar-track,
   border: 1px solid transparent !important;
   border-radius: 10px !important;
   box-shadow: none !important;
-  color: #64748b !important;
+  color: var(--color-text-muted) !important;
   font-weight: 600 !important;
   display: flex !important;
   align-items: center !important;
@@ -166,34 +123,34 @@ body[data-role="tenant"] *::-webkit-scrollbar-track,
   width: 18px;
   height: 18px;
   flex: 0 0 18px;
-  color: #94a3b8;
+  color: var(--color-text-muted);
   transition: transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1), color 0.2s ease;
 }
 
 .dashboard-layout-tenant .sidebar-link:hover {
-  border-color: #e2e8f0 !important;
-  background: #f8fafc !important;
-  color: #0f172a !important;
+  border-color: var(--color-border-default) !important;
+  background: var(--color-bg-canvas) !important;
+  color: var(--color-text-primary) !important;
   transform: translateX(4px) !important;
 }
 
 .dashboard-layout-tenant .sidebar-link:hover .nav-icon,
 .dashboard-layout-tenant .sidebar-link:hover svg {
   transform: scale(1.15);
-  color: #0052ea;
+  color: var(--color-link);
 }
 
 .dashboard-layout-tenant .sidebar-link.active {
   border-color: rgba(0, 82, 234, 0.16) !important;
-  background: #eff6ff !important;
-  color: #0052ea !important;
+  background: var(--color-info-bg) !important;
+  color: var(--color-link) !important;
   font-weight: 700 !important;
   box-shadow: 0 1px 3px rgba(0, 82, 234, 0.06) !important;
 }
 
 .dashboard-layout-tenant .sidebar-link.active .nav-icon,
 .dashboard-layout-tenant .sidebar-link.active svg {
-  color: #0052ea !important;
+  color: var(--color-link) !important;
   transform: scale(1.06);
 }
 
@@ -264,163 +221,12 @@ body[data-role="tenant"] *::-webkit-scrollbar-track,
   border: 2px solid color-mix(in srgb, var(--color-action-primary) 35%, var(--color-border-default));
   border-radius: 50% !important;
   background: var(--color-action-primary-subtle);
-  color: var(--color-action-primary);
+  color: var(--color-link);
   font-size: 0.8125rem;
   font-weight: 800;
   letter-spacing: 0.02em;
   overflow: hidden;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
-}
-
-.dashboard-layout-tenant .topbar-account-dropdown {
-  position: relative;
-  display: flex;
-  align-items: center;
-}
-
-.dashboard-layout-tenant .topbar-avatar-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 2px;
-  background: transparent;
-  border: 2px solid transparent;
-  border-radius: 50%;
-  cursor: pointer;
-  transition: transform var(--transition-fast), border-color var(--transition-fast), box-shadow var(--transition-fast);
-}
-
-.dashboard-layout-tenant .topbar-avatar-btn:hover {
-  transform: scale(1.05);
-  border-color: var(--color-action-primary);
-}
-
-.dashboard-layout-tenant .topbar-avatar-btn:focus-visible {
-  outline: none;
-  border-color: var(--color-action-primary);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-action-primary) 28%, transparent);
-}
-
-.dashboard-layout-tenant .topbar-right > .dk-tour-replay,
-.dashboard-layout-tenant .topbar-right > .theme-toggle {
-  display: none !important;
-}
-
-.dashboard-layout-tenant .topbar-dropdown-menu {
-  position: absolute;
-  top: calc(100% + 8px);
-  right: 0;
-  min-width: 190px;
-  width: max-content;
-  background: var(--color-bg-surface);
-  border: 1px solid var(--color-border-default);
-  border-radius: var(--radius-lg, 12px);
-  box-shadow: var(--shadow-dropdown);
-  padding: 6px;
-  z-index: 1100;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  animation: topbarDropdownFadeIn 0.16s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.dashboard-layout-tenant .topbar-dropdown-menu[hidden] {
-  display: none !important;
-}
-
-@keyframes topbarDropdownFadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(-6px) scale(0.97);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
-
-.dashboard-layout-tenant .topbar-dropdown-item,
-.dashboard-layout-tenant .topbar-dropdown-menu .topbar-dropdown-item,
-.dashboard-layout-tenant .topbar-dropdown-menu [data-theme-toggle] {
-  display: flex !important;
-  align-items: center !important;
-  justify-content: flex-start !important;
-  gap: 12px !important;
-  width: 100% !important;
-  min-width: 100% !important;
-  height: auto !important;
-  min-height: 40px !important;
-  padding: 9px 12px !important;
-  border: none !important;
-  border-radius: var(--radius-md, 8px) !important;
-  background: transparent !important;
-  color: var(--color-text-primary) !important;
-  box-shadow: none !important;
-  text-decoration: none !important;
-  font-size: 0.875rem !important;
-  font-weight: 500 !important;
-  cursor: pointer !important;
-  text-align: left !important;
-  white-space: nowrap !important;
-  transition: background-color var(--transition-fast), color var(--transition-fast) !important;
-}
-
-.dashboard-layout-tenant .topbar-dropdown-item .dropdown-item-icon {
-  display: inline-flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  width: 20px !important;
-  height: 20px !important;
-  flex-shrink: 0 !important;
-  color: var(--color-text-secondary) !important;
-  transition: color var(--transition-fast) !important;
-}
-
-.dashboard-layout-tenant .topbar-dropdown-item svg {
-  width: 18px !important;
-  height: 18px !important;
-  flex-shrink: 0 !important;
-  color: inherit !important;
-}
-
-.dashboard-layout-tenant .topbar-dropdown-item:hover,
-.dashboard-layout-tenant .topbar-dropdown-item:focus-visible,
-.dashboard-layout-tenant .topbar-dropdown-item.active {
-  background: var(--color-bg-subtle, rgba(0, 0, 0, 0.05)) !important;
-  color: var(--color-action-primary) !important;
-  outline: none !important;
-}
-
-.dashboard-layout-tenant .topbar-dropdown-item:hover .dropdown-item-icon,
-.dashboard-layout-tenant .topbar-dropdown-item:focus-visible .dropdown-item-icon,
-.dashboard-layout-tenant .topbar-dropdown-item.active .dropdown-item-icon {
-  color: var(--color-action-primary) !important;
-}
-
-.dashboard-layout-tenant .topbar-dropdown-divider {
-  height: 1px;
-  background: var(--color-divider, var(--color-border-default));
-  margin: 4px 4px;
-}
-
-.dashboard-layout-tenant .topbar-dropdown-logout,
-.dashboard-layout-tenant .topbar-dropdown-menu .topbar-dropdown-logout {
-  color: var(--color-error-text, #ef4444) !important;
-}
-
-.dashboard-layout-tenant .topbar-dropdown-logout .dropdown-item-icon {
-  color: var(--color-error-text, #ef4444) !important;
-}
-
-.dashboard-layout-tenant .topbar-dropdown-logout:hover,
-.dashboard-layout-tenant .topbar-dropdown-logout:focus-visible {
-  background: color-mix(in srgb, var(--color-error-text, #ef4444) 10%, transparent) !important;
-  color: var(--color-error-text, #ef4444) !important;
-}
-
-.dashboard-layout-tenant .topbar-dropdown-logout:hover .dropdown-item-icon,
-.dashboard-layout-tenant .topbar-dropdown-logout:focus-visible .dropdown-item-icon {
-  color: var(--color-error-text, #ef4444) !important;
 }
 
 .dashboard-layout-tenant .topbar-account-copy {
@@ -458,7 +264,7 @@ body[data-role="tenant"] *::-webkit-scrollbar-track,
 
 .tenant-page-eyebrow {
   margin: 0 0 5px;
-  color: var(--color-action-primary);
+  color: var(--color-link);
   font-size: 0.75rem;
   font-weight: 750;
   letter-spacing: 0.075em;
@@ -510,7 +316,7 @@ body[data-role="tenant"] *::-webkit-scrollbar-track,
 .tenant-summary-action.secondary:hover {
   border-color: var(--color-action-primary);
   background: var(--color-action-primary-subtle);
-  color: var(--color-action-primary) !important;
+  color: var(--color-link) !important;
 }
 
 .tenant-journey {
@@ -548,7 +354,7 @@ body[data-role="tenant"] *::-webkit-scrollbar-track,
 
 .tenant-journey-step.active {
   background: var(--color-action-primary-subtle);
-  color: var(--color-action-primary) !important;
+  color: var(--color-link) !important;
 }
 
 .tenant-journey-step.active::after {
@@ -819,10 +625,9 @@ body[data-role="tenant"] *::-webkit-scrollbar-track,
   font-style: italic !important;
   font-weight: 400 !important;
   color: var(--color-text-secondary, #64748b) !important;
-  max-width: 170px !important;
-  white-space: nowrap !important;
-  overflow: hidden !important;
-  text-overflow: ellipsis !important;
+  max-width: 36ch;
+  white-space: normal !important;
+  overflow-wrap: anywhere;
 }
 
 /* Property column */
@@ -846,7 +651,7 @@ body[data-role="tenant"] *::-webkit-scrollbar-track,
   justify-content: center !important;
   flex-shrink: 0 !important;
   background: var(--color-action-primary-subtle, #eaf0ff) !important;
-  color: var(--color-action-primary, #0355f3) !important;
+  color: var(--color-link, #0355f3) !important;
   border: 1px solid color-mix(in srgb, var(--color-action-primary) 18%, transparent) !important;
 }
 
@@ -915,7 +720,7 @@ body[data-role="tenant"] *::-webkit-scrollbar-track,
   padding: 8px 16px !important;
   border: 1px solid var(--color-action-primary, #0355f3) !important;
   border-radius: 8px !important;
-  color: var(--color-action-primary, #0355f3) !important;
+  color: var(--color-link, #0355f3) !important;
   background: transparent !important;
   font-size: 0.8125rem !important;
   font-weight: 600 !important;
@@ -1043,7 +848,7 @@ body[data-tenant-page="property-details"] #detailsMap {
 }
 
 .dashboard-layout-tenant .breadcrumb-nav a:hover {
-  color: var(--color-action-primary) !important;
+  color: var(--color-link) !important;
 }
 
 @media (max-width: 1023px) {
@@ -1078,7 +883,7 @@ body[data-tenant-page="property-details"] #detailsMap {
     border: 1px solid var(--color-border-strong);
     border-radius: 8px;
     background: var(--color-bg-surface);
-    color: var(--color-action-primary);
+    color: var(--color-link);
     font: inherit;
     font-size: 0.8125rem;
     font-weight: 750;
@@ -1161,7 +966,7 @@ body[data-tenant-page="property-details"] #detailsMap {
     border: 1px solid var(--color-border-strong);
     border-radius: 8px;
     background: var(--color-bg-surface);
-    color: var(--color-action-primary);
+    color: var(--color-link);
     font: inherit;
     font-size: 0.8125rem;
     font-weight: 750;
@@ -1427,7 +1232,7 @@ body[data-tenant-page="property-details"] :where(
 }
 
 body[data-tenant-page="property-details"] .breadcrumb-nav a {
-  color: var(--color-action-primary) !important;
+  color: var(--color-link) !important;
 }
 
 body[data-tenant-page="property-details"] :where(
@@ -1461,7 +1266,7 @@ body[data-tenant-page="property-details"] .detail-pill-type {
 body[data-tenant-page="property-details"] .detail-pill-suit {
   border-color: var(--color-action-primary) !important;
   background: var(--color-action-primary-subtle) !important;
-  color: var(--color-action-primary) !important;
+  color: var(--color-link) !important;
 }
 
 body[data-tenant-page="property-details"] .detail-pill-price,
@@ -1487,13 +1292,13 @@ body[data-tenant-page="property-details"] :where(.btn-action-apply, .btn-action-
   background: var(--color-action-primary-hover) !important;
 }
 
-body[data-tenant-page="property-details"] [style*="color: #0f172a"],
-body[data-tenant-page="property-details"] [style*="color:#0f172a"] {
+body[data-tenant-page="property-details"] [style*="color: var(--color-text-primary)"],
+body[data-tenant-page="property-details"] [style*="color: var(--color-text-primary)"] {
   color: var(--color-text-primary) !important;
 }
 
-body[data-tenant-page="property-details"] [style*="color: #64748b"],
-body[data-tenant-page="property-details"] [style*="color:#64748b"] {
+body[data-tenant-page="property-details"] [style*="color: var(--color-text-muted)"],
+body[data-tenant-page="property-details"] [style*="color: var(--color-text-muted)"] {
   color: var(--color-text-secondary) !important;
 }
 
@@ -1553,16 +1358,16 @@ body[data-tenant-page="application-details"] :where(
 }
 
 body[data-tenant-page="application-details"] .breadcrumb-nav a {
-  color: var(--color-action-primary) !important;
+  color: var(--color-link) !important;
 }
 
-body[data-tenant-page="application-details"] [style*="background-color: #f8fafc"],
-body[data-tenant-page="application-details"] [style*="background-color:#f8fafc"] {
+body[data-tenant-page="application-details"] [style*="background-color: var(--color-bg-canvas)"],
+body[data-tenant-page="application-details"] [style*="background-color: var(--color-bg-canvas)"] {
   background: var(--color-bg-subtle) !important;
 }
 
-body[data-tenant-page="application-details"] [style*="color: #0f172a"],
-body[data-tenant-page="application-details"] [style*="color:#0f172a"] {
+body[data-tenant-page="application-details"] [style*="color: var(--color-text-primary)"],
+body[data-tenant-page="application-details"] [style*="color: var(--color-text-primary)"] {
   color: var(--color-text-primary) !important;
 }
 
@@ -1604,7 +1409,7 @@ body[data-tenant-page="billings"] .dashboard-container {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  color: var(--color-action-primary, #0355f3);
+  color: var(--color-link, #0355f3);
   font-size: 0.875rem;
   font-weight: 600;
   text-decoration: none;
@@ -1661,7 +1466,7 @@ body[data-tenant-page="lease-details"] .app-details-grid {
   height: 38px;
   border-radius: 10px;
   background: var(--color-action-primary-subtle, #eaf0ff);
-  color: var(--color-action-primary, #0355f3);
+  color: var(--color-link, #0355f3);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1691,8 +1496,8 @@ body[data-tenant-page="lease-details"] .app-details-grid {
 
 /* Status Notice Box */
 .app-status-notice {
-  background: #eff6ff;
-  border: 1px solid #bfdbfe;
+  background: var(--color-info-bg);
+  border: 1px solid var(--color-info-border);
   border-radius: 12px;
   padding: 16px 20px;
   display: flex;
@@ -1702,7 +1507,7 @@ body[data-tenant-page="lease-details"] .app-details-grid {
 }
 
 .app-status-notice-icon {
-  color: var(--color-action-primary, #0355f3);
+  color: var(--color-link, #0355f3);
   flex-shrink: 0;
   margin-top: 2px;
   display: flex;
@@ -1763,7 +1568,7 @@ body[data-tenant-page="lease-details"] .app-details-grid {
   height: 32px;
   border-radius: 8px;
   background: var(--color-action-primary-subtle, #eaf0ff);
-  color: var(--color-action-primary, #0355f3);
+  color: var(--color-link, #0355f3);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1807,7 +1612,7 @@ body[data-tenant-page="lease-details"] .app-details-grid {
 }
 
 .app-prop-meta-block .app-meta-title svg {
-  color: var(--color-action-primary, #0355f3);
+  color: var(--color-link, #0355f3);
 }
 
 .app-prop-meta-block .app-meta-desc {
@@ -1904,11 +1709,11 @@ body[data-tenant-page="lease-details"] .app-details-grid {
 }
 
 .app-req-badge.success {
-  color: #16a34a;
+  color: var(--color-success-text);
 }
 
 .app-req-badge.warning {
-  color: #b45309;
+  color: var(--color-warning-text);
 }
 
 /* Submitted Documents */
@@ -1920,7 +1725,7 @@ body[data-tenant-page="lease-details"] .app-details-grid {
 }
 
 .app-submitted-doc-item {
-  background: #ffffff;
+  background: var(--color-bg-surface);
   border: 1px solid var(--color-border-default, #e2e8f0);
   border-radius: 12px;
   padding: 12px 14px;
@@ -1944,31 +1749,31 @@ body[data-tenant-page="lease-details"] .app-details-grid {
   width: 38px;
   height: 38px;
   border-radius: 10px;
-  background: #f1f5f9;
+  background: var(--color-bg-subtle);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #475569;
+  color: var(--color-text-secondary);
   flex-shrink: 0;
   transition: transform 0.15s ease;
 }
 
 .app-doc-icon-box.doc-type-pdf {
-  background: #fef2f2;
-  color: #dc2626;
+  background: var(--color-error-bg);
+  color: var(--color-error-text);
   border: 1px solid #fee2e2;
 }
 
 .app-doc-icon-box.doc-type-img {
-  background: #eff6ff;
-  color: #2563eb;
-  border: 1px solid #dbeafe;
+  background: var(--color-info-bg);
+  color: var(--color-link);
+  border: 1px solid var(--color-info-border);
 }
 
 .app-doc-icon-box.doc-type-other {
-  background: #f8fafc;
-  color: #64748b;
-  border: 1px solid #e2e8f0;
+  background: var(--color-bg-canvas);
+  color: var(--color-text-muted);
+  border: 1px solid var(--color-border-default);
 }
 
 .app-doc-info-block {
@@ -1995,7 +1800,7 @@ body[data-tenant-page="lease-details"] .app-details-grid {
 }
 
 .app-doc-type-title:hover {
-  color: var(--color-action-primary, #0355f3);
+  color: var(--color-link, #0355f3);
   text-decoration: underline;
 }
 
@@ -2014,8 +1819,8 @@ body[data-tenant-page="lease-details"] .app-details-grid {
   font-weight: 700;
   padding: 1px 6px;
   border-radius: 4px;
-  background: #f1f5f9;
-  color: #475569;
+  background: var(--color-bg-subtle);
+  color: var(--color-text-secondary);
   text-transform: uppercase;
   letter-spacing: 0.03em;
   flex-shrink: 0;
@@ -2023,13 +1828,13 @@ body[data-tenant-page="lease-details"] .app-details-grid {
 }
 
 .app-doc-file-tag.tag-pdf {
-  background: #fee2e2;
-  color: #b91c1c;
+  background: var(--color-error-bg);
+  color: var(--color-error-text);
 }
 
 .app-doc-file-tag.tag-img {
-  background: #dbeafe;
-  color: #1d4ed8;
+  background: var(--color-info-bg);
+  color: var(--color-link);
 }
 
 .app-doc-filename {
@@ -2038,7 +1843,7 @@ body[data-tenant-page="lease-details"] .app-details-grid {
   white-space: nowrap;
   min-width: 0;
   flex: 1;
-  color: #64748b;
+  color: var(--color-text-muted);
   display: inline-block;
 }
 
@@ -2049,9 +1854,9 @@ body[data-tenant-page="lease-details"] .app-details-grid {
   padding: 6px 12px;
   font-size: 0.75rem;
   font-weight: 700;
-  color: var(--color-action-primary, #0355f3);
-  background: #eff6ff;
-  border: 1px solid #bfdbfe;
+  color: var(--color-link, #0355f3);
+  background: var(--color-info-bg);
+  border: 1px solid var(--color-info-border);
   border-radius: 8px;
   text-decoration: none;
   flex-shrink: 0;
@@ -2084,8 +1889,8 @@ body[data-tenant-page="lease-details"] .app-details-grid {
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background: #e2e8f0;
-  color: #64748b;
+  background: var(--color-bg-subtle);
+  color: var(--color-text-muted);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -2114,8 +1919,8 @@ body[data-tenant-page="lease-details"] .app-details-grid {
   font-weight: 700;
   padding: 2px 8px;
   border-radius: 9999px;
-  background: #eff6ff;
-  color: var(--color-action-primary, #0355f3);
+  background: var(--color-info-bg);
+  color: var(--color-link, #0355f3);
 }
 
 /* Legacy compatibility */
@@ -2132,7 +1937,7 @@ body[data-tenant-page="lease-details"] .app-details-grid {
 }
 
 .app-doc-link:hover {
-  color: var(--color-action-primary, #0355f3);
+  color: var(--color-link, #0355f3);
   text-decoration: underline;
 }
 
@@ -2166,7 +1971,7 @@ body[data-tenant-page="lease-details"] .app-details-grid {
 }
 
 .app-drag-drop-zone {
-  border: 2px dashed #cbd5e1;
+  border: 2px dashed var(--color-border-strong);
   border-radius: 12px;
   padding: 28px 16px;
   text-align: center;
@@ -2185,8 +1990,8 @@ body[data-tenant-page="lease-details"] .app-details-grid {
   width: 42px;
   height: 42px;
   border-radius: 50%;
-  background: #f1f5f9;
-  color: #64748b;
+  background: var(--color-bg-subtle);
+  color: var(--color-text-muted);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -2200,7 +2005,7 @@ body[data-tenant-page="lease-details"] .app-details-grid {
 }
 
 .app-browse-link {
-  color: var(--color-action-primary, #0355f3);
+  color: var(--color-link, #0355f3);
   font-weight: 600;
   margin-left: 4px;
 }
@@ -2214,7 +2019,7 @@ body[data-tenant-page="lease-details"] .app-details-grid {
 .app-selected-file {
   font-size: 0.8125rem;
   font-weight: 700;
-  color: var(--color-action-primary, #0355f3);
+  color: var(--color-link, #0355f3);
   margin-top: 8px;
 }
 
@@ -2313,18 +2118,18 @@ body[data-tenant-page="lease-details"] .app-details-grid {
 }
 
 .tenant-lease-status-badge.status-active {
-  background: #d1fae5;
-  color: #065f46;
+  background: var(--color-success-bg);
+  color: var(--color-success-text);
 }
 
 .tenant-lease-status-badge.status-pending {
-  background: #fffbeb;
-  color: #b45309;
+  background: var(--color-warning-bg);
+  color: var(--color-warning-text);
 }
 
 .tenant-lease-status-badge.status-rejected {
-  background: #fef2f2;
-  color: #991b1b;
+  background: var(--color-error-bg);
+  color: var(--color-error-text);
 }
 
 /* Dividers */
@@ -2365,12 +2170,12 @@ body[data-tenant-page="lease-details"] .app-details-grid {
 }
 
 .tenant-lease-val.space-val {
-  color: var(--color-action-primary, #0355f3);
+  color: var(--color-link, #0355f3);
   font-weight: 600;
 }
 
 .tenant-lease-val.rent-val {
-  color: #059669;
+  color: var(--color-success-text);
   font-weight: 700;
 }
 
@@ -2405,7 +2210,7 @@ body[data-tenant-page="lease-details"] .app-details-grid {
 
 .tenant-lease-btn:hover {
   border-color: var(--color-action-primary, #0355f3);
-  color: var(--color-action-primary, #0355f3);
+  color: var(--color-link, #0355f3);
   background: var(--color-bg-subtle, #f8fafc);
 }
 
@@ -2467,7 +2272,7 @@ body[data-tenant-page="billings"] .tenant-subnav-tabs {
   display: flex !important;
   align-items: center !important;
   gap: 28px !important;
-  border-bottom: 1px solid #e2e8f0 !important;
+  border-bottom: 1px solid var(--color-border-default) !important;
   padding-bottom: 12px !important;
   margin-bottom: 28px !important;
 }
@@ -2478,7 +2283,7 @@ body[data-tenant-page="billings"] .tenant-tab-link {
   padding: 0 !important;
   font-size: 1rem !important;
   font-weight: 500 !important;
-  color: #64748b !important;
+  color: var(--color-text-muted) !important;
   cursor: pointer !important;
   display: inline-flex !important;
   align-items: center !important;
@@ -2489,23 +2294,23 @@ body[data-tenant-page="billings"] .tenant-tab-link {
 
 body[data-tenant-page="billings"] .tenant-tab-link.active {
   font-weight: 800 !important;
-  color: #042458 !important;
+  color: var(--color-text-primary) !important;
 }
 
 body[data-tenant-page="billings"] .tenant-tab-link:hover {
-  color: #042458 !important;
+  color: var(--color-text-primary) !important;
 }
 
 body[data-tenant-page="billings"] .tab-active-dot {
   font-size: 1.25rem !important;
   line-height: 1 !important;
-  color: #042458 !important;
+  color: var(--color-text-primary) !important;
 }
 
 /* Hero Balance Card */
 body[data-tenant-page="billings"] .tenant-billing-hero-card {
-  background: #ffffff !important;
-  border: 1px solid #e2e8f0 !important;
+  background: var(--color-bg-surface) !important;
+  border: 1px solid var(--color-border-default) !important;
   border-radius: 16px !important;
   padding: 28px 32px !important;
   box-shadow: 0 2px 8px rgba(4, 36, 88, 0.04) !important;
@@ -2522,7 +2327,7 @@ body[data-tenant-page="billings"] .billing-hero-top-row {
 body[data-tenant-page="billings"] .billing-hero-eyebrow {
   font-size: 0.8125rem !important;
   font-weight: 700 !important;
-  color: #475569 !important;
+  color: var(--color-text-secondary) !important;
   letter-spacing: 0.06em !important;
   text-transform: uppercase !important;
   margin-bottom: 8px !important;
@@ -2531,7 +2336,7 @@ body[data-tenant-page="billings"] .billing-hero-eyebrow {
 body[data-tenant-page="billings"] .billing-hero-amount {
   font-size: 2.25rem !important;
   font-weight: 900 !important;
-  color: #042458 !important;
+  color: var(--color-text-primary) !important;
   letter-spacing: -0.02em !important;
   line-height: 1.1 !important;
   font-family: "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, sans-serif !important;
@@ -2550,26 +2355,26 @@ body[data-tenant-page="billings"] .billing-hero-badge {
 }
 
 body[data-tenant-page="billings"] .billing-hero-badge.overdue {
-  background: #fffbeb !important;
-  color: #b45309 !important;
-  border: 1px solid #fde68a !important;
+  background: var(--color-warning-bg) !important;
+  color: var(--color-warning-text) !important;
+  border: 1px solid var(--color-warning-border) !important;
 }
 
 body[data-tenant-page="billings"] .billing-hero-badge.cleared {
-  background: #ecfdf5 !important;
-  color: #065f46 !important;
-  border: 1px solid #a7f3d0 !important;
+  background: var(--color-success-bg) !important;
+  color: var(--color-success-text) !important;
+  border: 1px solid var(--color-success-border) !important;
 }
 
 body[data-tenant-page="billings"] .billing-hero-badge.pending {
-  background: #eff6ff !important;
-  color: #1e40af !important;
-  border: 1px solid #bfdbfe !important;
+  background: var(--color-info-bg) !important;
+  color: var(--color-link) !important;
+  border: 1px solid var(--color-info-border) !important;
 }
 
 body[data-tenant-page="billings"] .billing-hero-divider {
   height: 1px !important;
-  background: #f1f5f9 !important;
+  background: var(--color-bg-subtle) !important;
   margin: 24px 0 !important;
 }
 
@@ -2583,14 +2388,14 @@ body[data-tenant-page="billings"] .billing-hero-bottom-row {
 
 body[data-tenant-page="billings"] .billing-hero-notice {
   font-size: 0.9375rem !important;
-  color: #475569 !important;
+  color: var(--color-text-secondary) !important;
   margin: 0 !important;
   max-width: 620px !important;
   line-height: 1.5 !important;
 }
 
 body[data-tenant-page="billings"] .btn-billing-hero-pay {
-  background: #042458 !important;
+  background: var(--color-action-primary) !important;
   color: #ffffff !important;
   padding: 12px 24px !important;
   border-radius: 8px !important;
@@ -2603,7 +2408,7 @@ body[data-tenant-page="billings"] .btn-billing-hero-pay {
 }
 
 body[data-tenant-page="billings"] .btn-billing-hero-pay:hover {
-  background: #0355f3 !important;
+  background: var(--color-action-primary) !important;
   transform: translateY(-1px) !important;
   box-shadow: 0 4px 12px rgba(3, 85, 243, 0.25) !important;
 }
@@ -2630,14 +2435,14 @@ body[data-tenant-page="billings"] .billing-table-title-group {
 body[data-tenant-page="billings"] .billing-table-title {
   font-size: 1.35rem !important;
   font-weight: 800 !important;
-  color: #042458 !important;
+  color: var(--color-text-primary) !important;
   margin: 0 !important;
   letter-spacing: -0.01em !important;
 }
 
 body[data-tenant-page="billings"] .billing-count-badge {
-  background: #e2e8f0 !important;
-  color: #475569 !important;
+  background: var(--color-bg-subtle) !important;
+  color: var(--color-text-secondary) !important;
   font-size: 0.75rem !important;
   font-weight: 700 !important;
   padding: 3px 10px !important;
@@ -2662,18 +2467,18 @@ body[data-tenant-page="billings"] .billing-search-box {
 body[data-tenant-page="billings"] .billing-search-box svg {
   position: absolute !important;
   left: 12px !important;
-  color: #94a3b8 !important;
+  color: var(--color-text-muted) !important;
   pointer-events: none !important;
 }
 
 body[data-tenant-page="billings"] .billing-search-box input {
   padding: 9px 14px 9px 36px !important;
-  border: 1px solid #cbd5e1 !important;
+  border: 1px solid var(--color-border-strong) !important;
   border-radius: 8px !important;
   font-size: 0.875rem !important;
-  color: #0f172a !important;
+  color: var(--color-text-primary) !important;
   width: 220px !important;
-  background: #ffffff !important;
+  background: var(--color-bg-surface) !important;
   outline: none !important;
   transition: border-color 0.15s ease !important;
   box-shadow: none !important;
@@ -2691,12 +2496,12 @@ body[data-tenant-page="billings"] .billing-select-wrap {
 
 body[data-tenant-page="billings"] .billing-status-select {
   padding: 9px 34px 9px 14px !important;
-  border: 1px solid #cbd5e1 !important;
+  border: 1px solid var(--color-border-strong) !important;
   border-radius: 8px !important;
   font-size: 0.875rem !important;
   font-weight: 500 !important;
-  color: #334155 !important;
-  background: #ffffff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23475569' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E") no-repeat right 10px center !important;
+  color: var(--color-text-secondary) !important;
+  background: var(--color-bg-surface) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23475569' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E") no-repeat right 10px center !important;
   -webkit-appearance: none !important;
   -moz-appearance: none !important;
   appearance: none !important;
@@ -2712,8 +2517,8 @@ body[data-tenant-page="billings"] .billing-status-select:focus {
 
 /* Data Table Card Container & Table */
 body[data-tenant-page="billings"] .billing-table-card {
-  background: #ffffff !important;
-  border: 1px solid #e2e8f0 !important;
+  background: var(--color-bg-surface) !important;
+  border: 1px solid var(--color-border-default) !important;
   border-radius: 12px !important;
   overflow: hidden !important;
   box-shadow: none !important;
@@ -2731,23 +2536,23 @@ body[data-tenant-page="billings"] .tenant-billing-table {
   text-align: left !important;
   font-size: 0.875rem !important;
   font-family: "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, "Helvetica Neue", Arial, sans-serif !important;
-  background: #ffffff !important;
+  background: var(--color-bg-surface) !important;
   margin: 0 !important;
 }
 
 body[data-tenant-page="billings"] .tenant-billing-table thead {
-  background: #f8fafc !important;
-  border-bottom: 1px solid #e2e8f0 !important;
+  background: var(--color-bg-canvas) !important;
+  border-bottom: 1px solid var(--color-border-default) !important;
 }
 
 body[data-tenant-page="billings"] .tenant-billing-table th {
-  background: #f8fafc !important;
+  background: var(--color-bg-canvas) !important;
   border: none !important;
-  border-bottom: 1px solid #e2e8f0 !important;
+  border-bottom: 1px solid var(--color-border-default) !important;
   padding: 14px 20px !important;
   font-size: 0.6875rem !important;
   font-weight: 750 !important;
-  color: #64748b !important;
+  color: var(--color-text-muted) !important;
   text-transform: uppercase !important;
   letter-spacing: 0.06em !important;
   white-space: nowrap !important;
@@ -2759,8 +2564,8 @@ body[data-tenant-page="billings"] .tenant-billing-table th.col-action-th {
 }
 
 body[data-tenant-page="billings"] .tenant-billing-table tbody tr {
-  background: #ffffff !important;
-  border-bottom: 1px solid #f1f5f9 !important;
+  background: var(--color-bg-surface) !important;
+  border-bottom: 1px solid var(--color-divider) !important;
   transition: none !important;
 }
 
@@ -2783,11 +2588,11 @@ body[data-tenant-page="billings"] .tenant-billing-table tbody tr:last-child td {
 body[data-tenant-page="billings"] .tenant-billing-table td {
   padding: 16px 20px !important;
   border: none !important;
-  border-bottom: 1px solid #f1f5f9 !important;
+  border-bottom: 1px solid var(--color-divider) !important;
   vertical-align: middle !important;
-  color: #475569 !important;
+  color: var(--color-text-secondary) !important;
   font-size: 0.875rem !important;
-  background: #ffffff !important;
+  background: var(--color-bg-surface) !important;
 }
 
 body[data-tenant-page="billings"] .tenant-billing-table td.col-action-td {
@@ -2797,28 +2602,28 @@ body[data-tenant-page="billings"] .tenant-billing-table td.col-action-td {
 
 body[data-tenant-page="billings"] .col-cycle {
   font-weight: 700 !important;
-  color: #042458 !important;
+  color: var(--color-text-primary) !important;
 }
 
 body[data-tenant-page="billings"] .col-property {
-  color: #475569 !important;
+  color: var(--color-text-secondary) !important;
   font-weight: 500 !important;
 }
 
 body[data-tenant-page="billings"] .col-rent {
-  color: #475569 !important;
+  color: var(--color-text-secondary) !important;
   font-weight: 500 !important;
   font-family: "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, sans-serif !important;
 }
 
 body[data-tenant-page="billings"] .col-total {
   font-weight: 700 !important;
-  color: #042458 !important;
+  color: var(--color-text-primary) !important;
   font-family: "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, sans-serif !important;
 }
 
 body[data-tenant-page="billings"] .col-due {
-  color: #475569 !important;
+  color: var(--color-text-secondary) !important;
   font-weight: 500 !important;
 }
 
@@ -2833,28 +2638,28 @@ body[data-tenant-page="billings"] .table-status-pill {
 }
 
 body[data-tenant-page="billings"] .table-status-pill.overdue {
-  background: #fef2f2 !important;
-  color: #991b1b !important;
-  border: 1px solid #fecaca !important;
+  background: var(--color-error-bg) !important;
+  color: var(--color-error-text) !important;
+  border: 1px solid var(--color-error-border) !important;
 }
 
 body[data-tenant-page="billings"] .table-status-pill.paid {
-  background: #ecfdf5 !important;
-  color: #065f46 !important;
-  border: 1px solid #a7f3d0 !important;
+  background: var(--color-success-bg) !important;
+  color: var(--color-success-text) !important;
+  border: 1px solid var(--color-success-border) !important;
 }
 
 body[data-tenant-page="billings"] .table-status-pill.pending,
 body[data-tenant-page="billings"] .table-status-pill.waiting_verification {
-  background: #eff6ff !important;
-  color: #1e40af !important;
-  border: 1px solid #bfdbfe !important;
+  background: var(--color-info-bg) !important;
+  color: var(--color-link) !important;
+  border: 1px solid var(--color-info-border) !important;
 }
 
 body[data-tenant-page="billings"] .btn-table-action {
   background: none !important;
   border: none !important;
-  color: #042458 !important;
+  color: var(--color-text-primary) !important;
   font-weight: 700 !important;
   font-size: 0.875rem !important;
   cursor: pointer !important;
@@ -2865,7 +2670,7 @@ body[data-tenant-page="billings"] .btn-table-action {
 }
 
 body[data-tenant-page="billings"] .btn-table-action:hover {
-  color: #0355f3 !important;
+  color: var(--color-link) !important;
   text-decoration: underline !important;
 }
 

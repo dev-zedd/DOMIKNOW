@@ -2,6 +2,7 @@
     'use strict';
 
     const CARTO_TILES = {
+       // light: 'https://basemaps.cartocdn.com/rastertiles/voyager/%7Bz%7D/%7Bx%7D/%7By%7D.png?key=cb1_2zqq_1_9bd7dd58e94de23eaa612d9b',
         light: 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',
         dark: 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
     };

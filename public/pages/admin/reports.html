@@ -22,11 +22,7 @@
             overflow-x: auto;
             padding-bottom: 0.25rem;
             margin-bottom: 1.25rem;
-            scrollbar-width: none;
-        }
-
-        .reports-tabs-bar::-webkit-scrollbar {
-            display: none;
+            scrollbar-width: thin;
         }
 
         .reports-tab-btn {
@@ -52,8 +48,8 @@
         }
 
         .reports-tab-btn.active {
-            background: var(--color-text-primary, #042458);
-            border-color: var(--color-text-primary, #042458);
+            background: var(--color-action-primary);
+            border-color: var(--color-action-primary);
             color: #ffffff;
             box-shadow: 0 2px 8px rgba(4, 36, 88, 0.2);
         }
@@ -174,7 +170,7 @@
 
         .chip-landlord-vs-tenant {
             background: rgba(3, 85, 243, 0.1);
-            color: #0355f3;
+            color: var(--color-link);
             border: 1px solid rgba(3, 85, 243, 0.25);
         }
 
@@ -214,7 +210,7 @@
 
         .prio-critical {
             background: rgba(239, 68, 68, 0.1);
-            color: #dc2626;
+            color: var(--color-error-text);
             border: 1px solid rgba(239, 68, 68, 0.25);
         }
 
@@ -228,14 +224,14 @@
         .prio-moderate,
         .prio-normal {
             background: rgba(3, 85, 243, 0.1);
-            color: #0355f3;
+            color: var(--color-link);
             border: 1px solid rgba(3, 85, 243, 0.25);
         }
 
         .prio-minor,
         .prio-low {
             background: rgba(100, 116, 139, 0.1);
-            color: #64748b;
+            color: var(--color-text-muted);
             border: 1px solid rgba(100, 116, 139, 0.25);
         }
 
@@ -254,7 +250,7 @@
 
         .status-pending {
             background: rgba(245, 158, 11, 0.1);
-            color: #b45309;
+            color: var(--color-warning-text);
             border: 1px solid rgba(245, 158, 11, 0.25);
         }
 
@@ -273,14 +269,14 @@
         .status-active,
         .status-resolved {
             background: rgba(16, 185, 129, 0.1);
-            color: #047857;
+            color: var(--color-success-text);
             border: 1px solid rgba(16, 185, 129, 0.25);
         }
 
         .status-rejected,
         .status-dismissed {
             background: rgba(100, 116, 139, 0.1);
-            color: #475569;
+            color: var(--color-text-secondary);
             border: 1px solid rgba(100, 116, 139, 0.25);
         }
 
@@ -311,13 +307,13 @@
 
         .party-avatar-reporter {
             background: rgba(3, 85, 243, 0.12);
-            color: #0355f3;
+            color: var(--color-link);
             border: 1px solid rgba(3, 85, 243, 0.25);
         }
 
         .party-avatar-target {
             background: rgba(239, 68, 68, 0.12);
-            color: #dc2626;
+            color: var(--color-error-text);
             border: 1px solid rgba(239, 68, 68, 0.25);
         }
 
@@ -340,7 +336,7 @@
         }
 
         .party-name-target {
-            color: #b91c1c;
+            color: var(--color-error-text);
         }
 
         .category-text {
@@ -745,7 +741,7 @@
                             </div>
                             <div class="party-row">
                                 <span class="party-avatar-xs party-avatar-target" aria-hidden="true">${escapeHtml(targetInitial)}</span>
-                                <span class="party-label-tag" style="color: #dc2626;">Target:</span>
+                                <span class="party-label-tag" style="color: var(--color-error-text);">Target:</span>
                                 <span class="party-name-val party-name-target" title="${escapeHtml(targetName)}">${escapeHtml(targetName)}</span>
                             </div>
                         </div>

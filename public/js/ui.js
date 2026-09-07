@@ -17,6 +17,15 @@
     let mutationObserver = null;
 
     const ICON_PATHS = {
+        pause: '<path d="M8 5v14M16 5v14" stroke-width="3"/>',
+        replay: '<path d="M3 10a9 9 0 1 1 1 7M3 3v7h7"/>',
+        sun: '<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M5 5l1.5 1.5M17.5 17.5 19 19M19 5l-1.5 1.5M6.5 17.5 5 19"/>',
+        moon: '<path d="M20.5 13A9 9 0 0 1 11 3.5 9 9 0 1 0 20.5 13Z"/>',
+        star: '<path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1.1 6.2-5.6-3-5.6 3 1.1-6.2L3 9.6l6.2-.9L12 3Z"/>',
+        user: '<circle cx="12" cy="8" r="4"/><path d="M4 21v-2a8 8 0 0 1 16 0v2"/>',
+        scales: '<path d="M12 3v18M7 21h10M3 7h18M6 7l-4 8h8L6 7ZM18 7l-4 8h8l-4-8Z"/>',
+        video: '<rect x="3" y="5" width="13" height="14" rx="2"/><path d="m16 10 5-3v10l-5-3"/>',
+        globe: '<circle cx="12" cy="12" r="9"/><ellipse cx="12" cy="12" rx="4" ry="9"/><path d="M3 12h18M5 6h14M5 18h14"/>',
         clipboard: '<rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4V2h6v2M8 9h8M8 13h6M8 17h4"/>',
         clock: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
         worker: '<circle cx="12" cy="7" r="3"/><path d="M5 21v-2a7 7 0 0 1 14 0v2M8 4l2-2 2 2 2-2 2 2"/>',
@@ -71,6 +80,15 @@
 
     window.domiknowIcon = domiknowIcon;
 
+    // Keep dynamic labels as text: filenames and API messages must never be
+    // interpolated into icon markup.
+    window.domiknowSetIconText = function (element, name, text) {
+        element.textContent = '';
+        const icon = document.createElement('span');
+        icon.innerHTML = domiknowIcon(name);
+        element.append(icon, document.createTextNode(` ${text}`));
+    };
+
     function ensureBrandFavicons() {
         if (!document.head.querySelector('link[data-domiknow-favicon]')) {
             const favicon = document.createElement('link');
@@ -95,7 +113,11 @@
         document.querySelectorAll('[data-icon]:not([data-icon-rendered])').forEach((placeholder) => {
             const iconName = placeholder.getAttribute('data-icon');
             const label = placeholder.getAttribute('aria-label') || '';
-            placeholder.outerHTML = domiknowIcon(iconName, label).replace('<span', '<span data-icon-rendered="true"');
+            // Preserve caller sizing classes, IDs, and accessible attributes.
+            placeholder.classList.add('ui-icon');
+            placeholder.setAttribute('data-icon-rendered', 'true');
+            placeholder.setAttribute('aria-hidden', label ? 'false' : 'true');
+            placeholder.innerHTML = domiknowIcon(iconName, label).replace(/^<span[^>]*>|<\/span>$/g, '');
         });
     }
 
@@ -138,7 +160,14 @@
         }
 
         updateThemeControls();
+        window.dispatchEvent(new CustomEvent('domiknow:theme-changed', { detail: { theme: nextTheme } }));
     }
+
+    window.DomiKnowTheme = Object.freeze({
+        get: getCurrentTheme,
+        set: (theme) => applyTheme(theme, true),
+        toggle: () => applyTheme(getCurrentTheme() === 'dark' ? 'light' : 'dark', true)
+    });
 
     function updateThemeControls() {
         const currentTheme = getCurrentTheme();
@@ -165,9 +194,10 @@
             }
 
             if (themeIcon) {
-                const nextIcon = currentTheme === 'dark' ? '\u2600' : '\u263e';
-                if (themeIcon.textContent !== nextIcon) {
-                    themeIcon.textContent = nextIcon;
+                const nextIcon = currentTheme === 'dark' ? 'sun' : 'moon';
+                if (themeIcon.getAttribute('data-theme-icon') !== nextIcon) {
+                    themeIcon.setAttribute('data-theme-icon', nextIcon);
+                    themeIcon.innerHTML = domiknowIcon(nextIcon);
                 }
             }
         });
@@ -838,7 +868,14 @@
 
         enhancementFrame = window.requestAnimationFrame(() => {
             enhancementFrame = null;
-            runEnhancements();
+            // Do not observe our own class/href changes. Otherwise a table or
+            // skip link schedules another full-page scan every animation frame.
+            mutationObserver?.disconnect();
+            try {
+                runEnhancements();
+            } finally {
+                observeDynamicContent();
+            }
         });
     }
 
@@ -870,11 +907,9 @@
     }
 
     function observeDynamicContent() {
-        if (mutationObserver) {
-            return;
+        if (!mutationObserver) {
+            mutationObserver = new MutationObserver(scheduleEnhancements);
         }
-
-        mutationObserver = new MutationObserver(scheduleEnhancements);
         mutationObserver.observe(document.body, {
             childList: true,
             subtree: true,
@@ -920,8 +955,8 @@
     }
 
     window.addEventListener('storage', (event) => {
-        if (event.key === THEME_STORAGE_KEY && THEMES.has(event.newValue)) {
-            applyTheme(event.newValue, false);
+        if (event.key === THEME_STORAGE_KEY || event.key === null) {
+            applyTheme(readStoredTheme() || getSystemTheme(), false);
         }
     });
 })();

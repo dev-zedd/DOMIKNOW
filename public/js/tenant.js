@@ -330,11 +330,9 @@
 
         const isVisible = (modal) => {
             const style = window.getComputedStyle(modal);
-            return !modal.classList.contains('hidden')
+            return !modal.hidden && !modal.classList.contains('hidden')
                 && style.display !== 'none'
-                && style.visibility !== 'hidden'
-                && style.pointerEvents !== 'none'
-                && style.opacity !== '0';
+                && style.visibility !== 'hidden';
         };
 
         const syncModal = (modal) => {
@@ -357,15 +355,16 @@
         };
 
         overlays.forEach((modal, index) => {
-            modal.setAttribute('role', 'dialog');
-            modal.setAttribute('aria-modal', 'true');
+            const dialog = modal.querySelector(':scope > .modal-container, :scope > .modal-box, :scope > .form-modal, :scope > .details-modal') || modal;
+            dialog.setAttribute('role', 'dialog');
+            dialog.setAttribute('aria-modal', 'true');
             modal.tabIndex = -1;
             const heading = modal.querySelector('h1, h2, h3, .modal-title');
             if (heading) {
                 if (!heading.id) heading.id = `tenantModalTitle${index + 1}`;
-                modal.setAttribute('aria-labelledby', heading.id);
-            } else if (!modal.getAttribute('aria-label')) {
-                modal.setAttribute('aria-label', 'Dialog');
+                dialog.setAttribute('aria-labelledby', heading.id);
+            } else if (!dialog.getAttribute('aria-label')) {
+                dialog.setAttribute('aria-label', 'Dialog');
             }
             syncModal(modal);
             new MutationObserver(() => syncModal(modal)).observe(modal, {

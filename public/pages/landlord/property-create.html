@@ -97,7 +97,7 @@
             user-select: none;
         }
         .step-header.active {
-            color: var(--landlord);
+            color: var(--color-link);
             opacity: 1;
         }
         .step-header.completed {
@@ -174,7 +174,7 @@
         .rule-chip:hover {
             background-color: var(--primary-light);
             border-color: var(--primary);
-            color: var(--primary);
+            color: var(--color-link);
         }
         .rule-chip.active-chip {
             background-color: var(--primary) !important;
@@ -225,14 +225,14 @@
         .radio-card.selected {
             background-color: rgba(220, 252, 231, 0.4);
             border-color: var(--success);
-            color: var(--success-text);
+            color: var(--color-success-text);
             font-weight: 700;
         }
 
         .radio-card.selected-not {
             background-color: rgba(254, 226, 226, 0.4);
             border-color: var(--error);
-            color: var(--error-text);
+            color: var(--color-error-text);
             font-weight: 700;
         }
 
@@ -953,7 +953,7 @@
                 currentRules = currentRules.filter(r => r !== ruleText);
             } else {
                 elem.classList.add('active-chip');
-                elem.innerHTML = `✓ ${ruleText.replace(/[\.\s]*$/, '')}`;
+                elem.innerHTML = `<span data-icon="check" aria-hidden="true"></span> ${ruleText.replace(/[\.\s]*$/, '')}`;
                 if (!currentRules.includes(ruleText)) {
                     currentRules.push(ruleText);
                 }
@@ -994,12 +994,12 @@
                             phoneInput.value = u.contact_number.trim();
                             if (noticeSpan) {
                                 noticeSpan.style.color = 'var(--color-success-text)';
-                                noticeSpan.textContent = '✓ Auto-filled from profile';
+                                domiknowSetIconText(noticeSpan, 'check', 'Auto-filled from profile');
                             }
                         } else {
                             if (noticeSpan) {
                                 noticeSpan.style.color = 'var(--primary)';
-                                noticeSpan.textContent = 'ℹ️ Please enter active phone number';
+                                domiknowSetIconText(noticeSpan, 'note', 'Please enter active phone number');
                             }
                         }
                     }
@@ -1250,7 +1250,7 @@
             const statusLabel = document.getElementById('bgyDetectStatus');
             if (statusLabel) {
                 statusLabel.style.color = 'var(--primary)';
-                statusLabel.textContent = '⚡ Detecting Location Details...';
+                domiknowSetIconText(statusLabel, 'bolt', 'Detecting Location Details...');
             }
 
             let detectedRoad = '';
@@ -1353,7 +1353,7 @@
             if (statusLabel) {
                 if (matchedBarangay) {
                     statusLabel.style.color = 'var(--color-success-text)';
-                    statusLabel.textContent = `✓ Detected Barangay: ${matchedBarangay}`;
+                    domiknowSetIconText(statusLabel, 'check', `Detected Barangay: ${matchedBarangay}`);
                 } else {
                     statusLabel.style.color = 'var(--color-warning-text)';
                     statusLabel.textContent = 'Barangay could not be verified automatically. Select the correct barangay manually.';
@@ -1585,14 +1585,14 @@
                 if (res.ok) {
                     if (statusElem) {
                         statusElem.style.color = 'var(--success)';
-                        statusElem.textContent = `✓ Uploaded: ${file.name}`;
+                        domiknowSetIconText(statusElem, 'check', `Uploaded: ${file.name}`);
                     }
                     return true;
                 } else {
                     const errRes = await res.json();
                     if (statusElem) {
                         statusElem.style.color = 'var(--error)';
-                        statusElem.textContent = `❌ ${errRes.message || 'Upload failed'}`;
+                        domiknowSetIconText(statusElem, 'x', `${errRes.message || 'Upload failed'}`);
                     }
                     return false;
                 }
@@ -1600,7 +1600,7 @@
                 console.error(err);
                 if (statusElem) {
                     statusElem.style.color = 'var(--error)';
-                    statusElem.textContent = `❌ Upload failed`;
+                    domiknowSetIconText(statusElem, 'x', `Upload failed`);
                 }
                 return false;
             }
@@ -1680,14 +1680,14 @@
                 if (res.ok) {
                     if (statusElem) {
                         statusElem.style.color = 'var(--success)';
-                        statusElem.textContent = `✓ Uploaded: ${file.name}`;
+                        domiknowSetIconText(statusElem, 'check', `Uploaded: ${file.name}`);
                     }
                     return true;
                 } else {
                     const errRes = await res.json();
                     if (statusElem) {
                         statusElem.style.color = 'var(--error)';
-                        statusElem.textContent = `❌ ${errRes.message || 'Upload failed'}`;
+                        domiknowSetIconText(statusElem, 'x', `${errRes.message || 'Upload failed'}`);
                     }
                     return false;
                 }
@@ -1695,7 +1695,7 @@
                 console.error(err);
                 if (statusElem) {
                     statusElem.style.color = 'var(--error)';
-                    statusElem.textContent = `❌ Upload failed`;
+                    domiknowSetIconText(statusElem, 'x', `Upload failed`);
                 }
                 return false;
             }
@@ -1722,7 +1722,7 @@
 
             const feedback = document.getElementById('createFeedback');
             if (feedback) {
-                feedback.textContent = '🎉 Property registration completed! Your property is submitted for admin review.';
+                domiknowSetIconText(feedback, 'check', 'Property registration completed! Your property is submitted for admin review.');
                 feedback.classList.remove('hidden');
             }
 

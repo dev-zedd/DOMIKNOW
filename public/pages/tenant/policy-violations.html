@@ -13,7 +13,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 1px solid #e2e8f0;
+            border-bottom: 1px solid var(--color-border-default);
             margin-bottom: 16px;
             gap: 16px;
             flex-wrap: wrap;
@@ -23,17 +23,17 @@
             align-items: center;
             gap: 22px;
             overflow-x: auto;
-            scrollbar-width: none;
+            scrollbar-width: thin;
             padding-bottom: 12px;
         }
-        .maintenance-tabs-bar::-webkit-scrollbar { display: none; }
+
         .m-tab-btn {
             background: none;
             border: none;
             padding: 4px 0;
             font-size: 0.9375rem;
             font-weight: 700;
-            color: #64748b;
+            color: var(--color-text-muted);
             cursor: pointer;
             display: inline-flex;
             align-items: center;
@@ -43,10 +43,10 @@
             white-space: nowrap;
         }
         .m-tab-btn:hover {
-            color: #0052ea;
+            color: var(--color-link);
         }
         .m-tab-btn.active {
-            color: #0052ea;
+            color: var(--color-link);
             font-weight: 800;
         }
         .m-tab-btn.active::after {
@@ -56,7 +56,7 @@
             left: 0;
             right: 0;
             height: 2.5px;
-            background: #0052ea;
+            background: var(--color-action-primary);
             border-radius: 2px;
         }
 
@@ -82,20 +82,20 @@
             left: 14px;
             top: 50%;
             transform: translateY(-50%);
-            color: #94a3b8;
+            color: var(--color-text-muted);
             pointer-events: none;
             z-index: 1;
         }
         .ledger-search-box input {
             padding: 8px 14px 8px 40px !important;
             padding-left: 40px !important;
-            border: 1px solid #cbd5e1;
+            border: 1px solid var(--color-border-strong);
             border-radius: 8px;
             font-size: 0.875rem;
-            color: #0f172a;
+            color: var(--color-text-primary);
             width: 100%;
             max-width: 100%;
-            background: #ffffff;
+            background: var(--color-bg-surface);
             outline: none;
             transition: border-color 0.15s ease, box-shadow 0.15s ease;
         }
@@ -116,9 +116,9 @@
 
         /* ── Policy Meta & Executive Summary Card ── */
         .policy-meta-card {
-            background: #ffffff;
-            border: 1px solid #e2e8f0 !important;
-            border-left: 1px solid #e2e8f0 !important;
+            background: var(--color-bg-surface);
+            border: 1px solid var(--color-border-default) !important;
+            border-left: 1px solid var(--color-border-default) !important;
             border-radius: 12px;
             padding: 18px 20px;
             margin-bottom: 16px;
@@ -128,19 +128,19 @@
             margin: 6px 0 0 0;
             font-size: 1.25rem;
             font-weight: 800;
-            color: #0f172a;
+            color: var(--color-text-primary);
             line-height: 1.3;
         }
 
         /* ── Detail Box ── */
         .detail-box {
-            background: #f8fafc;
-            border: 1px solid #e2e8f0 !important;
-            border-left: 1px solid #e2e8f0 !important;
+            background: var(--color-bg-canvas);
+            border: 1px solid var(--color-border-default) !important;
+            border-left: 1px solid var(--color-border-default) !important;
             border-radius: 10px;
             padding: 12px 16px;
             font-size: 0.875rem;
-            color: #334155;
+            color: var(--color-text-secondary);
             line-height: 1.6;
         }
 
@@ -163,17 +163,17 @@
             margin-bottom: 32px;
         }
         .policy-clause-card {
-            background: #ffffff;
-            border: 1px solid #e2e8f0 !important;
-            border-left: 1px solid #e2e8f0 !important;
+            background: var(--color-bg-surface);
+            border: 1px solid var(--color-border-default) !important;
+            border-left: 1px solid var(--color-border-default) !important;
             border-radius: 12px;
             padding: 18px 20px;
             transition: all 0.15s ease;
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
         }
         .policy-clause-card:hover {
-            border-color: #cbd5e1 !important;
-            border-left-color: #cbd5e1 !important;
+            border-color: var(--color-border-strong) !important;
+            border-left-color: var(--color-border-strong) !important;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
             transform: translateY(-1px);
         }
@@ -183,13 +183,13 @@
         .clause-title {
             font-size: 1rem;
             font-weight: 700;
-            color: #0f172a;
+            color: var(--color-text-primary);
             margin: 0;
             line-height: 1.35;
         }
         .clause-body {
             font-size: 0.875rem;
-            color: #334155;
+            color: var(--color-text-secondary);
             line-height: 1.65;
             margin: 0;
             padding-left: 0;
@@ -242,15 +242,15 @@
                 <input type="text" id="policySearchInput" placeholder="Search clauses (e.g. noise, payments, visitors, quiet hours)..." autocomplete="off">
             </div>
             <div style="display: flex; align-items: center; gap: 8px;">
-                <span id="policyVersionDisplay" class="rc-tag-pill" style="background:#f1f5f9; color:#475569;">Version: v2.4</span>
-                <span id="policyLastUpdatedDisplay" class="rc-tag-pill" style="background:#f1f5f9; color:#475569;">Updated: August 2026</span>
+                <span id="policyVersionDisplay" class="rc-tag-pill" style="background: var(--color-bg-subtle); color: var(--color-text-secondary);">Version: v2.4</span>
+                <span id="policyLastUpdatedDisplay" class="rc-tag-pill" style="background: var(--color-bg-subtle); color: var(--color-text-secondary);">Updated: August 2026</span>
             </div>
         </div>
 
         <!-- ── Policy Overview Card ── -->
         <div class="policy-meta-card">
             <div style="margin-bottom: 8px;">
-                <span id="policyCategoryTag" class="rc-tag-pill" style="background:#eff6ff; color:#0052ea;">Legal &amp; Governance</span>
+                <span id="policyCategoryTag" class="rc-tag-pill" style="background: var(--color-info-bg); color: var(--color-link);">Legal &amp; Governance</span>
                 <h2 id="policyTitleDisplay" class="policy-active-title">Platform Terms of Service (TOS)</h2>
             </div>
             <div class="detail-box" id="policySummaryDisplay" style="margin-top: 10px;">
@@ -307,13 +307,13 @@
                     });
                     renderActivePolicyClauses();
                 } else {
-                    container.innerHTML = '<div style="background:#ffffff; border:1px solid #fecaca; border-radius:12px; padding:24px; text-align:center; color:#dc2626; font-size:0.875rem;">Failed to load platform policies.</div>';
+                    container.innerHTML = '<div style="background: var(--color-bg-surface); border: 1px solid var(--color-error-border); border-radius:12px; padding:24px; text-align:center; color: var(--color-error-text); font-size:0.875rem;">Failed to load platform policies.</div>';
                 }
             } catch (err) {
                 console.error(err);
                 const container = document.getElementById('policySectionsContainer');
                 if (container) {
-                    container.innerHTML = '<div style="background:#ffffff; border:1px solid #fecaca; border-radius:12px; padding:24px; text-align:center; color:#dc2626; font-size:0.875rem;">Network error loading policies. Please try again.</div>';
+                    container.innerHTML = '<div style="background: var(--color-bg-surface); border: 1px solid var(--color-error-border); border-radius:12px; padding:24px; text-align:center; color: var(--color-error-text); font-size:0.875rem;">Network error loading policies. Please try again.</div>';
                 }
             }
         }
@@ -365,12 +365,12 @@
 
             if (filteredSections.length === 0) {
                 container.innerHTML = `
-                    <div style="background:#ffffff; border:1px solid #e2e8f0; border-radius:12px; padding:48px 24px; text-align:center;">
-                        <div style="width:44px; height:44px; border-radius:10px; background:#f8fafc; border:1px solid #e2e8f0; color:#94a3b8; display:inline-flex; align-items:center; justify-content:center; margin-bottom:12px;">
+                    <div style="background: var(--color-bg-surface); border: 1px solid var(--color-border-default); border-radius:12px; padding:48px 24px; text-align:center;">
+                        <div style="width:44px; height:44px; border-radius:10px; background: var(--color-bg-canvas); border: 1px solid var(--color-border-default); color: var(--color-text-muted); display:inline-flex; align-items:center; justify-content:center; margin-bottom:12px;">
                             <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
                         </div>
-                        <div style="font-size:0.95rem; font-weight:700; color:#0f172a; margin-bottom:4px;">No Clauses Found</div>
-                        <div style="font-size:0.8125rem; color:#64748b;">No policy clauses matched "${domiknowEscapeHtml(currentSearchQuery)}". Try a different keyword or switch tabs.</div>
+                        <div style="font-size:0.95rem; font-weight:700; color: var(--color-text-primary); margin-bottom:4px;">No Clauses Found</div>
+                        <div style="font-size:0.8125rem; color: var(--color-text-muted);">No policy clauses matched "${domiknowEscapeHtml(currentSearchQuery)}". Try a different keyword or switch tabs.</div>
                     </div>
                 `;
                 return;

@@ -20,12 +20,22 @@ function domiknowSafeExternalUrl(value) {
     }
 }
 
+function domiknowDocumentLink(value, label = 'View document', className = '') {
+    const raw = String(value || '').trim();
+    const url = raw && !raw.startsWith('#') ? domiknowSafeExternalUrl(raw) : '#';
+    const text = domiknowEscapeHtml(label);
+    if (url === '#') {
+        return `<span class="document-unavailable">${text} <small>— File unavailable</small></span>`;
+    }
+    return `<a href="${domiknowEscapeHtml(url)}" target="_blank" rel="noopener noreferrer" class="${domiknowEscapeHtml(className)}">${text}</a>`;
+}
+
 // Run on page load
 document.addEventListener('DOMContentLoaded', async () => {
     // 1. Check token
     const token = localStorage.getItem('domiknow_token');
     if (!token) {
-        window.location.href = '/pages/auth/login.html';
+        redirectToDashboardLogin();
         return;
     }
 
@@ -55,7 +65,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const storedRole = localStorage.getItem('domiknow_role');
     const activeRole = expectedRole || storedRole || 'tenant';
 
-    // ⚡ INSTANT SIDEBAR RENDER: Render layout synchronously BEFORE network fetch
+    // INSTANT SIDEBAR RENDER: Render layout synchronously BEFORE network fetch
     // Eliminates any millisecond delay or layout shift on refresh
     renderNewDashboardLayout({ role: activeRole });
 
@@ -68,10 +78,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
 
         if (!response.ok) {
-            // Token invalid or expired
-            localStorage.removeItem('domiknow_token');
-            localStorage.removeItem('domiknow_role');
-            window.location.href = '/pages/auth/login.html';
+            // Temporary service failures must not sign users out or lose their route.
+            if (response.status === 401) {
+                localStorage.removeItem('domiknow_token');
+                localStorage.removeItem('domiknow_role');
+                redirectToDashboardLogin();
+            } else {
+                showDashboardLoadError();
+            }
             return;
         }
 
@@ -98,6 +112,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         showDashboardLoadError();
     }
 });
+
+function redirectToDashboardLogin() {
+    const returnTo = window.location.pathname + window.location.search + window.location.hash;
+    window.location.href = '/pages/auth/login.html?redirect=' + encodeURIComponent(returnTo);
+}
 
 function showDashboardLoadError() {
     const account = document.querySelector('.topbar-account');
@@ -424,6 +443,7 @@ function renderNewDashboardLayout(user) {
             {
                 section: 'Command Center',
                 items: [
+                    { label: 'Descriptive Analytics', href: 'analytics.html', icon: 'Dashboard' },
                     { label: 'User Access', href: 'users.html' },
                     { label: 'Property Approvals', href: 'property-review.html' }
                 ]
@@ -431,7 +451,7 @@ function renderNewDashboardLayout(user) {
             {
                 section: 'Platform Monitoring',
                 items: [
-                    { label: 'Payment Verification', href: 'payments.html' }
+                    { label: 'Payment Monitoring', href: 'payments.html' }
                 ]
             },
             {
@@ -643,6 +663,7 @@ function renderNewDashboardLayout(user) {
             {
                 section: 'Command Center',
                 items: [
+                    { label: 'Descriptive Analytics', href: 'analytics.html', icon: 'Dashboard' },
                     { label: 'User Access', href: 'users.html', icon: 'User Access' },
                     { label: 'Property Approvals', href: 'property-review.html', icon: 'Property Approvals' }
                 ]
@@ -650,7 +671,7 @@ function renderNewDashboardLayout(user) {
             {
                 section: 'Platform Monitoring',
                 items: [
-                    { label: 'Payment Verification', href: 'payments.html', icon: 'Payment Verification' }
+                    { label: 'Payment Monitoring', href: 'payments.html', icon: 'Payment Monitoring' }
                 ]
             },
             {
@@ -710,7 +731,6 @@ function renderNewDashboardLayout(user) {
                         <span class="app-brand-mark" aria-hidden="true">D</span>
                         <span class="app-brand-name">DOMI<span class="app-brand-accent">KNOW</span></span>
                     </div>
-                    <span class="role-badge navbar-badge ${roleBadgeClass}">Field operations</span>
                 </div>
                 <nav class="sidebar-menu" aria-label="Primary navigation">
                     <div class="sidebar-section-title">Workspace</div>
@@ -728,16 +748,6 @@ function renderNewDashboardLayout(user) {
 
         sidebarHtml += `
                 </nav>
-                <div class="maintenance-sidebar-note" role="note">
-                    <span class="maintenance-sidebar-note-icon" aria-hidden="true">!</span>
-                    <span>Update task status as work progresses so tenants and landlords stay informed.</span>
-                </div>
-                <div class="sidebar-footer">
-                    <button type="button" id="newLogoutBtn" class="sidebar-link sidebar-logout" aria-label="Log out of DOMIKNOW">
-                        <svg class="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-                        <span>Log out</span>
-                    </button>
-                </div>
             </aside>
         `;
     } else {
@@ -794,29 +804,19 @@ function renderNewDashboardLayout(user) {
                     <button type="button" id="menuToggleBtn" class="mobile-menu-toggle topbar-action" aria-label="Open navigation" aria-controls="domiknowSidebar" aria-expanded="false">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/></svg>
                     </button>
-                    ${(role === 'tenant' || role === 'landlord' || role === 'admin') ? `
-                    <h1 class="sr-only" id="appPageTitle">${pageTitle}</h1>
-                    ` : `
                     <div class="topbar-heading">
                         <span class="topbar-context">${role === 'maintenance' ? 'Field operations' : `${roleLabel} workspace`}</span>
-                        <h1 class="topbar-title" id="appPageTitle">${pageTitle}</h1>
+                        <h1 class="topbar-title" id="appPageTitle">${domiknowEscapeHtml(pageTitle)}</h1>
                     </div>
-                    `}
                 </div>
                 <div class="topbar-right">
                     <button type="button" class="topbar-action notification-trigger" data-notification-trigger aria-label="Open notifications" aria-controls="domiknowNotificationOverlay" aria-expanded="false" title="Notifications">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
                         <span class="notification-trigger__badge" data-notification-badge hidden>0</span>
                     </button>
-                    ${(role !== 'tenant' && role !== 'landlord' && role !== 'admin') ? `
-                    <button type="button" class="topbar-action theme-toggle" data-theme-toggle aria-label="Toggle color theme" aria-pressed="false" title="Toggle color theme">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.66 6.34l1.41-1.41"/></svg>
-                    </button>
-                    ` : ''}
-                    ${(role === 'tenant' || role === 'landlord' || role === 'admin') ? `
                     <div class="topbar-account-dropdown" id="topbarAccountDropdown">
                         <button type="button" class="topbar-avatar-btn" id="profileDropdownBtn" aria-expanded="false" aria-haspopup="true" aria-label="Open account menu" title="Account menu">
-                            <span class="topbar-avatar" aria-hidden="true">${shellUserName.trim().charAt(0).toUpperCase() || (role === 'landlord' ? 'L' : role === 'admin' ? 'A' : 'T')}</span>
+                            <span class="topbar-avatar" aria-hidden="true">${shellUserName.trim().charAt(0).toUpperCase() || (role === 'landlord' ? 'L' : role === 'admin' ? 'A' : role === 'maintenance' ? 'M' : 'T')}</span>
                         </button>
                         <div class="topbar-dropdown-menu" id="profileDropdownMenu" role="menu" aria-labelledby="profileDropdownBtn" hidden>
                             <a href="/pages/${role}/profile.html" class="topbar-dropdown-item ${activeNavigationFilename === 'profile.html' ? 'active' : ''}" id="dropdownProfileLink" role="menuitem">
@@ -846,15 +846,7 @@ function renderNewDashboardLayout(user) {
                             </button>
                         </div>
                     </div>
-                    ` : `
-                    <a class="topbar-account" href="/pages/${role}/profile.html" aria-label="Open your profile" title="Open profile" ${activeNavigationFilename === 'profile.html' ? 'aria-current="page"' : ''}>
-                        <span class="topbar-avatar" aria-hidden="true">${shellUserName.trim().charAt(0).toUpperCase() || 'T'}</span>
-                        <span class="topbar-account-copy">
-                            <span class="topbar-account-role">${roleLabel}</span>
-                            <span class="user-name">Checking account...</span>
-                        </span>
-                    </a>
-                    `}
+
                 </div>
             </header>
             <div class="main-content-inner">
@@ -1075,8 +1067,8 @@ function renderNewDashboardLayout(user) {
         });
     }
 
-    // 4. Attach Seamless SPA Dashboard Navigation
-    initSeamlessDashboardNavigation(role, sidebar);
+    // 4. Preserve navigation position across document loads
+    initDashboardNavigation(role, sidebar);
 
     // Logout button behavior
     const logoutBtn = document.getElementById('newLogoutBtn');
@@ -1109,6 +1101,7 @@ function renderNewDashboardLayout(user) {
 
     if (profileDropdownBtn && profileDropdownMenu) {
         updateDropdownThemeState();
+        window.addEventListener('domiknow:theme-changed', updateDropdownThemeState);
 
         profileDropdownBtn.addEventListener('click', (e) => {
             e.stopPropagation();
@@ -1117,6 +1110,35 @@ function renderNewDashboardLayout(user) {
             profileDropdownBtn.setAttribute('aria-expanded', String(!isOpen));
             if (!isOpen) {
                 updateDropdownThemeState();
+                profileDropdownMenu.querySelector('[role="menuitem"]')?.focus();
+            }
+        });
+
+        profileDropdownBtn.addEventListener('keydown', (event) => {
+            if (!['ArrowDown', 'ArrowUp'].includes(event.key)) return;
+            event.preventDefault();
+            profileDropdownMenu.hidden = false;
+            profileDropdownBtn.setAttribute('aria-expanded', 'true');
+            updateDropdownThemeState();
+            const items = profileDropdownMenu.querySelectorAll('[role="menuitem"]');
+            items[event.key === 'ArrowUp' ? items.length - 1 : 0]?.focus();
+        });
+        profileDropdownMenu.addEventListener('keydown', (event) => {
+            const items = Array.from(profileDropdownMenu.querySelectorAll('[role="menuitem"]'));
+            const current = items.indexOf(document.activeElement);
+            const positions = {
+                ArrowDown: (current + 1) % items.length,
+                ArrowUp: (current - 1 + items.length) % items.length,
+                Home: 0,
+                End: items.length - 1
+            };
+            if (event.key in positions) {
+                event.preventDefault();
+                items[positions[event.key]]?.focus();
+            } else if (event.key === 'Tab') {
+                profileDropdownMenu.hidden = true;
+                profileDropdownBtn.setAttribute('aria-expanded', 'false');
+                profileDropdownBtn.focus();
             }
         });
 
@@ -1142,16 +1164,7 @@ function renderNewDashboardLayout(user) {
         dropdownThemeBtn.addEventListener('click', (e) => {
             e.preventDefault();
             e.stopPropagation();
-            const currentTheme = document.documentElement.getAttribute('data-theme') || localStorage.getItem('domiknow_theme') || 'light';
-            const nextTheme = currentTheme === 'dark' ? 'light' : 'dark';
-            document.documentElement.setAttribute('data-theme', nextTheme);
-            document.documentElement.style.colorScheme = nextTheme;
-            localStorage.setItem('domiknow_theme', nextTheme);
-            document.querySelectorAll('[data-theme-toggle]').forEach(ctrl => {
-                ctrl.setAttribute('aria-pressed', String(nextTheme === 'dark'));
-                ctrl.setAttribute('data-theme-state', nextTheme);
-            });
-            updateDropdownThemeState();
+            window.DomiKnowTheme?.toggle();
         });
     }
 
@@ -1298,7 +1311,7 @@ function renderNewDashboardLayout(user) {
         }
     });
 
-    // ⚡ INSTANT FADE-IN: Reveal layout smooth & flicker-free once sidebar is constructed
+    // INSTANT FADE-IN: Reveal layout smooth & flicker-free once sidebar is constructed
     loadNotificationSystemAssets();
     document.body.classList.remove('app-loading');
     document.body.classList.add('app-ready');
@@ -1484,447 +1497,23 @@ function updateActiveNavigationIndicators(pathname, role) {
     });
 }
 
-function showNavigationProgress() {
-    const mainContent = document.querySelector('.main-content-inner');
-    mainContent?.classList.add('dk-route-loading');
-    mainContent?.setAttribute('aria-busy', 'true');
-    return window.DomiKnowLoading?.start({ delay: 0, timeout: 15000 }) || null;
-}
-
-function hideNavigationProgress(token) {
-    const mainContent = document.querySelector('.main-content-inner');
-    mainContent?.classList.remove('dk-route-loading');
-    mainContent?.removeAttribute('aria-busy');
-    if (token) window.DomiKnowLoading?.finish(token);
-}
-
-function loadExternalScript(src) {
-    return new Promise((resolve) => {
-        if (document.querySelector(`script[src="${src}"]`)) {
-            resolve();
-            return;
-        }
-        const script = document.createElement('script');
-        script.src = src;
-        script.onload = () => resolve();
-        script.onerror = () => resolve();
-        document.head.appendChild(script);
-    });
-}
-
-function isModalElement(el) {
-    if (!el || el.nodeType !== 1) return false;
-    const id = el.id || '';
-    const cls = el.className || '';
-    return (
-        cls.includes('modal') ||
-        cls.includes('overlay') ||
-        id.toLowerCase().includes('modal') ||
-        el.getAttribute('role') === 'dialog'
-    );
-}
-
-let isSeamlessNavigating = false;
-const seamlessPageCache = new Map();
-const SEAMLESS_CACHE_TTL = 30000;
-let pageStyleLifecyclePrepared = false;
-
-function preparePageStyleLifecycle() {
-    if (pageStyleLifecyclePrepared) return;
-    document.head.querySelectorAll('style').forEach(style => {
-        style.setAttribute('data-domiknow-page-style', '');
-    });
-    pageStyleLifecyclePrepared = true;
-}
-
-async function loadDashboardPageHtml(targetUrlString) {
-    const url = new URL(targetUrlString, window.location.href);
-    url.hash = '';
-    const cacheKey = url.href;
-    const cached = seamlessPageCache.get(cacheKey);
-    if (cached && cached.expiresAt > Date.now()) return cached.promise;
-
-    const promise = fetch(cacheKey, {
-        headers: {
-            'X-Requested-With': 'DOMIKNOW-SPA',
-            'X-DOMIKNOW-SILENT': '1'
-        },
-        domiknowLoading: false
-    }).then(async response => {
-        if (!response.ok) throw new Error(`Dashboard page returned ${response.status}`);
-        return response.text();
-    });
-
-    seamlessPageCache.set(cacheKey, {
-        promise,
-        expiresAt: Date.now() + SEAMLESS_CACHE_TTL
-    });
-    promise.catch(() => seamlessPageCache.delete(cacheKey));
-    return promise;
-}
-
-async function seamlessNavigateTo(targetUrlString, role, pushState = true) {
-    if (isSeamlessNavigating) return;
-    isSeamlessNavigating = true;
-
-    const navigationLoadingToken = showNavigationProgress();
-    const mainContent = document.querySelector('.main-content-inner');
-
-    try {
-        const html = await loadDashboardPageHtml(targetUrlString);
-        const parser = new DOMParser();
-        const newDoc = parser.parseFromString(html, 'text/html');
-
-        // Update URL and Title
-        if (pushState) {
-            history.pushState({ spa: true, url: targetUrlString }, newDoc.title, targetUrlString);
-        }
-        document.title = newDoc.title;
-
-        // Update topbar title
-        const topbarTitle = document.getElementById('appPageTitle');
-        let newTitle = (newDoc.body.getAttribute('data-page-title') || '').trim();
-        if (!newTitle && newDoc.title) {
-            newTitle = newDoc.title.split(' - ')[0];
-        }
-        if (topbarTitle && newTitle) {
-            topbarTitle.textContent = newTitle;
-        }
-
-        // Close mobile sidebar or bottom sheet if open
-        const sidebar = document.getElementById('domiknowSidebar');
-        const overlay = document.getElementById('sidebarOverlay');
-        const navSheetOverlay = document.getElementById('navSheetOverlay');
-        if (sidebar && overlay && sidebar.classList.contains('open')) {
-            sidebar.classList.remove('open');
-            overlay.classList.remove('open');
-        }
-        if (navSheetOverlay && navSheetOverlay.classList.contains('open')) {
-            navSheetOverlay.classList.remove('open');
-        }
-
-        // Close header profile dropdown if open
-        const profileMenu = document.getElementById('profileDropdownMenu');
-        const profileBtn = document.getElementById('profileDropdownBtn');
-        if (profileMenu) profileMenu.hidden = true;
-        if (profileBtn) profileBtn.setAttribute('aria-expanded', 'false');
-
-        // Sync stylesheets and replace page-scoped inline styles. Without this
-        // lifecycle, inline rules from every visited screen remain in the head
-        // and can visually override later pages.
-        preparePageStyleLifecycle();
-        document.head.querySelectorAll('style[data-domiknow-page-style]').forEach(style => style.remove());
-        const getNormalizedStylesheetKey = (urlStr) => {
-            if (!urlStr) return '';
-            try {
-                const parsed = new URL(urlStr, window.location.href);
-                if (parsed.origin === window.location.origin) {
-                    return parsed.pathname.toLowerCase();
-                }
-                return parsed.href;
-            } catch (_) {
-                return urlStr.split('?')[0].split('#')[0].toLowerCase();
-            }
-        };
-
-        const existingLoadedStylesheets = new Set(
-            Array.from(document.head.querySelectorAll('link[rel="stylesheet"]'))
-                .map(link => getNormalizedStylesheetKey(link.getAttribute('href') || link.href))
-                .filter(Boolean)
-        );
-
-        newDoc.querySelectorAll('link[rel="stylesheet"], style').forEach(el => {
-            if (el.tagName === 'LINK') {
-                const href = el.getAttribute('href');
-                const sheetKey = getNormalizedStylesheetKey(href);
-                if (href && sheetKey && !existingLoadedStylesheets.has(sheetKey)) {
-                    const newLink = document.createElement('link');
-                    newLink.rel = 'stylesheet';
-                    newLink.href = href;
-                    document.head.appendChild(newLink);
-                    existingLoadedStylesheets.add(sheetKey);
-                }
-            } else if (el.tagName === 'STYLE') {
-                const newStyle = document.createElement('style');
-                newStyle.textContent = el.textContent;
-                newStyle.setAttribute('data-domiknow-page-style', '');
-                document.head.appendChild(newStyle);
-            }
-        });
-
-        // 0. Clean up previous page listeners and intervals
-        if (Array.isArray(window.__domiknowActivePageCleanups)) {
-            while (window.__domiknowActivePageCleanups.length > 0) {
-                const cleanup = window.__domiknowActivePageCleanups.pop();
-                try { cleanup(); } catch (e) { console.warn('Page cleanup warning:', e); }
-            }
-        }
-        const activePageCleanups = [];
-        window.__domiknowActivePageCleanups = activePageCleanups;
-
-        // 1. Remove previous page-specific modals from body (keep shell and persistent chat)
-        Array.from(document.body.children).forEach(child => {
-            if (
-                child.classList.contains('dashboard-layout') ||
-                child.id === 'floatingChatHeadFab' ||
-                child.id === 'chatHeadModal' ||
-                child.tagName === 'SCRIPT'
-            ) {
-                return;
-            }
-            if (isModalElement(child)) {
-                child.remove();
-            }
-        });
-
-        // 2. Separate modals from main content elements
-        const bodyChildren = Array.from(newDoc.body.children);
-        const newMainElements = [];
-        const newModalElements = [];
-        const scriptsToRun = [];
-
-        bodyChildren.forEach(child => {
-            if (child.tagName === 'SCRIPT') {
-                scriptsToRun.push(child);
-            } else if (child.tagName === 'STYLE') {
-                // Handled in head sync
-            } else if (child.classList.contains('dashboard-layout') || child.tagName === 'NAV') {
-                // Ignore layout shell and legacy navbar
-            } else if (isModalElement(child)) {
-                newModalElements.push(child);
-            } else {
-                newMainElements.push(child);
-            }
-        });
-
-        // 3. Attach new modals directly to document.body so they stay top-level and unconstrained
-        newModalElements.forEach(el => {
-            document.body.appendChild(document.importNode(el, true));
-        });
-
-        // 4. Place main content inside .main-content-inner
-        if (mainContent) {
-            mainContent.innerHTML = '';
-            newMainElements.forEach(el => {
-                mainContent.appendChild(document.importNode(el, true));
-            });
-        }
-
-        // 5. Load external scripts from head if not present (e.g. Leaflet)
-        const headScripts = Array.from(newDoc.head.querySelectorAll('script'));
-        for (const script of headScripts) {
-            const src = script.getAttribute('src');
-            if (src && !document.querySelector(`script[src="${src}"]`)) {
-                await loadExternalScript(src);
-            }
-        }
-
-        // 6. Update active navigation indicators on sidebar
-        updateActiveNavigationIndicators(window.location.pathname, role);
-        ensureContextBreadcrumbs(role, window.location.pathname);
-
-        // 7. Trigger module enhancers for newly mounted content
-        document.dispatchEvent(new CustomEvent('domiknow:page-content-updated', { detail: { role, path: window.location.pathname } }));
-
-        // 8. Execute page scripts in isolated scope with page-level lifecycle protection
-        const pageDCLCallbacks = [];
-
-        const scopedDocument = new Proxy(document, {
-            get(target, prop) {
-                if (prop === 'addEventListener') {
-                    return function(type, listener, options) {
-                        if (type === 'DOMContentLoaded') {
-                            if (typeof listener === 'function') {
-                                pageDCLCallbacks.push(listener);
-                            }
-                            return;
-                        }
-                        target.addEventListener(type, listener, options);
-                        activePageCleanups.push(() => {
-                            try { target.removeEventListener(type, listener, options); } catch(e) {}
-                        });
-                    };
-                }
-                const val = target[prop];
-                return typeof val === 'function' ? val.bind(target) : val;
-            },
-            set(target, prop, value) {
-                target[prop] = value;
-                return true;
-            }
-        });
-
-        const scopedWindow = new Proxy(window, {
-            get(target, prop) {
-                if (prop === 'document') {
-                    return scopedDocument;
-                }
-                if (prop === 'addEventListener') {
-                    return function(type, listener, options) {
-                        if (type === 'DOMContentLoaded') {
-                            if (typeof listener === 'function') {
-                                pageDCLCallbacks.push(listener);
-                            }
-                            return;
-                        }
-                        target.addEventListener(type, listener, options);
-                        activePageCleanups.push(() => {
-                            try { target.removeEventListener(type, listener, options); } catch(e) {}
-                        });
-                    };
-                }
-                if (prop === 'setInterval') {
-                    return function(handler, timeout, ...args) {
-                        const id = target.setInterval(handler, timeout, ...args);
-                        activePageCleanups.push(() => clearInterval(id));
-                        return id;
-                    };
-                }
-                const val = target[prop];
-                return typeof val === 'function' ? val.bind(target) : val;
-            },
-            set(target, prop, value) {
-                target[prop] = value;
-                return true;
-            }
-        });
-
-        window.__domiknowPageEnv = {
-            window: scopedWindow,
-            document: scopedDocument
-        };
-
-        for (const script of scriptsToRun) {
-            const src = script.getAttribute('src');
-            if (src) {
-                if (!src.includes('dashboard.js') && !src.includes('auth.js') && !src.includes('ui.js')) {
-                    await loadExternalScript(src);
-                }
-            } else if (script.textContent.trim()) {
-                const text = script.textContent.trim();
-                const fnNames = [];
-                const fnRegex = /(?:async\s+)?function\s+([a-zA-Z0-9_$]+)\s*\(/g;
-                let match;
-                while ((match = fnRegex.exec(text)) !== null) {
-                    fnNames.push(match[1]);
-                }
-                const exportLines = fnNames.map(name => `try { if (typeof ${name} !== 'undefined') window.${name} = ${name}; } catch(e) {}`).join(';\n');
-
-                const s = document.createElement('script');
-                s.type = 'text/javascript';
-                s.textContent = `(function(window, document) { try { ${text}\n${exportLines} } catch(err) { console.error("Page script error:", err); } })(window.__domiknowPageEnv.window, window.__domiknowPageEnv.document);`;
-                document.body.appendChild(s);
-                s.remove();
-            }
-        }
-        delete window.__domiknowPageEnv;
-
-        // 9. Execute DOMContentLoaded handlers scoped to this newly mounted page
-        for (const cb of pageDCLCallbacks) {
-            try {
-                cb(new Event('DOMContentLoaded'));
-            } catch (err) {
-                console.error('Page initialization error:', err);
-            }
-        }
-
-        // Reset scroll position
-        window.scrollTo({ top: 0, behavior: 'instant' });
-        if (mainContent) {
-            mainContent.scrollTop = 0;
-        }
-    } catch (err) {
-        console.error('Seamless navigation error, falling back to standard load:', err);
-        window.location.href = targetUrlString;
-    } finally {
-        isSeamlessNavigating = false;
-        hideNavigationProgress(navigationLoadingToken);
-    }
-}
-
-function initSeamlessDashboardNavigation(role, sidebar) {
+// Each workspace page owns its scripts, forms and styles. Use the browser's
+// document lifecycle so page listeners cannot leak into the next workflow.
+function initDashboardNavigation(role, sidebar) {
     if (!sidebar) return;
-
-    // 1. Restore scroll position from sessionStorage
-    const savedScroll = sessionStorage.getItem('domiknow_sidebar_scroll');
-    if (savedScroll !== null) {
-        sidebar.scrollTop = parseInt(savedScroll, 10);
-    } else {
-        const activeLink = sidebar.querySelector('.sidebar-link.active, .sidebar-sub-link.active');
-        if (activeLink) {
-            activeLink.scrollIntoView({ block: 'nearest' });
+    const scrollKey = `domiknow_sidebar_scroll_${role}`;
+    try {
+        const savedScroll = sessionStorage.getItem(scrollKey);
+        if (savedScroll !== null && Number.isFinite(Number(savedScroll))) {
+            sidebar.scrollTop = Math.max(0, Number(savedScroll));
         }
+    } catch (_) {
+        // Navigation remains usable when browser storage is unavailable.
     }
-
-    // Save scroll position on scroll
     sidebar.addEventListener('scroll', () => {
-        sessionStorage.setItem('domiknow_sidebar_scroll', sidebar.scrollTop);
+        try { sessionStorage.setItem(scrollKey, String(sidebar.scrollTop)); } catch (_) {}
     }, { passive: true });
-
-    // 2. Attach global internal link interceptor once
-    if (window.__domiknowNavInitialized) return;
-    window.__domiknowNavInitialized = true;
-
-    const dashboardPathPrefixes = ['/pages/tenant/', '/pages/landlord/', '/pages/admin/', '/pages/maintenance/'];
-    const getDashboardUrl = link => {
-        if (!link || link.hasAttribute('download') || (link.target && link.target !== '_self')) return null;
-        const href = link.getAttribute('href');
-        if (!href || href.startsWith('#') || href.startsWith('javascript:') || href.startsWith('mailto:') || href.startsWith('tel:')) return null;
-        try {
-            const url = new URL(link.href, window.location.origin);
-            if (url.origin !== window.location.origin) return null;
-            if (!dashboardPathPrefixes.some(prefix => url.pathname.startsWith(prefix))) return null;
-            if (url.pathname.includes('/auth/') || url.pathname.includes('/login') || url.pathname.includes('/register')) return null;
-            return url;
-        } catch (_error) {
-            return null;
-        }
-    };
-
-    const prefetchLink = event => {
-        const link = event.target instanceof Element ? event.target.closest('a[href]') : null;
-        const url = getDashboardUrl(link);
-        if (!url || url.pathname === window.location.pathname && url.search === window.location.search) return;
-        loadDashboardPageHtml(url.href).catch(() => {});
-    };
-    document.addEventListener('pointerover', prefetchLink, { passive: true });
-    document.addEventListener('focusin', prefetchLink);
-
-    document.addEventListener('click', async (e) => {
-        if (e.defaultPrevented || e.button !== 0 || e.ctrlKey || e.metaKey || e.shiftKey || e.altKey) return;
-
-        const link = e.target.closest('a[href]');
-        if (!link) return;
-
-        const href = link.getAttribute('href');
-        if (!href || href.startsWith('#') || href.startsWith('javascript:') || href.startsWith('mailto:') || href.startsWith('tel:')) return;
-        if (link.hasAttribute('download') || link.target === '_blank') return;
-        if (link.id === 'newLogoutBtn' || link.id === 'sheetLogoutBtn') return;
-
-        const targetUrl = getDashboardUrl(link);
-        if (!targetUrl) return;
-
-        // If clicking current page without params change, just scroll top
-        if (targetUrl.pathname === window.location.pathname && targetUrl.search === window.location.search) {
-            e.preventDefault();
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-            return;
-        }
-
-        e.preventDefault();
-
-        // ⚡ INSTANT ACTIVE INDICATOR UPDATE: highlight clicked nav immediately!
-        updateActiveNavigationIndicators(targetUrl.pathname, role);
-
-        // Perform seamless navigation without page reload
-        await seamlessNavigateTo(targetUrl.href, role, true);
-    });
-
-    // Handle browser Back / Forward buttons
-    window.addEventListener('popstate', () => {
-        updateActiveNavigationIndicators(window.location.pathname, role);
-        seamlessNavigateTo(window.location.href, role, false);
-    });
+    updateActiveNavigationIndicators(window.location.pathname, role);
 }
 
 // Minimal inline SVG icons for sidebar links (Serious & System-like)
@@ -1997,7 +1586,7 @@ function getLinkIcon(label) {
     icons['User Access'] = icons['User Management'];
     icons['Property Approvals'] = icons['Property Review'];
     icons['Reservations'] = icons['Reservation Monitoring'];
-    icons['Payment Verification'] = icons['Payment Monitor'];
+    icons['Payment Monitoring'] = icons['Payment Monitor'];
     icons['Case Triage'] = icons['Reports Monitor'];
     icons['Policies'] = icons['Policy Violations'];
     icons['Audit Trail'] = icons['Audit Logs'];

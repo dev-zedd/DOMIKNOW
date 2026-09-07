@@ -1,0 +1,41 @@
+.analytics-filters { display: flex; align-items: end; flex-wrap: wrap; gap: 16px; margin: 24px 0 16px; }
+.analytics-filters label { display: grid; gap: 8px; font-size: .875rem; font-weight: 600; }
+.analytics-filters input { min-height: 44px; padding: 10px 12px; background: var(--color-bg-surface); color: var(--color-text-primary); border: 1px solid var(--color-border-default); border-radius: var(--radius-md); }
+.analytics-filters .btn { width: auto; }
+.analytics-note { color: var(--color-text-secondary); font-size: .875rem; line-height: 1.6; margin: 12px 0 24px; }
+.analytics-panels { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; }
+.analytics-panel { min-width: 0; padding: 24px; border: 1px solid var(--color-border-default); border-radius: var(--radius-lg); background: var(--color-bg-surface); }
+.analytics-panel h2 { font-size: 1.125rem; margin: 0 0 16px; }
+.analytics-total { display: block; font-size: 2rem; color: var(--color-link); margin-bottom: 16px; }
+.analytics-bars { display: grid; gap: 12px; margin: 16px 0 24px; }
+.analytics-bar-label { display: flex; justify-content: space-between; gap: 12px; font-size: .875rem; margin-bottom: 6px; }
+.analytics-track { height: 8px; border-radius: 8px; background: var(--color-bg-subtle); overflow: hidden; }
+.analytics-fill { height: 100%; background: var(--color-action-primary); }
+.analytics-panel details { margin-top: 20px; }
+.analytics-panel summary { cursor: pointer; color: var(--color-link); padding: 8px 0; }
+.analytics-panel table { width: 100%; border-collapse: collapse; font-size: .875rem; }
+.analytics-panel th, .analytics-panel td { padding: 10px 0; text-align: left; border-bottom: 1px solid var(--color-border-default); }
+@media (max-width: 800px) { .analytics-panels { grid-template-columns: 1fr; } }
+@media (max-width: 480px) { .analytics-panel { padding: 16px; } .analytics-filters > * { width: 100%; } .analytics-filters .btn { width: 100%; } }
+
+.analytics-filters { padding: 20px; border: 1px solid var(--color-border-default); border-radius: var(--radius-lg); background: var(--color-bg-surface); }
+.analytics-method { margin: 12px 0 24px; color: var(--color-text-secondary); font-size: .875rem; }
+.analytics-method summary { cursor: pointer; padding: 8px 0; }
+.analytics-figures { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin: 24px 0; }
+.analytics-figure { display: flex; flex-direction: column; gap: 12px; text-decoration: none; padding: 20px; border: 1px solid var(--color-border-default); border-radius: var(--radius-lg); background: var(--color-bg-surface); color: var(--color-text-primary); }
+.analytics-figure:hover { border-color: var(--color-link); }
+.analytics-figure strong { font-size: 2rem; line-height: 1.2; color: var(--color-link); }
+.analytics-figure small { color: var(--color-text-secondary); }
+.analytics-panel { scroll-margin-top: 90px; }
+.analytics-panel > .analytics-total { font-size: .875rem; font-weight: 500; color: var(--color-text-secondary); }
+.analytics-chart-heading, .analytics-monthly figcaption { font-size: .875rem; font-weight: 600; color: var(--color-text-primary); }
+.analytics-monthly { margin: 24px 0 0; padding-top: 20px; border-top: 1px solid var(--color-border-default); }
+.analytics-monthly svg { display: block; width: 100%; height: auto; margin-top: 12px; overflow: visible; }
+.analytics-axis { fill: var(--color-text-secondary); font-size: 11px; }
+.analytics-gridline { stroke: var(--color-border-default); stroke-width: 1; }
+.analytics-column { fill: var(--color-action-primary); }
+.analytics-chart-note { font-size: .75rem; line-height: 1.5; color: var(--color-text-secondary); }
+.analytics-empty { padding: 24px 12px; text-align: center; color: var(--color-text-secondary); background: var(--color-bg-subtle); border-radius: var(--radius-md); }
+.analytics-bar-label { text-transform: capitalize; }
+@media (max-width: 800px) { .analytics-figures { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 480px) { .analytics-figure { padding: 16px; } .analytics-figure strong { font-size: 1.5rem; overflow-wrap: anywhere; } }

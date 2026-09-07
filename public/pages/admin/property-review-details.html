@@ -89,15 +89,15 @@
         .prop-type-pill {
             display: inline-flex;
             align-items: center;
-            background: #f1f5f9;
-            color: #334155;
+            background: var(--color-bg-subtle);
+            color: var(--color-text-secondary);
             padding: 4px 10px;
             border-radius: 999px;
             font-size: 0.72rem;
             font-weight: 750;
             text-transform: uppercase;
             letter-spacing: 0.04em;
-            border: 1px solid #e2e8f0;
+            border: 1px solid var(--color-border-default);
         }
 
         .review-hero-title {
@@ -111,7 +111,7 @@
 
         .review-hero-location {
             font-size: 0.9rem;
-            color: #64748b;
+            color: var(--color-text-muted);
             margin: 0;
             display: flex;
             align-items: center;
@@ -130,7 +130,7 @@
         }
 
         .review-card:hover {
-            border-color: #cbd5e1;
+            border-color: var(--color-border-strong);
         }
 
         .review-card-header {
@@ -171,9 +171,9 @@
         .review-card-step-badge {
             font-size: 0.72rem;
             font-weight: 700;
-            color: #64748b;
-            background: #f8fafc;
-            border: 1px solid #e2e8f0;
+            color: var(--color-text-muted);
+            background: var(--color-bg-canvas);
+            border: 1px solid var(--color-border-default);
             border-radius: 999px;
             padding: 3px 10px;
             text-transform: uppercase;
@@ -207,7 +207,7 @@
         .review-field-label {
             font-size: 0.72rem;
             font-weight: 750;
-            color: #64748b;
+            color: var(--color-text-muted);
             text-transform: uppercase;
             letter-spacing: 0.05em;
         }
@@ -231,10 +231,10 @@
             color: var(--color-text-secondary, #475569);
             line-height: 1.6;
             margin: 0;
-            background: #f8fafc;
+            background: var(--color-bg-canvas);
             padding: 14px 16px;
             border-radius: 10px;
-            border: 1px solid #e2e8f0;
+            border: 1px solid var(--color-border-default);
         }
 
         /* ── Map Container ── */
@@ -262,9 +262,9 @@
             display: inline-flex;
             align-items: center;
             gap: 6px;
-            background: #f0fdf4;
-            color: #166534;
-            border: 1px solid #bbf7d0;
+            background: var(--color-success-bg);
+            color: var(--color-success-text);
+            border: 1px solid var(--color-success-border);
             padding: 6px 12px;
             border-radius: 8px;
             font-size: 0.8125rem;
@@ -278,10 +278,10 @@
             line-height: 1.6;
             margin: 0;
             white-space: pre-line;
-            background: #f8fafc;
+            background: var(--color-bg-canvas);
             padding: 14px 16px;
             border-radius: 10px;
-            border: 1px solid #e2e8f0;
+            border: 1px solid var(--color-border-default);
         }
 
         /* ── Document Slot Items ── */
@@ -300,7 +300,7 @@
         }
 
         .doc-slot-card:hover {
-            border-color: #cbd5e1;
+            border-color: var(--color-border-strong);
             box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
         }
 
@@ -342,7 +342,7 @@
 
         .doc-slot-subtext {
             font-size: 0.72rem;
-            color: #94a3b8;
+            color: var(--color-text-muted);
             display: block;
             margin-top: 3px;
         }
@@ -364,7 +364,7 @@
         }
 
         .photo-slot-card:hover {
-            border-color: #cbd5e1;
+            border-color: var(--color-border-strong);
             transform: translateY(-2px);
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
         }
@@ -373,7 +373,7 @@
             position: relative;
             height: 180px;
             width: 100%;
-            background-color: #f8fafc;
+            background-color: var(--color-bg-canvas);
         }
 
         .photo-slot-image-wrap img {
@@ -390,8 +390,8 @@
             align-items: center;
             justify-content: center;
             height: 100%;
-            color: #94a3b8;
-            background-color: #f8fafc;
+            color: var(--color-text-muted);
+            background-color: var(--color-bg-canvas);
         }
 
         .photo-slot-label {
@@ -401,22 +401,22 @@
             text-align: center;
             color: var(--color-text-primary, #0f172a);
             border-top: 1px solid var(--color-border-default, #e2e8f0);
-            background-color: #f8fafc;
+            background-color: var(--color-bg-canvas);
         }
 
         /* ── Verification Decision Panel ── */
         .review-decision-card {
-            border: 2px solid #e2e8f0;
+            border: 2px solid var(--color-border-default);
         }
 
         .review-card-icon--decision {
-            background: #eff6ff;
-            color: #0355f3;
+            background: var(--color-info-bg);
+            color: var(--color-link);
         }
 
         .review-decision-summary {
-            background: #f8fafc;
-            border: 1px solid #e2e8f0;
+            background: var(--color-bg-canvas);
+            border: 1px solid var(--color-border-default);
             border-radius: 12px;
             padding: 16px 20px;
             margin-bottom: 1rem;
@@ -424,9 +424,9 @@
 
         .review-rejection-msg {
             font-size: 0.9rem;
-            color: #b91c1c;
+            color: var(--color-error-text);
             font-style: italic;
-            background-color: #fef2f2;
+            background-color: var(--color-error-bg);
             padding: 10px 14px;
             border: 1px dashed #f87171;
             border-radius: 8px;
@@ -436,7 +436,7 @@
 
         .review-audit-meta {
             font-size: 0.78rem;
-            color: #64748b;
+            color: var(--color-text-muted);
             margin-top: 8px;
             font-weight: 500;
         }
@@ -446,7 +446,7 @@
             border-radius: 10px;
             padding: 12px;
             font-size: 0.875rem;
-            border: 1px solid #cbd5e1;
+            border: 1px solid var(--color-border-strong);
             transition: border-color 0.15s ease;
         }
 
@@ -478,13 +478,13 @@
         }
 
         .btn-decision--reject {
-            background: #fef2f2;
-            color: #dc2626;
-            border: 1px solid #fecaca;
+            background: var(--color-error-bg);
+            color: var(--color-error-text);
+            border: 1px solid var(--color-error-border);
         }
 
         .btn-decision--reject:hover {
-            background: #fee2e2;
+            background: var(--color-error-bg);
             border-color: #fca5a5;
             transform: translateY(-1px);
         }
@@ -519,24 +519,24 @@
         .status-badge.status-active,
         .status-badge.approved,
         .status-badge.accepted {
-            background: #ecfdf5 !important;
-            color: #059669 !important;
-            border: 1px solid #a7f3d0 !important;
+            background: var(--color-success-bg) !important;
+            color: var(--color-success-text) !important;
+            border: 1px solid var(--color-success-border) !important;
         }
 
         .status-badge.status-pending,
         .status-badge.pending_review,
         .status-badge.pending {
-            background: #fffbeb !important;
-            color: #d97706 !important;
-            border: 1px solid #fde68a !important;
+            background: var(--color-warning-bg) !important;
+            color: var(--color-warning-text) !important;
+            border: 1px solid var(--color-warning-border) !important;
         }
 
         .status-badge.status-rejected,
         .status-badge.rejected {
-            background: #fef2f2 !important;
-            color: #dc2626 !important;
-            border: 1px solid #fecaca !important;
+            background: var(--color-error-bg) !important;
+            color: var(--color-error-text) !important;
+            border: 1px solid var(--color-error-border) !important;
         }
 
         @media (max-width: 640px) {
@@ -813,7 +813,7 @@
                 <div id="reviewDisplayPanel" class="hidden">
                     <div class="review-decision-summary">
                         <div id="rejectionReasonBlock">
-                            <div class="review-field-label" style="color: #b91c1c; margin-bottom: 4px;">Rejection Reason</div>
+                            <div class="review-field-label" style="color: var(--color-error-text); margin-bottom: 4px;">Rejection Reason</div>
                             <p id="rejectionReasonText" class="review-rejection-msg">-</p>
                         </div>
                         <div id="reviewedByText" class="review-audit-meta">Reviewed by -</div>
@@ -824,7 +824,7 @@
                 <div id="decisionControls">
                     <div class="form-group" style="margin-bottom: 1.25rem;">
                         <label for="rejectionRemarks" class="review-field-label" style="display: block; margin-bottom: 8px;">
-                            Rejection Reason Remarks <span style="font-weight: 500; text-transform: none; color: #64748b;">(Required if rejecting)</span>
+                            Rejection Reason Remarks <span style="font-weight: 500; text-transform: none; color: var(--color-text-muted);">(Required if rejecting)</span>
                         </label>
                         <textarea id="rejectionRemarks" rows="3" placeholder="If rejecting, state structural errors, missing licenses, coordinate discrepancies, or issues here..." class="form-input form-textarea review-textarea"></textarea>
                     </div>
@@ -968,7 +968,7 @@
                     amenities.forEach(a => {
                         const tag = document.createElement('span');
                         tag.className = 'badge-amenity';
-                        tag.innerHTML = `<svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="color: #059669;"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg> ${domiknowEscapeHtml(a)}`;
+                        tag.innerHTML = `<svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="color: var(--color-success-text);"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg> ${domiknowEscapeHtml(a)}`;
                         amenitiesContainer.appendChild(tag);
                     });
                 } else {
@@ -1105,7 +1105,7 @@
                                 <span class="doc-slot-meta">
                                     <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="color: var(--color-action-primary, #0355f3); flex-shrink: 0;"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
                                     <a href="${domiknowSafeExternalUrl(matchedDoc.file_url)}" target="_blank" rel="noopener noreferrer" class="doc-slot-link">${domiknowEscapeHtml(matchedDoc.file_name || 'Document')}</a>
-                                    <span style="color: #64748b; font-size: 0.8125rem;">(${sizeKB} KB)</span>
+                                    <span style="color: var(--color-text-muted); font-size: 0.8125rem;">(${sizeKB} KB)</span>
                                 </span>
                                 <span class="doc-slot-subtext">Submitted on ${uploadedDate}</span>
                             </div>

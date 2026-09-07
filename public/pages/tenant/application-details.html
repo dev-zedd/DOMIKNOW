@@ -536,7 +536,6 @@
             }
 
             docs.forEach(doc => {
-                const fileUrl = domiknowSafeExternalUrl(doc.file_url);
                 const rawType = String(doc.document_type || 'other').toLowerCase();
                 const meta = DOC_TYPE_META[rawType] || {
                     label: rawType.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
@@ -578,19 +577,14 @@
                         ${iconSvg}
                     </div>
                     <div class="app-doc-info-block">
-                        <a href="${fileUrl}" target="_blank" rel="noopener noreferrer" class="app-doc-type-title" title="Open ${domiknowEscapeHtml(meta.label)}">
-                            ${domiknowEscapeHtml(meta.label)}
-                        </a>
+                        ${domiknowDocumentLink(doc.file_url, meta.label, 'app-doc-type-title')}
                         <div class="app-doc-meta-row">
                             <span class="app-doc-file-tag ${tagClass}">${fileTagText}</span>
                             <span class="app-doc-filename" title="${cleanFileName}">${cleanFileName}</span>
-                            ${sizeText ? `<span style="flex-shrink: 0; color: #94a3b8;">• ${sizeText}</span>` : ''}
+                            ${sizeText ? `<span style="flex-shrink: 0; color: var(--color-text-muted);">• ${sizeText}</span>` : ''}
                         </div>
                     </div>
-                    <a href="${fileUrl}" target="_blank" rel="noopener noreferrer" class="app-doc-action-btn" title="View ${cleanFileName}">
-                        <span>View</span>
-                        <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25"/></svg>
-                    </a>
+                    ${domiknowDocumentLink(doc.file_url, 'View', 'app-doc-action-btn')}
                 `;
                 container.appendChild(item);
             });

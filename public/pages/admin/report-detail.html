@@ -276,7 +276,7 @@
 
         .chip-landlord-vs-tenant {
             background: rgba(3, 85, 243, 0.1);
-            color: #0355f3;
+            color: var(--color-link);
             border: 1px solid rgba(3, 85, 243, 0.25);
         }
 
@@ -565,8 +565,8 @@
             max-width: calc(100vw - 2rem) !important;
             height: 560px !important;
             max-height: calc(100vh - 7rem) !important;
-            background: #f8fafc !important;
-            border: 1px solid #cbd5e1 !important;
+            background: var(--color-bg-canvas) !important;
+            border: 1px solid var(--color-border-strong) !important;
             border-radius: 20px !important;
             box-shadow: 0 20px 45px -10px rgba(15, 23, 42, 0.35) !important;
             z-index: 10060 !important;
@@ -612,7 +612,7 @@
 
         /* Pill Switch Button - Light Cream Pill with Accent Text */
         .chat-head-switch-btn {
-            background: #fef3c7 !important;
+            background: var(--color-warning-bg) !important;
             color: #0f766e !important;
             border: none !important;
             font-size: 0.78rem !important;
@@ -662,7 +662,7 @@
             flex: 1 !important;
             min-height: 0 !important;
             overflow: hidden !important;
-            background: #f8fafc !important;
+            background: var(--color-bg-canvas) !important;
             padding: 0 !important;
         }
 
@@ -673,7 +673,7 @@
             flex-direction: column !important;
             gap: 0.85rem !important;
             padding: 0.85rem !important;
-            background: #f8fafc !important;
+            background: var(--color-bg-canvas) !important;
             border-radius: 12px !important;
         }
 
@@ -698,11 +698,11 @@
         .chat-date-separator span {
             position: relative !important;
             z-index: 2 !important;
-            background: #f8fafc !important;
+            background: var(--color-bg-canvas) !important;
             padding: 0 0.75rem !important;
             font-size: 0.68rem !important;
             font-weight: 800 !important;
-            color: #64748b !important;
+            color: var(--color-text-muted) !important;
             letter-spacing: 0.05em !important;
             text-transform: uppercase !important;
         }
@@ -742,9 +742,9 @@
         }
 
         .chat-msg-row.other .chat-avatar {
-            background: #e2e8f0 !important;
-            color: #475569 !important;
-            border: 1px solid #cbd5e1 !important;
+            background: var(--color-bg-subtle) !important;
+            color: var(--color-text-secondary) !important;
+            border: 1px solid var(--color-border-strong) !important;
         }
 
         .chat-msg-row.me .chat-avatar {
@@ -770,7 +770,7 @@
         .chat-msg-meta {
             font-size: 0.7rem !important;
             font-weight: 600 !important;
-            color: #64748b !important;
+            color: var(--color-text-muted) !important;
             margin-bottom: 0.2rem !important;
             display: flex !important;
             align-items: center !important;
@@ -780,7 +780,7 @@
         }
 
         .chat-msg-meta strong {
-            color: #334155 !important;
+            color: var(--color-text-secondary) !important;
         }
 
         /* Speech Bubbles */
@@ -804,9 +804,9 @@
         }
 
         .chat-msg-row.other .chat-msg-bubble {
-            background: #ffffff !important;
-            color: #0f172a !important;
-            border: 1px solid #cbd5e1 !important;
+            background: var(--color-bg-surface) !important;
+            color: var(--color-text-primary) !important;
+            border: 1px solid var(--color-border-strong) !important;
             border-radius: 16px 16px 16px 4px !important;
         }
 
@@ -823,7 +823,7 @@
             align-items: center !important;
             gap: 0.75rem !important;
             padding: 0.6rem 0.85rem !important;
-            background: #ffffff !important;
+            background: var(--color-bg-surface) !important;
             border: 1.5px solid #0f766e !important;
             border-radius: 12px !important;
             margin-top: 0.4rem !important;
@@ -1060,7 +1060,7 @@
 
         <!-- Target User Prior Report History & Offenses -->
         <div class="case-card" id="historyCard" style="display:none; background: rgba(245, 158, 11, 0.04); border-color: rgba(245, 158, 11, 0.25);">
-            <div class="case-card-title" style="color: #d97706;">
+            <div class="case-card-title" style="color: var(--color-warning-text);">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M12 8v4l3 3" />
                     <circle cx="12" cy="12" r="10" />
@@ -1091,11 +1091,11 @@
                                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
                                 Disciplinary Decision Successfully Enforced &amp; Active
                             </h4>
-                            <span id="enforcementTimestamp" style="font-size: 0.75rem; font-weight: 700; color: #166534; background: rgba(22,163,74,0.15); padding: 0.25rem 0.75rem; border-radius: 999px;">Just Now</span>
+                            <span id="enforcementTimestamp" style="font-size: 0.75rem; font-weight: 700; color: var(--color-success-text); background: rgba(22,163,74,0.15); padding: 0.25rem 0.75rem; border-radius: 999px;">Just Now</span>
                         </div>
-                        <p id="enforcementMessageText" style="margin: 0.4rem 0 0.65rem 0; font-size: 0.88rem; color: #166534; font-weight: 600; line-height: 1.5;"></p>
+                        <p id="enforcementMessageText" style="margin: 0.4rem 0 0.65rem 0; font-size: 0.88rem; color: var(--color-success-text); font-weight: 600; line-height: 1.5;"></p>
                         <div id="enforcementChips" style="display: flex; flex-wrap: wrap; gap: 0.45rem; margin-bottom: 0.55rem;"></div>
-                        <div id="enforcementRemarksBox" style="font-size: 0.82rem; color: #14532d; background: rgba(255,255,255,0.75); border: 1px solid #bbf7d0; padding: 0.65rem 0.9rem; border-radius: var(--radius-sm); font-style: italic; white-space: pre-wrap;"></div>
+                        <div id="enforcementRemarksBox" style="font-size: 0.82rem; color: #14532d; background: rgba(255,255,255,0.75); border: 1px solid var(--color-success-border); padding: 0.65rem 0.9rem; border-radius: var(--radius-sm); font-style: italic; white-space: pre-wrap;"></div>
                     </div>
                 </div>
             </div>
@@ -1176,7 +1176,7 @@
 
         <!-- 3. Intake & Priority Triage Stage Control -->
         <div class="case-card" style="background: rgba(59, 130, 246, 0.03); border: 1px solid rgba(59, 130, 246, 0.25);">
-            <div class="case-card-title" style="color: var(--landlord);">
+            <div class="case-card-title" style="color: var(--color-link);">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
                 </svg>
@@ -1569,22 +1569,22 @@
             if (action === 'dismiss' || data.status === 'rejected') {
                 summaryMsg = `Report ticket has been officially dismissed. No disciplinary sanction was applied to ${targetRole} "${targetName}".`;
                 chipHtml = `
-                    <span style="font-size:0.75rem; font-weight:800; background:#e2e8f0; color:#475569; padding:0.25rem 0.65rem; border-radius:999px;">Decision: Dismissed</span>
-                    <span style="font-size:0.75rem; font-weight:800; background:#dcfce7; color:#15803d; padding:0.25rem 0.65rem; border-radius:999px;">Account Status: Active</span>
+                    <span style="font-size:0.75rem; font-weight:800; background: var(--color-bg-subtle); color: var(--color-text-secondary); padding:0.25rem 0.65rem; border-radius:999px;">Decision: Dismissed</span>
+                    <span style="font-size:0.75rem; font-weight:800; background: var(--color-success-bg); color: var(--color-success-text); padding:0.25rem 0.65rem; border-radius:999px;">Account Status: Active</span>
                     <span style="font-size:0.75rem; font-weight:800; background:#e0f2fe; color:#0369a1; padding:0.25rem 0.65rem; border-radius:999px;">Ticket Status: Closed / Resolved</span>
                 `;
             } else if (action === 'warning') {
                 summaryMsg = `Official Platform Warning issued to ${targetRole} "${targetName}". Infraction notice recorded in account audit history.`;
                 chipHtml = `
-                    <span style="font-size:0.75rem; font-weight:800; background:#fef3c7; color:#b45309; padding:0.25rem 0.65rem; border-radius:999px;">Decision: Formal Warning</span>
-                    <span style="font-size:0.75rem; font-weight:800; background:#dcfce7; color:#15803d; padding:0.25rem 0.65rem; border-radius:999px;">Account Status: Active (Warning Logged)</span>
+                    <span style="font-size:0.75rem; font-weight:800; background: var(--color-warning-bg); color: var(--color-warning-text); padding:0.25rem 0.65rem; border-radius:999px;">Decision: Formal Warning</span>
+                    <span style="font-size:0.75rem; font-weight:800; background: var(--color-success-bg); color: var(--color-success-text); padding:0.25rem 0.65rem; border-radius:999px;">Account Status: Active (Warning Logged)</span>
                     <span style="font-size:0.75rem; font-weight:800; background:#e0f2fe; color:#0369a1; padding:0.25rem 0.65rem; border-radius:999px;">Ticket Status: Resolved</span>
                 `;
             } else if (action === 'suspend') {
                 summaryMsg = `${targetRole} "${targetName}"'s account has been suspended for ${days} days. Login access is currently blocked until auto-lift expiration.`;
                 chipHtml = `
                     <span style="font-size:0.75rem; font-weight:800; background:#ffedd5; color:#c2410c; padding:0.25rem 0.65rem; border-radius:999px;">Decision: Temporary Suspension (${days} Days)</span>
-                    <span style="font-size:0.75rem; font-weight:800; background:#fee2e2; color:#b91c1c; padding:0.25rem 0.65rem; border-radius:999px;">Account Status: Disabled (${days} Days)</span>
+                    <span style="font-size:0.75rem; font-weight:800; background: var(--color-error-bg); color: var(--color-error-text); padding:0.25rem 0.65rem; border-radius:999px;">Account Status: Disabled (${days} Days)</span>
                     <span style="font-size:0.75rem; font-weight:800; background:#e0f2fe; color:#0369a1; padding:0.25rem 0.65rem; border-radius:999px;">Ticket Status: Resolved</span>
                 `;
             } else if (action === 'ban') {
@@ -1596,7 +1596,7 @@
                 `;
             } else {
                 chipHtml = `
-                    <span style="font-size:0.75rem; font-weight:800; background:#dcfce7; color:#15803d; padding:0.25rem 0.65rem; border-radius:999px;">Ticket Status: Enforced &amp; Resolved</span>
+                    <span style="font-size:0.75rem; font-weight:800; background: var(--color-success-bg); color: var(--color-success-text); padding:0.25rem 0.65rem; border-radius:999px;">Ticket Status: Enforced &amp; Resolved</span>
                 `;
             }
 

@@ -135,53 +135,6 @@
         }
     };
 
-    const GLYPH_ICONS = new Map([
-        ['📁', 'folder'],
-        ['🔒', 'lock'],
-        ['⚠️', 'warning'],
-        ['⚠', 'warning'],
-        ['❌', 'x'],
-        ['⚡', 'bolt'],
-        ['🟢', 'check'],
-        ['✅', 'check'],
-        ['📝', 'note'],
-        ['✨', 'sparkle'],
-        ['💬', 'message'],
-        ['⚑', 'flag'],
-        ['🗒️', 'note'],
-        ['🗒', 'note'],
-        ['🎯', 'target'],
-        ['🎉', 'sparkle'],
-        ['✕', 'x'],
-        ['📎', 'paperclip'],
-        ['🛡️', 'shield'],
-        ['🛡', 'shield'],
-        ['🔍', 'search'],
-        ['⛔', 'ban'],
-        ['✓', 'check']
-    ]);
-
-    const ICONIZE_SELECTOR = [
-        'button',
-        'a',
-        '.alert-icon',
-        '.empty-icon',
-        '.hero-icon',
-        '.card-head-icon',
-        '.status-badge',
-        '.badge',
-        '.chip',
-        '.feedback-snippet',
-        '.alert',
-        '[id$="StatusBanner"]',
-        '#contactNoNotice',
-        '#bgyDetectStatus',
-        '#locationAccuracyStatus',
-        '#createFeedback',
-        '[id^="statusDoc"]',
-        '[id^="statusPhoto"]'
-    ].join(',');
-
     const SEMANTIC_STYLE_REPLACEMENTS = [
         [/((?:border|border-color)\s*:[^;]*?)rgba?\(239\s*,\s*68\s*,\s*68\s*(?:,\s*(?:0?\.\d+|1(?:\.0)?))?\)/gi, '$1var(--color-error-border)'],
         [/((?:border|border-color)\s*:[^;]*?)rgba?\(16\s*,\s*185\s*,\s*129\s*(?:,\s*(?:0?\.\d+|1(?:\.0)?))?\)/gi, '$1var(--color-success-border)'],
@@ -293,7 +246,6 @@
 
         improveControls(document);
         normalizeSemanticInlineStyles(document);
-        improveIconography(document);
         improveTabs();
         improveSteppers();
         improveModals();
@@ -352,52 +304,12 @@
         });
     }
 
-    function improveIconography(root) {
-        const candidates = [];
-        if (root.nodeType === Node.ELEMENT_NODE && root.matches?.(ICONIZE_SELECTOR)) candidates.push(root);
-        root.querySelectorAll?.(ICONIZE_SELECTOR).forEach((element) => candidates.push(element));
-
-        candidates.forEach((element) => {
-            if (element.querySelector(':scope > .landlord-inline-icon')) return;
-
-            const walker = document.createTreeWalker(element, NodeFilter.SHOW_TEXT);
-            let textNode = walker.nextNode();
-            while (textNode && !textNode.textContent.trim()) textNode = walker.nextNode();
-            if (!textNode) return;
-
-            const originalText = textNode.textContent;
-            const leadingSpace = originalText.match(/^\s*/)?.[0] || '';
-            const trimmedText = originalText.slice(leadingSpace.length);
-            const match = Array.from(GLYPH_ICONS.keys())
-                .sort((left, right) => right.length - left.length)
-                .find((glyph) => trimmedText.startsWith(glyph));
-            if (!match) return;
-
-            const iconName = GLYPH_ICONS.get(match);
-            textNode.textContent = `${leadingSpace}${trimmedText.slice(match.length).replace(/^\s+/, '')}`;
-
-            const iconWrapper = document.createElement('span');
-            iconWrapper.className = 'landlord-inline-icon';
-            iconWrapper.setAttribute('aria-hidden', 'true');
-            iconWrapper.innerHTML = window.domiknowIcon
-                ? window.domiknowIcon(iconName)
-                : `<span data-icon="${iconName}"></span>`;
-            textNode.parentNode.insertBefore(iconWrapper, textNode);
-
-            if (!element.textContent.trim() && !element.getAttribute('aria-label')) {
-                element.setAttribute('aria-label', element.getAttribute('title') || iconName.replace(/-/g, ' '));
-            }
-        });
-    }
-
     function observeDynamicIconography() {
         const observer = new MutationObserver((mutations) => {
             mutations.forEach((mutation) => mutation.addedNodes.forEach((node) => {
                 if (node.nodeType === Node.ELEMENT_NODE) {
                     normalizeSemanticInlineStyles(node);
-                    improveIconography(node);
                 }
-                if (node.nodeType === Node.TEXT_NODE && node.parentElement) improveIconography(node.parentElement);
             }));
         });
         observer.observe(document.body, { childList: true, subtree: true });
@@ -484,11 +396,9 @@
 
         const isVisible = (modal) => {
             const style = window.getComputedStyle(modal);
-            return !modal.classList.contains('hidden')
+            return !modal.hidden && !modal.classList.contains('hidden')
                 && style.display !== 'none'
-                && style.visibility !== 'hidden'
-                && style.pointerEvents !== 'none'
-                && style.opacity !== '0';
+                && style.visibility !== 'hidden';
         };
 
         const syncModal = (modal) => {
@@ -511,15 +421,16 @@
         };
 
         overlays.forEach((modal, index) => {
-            modal.setAttribute('role', 'dialog');
-            modal.setAttribute('aria-modal', 'true');
+            const dialog = modal.querySelector(':scope > .modal-container, :scope > .modal-box, :scope > .form-modal, :scope > .details-modal') || modal;
+            dialog.setAttribute('role', 'dialog');
+            dialog.setAttribute('aria-modal', 'true');
             modal.tabIndex = -1;
             const heading = modal.querySelector('h1, h2, h3, .modal-title');
             if (heading) {
                 if (!heading.id) heading.id = `landlordModalTitle${index + 1}`;
-                modal.setAttribute('aria-labelledby', heading.id);
-            } else if (!modal.getAttribute('aria-label')) {
-                modal.setAttribute('aria-label', 'Dialog');
+                dialog.setAttribute('aria-labelledby', heading.id);
+            } else if (!dialog.getAttribute('aria-label')) {
+                dialog.setAttribute('aria-label', 'Dialog');
             }
             syncModal(modal);
             new MutationObserver(() => syncModal(modal)).observe(modal, {

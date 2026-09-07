@@ -1,0 +1,55 @@
+.earth-journey {
+  --earth-ocean: #061a36;
+  --earth-land: #153a67;
+  --earth-coast: #729fce;
+  --earth-grid: #244b77;
+  --earth-accent: #6b90ff;
+  position: relative;
+  margin: 0;
+  width: 100%;
+  min-width: 0;
+  aspect-ratio: 1.15;
+  overflow: hidden;
+  isolation: isolate;
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-xl);
+  background: #040e20;
+  color: #f8fafc;
+  box-shadow: var(--shadow-card);
+}
+.earth-journey canvas { display: block; width: 100%; height: 100%; }
+.earth-journey__heading {
+  position: absolute; inset: 0 0 auto; padding: 24px;
+  background: linear-gradient(#040e20e8, #040e2000);
+  pointer-events: none;
+}
+.earth-journey__eyebrow { display: flex; gap: 8px; align-items: center; color: #b3c9ed; font-size: .7rem; letter-spacing: .08em; text-transform: uppercase; }
+.earth-journey__heading strong { display: block; margin-top: 7px; font-size: clamp(1rem, 1.5vw, 1.3rem); font-weight: 600; }
+.earth-journey__destination {
+  position: absolute; left: 50%; top: 58%; transform: translate(-50%, -50%);
+  display: flex; align-items: center; gap: 10px; padding: 12px 16px;
+  width: max-content; max-width: calc(100% - 32px);
+  border: 1px solid #729fce70; border-radius: 12px;
+  background: #061a36ed; box-shadow: 0 12px 32px #0004;
+  opacity: 0; transition: opacity .4s; pointer-events: none;
+}
+.earth-journey[data-arrived="true"] .earth-journey__destination { opacity: 1; }
+.earth-journey__destination strong { display: block; font-size: .95rem; color: #f8fafc; }
+.earth-journey__destination div > span { display: block; font-size: .67rem; color: #b3c9ed; margin-top: 3px; }
+.earth-journey__pin { color: #8fb1ff; }
+.earth-journey__footer { position: absolute; inset: auto 0 0; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 20px; background: linear-gradient(#040e2000, #040e20); }
+.earth-journey__footer > span { color: #b3c9ed; font-size: .75rem; line-height: 1.5; }
+.earth-journey__controls { display: flex; gap: 8px; flex-shrink: 0; }
+.earth-journey__controls button { display: grid; place-items: center; width: 44px; height: 44px; padding: 0; border: 1px solid #729fce70; border-radius: 50%; color: #f8fafc; background: #153a67; cursor: pointer; }
+.earth-journey__controls button:hover:not(:disabled) { background: #155de3; }
+.earth-journey__controls button:focus-visible { outline: 3px solid #8fb1ff; outline-offset: 3px; }
+.earth-journey__controls button:disabled { opacity: .45; cursor: default; }
+.earth-journey__fallback { position: absolute; inset: 40% 24px auto; color: #f8fafc; text-align: center; }
+@media (max-width: 540px) {
+  .earth-journey { aspect-ratio: .95; }
+  .earth-journey__heading { padding: 18px; }
+  .earth-journey__footer { padding: 16px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .earth-journey__destination { transition: none; }
+}

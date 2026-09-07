@@ -1,3 +1,4 @@
+const { getBillingBalance } = require('../utils/billingBalanceHelper');
 const supabase = require('../config/supabaseClient');
 
 const paymentModel = {
@@ -84,13 +85,19 @@ const paymentModel = {
         // Enforce ownership check
         const { data: payment, error: checkError } = await supabase
             .from('payment_records')
-            .select('id, billing_id, payment_amount, landlord_id')
+            .select('id, billing_id, payment_amount, landlord_id, payment_status')
             .eq('id', id)
             .maybeSingle();
 
         if (checkError) throw checkError;
         if (!payment || payment.landlord_id !== landlordId) {
             return null;
+        }
+
+        if (payment.payment_status !== 'pending_verification') {
+            const error = new Error('This payment has already been reviewed. Refresh the payment list.');
+            error.statusCode = 409;
+            throw error;
         }
 
         // Update payment status
@@ -103,41 +110,34 @@ const paymentModel = {
                 updated_at: new Date()
             })
             .eq('id', id)
+            .eq('payment_status', 'pending_verification')
             .select()
-            .single();
+            .maybeSingle();
 
         if (error) throw error;
 
-        // Update the related billing status
-        if (paymentStatus === 'verified') {
-            // Get billing total amount
-            const { data: billing, error: billingError } = await supabase
-                .from('billing_records')
-                .select('total_amount')
-                .eq('id', payment.billing_id)
-                .single();
-
-            if (billingError) throw billingError;
-
-            const finalStatus = parseFloat(payment.payment_amount) >= parseFloat(billing.total_amount)
-                ? 'paid'
-                : 'partially_paid';
-
-            const { error: updateBillingError } = await supabase
-                .from('billing_records')
-                .update({ billing_status: finalStatus, updated_at: new Date() })
-                .eq('id', payment.billing_id);
-
-            if (updateBillingError) throw updateBillingError;
-        } else if (paymentStatus === 'rejected') {
-            // Revert billing status back to pending_payment on rejection
-            const { error: updateBillingError } = await supabase
-                .from('billing_records')
-                .update({ billing_status: 'pending_payment', updated_at: new Date() })
-                .eq('id', payment.billing_id);
-
-            if (updateBillingError) throw updateBillingError;
+        if (!updatedPayment) {
+            const conflict = new Error('This payment was reviewed by another request. Refresh the payment list.');
+            conflict.statusCode = 409;
+            throw conflict;
         }
+
+        // Reconcile against all verified instalments, including earlier payments
+        // when the current proof is rejected. Pending proofs are not money received.
+        const { data: billing, error: billingError } = await supabase
+            .from('billing_records').select('total_amount').eq('id', payment.billing_id).single();
+        if (billingError) throw billingError;
+        const { data: payments, error: paymentsError } = await supabase
+            .from('payment_records').select('payment_amount, payment_status').eq('billing_id', payment.billing_id);
+        if (paymentsError) throw paymentsError;
+        const balance = getBillingBalance(billing.total_amount, payments || []);
+        const finalStatus = balance.remaining_balance === 0 ? 'paid'
+            : (payments || []).some(item => item.payment_status === 'pending_verification') ? 'waiting_verification'
+            : balance.paid_amount > 0 ? 'partially_paid' : 'pending_payment';
+        const { error: updateBillingError } = await supabase
+            .from('billing_records').update({ billing_status: finalStatus, updated_at: new Date() })
+            .eq('id', payment.billing_id);
+        if (updateBillingError) throw updateBillingError;
 
         return updatedPayment;
     },

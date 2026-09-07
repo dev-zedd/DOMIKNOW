@@ -465,34 +465,6 @@ const landlordController = {
                 return responseHelper.error(res, 'Application not found or unauthorized status change.', null, 400);
             }
 
-            // Reserve unit/bed if approved
-            if (status === 'approved') {
-                if (updated.bed_id) {
-                    await supabase
-                        .from('unit_beds')
-                        .update({ status: 'reserved' })
-                        .eq('id', updated.bed_id);
-                } else if (updated.unit_id) {
-                    await supabase
-                        .from('property_units')
-                        .update({ status: 'reserved' })
-                        .eq('id', updated.unit_id);
-                }
-            } else if (status === 'rejected') {
-                // Revert status to available if landlord rejects
-                if (updated.bed_id) {
-                    await supabase
-                        .from('unit_beds')
-                        .update({ status: 'available' })
-                        .eq('id', updated.bed_id);
-                } else if (updated.unit_id) {
-                    await supabase
-                        .from('property_units')
-                        .update({ status: 'available' })
-                        .eq('id', updated.unit_id);
-                }
-            }
-
             // Log audits
             const actionType = status === 'approved' ? 'APPROVE_TENANT_APPLICATION' : 'REJECT_TENANT_APPLICATION';
             await auditLogModel.log(landlordId, actionType, `Landlord updated tenant application ${id} status to ${status}`);
@@ -511,7 +483,7 @@ const landlordController = {
 
         } catch (error) {
             console.error('Update tenant application status error:', error);
-            return responseHelper.error(res, 'Failed to update tenant application status', error, 500);
+            return responseHelper.error(res, error.message || 'Failed to update tenant application status', error, error.statusCode || 500);
         }
     },
 

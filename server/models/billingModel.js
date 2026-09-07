@@ -1,3 +1,4 @@
+const { withBillingBalance } = require('../utils/billingBalanceHelper');
 const supabase = require('../config/supabaseClient');
 
 const billingModel = {
@@ -33,6 +34,7 @@ const billingModel = {
                 other_charges,
                 penalty_amount,
                 total_amount,
+                payment_records (payment_amount, payment_status),
                 due_date,
                 billing_status,
                 remarks,
@@ -55,7 +57,7 @@ const billingModel = {
             .order('created_at', { ascending: false });
 
         if (error) throw error;
-        return data || [];
+        return (data || []).map(withBillingBalance);
     },
 
     async findByTenantId(tenantId) {
@@ -76,6 +78,7 @@ const billingModel = {
                 other_charges,
                 penalty_amount,
                 total_amount,
+                payment_records (payment_amount, payment_status),
                 due_date,
                 billing_status,
                 remarks,
@@ -98,7 +101,7 @@ const billingModel = {
             .order('created_at', { ascending: false });
 
         if (error) throw error;
-        return data || [];
+        return (data || []).map(withBillingBalance);
     },
 
     async findById(id) {
@@ -119,6 +122,7 @@ const billingModel = {
                 other_charges,
                 penalty_amount,
                 total_amount,
+                payment_records (payment_amount, payment_status),
                 due_date,
                 billing_status,
                 remarks,
@@ -147,7 +151,7 @@ const billingModel = {
             .maybeSingle();
 
         if (error) throw error;
-        return data || null;
+        return withBillingBalance(data);
     },
 
     async findOverdueByLandlordId(landlordId) {
@@ -167,6 +171,7 @@ const billingModel = {
                 other_charges,
                 penalty_amount,
                 total_amount,
+                payment_records (payment_amount, payment_status),
                 due_date,
                 billing_status,
                 users!billing_records_tenant_id_fkey (
@@ -177,12 +182,12 @@ const billingModel = {
                 )
             `)
             .eq('landlord_id', landlordId)
-            .in('billing_status', ['pending_payment', 'unpaid'])
+            .in('billing_status', ['pending_payment', 'unpaid', 'partially_paid', 'overdue'])
             .lt('due_date', todayStr)
             .order('due_date', { ascending: true });
 
         if (error) throw error;
-        return data || [];
+        return (data || []).map(withBillingBalance);
     },
 
     async findOverdueByTenantId(tenantId) {
@@ -202,6 +207,7 @@ const billingModel = {
                 other_charges,
                 penalty_amount,
                 total_amount,
+                payment_records (payment_amount, payment_status),
                 due_date,
                 billing_status,
                 properties (
@@ -209,12 +215,12 @@ const billingModel = {
                 )
             `)
             .eq('tenant_id', tenantId)
-            .in('billing_status', ['pending_payment', 'unpaid'])
+            .in('billing_status', ['pending_payment', 'unpaid', 'partially_paid', 'overdue'])
             .lt('due_date', todayStr)
             .order('due_date', { ascending: true });
 
         if (error) throw error;
-        return data || [];
+        return (data || []).map(withBillingBalance);
     },
 
     async findAllBillings() {
@@ -227,6 +233,7 @@ const billingModel = {
                 utility_amount,
                 penalty_amount,
                 total_amount,
+                payment_records (payment_amount, payment_status),
                 due_date,
                 billing_status,
                 tenant:users!billing_records_tenant_id_fkey (
@@ -242,7 +249,7 @@ const billingModel = {
             .order('created_at', { ascending: false });
 
         if (error) throw error;
-        return data || [];
+        return (data || []).map(withBillingBalance);
     },
 
     async updateBilling(id, landlordId, billingData) {

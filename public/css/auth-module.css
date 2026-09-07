@@ -259,7 +259,7 @@ body.auth-page {
   border: 0;
   border-radius: var(--radius-sm);
   background: transparent;
-  color: var(--color-action-primary);
+  color: var(--color-link);
   font-size: var(--font-size-label-sm);
   font-weight: 750;
   transform: translateY(-50%);
@@ -405,7 +405,7 @@ body.auth-page [hidden] { display: none !important; }
   text-align: center;
 }
 
-.auth-recovery-progress span.is-active { background: var(--color-bg-surface); color: var(--color-action-primary); box-shadow: var(--shadow-xs); }
+.auth-recovery-progress span.is-active { background: var(--color-bg-surface); color: var(--color-link); box-shadow: var(--shadow-card); }
 .auth-recovery-success { display: grid; gap: 8px; padding-block: 24px; }
 .auth-recovery-success__icon { display: grid; width: 48px; height: 48px; place-items: center; margin: 0 auto 3px; border-radius: 50%; background: var(--color-success-text); color: #fff; }
 .auth-recovery-success h3 { margin: 0; color: var(--color-success-text); }
@@ -474,7 +474,7 @@ body.auth-page [hidden] { display: none !important; }
   font-weight: 800;
 }
 
-.registration-step.is-active { color: var(--color-action-primary); }
+.registration-step.is-active { color: var(--color-link); }
 .registration-step.is-active > span {
   border-color: var(--color-action-primary);
   background: var(--color-action-primary);
@@ -504,7 +504,7 @@ body.auth-page [hidden] { display: none !important; }
   padding: 4px 7px;
   border-radius: var(--radius-sm);
   background: var(--color-action-primary-subtle);
-  color: var(--color-action-primary);
+  color: var(--color-link);
   font-size: 0.6875rem;
   font-weight: 800;
 }
@@ -526,7 +526,7 @@ body.auth-page [hidden] { display: none !important; }
 .registration-panel__heading { margin-bottom: 22px; }
 .auth-eyebrow {
   margin: 0 0 6px;
-  color: var(--color-action-primary);
+  color: var(--color-link);
   font-size: 0.6875rem;
   font-weight: 800;
   letter-spacing: 0.075em;
@@ -590,7 +590,7 @@ body.auth-page [hidden] { display: none !important; }
 .role-choice strong { display: block; color: var(--color-text-primary); font-size: var(--font-size-body-md); }
 .role-choice small { display: block; margin-top: 3px; color: var(--color-text-secondary); font-size: var(--font-size-label-sm); line-height: 1.45; }
 .role-choice__check { color: transparent; font-weight: 900; }
-.role-choice:has(input:checked) .role-choice__check { color: var(--color-action-primary); }
+.role-choice:has(input:checked) .role-choice__check { color: var(--color-link); }
 
 .registration-field-grid {
   display: grid;

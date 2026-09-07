@@ -105,6 +105,12 @@
         <h2>Task queue</h2>
         <p class="maintenance-page-lead">Review offers, update active work, and open completed work orders.</p>
 
+        <div class="maintenance-queue-toolbar">
+            <label>Search tasks<input id="taskSearch" type="search" placeholder="Property, unit or problem"></label>
+            <label>Priority<select id="taskPriority"><option value="all">All priorities</option><option value="low">Low</option><option value="normal">Normal</option><option value="medium">Medium</option><option value="high">High</option><option value="emergency">Emergency</option></select></label>
+            <button id="refreshTasks" type="button" class="btn btn-secondary">Refresh tasks</button>
+        </div>
+        <p id="taskResultCount" role="status" class="maintenance-task-meta"></p>
         <div class="filters-group">
             <button class="filter-btn active" data-filter="all" aria-pressed="true">All tasks</button>
             <button class="filter-btn" data-filter="assigned" aria-pressed="false">New offers</button>
@@ -146,6 +152,9 @@
         document.addEventListener('DOMContentLoaded', () => {
             if (!token) return;
             fetchAssignedTasks();
+            document.getElementById('taskSearch').addEventListener('input', renderTasksTable);
+            document.getElementById('taskPriority').addEventListener('change', renderTasksTable);
+            document.getElementById('refreshTasks').addEventListener('click', fetchAssignedTasks);
 
             document.querySelector('.filters-group').addEventListener('click', (e) => {
                 const btn = e.target.closest('[data-filter]');
@@ -165,6 +174,8 @@
 
         async function fetchAssignedTasks() {
             const tableBody = document.getElementById('tasksTableBody');
+            tableBody.setAttribute('aria-busy', 'true');
+            document.getElementById('refreshTasks').disabled = true;
             try {
                 const response = await fetch('/api/maintenance/requests/worker', {
                     headers: { 'Authorization': `Bearer ${token}` }
@@ -182,23 +193,30 @@
             } catch (err) {
                 console.error(err);
                 renderTaskMessage('The maintenance service could not be reached. Check your connection and try again.', 'error', true);
+            } finally {
+                document.getElementById('refreshTasks').disabled = false;
             }
         }
 
         function renderTasksTable() {
             const tableBody = document.getElementById('tasksTableBody');
             
+            const query = document.getElementById('taskSearch').value.trim().toLowerCase();
+            const priority = document.getElementById('taskPriority').value;
             const filtered = myTasks.filter(t => {
+                if (priority !== 'all' && (t.priority_level || 'normal') !== priority) return false;
+                if (query && ![t.properties?.property_name, t.unit_number, t.issue_title, t.issue_category].join(' ').toLowerCase().includes(query)) return false;
                 if (activeFilter === 'all') return true;
                 if (activeFilter === 'in_progress') {
                     return ['travelling', 'arrived', 'repairing'].includes(t.status);
                 }
-                if (activeFilter === 'closed') {
-                    return ['verified', 'closed'].includes(t.status);
+                if (activeFilter === 'completed') {
+                    return ['completed', 'verified'].includes(t.status);
                 }
                 return t.status === activeFilter;
             });
 
+            document.getElementById('taskResultCount').textContent = `${filtered.length} of ${myTasks.length} tasks`;
             if (filtered.length === 0) {
                 renderTaskMessage('No maintenance tasks match this filter. Select another status to view more work.');
                 return;
@@ -229,19 +247,19 @@
                 const row = document.createElement('tr');
                 row.innerHTML = `
                     <td data-label="Property and unit">
-                        <div class="maintenance-task-property">${task.properties?.property_name || 'Property not specified'}</div>
-                        <div class="maintenance-task-meta">Unit: ${task.unit_number || 'Not specified'}</div>
+                        <div class="maintenance-task-property">${window.domiknowEscapeHtml(task.properties?.property_name || 'Property not specified')}</div>
+                        <div class="maintenance-task-meta">Unit: ${window.domiknowEscapeHtml(task.unit_number || 'Not specified')}</div>
                     </td>
                     <td data-label="Problem and schedule">
-                        <div class="maintenance-task-title">${task.issue_title || 'Maintenance request'}</div>
-                        <div class="maintenance-task-meta">Preferred schedule: ${task.preferred_schedule || 'Not specified'}</div>
+                        <div class="maintenance-task-title">${window.domiknowEscapeHtml(task.issue_title || 'Maintenance request')}</div>
+                        <div class="maintenance-task-meta">Preferred schedule: ${window.domiknowEscapeHtml(task.preferred_schedule || 'Not specified')}</div>
                     </td>
-                    <td data-label="Category" class="maintenance-task-capitalize">${task.issue_category || 'Other'}</td>
-                    <td data-label="Priority"><span class="status-badge ${priorityBadgeClass}">${task.priority_level || 'Normal'}</span></td>
-                    <td data-label="Status"><span class="status-badge ${statusBadgeClass}">${taskStatus}</span></td>
+                    <td data-label="Category" class="maintenance-task-capitalize">${window.domiknowEscapeHtml(task.issue_category || 'Other')}</td>
+                    <td data-label="Priority"><span class="status-badge ${priorityBadgeClass}">${window.domiknowEscapeHtml(task.priority_level || 'Normal')}</span></td>
+                    <td data-label="Status"><span class="status-badge ${statusBadgeClass}">${window.domiknowEscapeHtml(taskStatus)}</span></td>
                     <td data-label="Assigned">${assignedDate}</td>
                     <td data-label="Action">
-                        <a href="task-details.html?id=${task.id}" class="action-btn">${actionLabel}</a>
+                        <a href="task-details.html?id=${encodeURIComponent(task.id)}" class="action-btn">${actionLabel}</a>
                     </td>
                 `;
                 tableBody.appendChild(row);
