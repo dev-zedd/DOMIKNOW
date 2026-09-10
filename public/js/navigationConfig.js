@@ -87,8 +87,7 @@ const NAVIGATION_CONFIG = {
     {
       section: 'Command Center',
       items: [
-        { label: 'Descriptive Analytics', href: 'analytics.html', icon: 'Dashboard' },
-                    { label: 'User Access', href: 'users.html' },
+        { label: 'User Access', href: 'users.html' },
         { label: 'Property Approvals', href: 'property-review.html' }
       ]
     },
@@ -113,7 +112,6 @@ const NAVIGATION_CONFIG = {
       items: [
         { label: 'Dashboard', href: 'dashboard.html' },
         { label: 'Assigned Tasks', href: 'tasks.html' },
-        { label: 'Notifications', href: 'notifications.html' },
         { label: 'My Profile', href: 'profile.html' }
       ]
     }

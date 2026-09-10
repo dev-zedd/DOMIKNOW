@@ -3,30 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Descriptive Analytics - DomiKnow</title>
-    <link href="../../css/input.css" rel="stylesheet">
-    <link href="../../css/design-system.css" rel="stylesheet">
-    <link href="../../css/admin.css" rel="stylesheet">
-    <link href="../../css/admin-analytics.css" rel="stylesheet">
-    <script src="../../js/ui.js" defer></script>
+    <title>Redirecting - DomiKnow</title>
+    <script>
+        window.location.replace('/pages/admin/users.html');
+    </script>
 </head>
-<body class="app-loading" data-role="admin" data-page-title="Descriptive Analytics">
-    <main class="dashboard-container">
-        <p>Understand recorded platform activity through totals, current status distributions and monthly submission counts.</p>
-        <form id="analyticsFilters" class="analytics-filters">
-            <label>Created from<input type="date" id="analyticsFrom"></label>
-            <label>Created through<input type="date" id="analyticsTo"></label>
-            <button class="btn btn-primary" type="submit">Apply dates</button>
-            <button class="btn btn-secondary" type="reset">All dates</button>
-            <button class="btn btn-secondary" type="button" id="analyticsRefresh">Refresh data</button>
-        </form>
-        <p id="analyticsStatus" role="status" aria-live="polite">Loading analytics...</p>
-        <details class="analytics-method"><summary>About these figures</summary><p class="analytics-note">Dates use Philippine time and include both selected days. Counts summarize records returned by the existing admin lists; API limits may restrict coverage. Statuses reflect the present state of those records, not their historical state. Undated records are excluded when dates are selected. Payment counts represent submissions, not collected revenue.</p></details>
-        <section id="analyticsFigures" class="analytics-figures" aria-label="Key figures"></section>
-        <div id="analyticsPanels" class="analytics-panels" aria-busy="true"></div>
-    </main>
-    <script src="../../js/auth.js"></script>
-    <script src="../../js/dashboard.js"></script>
-    <script src="../../js/admin-analytics.js"></script>
+<body style="font-family: sans-serif; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; background: #0f172a; color: var(--color-text-muted);">
+    <p>Redirecting to Admin User Directory...</p>
 </body>
 </html>

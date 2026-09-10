@@ -51,7 +51,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         window.location.href = '/pages/landlord/properties.html';
         return;
     }
-    if (path.includes('/admin/reservations.html')) {
+    if (path.includes('/admin/reservations.html') || path.includes('/admin/analytics.html')) {
         window.location.href = '/pages/admin/users.html';
         return;
     }
@@ -236,10 +236,11 @@ function loadLandlordModuleAssets() {
 }
 
 function loadMaintenanceModuleAssets() {
+    document.documentElement.setAttribute('data-maintenance-portal', 'true');
     if (!document.querySelector('link[data-maintenance-module]')) {
         const stylesheet = document.createElement('link');
         stylesheet.rel = 'stylesheet';
-        stylesheet.href = '/css/maintenance.css?v=20260827-1';
+        stylesheet.href = '/css/maintenance.css?v=20260909-1';
         stylesheet.setAttribute('data-maintenance-module', '');
         document.head.appendChild(stylesheet);
     }
@@ -443,7 +444,6 @@ function renderNewDashboardLayout(user) {
             {
                 section: 'Command Center',
                 items: [
-                    { label: 'Descriptive Analytics', href: 'analytics.html', icon: 'Dashboard' },
                     { label: 'User Access', href: 'users.html' },
                     { label: 'Property Approvals', href: 'property-review.html' }
                 ]
@@ -663,7 +663,6 @@ function renderNewDashboardLayout(user) {
             {
                 section: 'Command Center',
                 items: [
-                    { label: 'Descriptive Analytics', href: 'analytics.html', icon: 'Dashboard' },
                     { label: 'User Access', href: 'users.html', icon: 'User Access' },
                     { label: 'Property Approvals', href: 'property-review.html', icon: 'Property Approvals' }
                 ]
@@ -718,22 +717,23 @@ function renderNewDashboardLayout(user) {
         `;
     } else if (role === 'maintenance') {
         const maintenanceItems = [
-            { label: 'Work overview', href: 'dashboard.html', icon: 'Dashboard' },
-            { label: 'Assigned tasks', href: 'tasks.html', icon: 'Assigned Tasks' },
-            { label: 'Notifications', href: 'notifications.html', icon: 'Notifications' },
-            { label: 'My profile', href: 'profile.html', icon: 'Profile' }
+            { label: 'Dashboard', href: 'dashboard.html', icon: 'Dashboard' },
+            { label: 'Assigned Tasks', href: 'tasks.html', icon: 'Assigned Tasks' },
+            { label: 'My Profile', href: 'profile.html', icon: 'Profile' }
         ];
 
         sidebarHtml = `
-            <aside class="sidebar sidebar-maintenance" id="domiknowSidebar" aria-label="Maintenance personnel navigation">
+            <aside class="sidebar sidebar-maintenance" id="domiknowSidebar" aria-label="Maintenance navigation">
                 <div class="sidebar-logo-container">
                     <div class="app-brand" aria-label="DOMIKNOW">
                         <span class="app-brand-mark" aria-hidden="true">D</span>
-                        <span class="app-brand-name">DOMI<span class="app-brand-accent">KNOW</span></span>
+                        <span class="maintenance-brand-copy">
+                            <span class="app-brand-name">DOMI<span class="app-brand-accent">KNOW</span></span>
+                        </span>
                     </div>
                 </div>
                 <nav class="sidebar-menu" aria-label="Primary navigation">
-                    <div class="sidebar-section-title">Workspace</div>
+                    <div class="sidebar-section-title">Menu</div>
         `;
 
         maintenanceItems.forEach(item => {
@@ -771,7 +771,7 @@ function renderNewDashboardLayout(user) {
                 const isItemActive = activeNavigationFilename === item.href;
                 const activeClass = isItemActive ? 'active' : '';
                 sidebarHtml += `<a href="${item.href}" class="sidebar-link ${activeClass}" ${isItemActive ? 'aria-current="page"' : ''}>
-                    ${getLinkIcon(item.label)}
+                    ${getLinkIcon(item.icon || item.label)}
                     <span>${item.label}</span>
                 </a>`;
             });
@@ -805,7 +805,7 @@ function renderNewDashboardLayout(user) {
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/></svg>
                     </button>
                     <div class="topbar-heading">
-                        <span class="topbar-context">${role === 'maintenance' ? 'Field operations' : `${roleLabel} workspace`}</span>
+                        <span class="topbar-context">${roleLabel} workspace</span>
                         <h1 class="topbar-title" id="appPageTitle">${domiknowEscapeHtml(pageTitle)}</h1>
                     </div>
                 </div>
@@ -863,7 +863,7 @@ function renderNewDashboardLayout(user) {
                           activeNavigationFilename === 'billings.html' ? 'payments' :
                           activeNavigationFilename === 'reports.html' ? 'reports' :
                           ['maintenance.html', 'disputes.html', 'feedback.html'].includes(activeNavigationFilename) ? 'support' :
-                          ['policy-violations.html', 'notifications.html', 'profile.html'].includes(activeNavigationFilename) ? 'more' : '';
+                          ['policy-violations.html', 'profile.html'].includes(activeNavigationFilename) ? 'more' : '';
 
         topbarHtml += `
             <nav class="bottom-nav-bar" aria-label="Tenant quick navigation">
@@ -988,22 +988,21 @@ function renderNewDashboardLayout(user) {
     } else if (role === 'maintenance') {
         const isOverviewActive = activeNavigationFilename === 'dashboard.html';
         const isTasksActive = ['tasks.html', 'task-details.html'].includes(activeNavigationFilename);
-        const isNotificationsActive = activeNavigationFilename === 'notifications.html';
         const isProfileActive = activeNavigationFilename === 'profile.html';
         topbarHtml += `
             <nav class="bottom-nav-bar" aria-label="Maintenance quick navigation">
                 <a href="/pages/maintenance/dashboard.html" class="bottom-nav-item ${isOverviewActive ? 'active' : ''}" ${isOverviewActive ? 'aria-current="page"' : ''}>
                     ${getLinkIcon('Dashboard')}
-                    <span>Overview</span>
+                    <span>Dashboard</span>
                 </a>
                 <a href="/pages/maintenance/tasks.html" class="bottom-nav-item ${isTasksActive ? 'active' : ''}" ${isTasksActive ? 'aria-current="page"' : ''}>
                     ${getLinkIcon('Assigned Tasks')}
                     <span>Tasks</span>
                 </a>
-                <a href="/pages/maintenance/notifications.html" class="bottom-nav-item ${isNotificationsActive ? 'active' : ''}" ${isNotificationsActive ? 'aria-current="page"' : ''}>
+                <button type="button" class="bottom-nav-item notification-trigger" data-notification-trigger aria-label="Open notifications" aria-controls="domiknowNotificationOverlay" aria-expanded="false">
                     ${getLinkIcon('Notifications')}
                     <span>Alerts</span>
-                </a>
+                </button>
                 <a href="/pages/maintenance/profile.html" class="bottom-nav-item ${isProfileActive ? 'active' : ''}" ${isProfileActive ? 'aria-current="page"' : ''}>
                     ${getLinkIcon('Profile')}
                     <span>Profile</span>
@@ -1497,8 +1496,416 @@ function updateActiveNavigationIndicators(pathname, role) {
     });
 }
 
-// Each workspace page owns its scripts, forms and styles. Use the browser's
-// document lifecycle so page listeners cannot leak into the next workflow.
+function showNavigationProgress() {
+    const mainContent = document.querySelector('.main-content-inner');
+    mainContent?.classList.add('dk-route-loading');
+    mainContent?.setAttribute('aria-busy', 'true');
+    return window.DomiKnowLoading?.start({ delay: 0, timeout: 15000 }) || null;
+}
+
+function hideNavigationProgress(token) {
+    const mainContent = document.querySelector('.main-content-inner');
+    mainContent?.classList.remove('dk-route-loading');
+    mainContent?.removeAttribute('aria-busy');
+    if (token && window.DomiKnowLoading?.finish) window.DomiKnowLoading.finish(token);
+}
+
+function loadExternalScript(src) {
+    return new Promise((resolve) => {
+        if (document.querySelector(`script[src="${src}"]`)) {
+            resolve();
+            return;
+        }
+        const script = document.createElement('script');
+        script.src = src;
+        script.onload = () => resolve();
+        script.onerror = () => resolve();
+        document.head.appendChild(script);
+    });
+}
+
+function isPageSpecificModal(el) {
+    if (!el || el.nodeType !== 1) return false;
+    if (
+        el.classList.contains('dashboard-layout') ||
+        el.id === 'domiknowSidebar' ||
+        el.id === 'sidebarOverlay' ||
+        el.id === 'navSheetOverlay' ||
+        el.id === 'floatingChatHeadFab' ||
+        el.id === 'chatHeadModal' ||
+        el.id === 'profileDropdownMenu'
+    ) {
+        return false;
+    }
+    const id = el.id || '';
+    const cls = typeof el.className === 'string' ? el.className : '';
+    return (
+        cls.includes('modal') ||
+        cls.includes('modal-overlay') ||
+        id.toLowerCase().includes('modal') ||
+        el.getAttribute('role') === 'dialog'
+    );
+}
+
+let isSeamlessNavigating = false;
+const seamlessPageCache = new Map();
+const SEAMLESS_CACHE_TTL = 30000;
+let pageStyleLifecyclePrepared = false;
+
+function preparePageStyleLifecycle() {
+    if (pageStyleLifecyclePrepared) return;
+    document.head.querySelectorAll('style').forEach(style => {
+        style.setAttribute('data-domiknow-page-style', '');
+    });
+    pageStyleLifecyclePrepared = true;
+}
+
+async function loadDashboardPageHtml(targetUrlString) {
+    const url = new URL(targetUrlString, window.location.href);
+    url.hash = '';
+    const cacheKey = url.href;
+    const cached = seamlessPageCache.get(cacheKey);
+    if (cached && cached.expiresAt > Date.now()) return cached.promise;
+
+    const promise = fetch(cacheKey, {
+        headers: {
+            'X-Requested-With': 'DOMIKNOW-SPA',
+            'X-DOMIKNOW-SILENT': '1'
+        },
+        domiknowLoading: false
+    }).then(async response => {
+        if (!response.ok) throw new Error(`Dashboard page returned ${response.status}`);
+        return response.text();
+    });
+
+    seamlessPageCache.set(cacheKey, {
+        promise,
+        expiresAt: Date.now() + SEAMLESS_CACHE_TTL
+    });
+    promise.catch(() => seamlessPageCache.delete(cacheKey));
+    return promise;
+}
+
+async function seamlessNavigateTo(targetUrlString, role, pushState = true) {
+    if (isSeamlessNavigating) return;
+    isSeamlessNavigating = true;
+
+    const navigationLoadingToken = showNavigationProgress();
+    const mainContent = document.querySelector('.main-content-inner');
+
+    try {
+        const html = await loadDashboardPageHtml(targetUrlString);
+        const parser = new DOMParser();
+        const newDoc = parser.parseFromString(html, 'text/html');
+
+        // Update URL and Title
+        if (pushState && window.history && typeof window.history['pushState'] === 'function') {
+            window.history['pushState']({ spa: true, url: targetUrlString }, newDoc.title, targetUrlString);
+        }
+        document.title = newDoc.title;
+
+        // Update topbar title
+        const topbarTitle = document.getElementById('appPageTitle');
+        let newTitle = (newDoc.body.getAttribute('data-page-title') || '').trim();
+        if (!newTitle && newDoc.title) {
+            newTitle = newDoc.title.split(' - ')[0];
+        }
+        if (topbarTitle && newTitle) {
+            topbarTitle.textContent = newTitle;
+        }
+
+        // Close mobile sidebar or bottom sheet if open
+        const sidebar = document.getElementById('domiknowSidebar');
+        const overlay = document.getElementById('sidebarOverlay');
+        const navSheetOverlay = document.getElementById('navSheetOverlay');
+        const menuToggleBtn = document.getElementById('menuToggleBtn');
+        if (sidebar && overlay && sidebar.classList.contains('open')) {
+            sidebar.classList.remove('open');
+            overlay.classList.remove('open');
+            if (menuToggleBtn) menuToggleBtn.setAttribute('aria-expanded', 'false');
+            overlay.setAttribute('aria-hidden', 'true');
+        }
+        if (navSheetOverlay && navSheetOverlay.classList.contains('open')) {
+            navSheetOverlay.classList.remove('open');
+        }
+
+        // Close header profile dropdown if open
+        const profileMenu = document.getElementById('profileDropdownMenu');
+        const profileBtn = document.getElementById('profileDropdownBtn');
+        if (profileMenu) profileMenu.hidden = true;
+        if (profileBtn) profileBtn.setAttribute('aria-expanded', 'false');
+
+        // Sync stylesheets and replace page-scoped inline styles.
+        preparePageStyleLifecycle();
+        document.head.querySelectorAll('style[data-domiknow-page-style]').forEach(style => style.remove());
+        const getNormalizedStylesheetKey = (urlStr) => {
+            if (!urlStr) return '';
+            try {
+                const parsed = new URL(urlStr, window.location.href);
+                if (parsed.origin === window.location.origin) {
+                    return parsed.pathname.toLowerCase();
+                }
+                return parsed.href;
+            } catch (_) {
+                return urlStr.split('?')[0].split('#')[0].toLowerCase();
+            }
+        };
+
+        const existingLoadedStylesheets = new Set(
+            Array.from(document.head.querySelectorAll('link[rel="stylesheet"]'))
+                .map(link => getNormalizedStylesheetKey(link.getAttribute('href') || link.href))
+                .filter(Boolean)
+        );
+
+        newDoc.querySelectorAll('link[rel="stylesheet"], style').forEach(el => {
+            if (el.tagName === 'LINK') {
+                const href = el.getAttribute('href');
+                const sheetKey = getNormalizedStylesheetKey(href);
+                if (href && sheetKey && !existingLoadedStylesheets.has(sheetKey)) {
+                    const newLink = document.createElement('link');
+                    newLink.rel = 'stylesheet';
+                    newLink.href = href;
+                    document.head.appendChild(newLink);
+                    existingLoadedStylesheets.add(sheetKey);
+                }
+            } else if (el.tagName === 'STYLE') {
+                const newStyle = document.createElement('style');
+                newStyle.textContent = el.textContent;
+                newStyle.setAttribute('data-domiknow-page-style', '');
+                document.head.appendChild(newStyle);
+            }
+        });
+
+        // 0. Clean up previous page listeners and intervals
+        if (Array.isArray(window.__domiknowActivePageCleanups)) {
+            while (window.__domiknowActivePageCleanups.length > 0) {
+                const cleanup = window.__domiknowActivePageCleanups.pop();
+                try { cleanup(); } catch (e) { console.warn('Page cleanup warning:', e); }
+            }
+        }
+        const activePageCleanups = [];
+        window.__domiknowActivePageCleanups = activePageCleanups;
+
+        // 1. Remove previous page-specific modals from body (keep shell and persistent chat)
+        Array.from(document.body.children).forEach(child => {
+            if (isPageSpecificModal(child)) {
+                child.remove();
+            }
+        });
+
+        // 2. Separate modals from main content elements
+        const bodyChildren = Array.from(newDoc.body.children);
+        const newMainElements = [];
+        const newModalElements = [];
+        const scriptsToRun = [];
+
+        bodyChildren.forEach(child => {
+            if (child.tagName === 'SCRIPT') {
+                scriptsToRun.push(child);
+            } else if (child.tagName === 'STYLE') {
+                // Handled in head sync
+            } else if (child.classList.contains('dashboard-layout') || child.tagName === 'NAV') {
+                // Ignore layout shell or legacy navbars
+            } else if (isPageSpecificModal(child)) {
+                newModalElements.push(child);
+            } else {
+                newMainElements.push(child);
+            }
+        });
+
+        // 3. Attach new modals directly to document.body
+        newModalElements.forEach(el => {
+            document.body.appendChild(document.importNode(el, true));
+        });
+
+        // 4. Place main content inside .main-content-inner
+        if (mainContent) {
+            mainContent.innerHTML = '';
+            newMainElements.forEach(el => {
+                mainContent.appendChild(document.importNode(el, true));
+            });
+        }
+
+        // Copy body data- attributes
+        Array.from(newDoc.body.attributes).forEach(attr => {
+            if (attr.name.startsWith('data-') && attr.name !== 'data-role') {
+                document.body.setAttribute(attr.name, attr.value);
+            }
+        });
+
+        // 5. Load external scripts from head if not present
+        const headScripts = Array.from(newDoc.head.querySelectorAll('script'));
+        for (const script of headScripts) {
+            const src = script.getAttribute('src');
+            if (src && !document.querySelector(`script[src="${src}"]`)) {
+                await loadExternalScript(src);
+            }
+        }
+
+        // 6. Update active navigation indicators on sidebar & breadcrumbs
+        updateActiveNavigationIndicators(window.location.pathname, role);
+        ensureContextBreadcrumbs(role, window.location.pathname);
+
+        // 7. Execute page scripts in isolated scope with page-level lifecycle protection
+        const pageDCLCallbacks = [];
+
+        const scopedDocument = new Proxy(document, {
+            get(target, prop) {
+                if (prop === 'addEventListener') {
+                    return function(type, listener, options) {
+                        if (type === 'DOMContentLoaded') {
+                            if (typeof listener === 'function') {
+                                pageDCLCallbacks.push(listener);
+                            }
+                            return;
+                        }
+                        target.addEventListener(type, listener, options);
+                        activePageCleanups.push(() => {
+                            try { target.removeEventListener(type, listener, options); } catch(e) {}
+                        });
+                    };
+                }
+                const val = target[prop];
+                return typeof val === 'function' ? val.bind(target) : val;
+            },
+            set(target, prop, value) {
+                target[prop] = value;
+                return true;
+            }
+        });
+
+        const scopedLocation = new Proxy(window.location, {
+            get(target, prop) {
+                const val = target[prop];
+                return typeof val === 'function' ? val.bind(target) : val;
+            },
+            set(target, prop, value) {
+                if (prop === 'href') {
+                    try {
+                        const targetUrl = new URL(value, window.location.href);
+                        if (targetUrl.origin === window.location.origin && targetUrl.pathname.startsWith(`/pages/${role}/`)) {
+                            seamlessNavigateTo(targetUrl.href, role, true);
+                            return true;
+                        }
+                    } catch (_) {}
+                }
+                target[prop] = value;
+                return true;
+            }
+        });
+
+        const scopedWindow = new Proxy(window, {
+            get(target, prop) {
+                if (prop === 'document') {
+                    return scopedDocument;
+                }
+                if (prop === 'location') {
+                    return scopedLocation;
+                }
+                if (prop === 'addEventListener') {
+                    return function(type, listener, options) {
+                        if (type === 'DOMContentLoaded') {
+                            if (typeof listener === 'function') {
+                                pageDCLCallbacks.push(listener);
+                            }
+                            return;
+                        }
+                        target.addEventListener(type, listener, options);
+                        activePageCleanups.push(() => {
+                            try { target.removeEventListener(type, listener, options); } catch(e) {}
+                        });
+                    };
+                }
+                if (prop === 'setInterval') {
+                    return function(handler, timeout, ...args) {
+                        const id = target.setInterval(handler, timeout, ...args);
+                        activePageCleanups.push(() => clearInterval(id));
+                        return id;
+                    };
+                }
+                if (prop === 'setTimeout') {
+                    return function(handler, timeout, ...args) {
+                        const id = target.setTimeout(handler, timeout, ...args);
+                        activePageCleanups.push(() => clearTimeout(id));
+                        return id;
+                    };
+                }
+                const val = target[prop];
+                return typeof val === 'function' ? val.bind(target) : val;
+            },
+            set(target, prop, value) {
+                target[prop] = value;
+                return true;
+            }
+        });
+
+        window.__domiknowNavEnv = {
+            window: scopedWindow,
+            document: scopedDocument
+        };
+
+        for (const script of scriptsToRun) {
+            const src = script.getAttribute('src');
+            if (src) {
+                if (!src.includes('dashboard.js') && !src.includes('auth.js') && !src.includes('ui.js')) {
+                    await loadExternalScript(src);
+                }
+            } else if (script.textContent.trim()) {
+                const text = script.textContent.trim();
+                const fnNames = [];
+                const fnRegex = /(?:async\s+)?function\s+([a-zA-Z0-9_$]+)\s*\(/g;
+                let match;
+                while ((match = fnRegex.exec(text)) !== null) {
+                    fnNames.push(match[1]);
+                }
+                const varRegex = /(?:const|let|var)\s+([a-zA-Z0-9_$]+)\s*=/g;
+                while ((match = varRegex.exec(text)) !== null) {
+                    fnNames.push(match[1]);
+                }
+                const uniqueNames = [...new Set(fnNames)];
+                const exportLines = uniqueNames.map(name => `try { if (typeof ${name} !== 'undefined') window.${name} = ${name}; } catch(e) {}`).join(';\n');
+
+                const s = document.createElement('script');
+                s.type = 'text/javascript';
+                s.textContent = `(function(window, document) { try { ${text}\n${exportLines} } catch(err) { console.error("Page script error:", err); } })(window.__domiknowNavEnv.window, window.__domiknowNavEnv.document);`;
+                document.body.appendChild(s);
+                s.remove();
+            }
+        }
+        delete window.__domiknowNavEnv;
+
+        // 8. Execute DOMContentLoaded handlers scoped to this newly mounted page
+        for (const cb of pageDCLCallbacks) {
+            try {
+                cb(new Event('DOMContentLoaded'));
+            } catch (err) {
+                console.error('Page initialization error:', err);
+            }
+        }
+
+        // 9. Trigger module enhancers for newly mounted content
+        document.dispatchEvent(new CustomEvent('domiknow:page-content-updated', { detail: { role, path: window.location.pathname } }));
+
+        // 10. Upgrade any legacy loading state
+        window.requestAnimationFrame(() => {
+            window.DomiKnowLoading?.upgradeLegacyLoading(document.body);
+            document.body.classList.remove('app-loading');
+        });
+
+        // Reset scroll position
+        window.scrollTo({ top: 0, behavior: 'instant' });
+        if (mainContent) {
+            mainContent.scrollTop = 0;
+        }
+    } catch (err) {
+        console.error('Seamless navigation error, falling back to standard load:', err);
+        window.location.href = targetUrlString;
+    } finally {
+        isSeamlessNavigating = false;
+        hideNavigationProgress(navigationLoadingToken);
+    }
+}
+
 function initDashboardNavigation(role, sidebar) {
     if (!sidebar) return;
     const scrollKey = `domiknow_sidebar_scroll_${role}`;
@@ -1514,6 +1921,81 @@ function initDashboardNavigation(role, sidebar) {
         try { sessionStorage.setItem(scrollKey, String(sidebar.scrollTop)); } catch (_) {}
     }, { passive: true });
     updateActiveNavigationIndicators(window.location.pathname, role);
+
+    initSeamlessDashboardNavigation(role);
+}
+
+function initSeamlessDashboardNavigation(role) {
+    if (window.__domiknowNavInitialized) return;
+    window.__domiknowNavInitialized = true;
+
+    const dashboardPathPrefixes = ['/pages/tenant/', '/pages/landlord/', '/pages/admin/', '/pages/maintenance/'];
+    const getDashboardUrl = link => {
+        if (!link || link.hasAttribute('download') || (link.target && link.target !== '_self')) return null;
+        const href = link.getAttribute('href');
+        if (!href || href.startsWith('#') || href.startsWith('javascript:') || href.startsWith('mailto:') || href.startsWith('tel:')) return null;
+        try {
+            const url = new URL(link.href, window.location.origin);
+            if (url.origin !== window.location.origin) return null;
+            if (!dashboardPathPrefixes.some(prefix => url.pathname.startsWith(prefix))) return null;
+            if (url.pathname.includes('/auth/') || url.pathname.includes('/login') || url.pathname.includes('/register')) return null;
+            return url;
+        } catch (_error) {
+            return null;
+        }
+    };
+
+    const prefetchLink = event => {
+        const link = event.target instanceof Element ? event.target.closest('a[href]') : null;
+        const url = getDashboardUrl(link);
+        if (!url || (url.pathname === window.location.pathname && url.search === window.location.search)) return;
+        loadDashboardPageHtml(url.href).catch(() => {});
+    };
+
+    if (typeof document.addEventListener === 'function') {
+        document.addEventListener('pointerover', prefetchLink, { passive: true });
+        document.addEventListener('focusin', prefetchLink);
+
+        document.addEventListener('click', async (e) => {
+            if (e.defaultPrevented || e.button !== 0 || e.ctrlKey || e.metaKey || e.shiftKey || e.altKey) return;
+
+            const link = e.target.closest('a[href]');
+            if (!link) return;
+
+            const href = link.getAttribute('href');
+            if (!href || href.startsWith('#') || href.startsWith('javascript:') || href.startsWith('mailto:') || href.startsWith('tel:')) return;
+            if (link.hasAttribute('download') || link.target === '_blank') return;
+            if (link.id === 'newLogoutBtn' || link.id === 'sheetLogoutBtn' || link.id === 'dropdownLogoutBtn') return;
+
+            const targetUrl = getDashboardUrl(link);
+            if (!targetUrl) return;
+
+            // Only navigate seamlessly within the same portal role
+            if (!targetUrl.pathname.startsWith(`/pages/${role}/`)) return;
+
+            // If clicking current page without params change, just scroll top
+            if (targetUrl.pathname === window.location.pathname && targetUrl.search === window.location.search) {
+                e.preventDefault();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                return;
+            }
+
+            e.preventDefault();
+
+            // Instant visual feedback for clicked link
+            updateActiveNavigationIndicators(targetUrl.pathname, role);
+
+            // Seamless navigation without reloading sidebar and header
+            await seamlessNavigateTo(targetUrl.href, role, true);
+        });
+    }
+
+    if (typeof window.addEventListener === 'function') {
+        window.addEventListener('popstate', () => {
+            updateActiveNavigationIndicators(window.location.pathname, role);
+            seamlessNavigateTo(window.location.href, role, false);
+        });
+    }
 }
 
 // Minimal inline SVG icons for sidebar links (Serious & System-like)

@@ -1468,7 +1468,8 @@
             const notifBtn = document.getElementById('unitsNotifBtn');
             if (notifBtn) {
                 notifBtn.addEventListener('click', () => {
-                    window.location.href = 'notifications.html';
+                    const bell = document.querySelector('[data-notification-trigger]');
+                    if (bell) bell.click();
                 });
             }
 

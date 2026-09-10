@@ -187,7 +187,6 @@
                 <aside class="notification-panel" role="dialog" aria-modal="true" aria-labelledby="notificationPanelTitle" tabindex="-1">
                     <header class="notification-panel__header">
                         <div>
-                            <p class="notification-panel__eyebrow">Updates that need you</p>
                             <h2 id="notificationPanelTitle">Notifications</h2>
                         </div>
                         <button type="button" class="notification-icon-button" data-notification-close aria-label="Close notifications">${icons.close}</button>
@@ -200,7 +199,6 @@
                         <button type="button" class="notification-mark-all" data-notification-mark-all>Mark all read</button>
                     </div>
                     <div class="notification-panel__body" data-notification-panel-list aria-live="polite"></div>
-                    <footer class="notification-panel__footer"><a href="${centerUrl()}">View notification center</a></footer>
                 </aside>`;
             overlay.addEventListener('click', event => {
                 if (event.target === overlay) closePanel();
@@ -434,7 +432,7 @@
             renderLoading(container, 5);
             return;
         }
-        renderList(container, filteredNotifications().slice(0, 7));
+        renderList(container, filteredNotifications());
         syncControls();
     }
 

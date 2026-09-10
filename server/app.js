@@ -79,6 +79,15 @@ app.use(compression());
 app.use(express.json({ limit: '100mb' }));
 app.use(express.urlencoded({ limit: '100mb', extended: true }));
 
+// Redirect retired admin pages and legacy notification center routes
+app.get(['/pages/admin/analytics.html', '/pages/admin/reservations.html'], (req, res) => {
+    res.redirect(302, '/pages/admin/users.html');
+});
+app.get('/pages/tenant/notifications.html', (req, res) => res.redirect(302, '/pages/tenant/properties.html'));
+app.get('/pages/landlord/notifications.html', (req, res) => res.redirect(302, '/pages/landlord/properties.html'));
+app.get('/pages/admin/notifications.html', (req, res) => res.redirect(302, '/pages/admin/users.html'));
+app.get('/pages/maintenance/notifications.html', (req, res) => res.redirect(302, '/pages/maintenance/dashboard.html'));
+
 // Serve static files from the 'public' folder
 app.use(express.static(path.join(__dirname, '../public')));
 

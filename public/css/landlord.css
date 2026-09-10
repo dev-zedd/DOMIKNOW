@@ -545,6 +545,26 @@ body[data-landlord-page] :where(.dk-breadcrumbs, [data-domiknow-breadcrumbs], .b
   background: var(--color-bg-hover) !important;
 }
 
+.dashboard-layout-landlord .landlord-data-table tbody td.table-empty-cell,
+.dashboard-layout-landlord .landlord-data-table tbody td.landlord-table-state-cell {
+  display: table-cell !important;
+  text-align: center !important;
+  padding: 0 !important;
+  border-bottom: 0 !important;
+}
+
+.dashboard-layout-landlord .landlord-data-table tbody tr:hover td.table-empty-cell,
+.dashboard-layout-landlord .landlord-data-table tbody tr:hover td.landlord-table-state-cell {
+  background: transparent !important;
+}
+
+.dashboard-layout-landlord .landlord-data-table .empty-state {
+  border: none !important;
+  background: transparent !important;
+  padding: 48px 24px !important;
+  width: 100% !important;
+}
+
 .dashboard-layout-landlord .status-badge {
   min-height: 24px;
   padding: 3px 9px !important;

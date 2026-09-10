@@ -6,48 +6,89 @@
     <title>Tenant Applications - DomiKnow</title>
     <link href="../../css/input.css" rel="stylesheet">
     <style>
-        .app-card {
-            background-color: var(--bg-secondary);
-            border: 1px solid var(--border-color);
+        .table-card {
+            background-color: var(--color-bg-surface);
+            border: 1px solid var(--color-border-default);
             border-radius: var(--radius-lg);
-            padding: 1.5rem;
-            box-shadow: var(--shadow-md);
+            box-shadow: var(--shadow-card);
             margin-bottom: 2rem;
             overflow-x: auto;
         }
-        table {
+        table.landlord-data-table {
             width: 100%;
+            min-width: 820px;
+            table-layout: fixed;
             border-collapse: collapse;
             text-align: left;
             font-size: 0.9375rem;
         }
-        th {
+        table.landlord-data-table th {
             font-weight: 700;
-            color: var(--text-secondary);
-            padding: 0.75rem 1rem;
-            border-bottom: 2px solid var(--border-color);
+            color: var(--color-text-secondary);
+            padding: 0.875rem 1rem;
+            background: var(--color-bg-subtle);
+            border-bottom: 1px solid var(--color-border-default);
             text-transform: uppercase;
-            font-size: 0.75rem;
+            font-size: 0.72rem;
             letter-spacing: 0.05em;
+            white-space: nowrap;
         }
-        td {
-            padding: 1.25rem 1rem;
-            border-bottom: 1px solid var(--border-color);
-            color: var(--text-primary);
+        table.landlord-data-table td {
+            padding: 1.1rem 1rem;
+            border-bottom: 1px solid var(--color-divider);
+            color: var(--color-text-primary);
+            vertical-align: middle;
         }
-        tr:hover td {
-            background-color: var(--bg-primary);
+        table.landlord-data-table tr:hover td {
+            background-color: var(--color-bg-hover);
         }
-        .empty-state {
-            text-align: center;
+        table.landlord-data-table td.table-empty-cell {
+            padding: 0 !important;
+            border-bottom: none !important;
+            background: transparent !important;
+            text-align: center !important;
+        }
+        table.landlord-data-table td.table-empty-cell:hover {
+            background: transparent !important;
+        }
+        .empty-state-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
             padding: 4rem 2rem;
-            color: var(--text-muted);
+            text-align: center;
+            width: 100%;
+        }
+        .empty-state-container .empty-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: var(--color-bg-subtle);
+            color: var(--color-text-muted);
+            margin-bottom: 1rem;
+        }
+        .empty-state-container h3 {
+            margin: 0 0 0.5rem;
+            font-size: 1.125rem;
+            font-weight: 700;
+            color: var(--color-text-primary);
+        }
+        .empty-state-container p {
+            margin: 0;
+            font-size: 0.875rem;
+            color: var(--color-text-secondary);
+            max-width: 440px;
+            line-height: 1.5;
         }
     </style>
     <link href="../../css/design-system.css" rel="stylesheet">
     <script src="../../js/ui.js" defer></script>
 </head>
-<body>
+<body class="app-loading" data-role="landlord" data-page-title="Tenant Applications">
     <!-- Navbar -->
     <nav class="navbar navbar-landlord">
         <div class="navbar-container">
@@ -70,22 +111,35 @@
 
     <!-- Main Content -->
     <main class="dashboard-container">
-        <div class="app-card">
-            <table>
+        <div class="table-card">
+            <table class="landlord-data-table landlord-record-table">
+                <colgroup>
+                    <col style="width: 23%;">
+                    <col style="width: 23%;">
+                    <col style="width: 14%;">
+                    <col style="width: 10%;">
+                    <col style="width: 12%;">
+                    <col style="width: 9%;">
+                    <col style="width: 9%;">
+                </colgroup>
                 <thead>
                     <tr>
-                        <th>Applicant</th>
-                        <th>Target Property</th>
-                        <th>Desired Move-in</th>
-                        <th>Docs Attached</th>
-                        <th>Submitted Date</th>
-                        <th>Status</th>
-                        <th>Action</th>
+                        <th scope="col" style="width: 23%;">Applicant</th>
+                        <th scope="col" style="width: 23%;">Target Property</th>
+                        <th scope="col" style="width: 14%;">Desired Move-in</th>
+                        <th scope="col" style="width: 10%; text-align: center;">Docs Attached</th>
+                        <th scope="col" style="width: 12%;">Submitted Date</th>
+                        <th scope="col" style="width: 9%;">Status</th>
+                        <th scope="col" style="width: 9%; text-align: right;">Action</th>
                     </tr>
                 </thead>
                 <tbody id="applicationsTableBody">
                     <tr>
-                        <td colspan="7" style="text-align: center; color: var(--text-muted);">Loading tenant applications...</td>
+                        <td colspan="7" class="table-empty-cell">
+                            <div class="empty-state-container" style="padding: 3rem 2rem;">
+                                <p style="color: var(--color-text-muted); font-size: 0.875rem;">Loading tenant applications...</p>
+                            </div>
+                        </td>
                     </tr>
                 </tbody>
             </table>
@@ -102,6 +156,16 @@
             fetchTenantApplications();
         });
 
+        function domiknowEscapeHtml(str) {
+            if (str == null) return '';
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
         async function fetchTenantApplications() {
             const tableBody = document.getElementById('applicationsTableBody');
             try {
@@ -110,7 +174,15 @@
                 });
 
                 if (!response.ok) {
-                    tableBody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: var(--error);">Failed to load applications.</td></tr>`;
+                    tableBody.innerHTML = `
+                        <tr>
+                            <td colspan="7" class="table-empty-cell">
+                                <div class="empty-state-container">
+                                    <p style="color: var(--color-error, #ef4444); font-size: 0.875rem;">Failed to load applications. Please try again.</p>
+                                </div>
+                            </td>
+                        </tr>
+                    `;
                     return;
                 }
 
@@ -120,10 +192,16 @@
                 if (applications.length === 0) {
                     tableBody.innerHTML = `
                         <tr>
-                            <td colspan="7" class="empty-state">
-                                <span class="empty-icon"><span data-icon="folder"></span></span>
-                                <h3 style="margin-top: 0.5rem; color: var(--text-secondary);">No Applications Received</h3>
-                                <p style="font-size: 0.875rem;">When tenants discover your approved listings and apply, they will appear here.</p>
+                            <td colspan="7" class="table-empty-cell">
+                                <div class="empty-state-container">
+                                    <div class="empty-icon">
+                                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                            <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
+                                        </svg>
+                                    </div>
+                                    <h3>No Applications Received</h3>
+                                    <p>When tenants discover your approved listings and apply, they will appear here.</p>
+                                </div>
                             </td>
                         </tr>
                     `;
@@ -138,12 +216,12 @@
                     if (app.status === 'rejected') statusClass = 'status-rejected';
 
                     // Format dates
-                    const moveInDate = new Date(app.desired_move_in_date).toLocaleDateString(undefined, {
+                    const moveInDate = app.desired_move_in_date ? new Date(app.desired_move_in_date).toLocaleDateString(undefined, {
                         year: 'numeric', month: 'short', day: 'numeric'
-                    });
-                    const submittedDate = new Date(app.created_at).toLocaleDateString(undefined, {
+                    }) : 'N/A';
+                    const submittedDate = app.created_at ? new Date(app.created_at).toLocaleDateString(undefined, {
                         year: 'numeric', month: 'short', day: 'numeric'
-                    });
+                    }) : 'N/A';
 
                     const tName = app.users ? app.users.full_name : 'Unknown';
                     const tEmail = app.users ? app.users.email : 'N/A';
@@ -152,19 +230,19 @@
                     const row = document.createElement('tr');
                     row.innerHTML = `
                         <td>
-                            <div style="font-weight: 700; color: var(--text-primary);">${tName}</div>
-                            <div style="font-size: 0.75rem; color: var(--text-muted);">${tEmail}</div>
+                            <div style="font-weight: 700; color: var(--color-text-primary); font-size: 0.9375rem;">${domiknowEscapeHtml(tName)}</div>
+                            <div style="font-size: 0.75rem; color: var(--color-text-muted); margin-top: 2px;">${domiknowEscapeHtml(tEmail)}</div>
                         </td>
                         <td>
-                            <div style="font-weight: 600;">${pName}</div>
-                            ${(app.unit || app.property_units) ? `<div style="font-size: 0.75rem; color: var(--text-muted); font-weight: 600;">Room: ${(app.unit || app.property_units).unit_number}${(app.bed || app.unit_beds) ? ` - ${(app.bed || app.unit_beds).bed_label}` : ''}</div>` : ''}
+                            <div style="font-weight: 600; color: var(--color-text-primary); font-size: 0.875rem;">${domiknowEscapeHtml(pName)}</div>
+                            ${(app.unit || app.property_units) ? `<div style="font-size: 0.75rem; color: var(--color-text-muted); font-weight: 600; margin-top: 2px;">Room: ${domiknowEscapeHtml(String((app.unit || app.property_units).unit_number))}${(app.bed || app.unit_beds) ? ` - ${domiknowEscapeHtml(String((app.bed || app.unit_beds).bed_label))}` : ''}</div>` : ''}
                         </td>
-                        <td style="font-weight: 600;">${moveInDate}</td>
+                        <td style="font-weight: 600; font-size: 0.875rem; color: var(--color-text-secondary); white-space: nowrap;">${moveInDate}</td>
                         <td style="text-align: center; font-weight: 700; color: var(--color-link);">${app.document_count || 0}</td>
-                        <td>${submittedDate}</td>
-                        <td><span class="status-badge ${statusClass}">${app.status}</span></td>
-                        <td>
-                            <a href="application-details.html?id=${app.id}" class="btn-primary" style="width: auto; padding: 0.45rem 1rem; font-size: 0.8125rem; text-decoration: none; background-color: var(--landlord);">Review</a>
+                        <td style="font-size: 0.875rem; color: var(--color-text-secondary); white-space: nowrap;">${submittedDate}</td>
+                        <td><span class="status-badge ${statusClass}">${domiknowEscapeHtml(app.status)}</span></td>
+                        <td style="text-align: right;">
+                            <a href="application-details.html?id=${encodeURIComponent(app.id)}" class="btn-primary" style="display: inline-block; width: auto; padding: 0.45rem 1rem; font-size: 0.8125rem; font-weight: 700; text-decoration: none; border-radius: var(--radius-md); background-color: var(--color-action-primary, #0355f3); color: #fff;">Review</a>
                         </td>
                     `;
                     tableBody.appendChild(row);
@@ -172,7 +250,15 @@
 
             } catch (err) {
                 console.error(err);
-                tableBody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: var(--error);">Error contacting database servers.</td></tr>`;
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="7" class="table-empty-cell">
+                            <div class="empty-state-container">
+                                <p style="color: var(--color-error, #ef4444); font-size: 0.875rem;">Error contacting database servers.</p>
+                            </div>
+                        </td>
+                    </tr>
+                `;
             }
         }
     </script>

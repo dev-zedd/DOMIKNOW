@@ -11,19 +11,19 @@
 
     const PAGE_META = {
         'dashboard.html': {
-            eyebrow: 'Field operations',
-            description: 'Check account readiness, open assigned work, and follow the same documented process for every property visit.',
+            eyebrow: 'Overview',
+            description: 'Check your tasks and repair requests.',
             showFlow: false
         },
         'tasks.html': {
-            eyebrow: 'Work queue',
-            description: 'Prioritize new offers and active repairs, then keep each task status current from acceptance through closure.',
+            eyebrow: 'Tasks',
+            description: 'View and update your assigned repair tasks.',
             showFlow: false
         },
         'task-details.html': {
-            eyebrow: 'Active work order',
-            description: 'Coordinate access, update your live status, document the repair, and submit evidence for verification.',
-            action: { label: 'Back to task queue', href: 'tasks.html', secondary: true },
+            eyebrow: 'Work Order',
+            description: 'View details and update progress for this request.',
+            action: { label: '← Back to tasks', href: 'tasks.html', secondary: true },
             showFlow: true,
             dynamicFlow: true
         }
@@ -189,4 +189,6 @@
     } else {
         initialize();
     }
+    document.addEventListener('domiknow:page-content-updated', initialize);
+    window.initializeMaintenanceModule = initialize;
 }());
