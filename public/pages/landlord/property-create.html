@@ -1073,8 +1073,8 @@
             try {
                 map = L.map('locationMap', { zoomControl: true }).setView([defaultLat, defaultLng], 17);
                 const domiknowBasemap = window.DomiknowMap
-                    ? DomiknowMap.addBasemap(map, { maxZoom: 20, maxNativeZoom: 20 })
-                    : L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(map);
+                    ? DomiknowMap.addBasemap(map, { maxZoom: 19, maxNativeZoom: 19 })
+                    : L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', { maxZoom: 19, attribution: 'Tiles &copy; Esri' }).addTo(map);
                 if (window.DomiknowMap) DomiknowMap.addLayerControl(map, domiknowBasemap, { satellite: true });
 
                 const propertyPin = window.DomiknowMap

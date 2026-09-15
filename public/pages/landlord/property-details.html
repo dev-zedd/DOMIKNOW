@@ -1158,8 +1158,8 @@
 
             detailsMap = L.map('landlordMap', { zoomControl: true }).setView([14.4172, 121.4475], 15);
             const domiknowBasemap = window.DomiknowMap
-                ? DomiknowMap.addBasemap(detailsMap, { maxZoom: 20, maxNativeZoom: 20 })
-                : L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(detailsMap);
+                ? DomiknowMap.addBasemap(detailsMap, { maxZoom: 19, maxNativeZoom: 19 })
+                : L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', { maxZoom: 19, attribution: 'Tiles &copy; Esri' }).addTo(detailsMap);
             if (window.DomiknowMap) DomiknowMap.addLayerControl(detailsMap, domiknowBasemap, { satellite: true });
 
             const mapElement = document.getElementById('landlordMap');

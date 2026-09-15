@@ -899,7 +899,7 @@
                     const detailsMapElement = document.getElementById('detailsMap');
                     const detailsMap = L.map(detailsMapElement).setView([propertyLatitude, propertyLongitude], 15);
                     if (window.DomiknowMap) DomiknowMap.addBasemap(detailsMap);
-                    else L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '&copy; OpenStreetMap contributors' }).addTo(detailsMap);
+                    else L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', { attribution: 'Tiles &copy; Esri' }).addTo(detailsMap);
                     if (window.DomiknowMap) DomiknowMap.observeContainer(detailsMap, detailsMapElement);
                     else requestAnimationFrame(() => requestAnimationFrame(() => detailsMap.invalidateSize(false)));
 
