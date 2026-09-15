@@ -8,6 +8,38 @@
     <link href="../../css/input.css" rel="stylesheet">
     <link href="../../css/design-system.css?v=20260905-1" rel="stylesheet">
     <style>
+        /* ── Completely Hide All Scrollbars (Clean, Sleek Look) ── */
+        html {
+            scrollbar-gutter: auto !important;
+        }
+        html,
+        body,
+        * {
+            scrollbar-width: none !important;
+            -ms-overflow-style: none !important;
+        }
+        html::-webkit-scrollbar,
+        body::-webkit-scrollbar,
+        *::-webkit-scrollbar {
+            display: none !important;
+            width: 0 !important;
+            height: 0 !important;
+            background: transparent !important;
+        }
+        html::-webkit-scrollbar-thumb,
+        body::-webkit-scrollbar-thumb,
+        *::-webkit-scrollbar-thumb {
+            display: none !important;
+            background: transparent !important;
+            border: none !important;
+        }
+        html::-webkit-scrollbar-track,
+        body::-webkit-scrollbar-track,
+        *::-webkit-scrollbar-track {
+            display: none !important;
+            background: transparent !important;
+        }
+
         /* ── Modern Disputes Page Styles (Matches maintenance.html) ── */
         .btn-submit-request {
             background: var(--color-bg-surface);
@@ -45,8 +77,14 @@
             align-items: center;
             gap: 22px;
             overflow-x: auto;
-            scrollbar-width: thin;
+            scrollbar-width: none !important;
+            -ms-overflow-style: none !important;
             padding-bottom: 12px;
+        }
+        .maintenance-tabs-bar::-webkit-scrollbar {
+            display: none !important;
+            width: 0 !important;
+            height: 0 !important;
         }
 
         .m-tab-btn {

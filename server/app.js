@@ -48,9 +48,11 @@ app.use(helmet({
             imgSrc: ["'self'", "data:", "blob:", "https:"],
             mediaSrc: ["'self'", "data:", "blob:", "https:", "https://*.supabase.co"],
             fontSrc: ["'self'", "https://fonts.gstatic.com"],
-            connectSrc: ["'self'", "https://nominatim.openstreetmap.org", "https://*.tile.openstreetmap.org", "https://api.bigdatacloud.net", "https://geocode.arcgis.com", "https://*.arcgis.com", "https://server.arcgisonline.com", "https://*.basemaps.cartocdn.com", "https://basemaps.cartocdn.com", "https://unpkg.com", "https://*.supabase.co"]
+            connectSrc: ["'self'", "https://nominatim.openstreetmap.org", "https://*.tile.openstreetmap.org", "https://api.bigdatacloud.net", "https://geocode.arcgis.com", "https://*.arcgis.com", "https://server.arcgisonline.com", "https://*.basemaps.cartocdn.com", "https://basemaps.cartocdn.com", "https://unpkg.com", "https://*.supabase.co"],
+            upgradeInsecureRequests: process.env.NODE_ENV === 'production' ? [] : null
         }
-    }
+    },
+    hsts: process.env.NODE_ENV === 'production'
 }));
 
 // CORS configuration
@@ -80,7 +82,7 @@ app.use(express.json({ limit: '100mb' }));
 app.use(express.urlencoded({ limit: '100mb', extended: true }));
 
 // Redirect retired admin pages and legacy notification center routes
-app.get(['/pages/admin/analytics.html', '/pages/admin/reservations.html'], (req, res) => {
+app.get('/pages/admin/reservations.html', (req, res) => {
     res.redirect(302, '/pages/admin/users.html');
 });
 app.get('/pages/tenant/notifications.html', (req, res) => res.redirect(302, '/pages/tenant/properties.html'));

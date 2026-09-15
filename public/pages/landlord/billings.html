@@ -213,6 +213,7 @@
             align-items: center;
             z-index: 1000;
             padding: 1.5rem;
+            box-sizing: border-box;
         }
         .modal-container {
             background-color: var(--bg-secondary);
@@ -222,6 +223,8 @@
             max-width: 650px;
             max-height: 92vh;
             overflow-y: auto;
+            overflow-x: hidden;
+            box-sizing: border-box;
             box-shadow: 0 25px 60px rgba(0,0,0,0.4);
             display: flex;
             flex-direction: column;
@@ -236,10 +239,15 @@
             position: sticky;
             top: 0;
             z-index: 10;
+            box-sizing: border-box;
         }
         .modal-body {
-            padding: 2rem;
+            padding: 1.75rem 2rem;
             overflow-y: auto;
+            overflow-x: hidden;
+            box-sizing: border-box;
+            width: 100%;
+            max-width: 100%;
         }
         .modal-footer {
             padding: 1rem 2rem;
@@ -248,6 +256,7 @@
             justify-content: flex-end;
             background-color: var(--bg-primary);
             gap: 0.75rem;
+            box-sizing: border-box;
         }
         .modal-close-x {
             background: transparent;
@@ -255,6 +264,44 @@
             font-size: 1.6rem;
             cursor: pointer;
             color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            transition: all 0.15s ease;
+        }
+        .modal-close-x:hover {
+            background-color: var(--border-color);
+            color: var(--text-primary);
+        }
+
+        /* ── Modal Alert / Warning Banner ── */
+        .modal-alert {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            padding: 12px 14px;
+            border-radius: var(--radius-md, 8px);
+            font-size: 0.8125rem;
+            font-weight: 500;
+            line-height: 1.5;
+            margin-bottom: 1.25rem;
+            box-sizing: border-box;
+            width: 100%;
+            max-width: 100%;
+            word-break: break-word;
+            overflow-wrap: break-word;
+            white-space: normal;
+        }
+        .modal-alert-error {
+            background-color: var(--color-error-bg, rgba(239, 68, 68, 0.08));
+            border: 1px solid var(--color-error-border, rgba(239, 68, 68, 0.25));
+            color: var(--color-error-text, #dc2626);
+        }
+        .modal-alert.hidden {
+            display: none !important;
         }
 
         .bill-details-grid {
@@ -447,7 +494,7 @@
             </div>
             <form id="billingForm">
                 <div class="modal-body">
-                    <div id="errorMessage" class="status-badge status-rejected hidden" style="margin-bottom:1rem;padding:0.75rem;"></div>
+                    <div id="errorMessage" class="modal-alert modal-alert-error hidden" role="alert"></div>
                     
                     <input type="hidden" id="formLeaseId" name="lease_id">
 
@@ -633,7 +680,7 @@
                 renderHistoryTable();
             });
             
-            // Auto fill due date month changes
+            // Auto fill due date month changes and check for duplicate billing
             document.getElementById('formBillingMonth').addEventListener('change', (e) => {
                 const val = e.target.value; // e.g. "2026-08"
                 if (!val) return;
@@ -649,6 +696,17 @@
                     const dueMonthStr = month < 10 ? `0${month}` : `${month}`;
                     const dueDayStr = dueDay < 10 ? `0${dueDay}` : `${dueDay}`;
                     document.getElementById('formDueDate').value = `${year}-${dueMonthStr}-${dueDayStr}`;
+
+                    // Real-time check if bill already exists for this selected month
+                    if (!editBillId) {
+                        const targetMonthPrefix = val.slice(0, 7);
+                        const existing = allBillings.find(b => b.lease_id === leaseId && b.billing_month && b.billing_month.startsWith(targetMonthPrefix));
+                        if (existing) {
+                            showModalError(`A billing statement already exists for this month (${targetMonthPrefix}) with status <strong>${existing.billing_status.toUpperCase()}</strong>. You cannot generate another bill for the same month.`);
+                        } else {
+                            hideModalError();
+                        }
+                    }
                 }
             });
         });
@@ -948,10 +1006,35 @@
             document.getElementById('formParking').value = 0;
             document.getElementById('formPenalty').value = 0;
             document.getElementById('formRemarks').value = '';
-            document.getElementById('errorMessage').classList.add('hidden');
+            
+            // Check if default target month already has a billing statement
+            const existingDefault = allBillings.find(b => b.lease_id === lease.id && b.billing_month && b.billing_month.startsWith(targetMonthStr.slice(0, 7)));
+            if (existingDefault) {
+                showModalError(`A billing statement already exists for this month (${targetMonthStr.slice(0, 7)}) with status <strong>${existingDefault.billing_status.toUpperCase()}</strong>. You cannot generate another bill for the same month.`);
+            } else {
+                hideModalError();
+            }
 
             calculateTotal();
             document.getElementById('generateBillModal').classList.remove('hidden');
+        }
+
+        function showModalError(msg) {
+            const errorDiv = document.getElementById('errorMessage');
+            if (!errorDiv) return;
+            errorDiv.innerHTML = `
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0; margin-top: 1px;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                <div style="flex: 1; min-width: 0; word-break: break-word; overflow-wrap: break-word; white-space: normal;">${msg}</div>
+            `;
+            errorDiv.classList.remove('hidden');
+        }
+
+        function hideModalError() {
+            const errorDiv = document.getElementById('errorMessage');
+            if (errorDiv) {
+                errorDiv.classList.add('hidden');
+                errorDiv.innerHTML = '';
+            }
         }
 
         // Open Edit Modal for Billing modification
@@ -1021,7 +1104,7 @@
             document.getElementById('formParking').value = bill.parking || 0;
             document.getElementById('formPenalty').value = bill.penalty_amount || 0;
             document.getElementById('formRemarks').value = bill.remarks || '';
-            document.getElementById('errorMessage').classList.add('hidden');
+            hideModalError();
 
             // Set button text styles
             document.getElementById('btnSaveDraft').textContent = 'Update Draft';
@@ -1083,16 +1166,14 @@
         }
 
         async function submitBillingForm(status) {
-            const errorDiv = document.getElementById('errorMessage');
-            errorDiv.classList.add('hidden');
+            hideModalError();
 
             const leaseId = document.getElementById('formLeaseId').value;
             const billingMonth = document.getElementById('formBillingMonth').value;
             const dueDate = document.getElementById('formDueDate').value;
 
             if (!billingMonth || !dueDate) {
-                errorDiv.textContent = 'Please fill out all date parameters.';
-                errorDiv.classList.remove('hidden');
+                showModalError('Please fill out all date parameters.');
                 return;
             }
 
@@ -1100,8 +1181,7 @@
                 const targetMonthPrefix = billingMonth.slice(0, 7);
                 const existing = allBillings.find(b => b.lease_id === leaseId && b.billing_month && b.billing_month.startsWith(targetMonthPrefix));
                 if (existing) {
-                    errorDiv.textContent = `A billing statement already exists for this month (${targetMonthPrefix}) with status ${existing.billing_status.toUpperCase()}. You cannot generate another bill for the same month.`;
-                    errorDiv.classList.remove('hidden');
+                    showModalError(`A billing statement already exists for this month (${targetMonthPrefix}) with status <strong>${existing.billing_status.toUpperCase()}</strong>. You cannot generate another bill for the same month.`);
                     return;
                 }
             }
@@ -1145,19 +1225,18 @@
                     closeGenerateModal();
                     loadBillingDashboard();
                 } else {
-                    errorDiv.textContent = result.message || 'Failed to submit billing details.';
-                    errorDiv.classList.remove('hidden');
+                    showModalError(result.message || 'Failed to submit billing details.');
                 }
             } catch (err) {
                 console.error(err);
-                errorDiv.textContent = 'Connection error transmitting billing payload.';
-                errorDiv.classList.remove('hidden');
+                showModalError('Connection error transmitting billing payload.');
             }
         }
 
         function closeGenerateModal() {
             document.getElementById('generateBillModal').classList.add('hidden');
             document.getElementById('billingForm').reset();
+            hideModalError();
             
             // Restore modal title & labels
             document.getElementById('generateBillModal').querySelector('h3').textContent = 'Generate Monthly Billing';

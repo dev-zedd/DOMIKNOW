@@ -326,6 +326,7 @@ const leaseModel = {
                 monthly_rent,
                 security_deposit,
                 lease_status,
+                created_at,
                 tenant:users!lease_records_tenant_id_fkey (
                     full_name
                 ),

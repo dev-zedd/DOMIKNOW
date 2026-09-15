@@ -155,6 +155,7 @@ const paymentModel = {
                 payment_status,
                 verification_remarks,
                 submitted_at,
+                created_at,
                 users:users!payment_records_tenant_id_fkey (
                     full_name,
                     email

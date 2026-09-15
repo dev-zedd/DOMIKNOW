@@ -51,7 +51,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         window.location.href = '/pages/landlord/properties.html';
         return;
     }
-    if (path.includes('/admin/reservations.html') || path.includes('/admin/analytics.html')) {
+    if (path.includes('/admin/reservations.html')) {
         window.location.href = '/pages/admin/users.html';
         return;
     }
@@ -412,6 +412,12 @@ function renderNewDashboardLayout(user) {
         ],
         landlord: [
             {
+                section: 'Overview',
+                items: [
+                    { label: 'Operational Analytics', href: 'analytics.html' }
+                ]
+            },
+            {
                 section: 'Portfolio',
                 items: [
                     { label: 'Properties', href: 'properties.html' }
@@ -444,6 +450,7 @@ function renderNewDashboardLayout(user) {
             {
                 section: 'Command Center',
                 items: [
+                    { label: 'System Analytics', href: 'analytics.html' },
                     { label: 'User Access', href: 'users.html' },
                     { label: 'Property Approvals', href: 'property-review.html' }
                 ]
@@ -597,6 +604,12 @@ function renderNewDashboardLayout(user) {
     } else if (role === 'landlord') {
         const landlordGroups = [
             {
+                section: 'Overview',
+                items: [
+                    { label: 'Operational Analytics', href: 'analytics.html', icon: 'Operational Analytics' }
+                ]
+            },
+            {
                 section: 'Portfolio',
                 items: [
                     { label: 'Properties', href: 'properties.html', icon: 'Properties' }
@@ -663,6 +676,7 @@ function renderNewDashboardLayout(user) {
             {
                 section: 'Command Center',
                 items: [
+                    { label: 'System Analytics', href: 'analytics.html', icon: 'System Analytics' },
                     { label: 'User Access', href: 'users.html', icon: 'User Access' },
                     { label: 'Property Approvals', href: 'property-review.html', icon: 'Property Approvals' }
                 ]
@@ -2051,6 +2065,9 @@ function getLinkIcon(label) {
         'Property Review': baseSvg('<path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline>'),
         'Register Property': baseSvg('<polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>'),
         'User Management': baseSvg('<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path>'),
+        'Analytics': baseSvg('<line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line>'),
+        'Operational Analytics': baseSvg('<line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line>'),
+        'System Analytics': baseSvg('<line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line>'),
         'Utilities': baseSvg('<polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>'),
         'Audit Logs': baseSvg('<line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line>'),
         'Notifications': baseSvg('<path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path>'),

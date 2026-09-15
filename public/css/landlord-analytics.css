@@ -1,5 +1,5 @@
 /* ══════════════════════════════════════════════════════════════════════════
-   DomiKnow Admin System Descriptive Analytics — Minimalist & Clean Design
+   DomiKnow Landlord Operational Descriptive Analytics — Minimalist & Clean
    ══════════════════════════════════════════════════════════════════════════ */
 
 .analytics-page {
@@ -71,9 +71,9 @@
 }
 
 .analytics-btn-primary {
-    background: var(--color-action-primary, #042458);
+    background: var(--landlord, #042458);
     color: #ffffff;
-    border: 1px solid var(--color-action-primary, #042458);
+    border: 1px solid var(--landlord, #042458);
 }
 
 .analytics-btn-primary:hover {
@@ -118,10 +118,10 @@
     border-radius: 50%;
     background: #10b981;
     box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2);
-    animation: analyticsPulse 2s infinite ease-in-out;
+    animation: landlordAnalyticsPulse 2s infinite ease-in-out;
 }
 
-@keyframes analyticsPulse {
+@keyframes landlordAnalyticsPulse {
     0%, 100% { transform: scale(1); opacity: 1; }
     50% { transform: scale(1.25); opacity: 0.7; }
 }
@@ -309,7 +309,7 @@
     justify-content: center;
     flex-shrink: 0;
     background: var(--color-bg-subtle, #f1f5f9);
-    color: var(--color-action-primary, #042458);
+    color: var(--landlord, #042458);
 }
 
 .analytics-stat-icon.blue {
@@ -503,17 +503,25 @@
 .bg-status-verified { background: #10b981; }
 .bg-status-paid { background: #10b981; }
 .bg-status-resolved { background: #10b981; }
+.bg-status-completed { background: #10b981; }
+.bg-status-signed { background: #10b981; }
 .bg-status-closed { background: #10b981; }
+.bg-status-occupied { background: #10b981; }
 
 .bg-status-pending { background: #f59e0b; }
 .bg-status-submitted { background: #f59e0b; }
 .bg-status-under_review { background: #f59e0b; }
+.bg-status-assigned { background: #f59e0b; }
 .bg-status-open { background: #f59e0b; }
+.bg-status-in_progress { background: #f59e0b; }
+.bg-status-draft { background: #f59e0b; }
+.bg-status-available { background: #3b82f6; }
 
 .bg-status-rejected { background: #ef4444; }
 .bg-status-disabled { background: #ef4444; }
 .bg-status-overdue { background: #ef4444; }
 .bg-status-unverified { background: #ef4444; }
+.bg-status-terminated { background: #ef4444; }
 
 .bg-status-default { background: #94a3b8; }
 

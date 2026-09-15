@@ -55,6 +55,12 @@ const NAVIGATION_CONFIG = {
   ],
   landlord: [
     {
+      section: 'Overview',
+      items: [
+        { label: 'Operational Analytics', href: 'analytics.html' }
+      ]
+    },
+    {
       section: 'Portfolio',
       items: [
         { label: 'Properties', href: 'properties.html' }
@@ -87,6 +93,7 @@ const NAVIGATION_CONFIG = {
     {
       section: 'Command Center',
       items: [
+        { label: 'System Analytics', href: 'analytics.html' },
         { label: 'User Access', href: 'users.html' },
         { label: 'Property Approvals', href: 'property-review.html' }
       ]
