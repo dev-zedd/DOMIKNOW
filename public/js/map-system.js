@@ -26,7 +26,7 @@
         let activeTheme = currentTheme();
         const createThemeLayer = (theme) => L.tileLayer(CARTO_TILES[theme], {
             attribution: ATTRIBUTION,
-            maxZoom: options.maxZoom || 20,
+            maxZoom: options.maxZoom ||  20,
             maxNativeZoom: options.maxNativeZoom || 20,
             subdomains: 'abcd',
             detectRetina: true,
