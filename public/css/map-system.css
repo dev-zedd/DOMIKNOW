@@ -66,12 +66,12 @@
 }
 
 .domiknow-map .leaflet-tile-pane {
-  filter: saturate(0.76) contrast(0.96) brightness(1.025);
+  filter: saturate(0.96) contrast(0.98) brightness(1.01);
   transition: filter var(--motion-page);
 }
 
 [data-theme="dark"] .domiknow-map .leaflet-tile-pane {
-  filter: saturate(0.66) contrast(1.04) brightness(0.82);
+  filter: saturate(0.9) contrast(1.02) brightness(0.95);
 }
 
 .domiknow-map .leaflet-control-container {
