@@ -1004,11 +1004,32 @@
                         maxOcc = 1; // A bed space is always exactly 1 occupant limit
                     }
 
-                    document.getElementById('monthlyRent').value = Number(rentVal) > 0 ? Number(rentVal) : '';
-                    document.getElementById('securityDeposit').value = '';
-                    document.getElementById('advancePayment').value = '';
+                    // Pre-fill financial terms with smart defaults
+                    const monthlyRent = Number(rentVal) > 0 ? Number(rentVal) : 0;
+                    document.getElementById('monthlyRent').value = monthlyRent || '';
+                    
+                    // Calculate suggested deposit and advance (Philippine standard: 1 month each)
+                    if (monthlyRent > 0) {
+                        document.getElementById('securityDeposit').value = monthlyRent;  // 1 month deposit
+                        document.getElementById('advancePayment').value = monthlyRent;   // 1 month advance
+                    } else {
+                        document.getElementById('securityDeposit').value = '';
+                        document.getElementById('advancePayment').value = '';
+                    }
+                    
                     document.getElementById('maxOccupants').value = Number(maxOcc) > 0 ? Number(maxOcc) : '';
-                    document.getElementById('dueDay').value = '';
+                    
+                    // Default due day: 26th (5 days before month start for advance payment rule)
+                    document.getElementById('dueDay').value = '26';
+                    
+                    // Pre-configure utilities based on property amenities
+                    const amenities = app.properties.amenities || [];
+                    preConfigureUtilities(amenities);
+                    
+                    // Pre-configure policies based on property type
+                    const propertyType = app.properties.property_type;
+                    const tenantSuitability = app.properties.tenant_type_suitability;
+                    preConfigurePoliciesFromPropertyType(propertyType, tenantSuitability);
                     
                     // Clear existing dynamic custom policy cards container
                     const customContainer = document.getElementById('customPoliciesContainer');
@@ -1077,6 +1098,108 @@
             } catch (err) {
                 console.error('Error fetching application details:', err);
             }
+        }
+
+        // NEW HELPER FUNCTIONS FOR ENHANCED PRE-FILLING
+
+        function preConfigureUtilities(amenities) {
+            console.log('Configuring utilities based on amenities:', amenities);
+            
+            // Default all utilities to "separate" billing first
+            setUtilityRadio('util_electricity', 'separate');
+            setUtilityRadio('util_water', 'separate');
+            setUtilityRadio('util_internet', 'separate');
+            setUtilityRadio('util_assoc_fee', 'separate');
+            
+            // Override based on available amenities
+            amenities.forEach(amenity => {
+                const name = amenity.toLowerCase();
+                
+                if (name.includes('wifi') || name.includes('internet')) {
+                    setUtilityRadio('util_internet', 'included');
+                    console.log('Set internet as included (found WiFi amenity)');
+                }
+                
+                if (name.includes('water') || name === 'water supply') {
+                    setUtilityRadio('util_water', 'included');
+                    console.log('Set water as included (found water amenity)');
+                }
+                
+                if (name.includes('electricity') || name.includes('power')) {
+                    setUtilityRadio('util_electricity', 'included');
+                    console.log('Set electricity as included (found power amenity)');
+                }
+            });
+        }
+
+        function setUtilityRadio(name, value) {
+            const radios = document.querySelectorAll(`input[name="${name}"]`);
+            radios.forEach(radio => {
+                radio.checked = radio.value === value;
+            });
+        }
+
+        function preConfigurePoliciesFromPropertyType(propertyType, tenantSuitability) {
+            console.log('Configuring policies for property type:', propertyType, 'tenant suitability:', tenantSuitability);
+            
+            // Clear existing dynamic policy cards
+            const customContainer = document.getElementById('customPoliciesContainer');
+            if (customContainer) customContainer.innerHTML = '';
+            customPolicyCounter = 0;
+
+            // Get default policies for this property type
+            const defaults = getPropertyTypeDefaults(propertyType, tenantSuitability);
+            
+            // Add each default policy
+            defaults.forEach(policy => {
+                addCustomPolicyCard(policy.name, policy.value, true); // isLocked = true (pre-filled)
+            });
+
+            // Refresh the chip display
+            if (typeof syncPolicyChips === 'function') {
+                syncPolicyChips();
+            }
+        }
+
+        function getPropertyTypeDefaults(propertyType, tenantSuitability) {
+            const defaults = [];
+            
+            // Base policies for all properties
+            defaults.push({ name: 'Smoking Policy', value: 'Not Allowed' });
+            
+            if (propertyType === 'boarding_house' || propertyType === 'bedspace') {
+                // Stricter policies for shared living spaces
+                defaults.push({ name: 'Pet Policy', value: 'Not Allowed' });
+                defaults.push({ name: 'Overnight Guests', value: 'Not Allowed' });
+                defaults.push({ name: 'Loud Music & Parties', value: 'Not Allowed' });
+                defaults.push({ name: 'Subleasing & Sharing', value: 'Not Allowed' });
+                defaults.push({ name: 'Unit Alterations & Painting', value: 'Not Allowed' });
+            } else if (propertyType === 'apartment' || propertyType === 'house') {
+                // More flexible policies for private units
+                defaults.push({ name: 'Pet Policy', value: 'With Restrictions' });
+                defaults.push({ name: 'Overnight Guests', value: 'Allowed' });
+                defaults.push({ name: 'Day Visitors', value: 'Allowed' });
+                defaults.push({ name: 'Unit Alterations & Painting', value: 'With Permission' });
+            } else if (propertyType === 'studio_unit' || propertyType === 'room_for_rent') {
+                // Moderate policies for studio/room rentals
+                defaults.push({ name: 'Pet Policy', value: 'With Restrictions' });
+                defaults.push({ name: 'Overnight Guests', value: 'With Restrictions' });
+                defaults.push({ name: 'Day Visitors', value: 'Allowed' });
+            }
+            
+            // Tenant type-specific policies
+            if (tenantSuitability === 'student') {
+                defaults.push({ name: 'Study Hours (Quiet Time)', value: 'Enforced 10PM-6AM' });
+                defaults.push({ name: 'Commercial Business Use', value: 'Not Allowed' });
+            } else if (tenantSuitability === 'worker') {
+                defaults.push({ name: 'Commercial Business Use', value: 'Not Allowed' });
+                defaults.push({ name: 'Working Hours Consideration', value: 'Respected' });
+            } else if (tenantSuitability === 'family') {
+                defaults.push({ name: 'Children-Friendly Environment', value: 'Maintained' });
+                defaults.push({ name: 'Family Activities', value: 'Allowed' });
+            }
+            
+            return defaults;
         }
 
         function populateInfoPanel(app) {
