@@ -1,0 +1,731 @@
+{
+  "users": {
+    "exists": true,
+    "colsSample": [
+      "id",
+      "full_name",
+      "email",
+      "password_hash",
+      "role",
+      "contact_number",
+      "address",
+      "profile_image_url",
+      "is_verified",
+      "account_status",
+      "created_at",
+      "updated_at",
+      "landlord_average_rating",
+      "landlord_rating_count",
+      "landlord_trust_score",
+      "suspension_lifted_at",
+      "created_by_landlord_id"
+    ]
+  },
+  "email_verifications": {
+    "exists": true,
+    "colsSample": [
+      "id",
+      "user_id",
+      "email",
+      "verification_code",
+      "expires_at",
+      "is_used",
+      "created_at"
+    ]
+  },
+  "audit_logs": {
+    "exists": true,
+    "colsSample": [
+      "id",
+      "user_id",
+      "action",
+      "description",
+      "created_at"
+    ]
+  },
+  "properties": {
+    "exists": true,
+    "colsSample": [
+      "id",
+      "landlord_id",
+      "property_name",
+      "property_type",
+      "description",
+      "address",
+      "barangay",
+      "municipality",
+      "province",
+      "latitude",
+      "longitude",
+      "monthly_rent",
+      "max_occupants",
+      "tenant_type_suitability",
+      "house_rules",
+      "status",
+      "average_rating",
+      "feedback_count",
+      "main_image_url",
+      "created_at",
+      "updated_at",
+      "admin_reviewed_by",
+      "admin_reviewed_at",
+      "rejection_reason",
+      "unit_number",
+      "rating_count",
+      "total_floors",
+      "total_capacity",
+      "landmark"
+    ]
+  },
+  "property_amenities": {
+    "exists": true,
+    "colsSample": [
+      "id",
+      "property_id",
+      "amenity_name",
+      "created_at"
+    ]
+  },
+  "property_documents": {
+    "exists": true,
+    "colsSample": [
+      "id",
+      "property_id",
+      "landlord_id",
+      "document_type",
+      "file_name",
+      "file_url",
+      "file_path",
+      "mime_type",
+      "file_size",
+      "uploaded_at",
+      "status"
+    ]
+  },
+  "property_images": {
+    "exists": true,
+    "colsSample": [
+      "id",
+      "property_id",
+      "image_url",
+      "image_path",
+      "is_main",
+      "uploaded_at"
+    ]
+  },
+  "property_reservations": {
+    "exists": true,
+    "colsSample": []
+  },
+  "property_units": {
+    "exists": true,
+    "colsSample": [
+      "id",
+      "property_id",
+      "unit_number",
+      "unit_type",
+      "monthly_rent",
+      "security_deposit",
+      "capacity",
+      "bedrooms",
+      "bathrooms",
+      "floor_area_sqm",
+      "status",
+      "main_image_url",
+      "description",
+      "created_at",
+      "updated_at",
+      "floor",
+      "gender_restriction",
+      "rental_style",
+      "room_name"
+    ]
+  },
+  "unit_amenities": {
+    "exists": true,
+    "colsSample": [
+      "id",
+      "unit_id",
+      "amenity_name",
+      "created_at"
+    ]
+  },
+  "unit_images": {
+    "exists": true,
+    "colsSample": [
+      "id",
+      "unit_id",
+      "image_url",
+      "image_path",
+      "is_main",
+      "uploaded_at"
+    ]
+  },
+  "unit_beds": {
+    "exists": true,
+    "colsSample": [
+      "id",
+      "unit_id",
+      "bed_number",
+      "bed_label",
+      "status",
+      "monthly_rent",
+      "created_at",
+      "updated_at"
+    ]
+  },
+  "recommendation_runs": {
+    "exists": true,
+    "colsSample": [
+      "id",
+      "formula_version",
+      "tenant_id",
+      "generated_at",
+      "tenant_input_snapshot",
+      "active_criteria",
+      "raw_importance",
+      "normalized_weights",
+      "platform_priors",
+      "candidate_count",
+      "eligible_count",
+      "excluded_count",
+      "created_at"
+    ]
+  },
+  "recommendation_candidates": {
+    "exists": true,
+    "colsSample": [
+      "id",
+      "recommendation_run_id",
+      "property_id",
+      "rank",
+      "eligibility_passed",
+      "raw_score",
+      "display_score",
+      "criterion_scores",
+      "fallback_flags",
+      "property_input_snapshot",
+      "explanation_snapshot",
+      "created_at"
+    ]
+  },
+  "recommendation_exclusions": {
+    "exists": true,
+    "colsSample": [
+      "id",
+      "recommendation_run_id",
+      "property_id",
+      "reason_codes",
+      "created_at"
+    ]
+  },
+  "tenant_applications": {
+    "exists": true,
+    "colsSample": [
+      "id",
+      "tenant_id",
+      "property_id",
+      "landlord_id",
+      "reservation_id",
+      "application_message",
+      "desired_move_in_date",
+      "status",
+      "landlord_remarks",
+      "submitted_at",
+      "reviewed_at",
+      "created_at",
+      "updated_at",
+      "unit_id",
+      "bed_id"
+    ]
+  },
+  "tenant_application_documents": {
+    "exists": true,
+    "colsSample": [
+      "id",
+      "application_id",
+      "tenant_id",
+      "document_type",
+      "file_name",
+      "file_url",
+      "file_path",
+      "mime_type",
+      "file_size",
+      "uploaded_at"
+    ]
+  },
+  "tenant_screening": {
+    "exists": true,
+    "colsSample": [
+      "id",
+      "tenant_id",
+      "application_id",
+      "property_id",
+      "landlord_id",
+      "monthly_income",
+      "employment_status",
+      "employment_details",
+      "payment_behavior_score",
+      "previous_rental_history",
+      "rental_conduct_notes",
+      "screening_score",
+      "screening_result_label",
+      "screening_remarks",
+      "status",
+      "created_at",
+      "updated_at"
+    ]
+  },
+  "lease_records": {
+    "exists": true,
+    "colsSample": [
+      "id",
+      "application_id",
+      "tenant_id",
+      "landlord_id",
+      "property_id",
+      "lease_start_date",
+      "lease_end_date",
+      "monthly_rent",
+      "security_deposit",
+      "lease_status",
+      "terms_and_conditions",
+      "created_at",
+      "updated_at",
+      "lease_number",
+      "advance_payment",
+      "payment_due_day",
+      "utilities_covered",
+      "utilities_other",
+      "max_occupants",
+      "pet_policy",
+      "pet_conditions",
+      "smoking_policy",
+      "parking_policy",
+      "parking_slot_number",
+      "house_rules",
+      "landlord_responsibilities",
+      "tenant_responsibilities",
+      "late_fee_amount",
+      "grace_period",
+      "termination_policy",
+      "additional_terms",
+      "landlord_signature_name",
+      "landlord_signature_date",
+      "tenant_signature_name",
+      "tenant_signature_date",
+      "unit_id",
+      "bed_id"
+    ]
+  },
+  "leases": {
+    "exists": false,
+    "error": "Could not find the table 'public.leases' in the schema cache"
+  },
+  "utility_records": {
+    "exists": true,
+    "colsSample": []
+  },
+  "billing_records": {
+    "exists": true,
+    "colsSample": [
+      "id",
+      "lease_id",
+      "tenant_id",
+      "landlord_id",
+      "property_id",
+      "billing_month",
+      "rent_amount",
+      "utility_amount",
+      "penalty_amount",
+      "total_amount",
+      "due_date",
+      "billing_status",
+      "created_at",
+      "updated_at",
+      "water",
+      "electricity",
+      "internet",
+      "parking",
+      "other_charges",
+      "remarks",
+      "unit_id"
+    ]
+  },
+  "payment_records": {
+    "exists": true,
+    "colsSample": [
+      "id",
+      "billing_id",
+      "lease_id",
+      "tenant_id",
+      "landlord_id",
+      "property_id",
+      "payment_amount",
+      "payment_method",
+      "payment_reference_number",
+      "payment_proof_url",
+      "payment_proof_path",
+      "payment_status",
+      "verification_remarks",
+      "submitted_at",
+      "verified_at",
+      "created_at",
+      "updated_at"
+    ]
+  },
+  "statements": {
+    "exists": false,
+    "error": "Could not find the table 'public.statements' in the schema cache"
+  },
+  "maintenance_requests": {
+    "exists": true,
+    "colsSample": [
+      "id",
+      "tenant_id",
+      "landlord_id",
+      "property_id",
+      "lease_id",
+      "assigned_maintenance_id",
+      "issue_title",
+      "issue_description",
+      "issue_category",
+      "priority_level",
+      "image_url",
+      "image_path",
+      "status",
+      "landlord_remarks",
+      "created_at",
+      "updated_at",
+      "completed_at",
+      "preferred_schedule",
+      "unit_number",
+      "rejection_reason",
+      "travel_started_at",
+      "arrived_at",
+      "repair_started_at",
+      "problem_found",
+      "repair_performed",
+      "recommendations",
+      "before_photo_url",
+      "after_photo_url",
+      "labor_cost",
+      "material_cost",
+      "unit_id"
+    ]
+  },
+  "maintenance_categories": {
+    "exists": true,
+    "colsSample": [
+      "id",
+      "category_name"
+    ]
+  },
+  "maintenance_personnel": {
+    "exists": false,
+    "error": "Could not find the table 'public.maintenance_personnel' in the schema cache"
+  },
+  "maintenance_assignments": {
+    "exists": true,
+    "colsSample": [
+      "id",
+      "maintenance_request_id",
+      "maintenance_personnel_id",
+      "due_date",
+      "instructions",
+      "assigned_at"
+    ]
+  },
+  "maintenance_updates": {
+    "exists": true,
+    "colsSample": [
+      "id",
+      "maintenance_request_id",
+      "status_update",
+      "notes",
+      "created_at"
+    ]
+  },
+  "maintenance_task_updates": {
+    "exists": true,
+    "colsSample": []
+  },
+  "maintenance_photos": {
+    "exists": true,
+    "colsSample": []
+  },
+  "maintenance_materials": {
+    "exists": true,
+    "colsSample": [
+      "id",
+      "maintenance_request_id",
+      "material_name",
+      "quantity",
+      "cost"
+    ]
+  },
+  "maintenance_reports": {
+    "exists": true,
+    "colsSample": [
+      "id",
+      "maintenance_request_id",
+      "maintenance_personnel_id",
+      "problem_found",
+      "repair_performed",
+      "materials_used",
+      "recommendations",
+      "labor_cost",
+      "material_cost",
+      "created_at"
+    ]
+  },
+  "landlord_workers": {
+    "exists": false,
+    "error": "Could not find the table 'public.landlord_workers' in the schema cache"
+  },
+  "complaints": {
+    "exists": true,
+    "colsSample": [
+      "id",
+      "complaint_number",
+      "lease_id",
+      "tenant_id",
+      "landlord_id",
+      "property_id",
+      "category",
+      "subject",
+      "description",
+      "attachment_url",
+      "attachment_path",
+      "status",
+      "resolution_notes",
+      "rejection_reason",
+      "resolved_at",
+      "closed_at",
+      "submitted_at",
+      "updated_at"
+    ]
+  },
+  "complaint_status_logs": {
+    "exists": true,
+    "colsSample": [
+      "id",
+      "complaint_id",
+      "updated_by",
+      "previous_status",
+      "new_status",
+      "remarks",
+      "updated_at"
+    ]
+  },
+  "disputes": {
+    "exists": true,
+    "colsSample": []
+  },
+  "policy_violations": {
+    "exists": true,
+    "colsSample": []
+  },
+  "policies": {
+    "exists": false,
+    "error": "Could not find the table 'public.policies' in the schema cache"
+  },
+  "platform_policies": {
+    "exists": false,
+    "error": "Could not find the table 'public.platform_policies' in the schema cache"
+  },
+  "tenant_reports": {
+    "exists": true,
+    "colsSample": [
+      "id",
+      "landlord_id",
+      "tenant_id",
+      "lease_id",
+      "property_id",
+      "report_category",
+      "incident_date",
+      "incident_description",
+      "severity",
+      "status",
+      "admin_id",
+      "admin_remarks",
+      "reviewed_at",
+      "tenant_explanation",
+      "tenant_responded_at",
+      "created_at",
+      "updated_at"
+    ]
+  },
+  "tenant_report_evidence": {
+    "exists": true,
+    "colsSample": [
+      "id",
+      "report_id",
+      "file_name",
+      "file_url",
+      "file_path",
+      "file_type",
+      "file_size",
+      "uploaded_at"
+    ]
+  },
+  "landlord_reports": {
+    "exists": true,
+    "colsSample": [
+      "id",
+      "tenant_id",
+      "landlord_id",
+      "lease_id",
+      "property_id",
+      "report_category",
+      "incident_date",
+      "incident_description",
+      "severity",
+      "status",
+      "admin_id",
+      "admin_remarks",
+      "reviewed_at",
+      "landlord_explanation",
+      "landlord_responded_at",
+      "created_at",
+      "updated_at"
+    ]
+  },
+  "landlord_report_evidence": {
+    "exists": true,
+    "colsSample": [
+      "id",
+      "report_id",
+      "file_name",
+      "file_url",
+      "file_path",
+      "file_type",
+      "file_size",
+      "uploaded_at"
+    ]
+  },
+  "user_reports": {
+    "exists": true,
+    "colsSample": [
+      "id",
+      "reporter_id",
+      "reported_user_id",
+      "property_id",
+      "report_type",
+      "report_title",
+      "report_description",
+      "attachment_url",
+      "attachment_path",
+      "status",
+      "admin_remarks",
+      "created_at",
+      "updated_at",
+      "resolved_at"
+    ]
+  },
+  "reports": {
+    "exists": false,
+    "error": "Could not find the table 'public.reports' in the schema cache"
+  },
+  "report_messages": {
+    "exists": true,
+    "colsSample": [
+      "id",
+      "report_type",
+      "report_id",
+      "sender_id",
+      "sender_role",
+      "recipient_role",
+      "message_text",
+      "attachment_url",
+      "attachment_path",
+      "created_at"
+    ]
+  },
+  "messages": {
+    "exists": false,
+    "error": "Could not find the table 'public.messages' in the schema cache"
+  },
+  "property_ratings": {
+    "exists": true,
+    "colsSample": [
+      "id",
+      "lease_id",
+      "tenant_id",
+      "landlord_id",
+      "property_id",
+      "cleanliness",
+      "safety",
+      "comfort",
+      "amenities",
+      "location",
+      "internet_availability",
+      "water_supply",
+      "electricity_reliability",
+      "noise_level",
+      "overall_satisfaction",
+      "overall_computed_avg",
+      "feedback",
+      "submitted_at",
+      "updated_at"
+    ]
+  },
+  "landlord_ratings_v2": {
+    "exists": true,
+    "colsSample": [
+      "id",
+      "lease_id",
+      "tenant_id",
+      "landlord_id",
+      "property_id",
+      "communication",
+      "responsiveness",
+      "professionalism",
+      "fairness",
+      "maintenance_response",
+      "respectfulness",
+      "reliability",
+      "overall_satisfaction",
+      "overall_computed_avg",
+      "feedback",
+      "submitted_at",
+      "updated_at"
+    ]
+  },
+  "landlord_ratings": {
+    "exists": true,
+    "colsSample": [
+      "id",
+      "lease_id",
+      "tenant_id",
+      "landlord_id",
+      "property_id",
+      "rating",
+      "feedback",
+      "submitted_at",
+      "updated_at"
+    ]
+  },
+  "ratings_feedback": {
+    "exists": true,
+    "colsSample": []
+  },
+  "property_feedback_summary": {
+    "exists": true,
+    "colsSample": []
+  },
+  "notifications": {
+    "exists": true,
+    "colsSample": [
+      "id",
+      "user_id",
+      "type",
+      "title",
+      "message",
+      "reference_id",
+      "read_status",
+      "created_at",
+      "updated_at"
+    ]
+  }
+}

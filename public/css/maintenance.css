@@ -960,3 +960,277 @@ body[data-maintenance-page="task-details"] .timeline {
 
 .maintenance-overview-actions > .btn { width: auto; flex-shrink: 0; }
 #workSummaryStatus { margin-top: 12px; font-size: 0.875rem; color: var(--color-text-secondary); }
+
+/* ── Worker Operational Analytics & KPI Graphs ── */
+.worker-charts-section {
+  margin-bottom: 2rem;
+}
+
+.worker-chart-card {
+  background: var(--color-bg-surface);
+  border: 1px solid var(--color-border-default);
+  border-radius: 16px;
+  padding: 1.25rem 1.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+  display: flex;
+  flex-direction: column;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.worker-chart-card:hover {
+  border-color: var(--color-border-strong, #cbd5e1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.worker-chart-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+  gap: 8px;
+}
+
+.worker-chart-title {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+
+.worker-chart-subtitle {
+  margin: 2px 0 0;
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+}
+
+.worker-chart-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 1.75rem 1rem;
+  color: var(--color-text-muted);
+  width: 100%;
+}
+
+.worker-chart-empty svg {
+  margin-bottom: 8px;
+  opacity: 0.45;
+}
+
+.worker-chart-empty p {
+  margin: 0;
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+
+.worker-chart-empty small {
+  margin-top: 4px;
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+}
+
+/* Category Donut & Legend */
+.worker-donut-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  flex-wrap: wrap;
+  gap: 1.25rem;
+  width: 100%;
+}
+
+.worker-donut-legend {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+  min-width: 140px;
+}
+
+.worker-legend-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.8125rem;
+  padding: 3px 0;
+}
+
+.worker-legend-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--color-text-secondary);
+  font-weight: 550;
+  text-transform: capitalize;
+}
+
+.worker-legend-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.worker-legend-count {
+  font-weight: 750;
+  color: var(--color-text-primary);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.worker-legend-pct {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  background: var(--color-bg-subtle, #f1f5f9);
+  padding: 2px 6px;
+  border-radius: 10px;
+}
+
+/* Pipeline Progress Rows */
+.worker-pipeline-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+}
+
+.worker-pipeline-row {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.worker-pipeline-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.8125rem;
+}
+
+.worker-pipeline-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.worker-pipeline-val {
+  font-weight: 750;
+  color: var(--color-text-primary);
+  font-size: 0.8125rem;
+}
+
+.worker-pipeline-track {
+  height: 7px;
+  background: var(--color-bg-subtle, #f1f5f9);
+  border-radius: 999px;
+  overflow: hidden;
+  position: relative;
+}
+
+.worker-pipeline-bar {
+  height: 100%;
+  border-radius: 999px;
+  transition: width 0.35s ease;
+}
+
+/* SLA Comparison Rows */
+.worker-sla-list {
+  display: flex;
+  flex-direction: column;
+  gap: 11px;
+  width: 100%;
+}
+
+.worker-sla-row {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.worker-sla-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.8125rem;
+}
+
+.worker-sla-badge {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 2px 7px;
+  border-radius: 6px;
+}
+
+.worker-sla-hours {
+  font-weight: 700;
+  font-size: 0.8125rem;
+  color: var(--color-text-primary);
+}
+
+.worker-sla-track {
+  height: 7px;
+  background: var(--color-bg-subtle, #f1f5f9);
+  border-radius: 999px;
+  overflow: hidden;
+  position: relative;
+}
+
+.worker-sla-bar {
+  height: 100%;
+  border-radius: 999px;
+  transition: width 0.35s ease;
+}
+
+/* Quality Gauge */
+.worker-gauge-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding-top: 4px;
+}
+
+.worker-gauge-svg {
+  overflow: visible;
+  max-width: 180px;
+  height: auto;
+}
+
+.worker-gauge-stats {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 1px solid var(--color-border-default, #e2e8f0);
+  width: 100%;
+}
+
+.worker-gauge-stat-item {
+  text-align: center;
+}
+
+.worker-gauge-stat-item span {
+  display: block;
+  font-size: 0.6875rem;
+  color: var(--color-text-muted);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.worker-gauge-stat-item strong {
+  font-size: 1rem;
+  font-weight: 800;
+  color: var(--color-text-primary);
+}

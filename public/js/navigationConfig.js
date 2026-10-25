@@ -42,13 +42,6 @@ const NAVIGATION_CONFIG = {
             { label: 'Disputes', href: 'disputes.html' },
             { label: 'Ratings & Feedback', href: 'feedback.html' }
           ]
-        },
-        {
-          label: 'Reports',
-          icon: 'Reports',
-          subItems: [
-            { label: 'My Reports', href: 'reports.html' }
-          ]
         }
       ]
     }
@@ -83,7 +76,6 @@ const NAVIGATION_CONFIG = {
       section: 'Operations & Support',
       items: [
         { label: 'Maintenance', href: 'maintenance.html' },
-        { label: 'Reports Center', href: 'reports.html' },
         { label: 'Complaints', href: 'disputes.html' },
         { label: 'Reviews & Feedback', href: 'feedback.html' }
       ]
@@ -110,13 +102,13 @@ const NAVIGATION_CONFIG = {
     {
       section: 'Platform Monitoring',
       items: [
-        { label: 'Payment Monitoring', href: 'payments.html' }
+        { label: 'Payment Monitoring', href: 'payments.html' },
+        { label: 'Maintenance', href: 'maintenance.html' }
       ]
     },
     {
       section: 'Trust & Governance',
       items: [
-        { label: 'Case Triage', href: 'reports.html' },
         { label: 'Policies', href: 'policy-management.html' },
         { label: 'Audit Logs', href: 'audit-logs.html' }
       ]

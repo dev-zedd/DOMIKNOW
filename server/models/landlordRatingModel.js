@@ -3,7 +3,7 @@ const supabase = require('../config/supabaseClient');
 const landlordRatingModel = {
     /**
      * Check if tenant has an eligible lease for this landlord/property.
-     * Statuses allowed: active, ended, terminated, completed.
+     * Statuses allowed: ended, terminated, completed, expired (finished contracts only).
      */
     async findEligibleLease(tenantId, leaseId) {
         const { data, error } = await supabase
@@ -11,7 +11,7 @@ const landlordRatingModel = {
             .select('id, landlord_id, property_id, lease_status, lease_number, lease_start_date')
             .eq('id', leaseId)
             .eq('tenant_id', tenantId)
-            .in('lease_status', ['active', 'expired', 'ended', 'terminated', 'completed'])
+            .in('lease_status', ['expired', 'ended', 'terminated', 'completed'])
             .maybeSingle();
 
         if (error) throw error;
@@ -20,6 +20,7 @@ const landlordRatingModel = {
 
     /**
      * Find all eligible leases for a tenant and check if they have already rated the landlord.
+     * Only completed or ended contracts are eligible.
      */
     async findEligibleLeasesByTenant(tenantId) {
         const { data: leases, error: leaseErr } = await supabase
@@ -40,7 +41,7 @@ const landlordRatingModel = {
                 )
             `)
             .eq('tenant_id', tenantId)
-            .in('lease_status', ['active', 'expired', 'ended', 'terminated', 'completed'])
+            .in('lease_status', ['expired', 'ended', 'terminated', 'completed'])
             .order('created_at', { ascending: false });
 
         if (leaseErr) throw leaseErr;
@@ -61,10 +62,8 @@ const landlordRatingModel = {
 
         const eligible = (leases || []).filter(lease => {
             const status = lease.lease_status;
-            // Active leases are always eligible — tenant is currently renting
-            if (status === 'active') return true;
-            if (status === 'expired' || status === 'ended' || status === 'terminated' || status === 'completed') return true;
-            return false;
+            // Only finished contracts are eligible to rate/review
+            return ['expired', 'ended', 'terminated', 'completed'].includes(status);
         });
 
         return eligible.map(lease => ({

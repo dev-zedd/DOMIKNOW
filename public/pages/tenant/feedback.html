@@ -7,6 +7,7 @@
     <meta name="description" content="Rate your rental property and landlord on DomiKnow.">
     <link href="../../css/input.css" rel="stylesheet">
     <link href="../../css/design-system.css?v=20260905-1" rel="stylesheet">
+    <link href="../../css/tenant.css" rel="stylesheet">
     <style>
         /* ── Completely Hide All Scrollbars (Clean, Sleek Look) ── */
         html {
@@ -721,7 +722,7 @@
 
                 <!-- No eligible lease notice -->
                 <div id="noLeaseNotice" style="display:none; background: var(--color-error-bg); border: 1px solid var(--color-error-border); border-radius:8px; padding:1rem; text-align:center; color: var(--color-error-text); font-size:0.875rem; font-weight:600; margin-bottom:1rem;">
-                    No eligible lease contracts found to review. You can review properties or landlords after your lease starts or once completed.
+                    No eligible lease contracts found to review. Maaari lamang mag-rate at magbigay ng feedback kapag tapos na ang inyong lease contract (ended or completed).
                 </div>
 
                 <form id="ratingForm">
@@ -968,7 +969,8 @@
                 const prop = l.properties?.property_name || 'Property';
                 const unit = l.unit_number ? ` · Unit ${l.unit_number}` : '';
                 const contract = l.lease_number ? ` (Contract #${l.lease_number})` : '';
-                opt.textContent = `${prop}${unit}${contract}`;
+                const statusTag = l.lease_status ? ` [${l.lease_status.toUpperCase()}]` : '';
+                opt.textContent = `${prop}${unit}${contract}${statusTag}`;
                 sel.appendChild(opt);
             });
 

@@ -57,7 +57,7 @@ app.use(helmet({
 }));
 
 // CORS configuration
-const allowedOrigins = process.env.ALLOWED_ORIGINS 
+const allowedOrigins = process.env.ALLOWED_ORIGINS
     ? process.env.ALLOWED_ORIGINS.split(',')
     : ['http://localhost:3000', 'http://127.0.0.1:3000'];
 
@@ -65,7 +65,7 @@ app.use(cors({
     origin: function (origin, callback) {
         // Allow requests with no origin (like mobile apps or curl)
         if (!origin) return callback(null, true);
-        
+
         if (allowedOrigins.indexOf(origin) !== -1 || process.env.NODE_ENV === 'development') {
             callback(null, true);
         } else {
@@ -90,6 +90,10 @@ app.get('/pages/tenant/notifications.html', (req, res) => res.redirect(302, '/pa
 app.get('/pages/landlord/notifications.html', (req, res) => res.redirect(302, '/pages/landlord/properties.html'));
 app.get('/pages/admin/notifications.html', (req, res) => res.redirect(302, '/pages/admin/users.html'));
 app.get('/pages/maintenance/notifications.html', (req, res) => res.redirect(302, '/pages/maintenance/dashboard.html'));
+app.get('/pages/maintenance/task-details.htm', (req, res) => {
+    const qs = req.url.includes('?') ? req.url.slice(req.url.indexOf('?')) : '';
+    res.redirect(302, '/pages/maintenance/task-details.html' + qs);
+});
 
 // Serve static files from the 'public' folder
 app.use(express.static(path.join(__dirname, '../public')));
@@ -137,7 +141,6 @@ app.use('/api', unitRoutes);
 app.use('/api', feedbackRoutes);
 app.use('/api', maintenanceComplianceRoutes);
 app.use('/api', maintenanceRoutes);
-app.use('/api', reportRoutes);
 app.use('/api', ratingsRoutes);
 app.use('/api', propertyRatingRoutes);
 app.use('/api', landlordRatingRoutes);

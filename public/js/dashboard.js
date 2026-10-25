@@ -41,7 +41,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Determine expected role based on path
     const path = window.location.pathname;
-    
+
     // Auto-redirect removed dashboard pages to properties.html
     if (path.includes('/tenant/dashboard.html')) {
         window.location.href = '/pages/tenant/properties.html';
@@ -170,7 +170,7 @@ function populateDashboardUI(user) {
     const statusEl = document.getElementById('accountStatus');
     if (statusEl) {
         statusEl.textContent = user.account_status.toUpperCase();
-        
+
         // Color coding for status using custom semantic classes
         statusEl.className = 'status-badge';
         if (user.account_status === 'active') {
@@ -399,13 +399,6 @@ function renderNewDashboardLayout(user) {
                             { label: 'Disputes', href: 'disputes.html' },
                             { label: 'Ratings & Feedback', href: 'feedback.html' }
                         ]
-                    },
-                    {
-                        label: 'Reports',
-                        icon: 'Reports',
-                        subItems: [
-                            { label: 'My Reports', href: 'reports.html' }
-                        ]
                     }
                 ]
             }
@@ -440,7 +433,6 @@ function renderNewDashboardLayout(user) {
                 section: 'Operations & Support',
                 items: [
                     { label: 'Maintenance', href: 'maintenance.html' },
-                    { label: 'Reports Center', href: 'reports.html' },
                     { label: 'Complaints', href: 'disputes.html' },
                     { label: 'Reviews & Feedback', href: 'feedback.html' }
                 ]
@@ -458,13 +450,13 @@ function renderNewDashboardLayout(user) {
             {
                 section: 'Platform Monitoring',
                 items: [
-                    { label: 'Payment Monitoring', href: 'payments.html' }
+                    { label: 'Payment Monitoring', href: 'payments.html' },
+                    { label: 'Maintenance', href: 'maintenance.html' }
                 ]
             },
             {
                 section: 'Trust & Governance',
                 items: [
-                    { label: 'Case Triage', href: 'reports.html' },
                     { label: 'Policies', href: 'policy-management.html' },
                     { label: 'Audit Trail', href: 'audit-logs.html' }
                 ]
@@ -523,18 +515,14 @@ function renderNewDashboardLayout(user) {
         tenant: {
             'property-details.html': 'properties.html',
             'apply.html': 'properties.html',
-            'application-details.html': 'applications.html',
-            'landlord-report-form.html': 'reports.html',
-            'tenant-reports.html': 'reports.html'
+            'application-details.html': 'applications.html'
         },
         landlord: {
             'property-details.html': 'properties.html',
             'units.html': 'properties.html',
             'application-details.html': 'applications.html',
             'lease-create.html': 'leases.html',
-            'maintenance-details.html': 'maintenance.html',
-            'tenant-report-form.html': 'reports.html',
-            'landlord-reports.html': 'reports.html'
+            'maintenance-details.html': 'maintenance.html'
         }
     };
     const activeNavigationFilename = parentNavigationPages[role]?.[currentPageFilename] || currentPageFilename;
@@ -568,7 +556,6 @@ function renderNewDashboardLayout(user) {
             {
                 section: 'Safety & records',
                 items: [
-                    { label: 'Reports center', href: 'reports.html', icon: 'Reports' },
                     { label: 'Policy violations', href: 'policy-violations.html', icon: 'Policy Violations' }
                 ]
             }
@@ -601,7 +588,7 @@ function renderNewDashboardLayout(user) {
                 `;
             });
         });
-        
+
         sidebarHtml += `
                 </nav>
             </aside>
@@ -637,7 +624,6 @@ function renderNewDashboardLayout(user) {
                 section: 'Operations & Support',
                 items: [
                     { label: 'Maintenance', href: 'maintenance.html', icon: 'Maintenance Management' },
-                    { label: 'Reports Center', href: 'reports.html', icon: 'Reports' },
                     { label: 'Complaints', href: 'disputes.html', icon: 'Disputes' },
                     { label: 'Reviews & Feedback', href: 'feedback.html', icon: 'Ratings and Feedback' }
                 ]
@@ -698,13 +684,13 @@ function renderNewDashboardLayout(user) {
             {
                 section: 'Platform Monitoring',
                 items: [
-                    { label: 'Payment Monitoring', href: 'payments.html', icon: 'Payment Monitoring' }
+                    { label: 'Payment Monitoring', href: 'payments.html', icon: 'Payment Monitoring' },
+                    { label: 'Maintenance', href: 'maintenance.html', icon: 'Maintenance' }
                 ]
             },
             {
                 section: 'Trust & Governance',
                 items: [
-                    { label: 'Case Triage', href: 'reports.html', icon: 'Case Triage' },
                     { label: 'Policies', href: 'policy-management.html', icon: 'Policies' },
                     { label: 'Audit Trail', href: 'audit-logs.html', icon: 'Audit Trail' }
                 ]
@@ -791,7 +777,7 @@ function renderNewDashboardLayout(user) {
                 </div>
                 <nav class="sidebar-menu" aria-label="Primary navigation">
         `;
-        
+
         menuGroups.forEach(group => {
             if (!(role === 'tenant' && group.section === 'Main')) {
                 sidebarHtml += `<div class="sidebar-section-title">${group.section}</div>`;
@@ -805,7 +791,7 @@ function renderNewDashboardLayout(user) {
                 </a>`;
             });
         });
-        
+
         sidebarHtml += `
                 </nav>
                 <div class="sidebar-footer">
@@ -887,12 +873,11 @@ function renderNewDashboardLayout(user) {
 
     if (role === 'tenant') {
         const activeTab = activeNavigationFilename === 'properties.html' ? 'discovery' :
-                          activeNavigationFilename === 'applications.html' ? 'applications' :
-                          activeNavigationFilename === 'leases.html' ? 'leases' :
-                          activeNavigationFilename === 'billings.html' ? 'payments' :
-                          activeNavigationFilename === 'reports.html' ? 'reports' :
-                          ['maintenance.html', 'disputes.html', 'feedback.html'].includes(activeNavigationFilename) ? 'support' :
-                          ['policy-violations.html', 'profile.html'].includes(activeNavigationFilename) ? 'more' : '';
+            activeNavigationFilename === 'applications.html' ? 'applications' :
+                activeNavigationFilename === 'leases.html' ? 'leases' :
+                    activeNavigationFilename === 'billings.html' ? 'payments' :
+                        ['maintenance.html', 'disputes.html', 'feedback.html'].includes(activeNavigationFilename) ? 'support' :
+                            ['policy-violations.html', 'profile.html'].includes(activeNavigationFilename) ? 'more' : '';
 
         topbarHtml += `
             <nav class="bottom-nav-bar" aria-label="Tenant quick navigation">
@@ -912,7 +897,7 @@ function renderNewDashboardLayout(user) {
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
                     <span>Payments</span>
                 </a>
-                <button type="button" id="btnOpenNavSheet" class="bottom-nav-item ${['support', 'reports', 'more'].includes(activeTab) ? 'active' : ''}" aria-label="Open more tenant tools" aria-controls="navSheetOverlay" aria-expanded="false">
+                <button type="button" id="btnOpenNavSheet" class="bottom-nav-item ${['support', 'more'].includes(activeTab) ? 'active' : ''}" aria-label="Open more tenant tools" aria-controls="navSheetOverlay" aria-expanded="false">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/></svg>
                     <span>More</span>
                 </button>
@@ -925,10 +910,6 @@ function renderNewDashboardLayout(user) {
                         <button type="button" id="btnCloseNavSheet" class="nav-sheet-close" aria-label="Close tenant tools">&times;</button>
                     </div>
                     <nav class="nav-sheet-menu" aria-label="Tenant support navigation">
-                        <a href="/pages/tenant/reports.html" class="nav-sheet-item" ${activeNavigationFilename === 'reports.html' ? 'aria-current="page"' : ''}>
-                            ${getTenantIcon('Reports')}
-                            <span>Reports center</span>
-                        </a>
                         <a href="/pages/tenant/maintenance.html" class="nav-sheet-item" ${activeNavigationFilename === 'maintenance.html' ? 'aria-current="page"' : ''}>
                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
                             <span>Maintenance requests</span>
@@ -951,9 +932,9 @@ function renderNewDashboardLayout(user) {
         `;
     } else if (role === 'landlord') {
         const activeTab = ['properties.html', 'property-create.html', 'property-details.html', 'units.html'].includes(activeNavigationFilename) ? 'portfolio' :
-                          ['applications.html', 'application-details.html'].includes(activeNavigationFilename) ? 'applications' :
-                          ['leases.html', 'lease-create.html'].includes(activeNavigationFilename) ? 'leases' :
-                          ['billings.html', 'payments.html'].includes(activeNavigationFilename) ? 'revenue' : 'more';
+            ['applications.html', 'application-details.html'].includes(activeNavigationFilename) ? 'applications' :
+                ['leases.html', 'lease-create.html'].includes(activeNavigationFilename) ? 'leases' :
+                    ['billings.html', 'payments.html'].includes(activeNavigationFilename) ? 'revenue' : 'more';
 
         topbarHtml += `
             <nav class="bottom-nav-bar" aria-label="Landlord quick navigation">
@@ -993,10 +974,6 @@ function renderNewDashboardLayout(user) {
                         <a href="/pages/landlord/maintenance.html" class="nav-sheet-item" ${activeNavigationFilename === 'maintenance.html' ? 'aria-current="page"' : ''}>
                             ${getLinkIcon('Maintenance Management')}
                             <span>Maintenance</span>
-                        </a>
-                        <a href="/pages/landlord/reports.html" class="nav-sheet-item" ${activeNavigationFilename === 'reports.html' ? 'aria-current="page"' : ''}>
-                            ${getLinkIcon('Reports')}
-                            <span>Reports Center</span>
                         </a>
                         <a href="/pages/landlord/disputes.html" class="nav-sheet-item" ${activeNavigationFilename === 'disputes.html' ? 'aria-current="page"' : ''}>
                             ${getLinkIcon('Disputes')}
@@ -1227,7 +1204,7 @@ function renderNewDashboardLayout(user) {
     const isTenant = sidebar && sidebar.classList.contains('sidebar-tenant');
     if (isTenant || document.getElementById('btnOpenNavSheet')) {
         const sidebarEl = document.getElementById('domiknowSidebar');
-        
+
         // Bottom Nav Sheet open/close toggles
         const btnOpenNavSheet = document.getElementById('btnOpenNavSheet');
         const btnCloseNavSheet = document.getElementById('btnCloseNavSheet');
@@ -1350,8 +1327,7 @@ function renderNewDashboardLayout(user) {
 
 const parentNavigationPages = {
     admin: {
-        'property-review-details.html': 'property-review.html',
-        'report-detail.html': 'reports.html'
+        'property-review-details.html': 'property-review.html'
     },
     maintenance: {
         'task-details.html': 'tasks.html'
@@ -1360,9 +1336,7 @@ const parentNavigationPages = {
         'property-details.html': 'properties.html',
         'apply.html': 'properties.html',
         'application-details.html': 'applications.html',
-        'lease-details.html': 'leases.html',
-        'landlord-report-form.html': 'reports.html',
-        'tenant-reports.html': 'reports.html'
+        'lease-details.html': 'leases.html'
     },
     landlord: {
         'property-create.html': 'properties.html',
@@ -1371,9 +1345,7 @@ const parentNavigationPages = {
         'application-details.html': 'applications.html',
         'lease-details.html': 'leases.html',
         'lease-create.html': 'leases.html',
-        'maintenance-details.html': 'maintenance.html',
-        'tenant-report-form.html': 'reports.html',
-        'landlord-reports.html': 'reports.html'
+        'maintenance-details.html': 'maintenance.html'
     }
 };
 
@@ -1387,12 +1359,7 @@ const contextualPageLabels = {
     'lease-create.html': 'Create lease',
     'maintenance-details.html': 'Maintenance details',
     'task-details.html': 'Task details',
-    'property-review-details.html': 'Property review details',
-    'report-detail.html': 'Case details',
-    'landlord-report-form.html': 'Report landlord',
-    'tenant-report-form.html': 'Report tenant',
-    'tenant-reports.html': 'Reports against me',
-    'landlord-reports.html': 'Reports against me'
+    'property-review-details.html': 'Property review details'
 };
 
 function navigationLabelForFile(role, filename) {
@@ -1781,7 +1748,7 @@ async function seamlessNavigateTo(targetUrlString, role, pushState = true) {
         const scopedDocument = new Proxy(document, {
             get(target, prop) {
                 if (prop === 'addEventListener') {
-                    return function(type, listener, options) {
+                    return function (type, listener, options) {
                         if (type === 'DOMContentLoaded') {
                             if (typeof listener === 'function') {
                                 pageDCLCallbacks.push(listener);
@@ -1790,7 +1757,7 @@ async function seamlessNavigateTo(targetUrlString, role, pushState = true) {
                         }
                         target.addEventListener(type, listener, options);
                         activePageCleanups.push(() => {
-                            try { target.removeEventListener(type, listener, options); } catch(e) {}
+                            try { target.removeEventListener(type, listener, options); } catch (e) { }
                         });
                     };
                 }
@@ -1816,7 +1783,7 @@ async function seamlessNavigateTo(targetUrlString, role, pushState = true) {
                             seamlessNavigateTo(targetUrl.href, role, true);
                             return true;
                         }
-                    } catch (_) {}
+                    } catch (_) { }
                 }
                 target[prop] = value;
                 return true;
@@ -1832,7 +1799,7 @@ async function seamlessNavigateTo(targetUrlString, role, pushState = true) {
                     return scopedLocation;
                 }
                 if (prop === 'addEventListener') {
-                    return function(type, listener, options) {
+                    return function (type, listener, options) {
                         if (type === 'DOMContentLoaded') {
                             if (typeof listener === 'function') {
                                 pageDCLCallbacks.push(listener);
@@ -1841,19 +1808,19 @@ async function seamlessNavigateTo(targetUrlString, role, pushState = true) {
                         }
                         target.addEventListener(type, listener, options);
                         activePageCleanups.push(() => {
-                            try { target.removeEventListener(type, listener, options); } catch(e) {}
+                            try { target.removeEventListener(type, listener, options); } catch (e) { }
                         });
                     };
                 }
                 if (prop === 'setInterval') {
-                    return function(handler, timeout, ...args) {
+                    return function (handler, timeout, ...args) {
                         const id = target.setInterval(handler, timeout, ...args);
                         activePageCleanups.push(() => clearInterval(id));
                         return id;
                     };
                 }
                 if (prop === 'setTimeout') {
-                    return function(handler, timeout, ...args) {
+                    return function (handler, timeout, ...args) {
                         const id = target.setTimeout(handler, timeout, ...args);
                         activePageCleanups.push(() => clearTimeout(id));
                         return id;
@@ -1947,7 +1914,7 @@ function initDashboardNavigation(role, sidebar) {
         // Navigation remains usable when browser storage is unavailable.
     }
     sidebar.addEventListener('scroll', () => {
-        try { sessionStorage.setItem(scrollKey, String(sidebar.scrollTop)); } catch (_) {}
+        try { sessionStorage.setItem(scrollKey, String(sidebar.scrollTop)); } catch (_) { }
     }, { passive: true });
     updateActiveNavigationIndicators(window.location.pathname, role);
 
@@ -1978,7 +1945,7 @@ function initSeamlessDashboardNavigation(role) {
         const link = event.target instanceof Element ? event.target.closest('a[href]') : null;
         const url = getDashboardUrl(link);
         if (!url || (url.pathname === window.location.pathname && url.search === window.location.search)) return;
-        loadDashboardPageHtml(url.href).catch(() => {});
+        loadDashboardPageHtml(url.href).catch(() => { });
     };
 
     if (typeof document.addEventListener === 'function') {
@@ -2030,52 +1997,52 @@ function initSeamlessDashboardNavigation(role) {
 // Minimal inline SVG icons for sidebar links (Serious & System-like)
 function getLinkIcon(label) {
     const baseSvg = (pathData) => `<svg class="nav-icon" viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">${pathData}</svg>`;
-    
+
     const icons = {
         'Dashboard': baseSvg('<rect x="3" y="3" width="7" height="9"></rect><rect x="14" y="3" width="7" height="5"></rect><rect x="14" y="12" width="7" height="9"></rect><rect x="3" y="16" width="7" height="5"></rect>'),
         'Property Discovery': baseSvg('<circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line>'),
         'Recommendations': baseSvg('<circle cx="12" cy="12" r="10"></circle><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"></polygon>'),
         'Compare Properties': baseSvg('<path d="M16 3h5v5M4 20L21 3M21 16v5h-5M15 15l6 6M4 4l5 5"></path>'),
-        
+
         'My Reservations': baseSvg('<rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line>'),
         'Reservation Monitoring': baseSvg('<rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line>'),
-        
+
         'My Applications': baseSvg('<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline>'),
         'Tenant Applications': baseSvg('<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline>'),
-        
+
         'Screening': baseSvg('<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>'),
         'Tenant Screening': baseSvg('<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>'),
         'Screening Monitor': baseSvg('<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>'),
-        
+
         'My Lease': baseSvg('<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline>'),
         'Leases': baseSvg('<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline>'),
         'Lease Monitor': baseSvg('<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline>'),
-        
+
         'My Billings': baseSvg('<rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line>'),
         'Billings': baseSvg('<rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line>'),
         'Billing Monitor': baseSvg('<rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line>'),
-        
+
         'My Payments': baseSvg('<line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>'),
         'Payments': baseSvg('<line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>'),
         'Payment Monitor': baseSvg('<line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>'),
-        
+
         'Maintenance Requests': baseSvg('<path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path>'),
         'Maintenance Management': baseSvg('<path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path>'),
         'Maintenance Monitor': baseSvg('<path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path>'),
         'Assigned Tasks': baseSvg('<path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path>'),
-        
+
         'Reports': baseSvg('<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line>'),
         'Reports Monitor': baseSvg('<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line>'),
-        
+
         'Disputes': baseSvg('<circle cx="6" cy="19" r="3"></circle><circle cx="18" cy="19" r="3"></circle><path d="M6 12V6a6 6 0 1 1 12 0v6M12 2v10"></path>'),
         'Disputes Monitor': baseSvg('<circle cx="6" cy="19" r="3"></circle><circle cx="18" cy="19" r="3"></circle><path d="M6 12V6a6 6 0 1 1 12 0v6M12 2v10"></path>'),
-        
+
         'Policy Violations': baseSvg('<path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line>'),
         'Policy Violations Monitor': baseSvg('<path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line>'),
-        
+
         'Ratings and Feedback': baseSvg('<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>'),
         'Feedback Monitor': baseSvg('<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>'),
-        
+
         'My Properties': baseSvg('<path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline>'),
         'Property Review': baseSvg('<path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline>'),
         'Register Property': baseSvg('<polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>'),
@@ -2101,11 +2068,13 @@ function getLinkIcon(label) {
     icons['Property Approvals'] = icons['Property Review'];
     icons['Reservations'] = icons['Reservation Monitoring'];
     icons['Payment Monitoring'] = icons['Payment Monitor'];
+    icons['Maintenance'] = icons['Maintenance Monitor'];
+    icons['Maintenance & Cost Hub'] = icons['Maintenance Monitor'];
     icons['Case Triage'] = icons['Reports Monitor'];
     icons['Policies'] = icons['Policy Violations'];
     icons['Audit Trail'] = icons['Audit Logs'];
     icons['My Profile'] = icons['Profile'];
-    
+
     return icons[label] || baseSvg('<circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="16"></line><line x1="8" y1="12" x2="16" y2="12"></line>');
 }
 
@@ -2124,3 +2093,152 @@ function getTenantIcon(label) {
     };
     return (icons[label] || '').replace('<svg ', '<svg aria-hidden="true" focusable="false" ');
 }
+
+// ===========================================================================
+// Universal Drag-and-Drop System for File / Image Uploads
+// ===========================================================================
+
+function initDomiknowDragAndDrop() {
+    if (typeof window === 'undefined' || typeof document === 'undefined') return;
+    if (typeof window.addEventListener !== 'function' || typeof document.querySelectorAll !== 'function') return;
+
+    // 1. Prevent default navigation if a file is dropped outside active dropzones
+    if (!window.__domiknowDragDropInitialized) {
+        window.__domiknowDragDropInitialized = true;
+
+        window.addEventListener('dragover', (e) => {
+            if (e && e.dataTransfer && Array.from(e.dataTransfer.types || []).includes('Files')) {
+                e.preventDefault();
+            }
+        });
+
+        window.addEventListener('drop', (e) => {
+            if (e && e.dataTransfer && Array.from(e.dataTransfer.types || []).includes('Files')) {
+                if (e.target && typeof e.target.closest === 'function' && !e.target.closest('[data-drop-zone], .upload-zone, .app-drag-drop-zone, .stmt-file-wrapper, .doc-upload-section, .upload-card, .photo-slot-card, .doc-slot-card, .upload-zone-compact, #chatHeadWindow, .profile-avatar-block, input[type="file"]')) {
+                    e.preventDefault();
+                }
+            }
+        });
+    }
+
+    // 2. Scan and bind dropzone behavior for any input[type="file"]
+    function enhanceFileInput(input) {
+        if (!input || input.dataset?.dragDropBound === 'true') return;
+        if (input.dataset) input.dataset.dragDropBound = 'true';
+
+        // Find best target container: explicit dropzone, parent wrapper, label, or form group
+        const container = (input.closest && input.closest('[data-drop-zone], .upload-zone, .app-drag-drop-zone, .stmt-file-wrapper, .doc-upload-section, .upload-card, .photo-slot-card, .doc-slot-card, .upload-zone-compact, .form-group')) || input.parentElement;
+        if (!container || typeof container.addEventListener !== 'function') return;
+
+        let dragCounter = 0;
+
+        container.addEventListener('dragenter', (e) => {
+            if (!e.dataTransfer || !Array.from(e.dataTransfer.types || []).includes('Files')) return;
+            e.preventDefault();
+            dragCounter++;
+            if (container.classList && typeof container.classList.add === 'function') {
+                container.classList.add('dragover');
+            }
+            if (typeof container.setAttribute === 'function') {
+                container.setAttribute('data-dragover', 'true');
+            }
+        });
+
+        container.addEventListener('dragover', (e) => {
+            if (!e.dataTransfer || !Array.from(e.dataTransfer.types || []).includes('Files')) return;
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'copy';
+        });
+
+        container.addEventListener('dragleave', (e) => {
+            e.preventDefault();
+            dragCounter--;
+            if (dragCounter <= 0) {
+                dragCounter = 0;
+                if (container.classList && typeof container.classList.remove === 'function') {
+                    container.classList.remove('dragover');
+                }
+                if (typeof container.removeAttribute === 'function') {
+                    container.removeAttribute('data-dragover');
+                }
+            }
+        });
+
+        container.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dragCounter = 0;
+            if (container.classList && typeof container.classList.remove === 'function') {
+                container.classList.remove('dragover');
+            }
+            if (typeof container.removeAttribute === 'function') {
+                container.removeAttribute('data-dragover');
+            }
+
+            const files = e.dataTransfer?.files;
+            if (!files || files.length === 0) return;
+
+            try {
+                if (typeof input.hasAttribute === 'function' && input.hasAttribute('multiple')) {
+                    input.files = files;
+                } else if (typeof DataTransfer !== 'undefined') {
+                    const dt = new DataTransfer();
+                    dt.items.add(files[0]);
+                    input.files = dt.files;
+                } else {
+                    input.files = files;
+                }
+            } catch (err) {
+                try {
+                    input.files = files;
+                } catch (e2) { }
+            }
+
+            // Dispatch events to notify form logic
+            if (typeof input.dispatchEvent === 'function') {
+                if (typeof Event === 'function') {
+                    input.dispatchEvent(new Event('input', { bubbles: true }));
+                    input.dispatchEvent(new Event('change', { bubbles: true }));
+                }
+            }
+
+            // If input has inline onchange attribute, invoke it
+            if (typeof input.onchange === 'function') {
+                input.onchange();
+            }
+        });
+    }
+
+    // Initial enhancement
+    try {
+        document.querySelectorAll('input[type="file"]').forEach(enhanceFileInput);
+    } catch (e) { }
+
+    // Dynamic enhancement for newly injected DOM elements (modals, slots, forms)
+    if (!window.__domiknowDropObserver && typeof window.MutationObserver === 'function' && document.body) {
+        window.__domiknowDropObserver = new window.MutationObserver((mutations) => {
+            for (const mutation of mutations) {
+                for (const node of mutation.addedNodes) {
+                    if (node.nodeType === 1) { // ELEMENT_NODE
+                        if (node.matches && node.matches('input[type="file"]')) {
+                            enhanceFileInput(node);
+                        } else if (node.querySelectorAll) {
+                            node.querySelectorAll('input[type="file"]').forEach(enhanceFileInput);
+                        }
+                    }
+                }
+            }
+        });
+        window.__domiknowDropObserver.observe(document.body, { childList: true, subtree: true });
+    }
+}
+
+// Ensure execution on DOM ready
+if (typeof document !== 'undefined') {
+    if (document.readyState === 'loading' && typeof document.addEventListener === 'function') {
+        document.addEventListener('DOMContentLoaded', initDomiknowDragAndDrop);
+    } else {
+        initDomiknowDragAndDrop();
+    }
+}
+
+

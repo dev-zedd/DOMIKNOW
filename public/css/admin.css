@@ -820,9 +820,14 @@ body[data-admin-page="policy-management"] #toastBanner[data-state="error"] {
 }
 
 .dashboard-layout-admin .admin-data-table th:last-child,
-.dashboard-layout-admin .admin-data-table td:last-child {
+.dashboard-layout-admin .admin-data-table td:last-child:not([colspan]) {
   text-align: right !important;
   white-space: nowrap !important;
+}
+
+.dashboard-layout-admin .admin-data-table td[colspan] {
+  text-align: center !important;
+  white-space: normal !important;
 }
 
 .dashboard-layout-admin #actionFeedback {

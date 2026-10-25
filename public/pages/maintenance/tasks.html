@@ -6,139 +6,306 @@
     <title>Assigned Tasks - DomiKnow</title>
     <link href="../../css/input.css" rel="stylesheet">
     <style>
-        .list-card {
-            background-color: var(--bg-secondary);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-lg);
-            padding: 2rem;
-            box-shadow: var(--shadow-lg);
+        /* ── Modern Landlord-Consistent Tabs Bar ── */
+        .review-tabs-bar {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-bottom: 1px solid var(--color-border-default, #e2e8f0);
+            margin-bottom: 1.25rem;
             overflow-x: auto;
-            margin-top: 1.5rem;
+            scrollbar-width: none;
+            -webkit-overflow-scrolling: touch;
+            padding-bottom: 0;
         }
-        table {
+        .review-tabs-bar::-webkit-scrollbar {
+            display: none;
+        }
+        .review-tab-btn {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 14px 14px;
+            border: none;
+            background: none;
+            color: var(--color-text-secondary, #475569);
+            font-size: 0.875rem;
+            font-weight: 600;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: color 0.15s ease;
+            text-decoration: none;
+        }
+        .review-tab-btn:hover {
+            color: var(--color-text-primary, #0f172a);
+        }
+        .review-tab-btn.active {
+            color: var(--color-action-primary, #0355f3) !important;
+            font-weight: 750 !important;
+        }
+        .review-tab-btn.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            right: 0;
+            height: 2.5px;
+            background: var(--color-action-primary, #0355f3);
+            border-radius: 2px 2px 0 0;
+        }
+        .review-tab-count {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 20px;
+            height: 20px;
+            padding: 0 6px;
+            border-radius: 999px;
+            font-size: 0.6875rem;
+            font-weight: 750;
+            background: var(--color-bg-subtle, #e2e8f0);
+            color: var(--color-text-muted, #475569);
+            line-height: 1.2;
+            transition: all 0.15s ease;
+        }
+        .review-tab-btn.active .review-tab-count {
+            background: rgba(3, 85, 243, 0.1);
+            color: var(--color-link, #0355f3);
+        }
+
+        /* ── Unified Table Card & Controls ── */
+        .table-card.landlord-table-card {
+            background-color: var(--color-bg-surface);
+            border: 1px solid var(--color-border-default);
+            border-radius: 16px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+            margin-bottom: 2rem;
+            overflow: hidden;
+        }
+        .landlord-table-controls {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 14px 20px;
+            border-bottom: 1px solid var(--color-border-default, #e2e8f0);
+            background: var(--color-bg-surface, #ffffff);
+        }
+        .landlord-table-controls-left {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            flex: 1 1 auto;
+            min-width: 0;
+        }
+        .landlord-table-search {
+            flex: 0 1 320px !important;
+            width: 320px !important;
+            min-width: 220px;
+            max-width: 100% !important;
+            min-height: 38px;
+            height: 38px;
+            padding: 6px 14px 6px 36px !important;
+            border: 1px solid var(--color-border-default, #e2e8f0) !important;
+            border-radius: 9px !important;
+            background-color: var(--color-bg-subtle, #f8fafc) !important;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'%3E%3C/circle%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'%3E%3C/line%3E%3C/svg%3E") !important;
+            background-repeat: no-repeat !important;
+            background-position: 11px center !important;
+            color: var(--color-text-primary, #0f172a) !important;
+            font-size: 0.8125rem;
+            font-weight: 500;
+            margin: 0;
+            transition: all 0.2s ease;
+        }
+        .landlord-table-search:focus {
+            border-color: var(--color-action-primary, #0355f3) !important;
+            box-shadow: 0 0 0 3px rgba(3, 85, 243, 0.12) !important;
+            background-color: var(--color-bg-surface, #ffffff) !important;
+            outline: none;
+        }
+        .task-priority-filter {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            flex-shrink: 0;
+            white-space: nowrap !important;
+        }
+        .task-priority-label {
+            font-size: 0.8125rem;
+            font-weight: 600;
+            color: var(--color-text-secondary, #475569);
+            margin: 0;
+            white-space: nowrap !important;
+            flex-shrink: 0;
+            display: inline-block;
+        }
+        .task-priority-select {
+            min-height: 38px;
+            height: 38px;
+            font-size: 0.8125rem;
+            padding: 4px 10px;
+            border-radius: 8px;
+            border: 1px solid var(--color-border-default, #cbd5e1);
+            background: var(--color-bg-surface, #ffffff);
+            color: var(--color-text-primary, #0f172a);
+            flex-shrink: 0;
+            white-space: nowrap;
+        }
+        .landlord-table-result-count {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 5px 12px;
+            border-radius: 999px;
+            background: var(--color-bg-subtle, #f1f5f9);
+            border: 1px solid var(--color-border-subtle, #e2e8f0);
+            color: var(--color-text-secondary, #475569);
+            font-size: 0.75rem;
+            font-weight: 600;
+            white-space: nowrap;
+            margin-left: auto;
+            flex-shrink: 0;
+        }
+
+        /* ── Data Table & Rows ── */
+        .maintenance-data-table {
             width: 100%;
+            table-layout: fixed;
             border-collapse: collapse;
             text-align: left;
-            font-size: 0.9375rem;
+            font-size: 0.875rem;
         }
-        th {
+        .maintenance-data-table th {
             font-weight: 700;
-            color: var(--text-secondary);
-            padding: 0.75rem 1rem;
-            border-bottom: 2px solid var(--border-color);
+            color: var(--color-text-secondary, #64748b);
+            padding: 0.85rem 1.15rem;
+            border-bottom: 1px solid var(--color-border-default, #e2e8f0);
             text-transform: uppercase;
             font-size: 0.72rem;
             letter-spacing: 0.05em;
+            background: var(--color-bg-subtle, #f8fafc);
+            white-space: nowrap;
         }
-        td {
-            padding: 1.15rem 1rem;
-            border-bottom: 1px solid var(--border-color);
-            color: var(--text-primary);
+        .maintenance-data-table td {
+            padding: 1rem 1.15rem;
+            border-bottom: 1px solid var(--color-border-subtle, #f1f5f9);
+            color: var(--color-text-primary, #1e293b);
+            vertical-align: middle;
         }
-        tr:hover td {
-            background-color: var(--bg-primary);
+        .maintenance-data-table th:first-child,
+        .maintenance-data-table td:first-child {
+            padding-left: 20px;
         }
+        .maintenance-data-table th:last-child,
+        .maintenance-data-table td:last-child {
+            padding-right: 20px;
+        }
+        .maintenance-data-table tbody tr {
+            transition: background-color 0.15s ease;
+        }
+        .maintenance-data-table tbody tr:hover td {
+            background-color: var(--color-bg-subtle, #f8fafc);
+        }
+        .maintenance-data-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
         .action-btn {
-            padding: 0.45rem 1.1rem;
-            font-size: 0.8125rem;
-            border-radius: var(--radius-sm);
-            cursor: pointer;
-            font-weight: 750;
-            border: 1px solid transparent;
-            text-decoration: none;
-            display: inline-block;
-            background-color: var(--maintenance);
-            color: white;
-        }
-        .action-btn:hover {
-            opacity: 0.9;
-        }
-        
-        .filters-group {
-            display: flex;
-            gap: 0.5rem;
-            flex-wrap: wrap;
-            margin-top: 1.5rem;
-            margin-bottom: 0.5rem;
-        }
-        .filter-btn {
-            background: var(--bg-secondary);
-            border: 1px solid var(--border-color);
-            color: var(--text-secondary);
             padding: 0.45rem 1rem;
             font-size: 0.8125rem;
-            border-radius: var(--radius-sm);
+            border-radius: 8px;
             cursor: pointer;
-            font-weight: 600;
-            transition: all 0.2s ease;
+            font-weight: 700;
+            border: 1px solid var(--color-border-strong, #cbd5e1);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--color-bg-surface, #ffffff);
+            color: var(--color-text-primary, #0f172a);
+            transition: all 0.15s ease;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+            white-space: nowrap;
         }
-        .filter-btn.active {
-            background: var(--maintenance);
-            color: white;
-            border-color: var(--maintenance);
+        .action-btn:hover {
+            border-color: var(--color-action-primary, #0355f3);
+            background-color: var(--color-action-primary, #0355f3);
+            color: #ffffff;
+            box-shadow: 0 2px 4px rgba(3,85,243,0.15);
         }
     </style>
     <link href="../../css/design-system.css?v=20260827-1" rel="stylesheet">
+    <link href="../../css/maintenance.css" rel="stylesheet">
     <script src="../../js/ui.js?v=20260827-2" defer></script>
 </head>
 <body class="app-loading" data-role="maintenance" data-page-title="My Assigned Tasks">
-    <!-- Navbar -->
-    <nav class="navbar navbar-maintenance">
-        <div class="navbar-container">
-            <div class="navbar-brand-group">
-                <a href="dashboard.html" style="text-decoration: none;"><span class="navbar-logo">DomiKnow</span></a>
-                <span class="navbar-badge navbar-badge-maintenance">Maintenance</span>
-            </div>
-            <div class="navbar-menu">
-                <a href="dashboard.html" class="navbar-menu-link">Dashboard</a>
-                <a href="tasks.html" class="navbar-menu-link active">Assigned Tasks</a>
-            </div>
-            <div class="navbar-right">
-                <span class="navbar-user-welcome">Welcome, <span class="user-name">User</span></span>
-                <button id="logoutBtn" class="navbar-btn">Logout</button>
-            </div>
-        </div>
-    </nav>
-
     <!-- Main Content -->
     <main class="dashboard-container">
-        <h2>Task queue</h2>
-        <p class="maintenance-page-lead">Review offers, update active work, and open completed work orders.</p>
+        <!-- Review Status Tabs -->
+        <nav class="review-tabs-bar filters-group" aria-label="Filter tasks by status">
+            <button class="review-tab-btn filter-btn active" data-filter="all" aria-pressed="true">
+                All Tasks <span class="review-tab-count" id="countAll">0</span>
+            </button>
+            <button class="review-tab-btn filter-btn" data-filter="assigned" aria-pressed="false">
+                New Offers <span class="review-tab-count" id="countAssigned">0</span>
+            </button>
+            <button class="review-tab-btn filter-btn" data-filter="accepted" aria-pressed="false">
+                Accepted <span class="review-tab-count" id="countAccepted">0</span>
+            </button>
+            <button class="review-tab-btn filter-btn" data-filter="in_progress" aria-pressed="false">
+                In Progress <span class="review-tab-count" id="countProgress">0</span>
+            </button>
+            <button class="review-tab-btn filter-btn" data-filter="completed" aria-pressed="false">
+                Completed <span class="review-tab-count" id="countCompleted">0</span>
+            </button>
+            <button class="review-tab-btn filter-btn" data-filter="closed" aria-pressed="false">
+                Closed <span class="review-tab-count" id="countClosed">0</span>
+            </button>
+        </nav>
 
-        <div class="maintenance-queue-toolbar">
-            <label>Search tasks<input id="taskSearch" type="search" placeholder="Property, unit or problem"></label>
-            <label>Priority<select id="taskPriority"><option value="all">All priorities</option><option value="low">Low</option><option value="normal">Normal</option><option value="medium">Medium</option><option value="high">High</option><option value="emergency">Emergency</option></select></label>
-            <button id="refreshTasks" type="button" class="btn btn-secondary">Refresh tasks</button>
-        </div>
-        <p id="taskResultCount" role="status" class="maintenance-task-meta"></p>
-        <div class="filters-group">
-            <button class="filter-btn active" data-filter="all" aria-pressed="true">All tasks</button>
-            <button class="filter-btn" data-filter="assigned" aria-pressed="false">New offers</button>
-            <button class="filter-btn" data-filter="accepted" aria-pressed="false">Accepted</button>
-            <button class="filter-btn" data-filter="in_progress" aria-pressed="false">Working</button>
-            <button class="filter-btn" data-filter="completed" aria-pressed="false">Completed</button>
-            <button class="filter-btn" data-filter="closed" aria-pressed="false">Closed</button>
-        </div>
+        <!-- Table Card with Integrated Search Controls -->
+        <div class="table-card landlord-table-card">
+            <div class="landlord-table-controls">
+                <div class="landlord-table-controls-left">
+                    <input id="taskSearch" type="search" class="landlord-table-search" placeholder="Search property, unit, or problem...">
+                    <div class="task-priority-filter">
+                        <label for="taskPriority" class="task-priority-label">Priority:</label>
+                        <select id="taskPriority" class="form-select task-priority-select">
+                            <option value="all">All Priorities</option>
+                            <option value="low">Low</option>
+                            <option value="normal">Normal</option>
+                            <option value="medium">Medium</option>
+                            <option value="high">High</option>
+                            <option value="emergency">Emergency</option>
+                        </select>
+                    </div>
+                </div>
+                <span id="taskResultCount" role="status" class="landlord-table-result-count">0 tasks</span>
+            </div>
 
-        <div class="list-card">
-            <table class="maintenance-data-table" aria-label="Assigned maintenance tasks">
-                <thead>
-                    <tr>
-                        <th>Property & Unit</th>
-                        <th>Problem Summary</th>
-                        <th>Category</th>
-                        <th>Priority</th>
-                        <th>Task Status</th>
-                        <th>Assigned Date</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody id="tasksTableBody" aria-live="polite" aria-busy="true">
-                    <tr>
-                        <td colspan="7" role="status" class="maintenance-table-message">Loading assigned tasks...</td>
-                    </tr>
-                </tbody>
-            </table>
+            <div style="overflow-x: auto;">
+                <table class="maintenance-data-table" aria-label="Assigned maintenance tasks">
+                    <thead>
+                        <tr>
+                            <th style="width: 25%; text-align: left;">Property &amp; Unit</th>
+                            <th style="width: 27%; text-align: left;">Problem &amp; Schedule</th>
+                            <th style="width: 14%; text-align: left;">Category</th>
+                            <th style="width: 11%; text-align: center;">Priority</th>
+                            <th style="width: 11%; text-align: center;">Status</th>
+                            <th style="width: 12%; text-align: center;">Assigned Date</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tasksTableBody" aria-live="polite" aria-busy="true">
+                        <tr>
+                            <td colspan="6" role="status" class="maintenance-table-message">Loading assigned tasks...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </main>
 
@@ -154,7 +321,6 @@
             fetchAssignedTasks();
             document.getElementById('taskSearch').addEventListener('input', renderTasksTable);
             document.getElementById('taskPriority').addEventListener('change', renderTasksTable);
-            document.getElementById('refreshTasks').addEventListener('click', fetchAssignedTasks);
 
             document.querySelector('.filters-group').addEventListener('click', (e) => {
                 const btn = e.target.closest('[data-filter]');
@@ -175,7 +341,6 @@
         async function fetchAssignedTasks() {
             const tableBody = document.getElementById('tasksTableBody');
             tableBody.setAttribute('aria-busy', 'true');
-            document.getElementById('refreshTasks').disabled = true;
             try {
                 const response = await fetch('/api/maintenance/requests/worker', {
                     headers: { 'Authorization': `Bearer ${token}` }
@@ -187,15 +352,35 @@
 
                 const result = await response.json();
                 myTasks = result.data || [];
+                updateTabCounts();
                 renderTasksTable();
                 tableBody.setAttribute('aria-busy', 'false');
 
             } catch (err) {
                 console.error(err);
                 renderTaskMessage('The maintenance service could not be reached. Check your connection and try again.', 'error', true);
-            } finally {
-                document.getElementById('refreshTasks').disabled = false;
             }
+        }
+
+        function updateTabCounts() {
+            const counts = {
+                all: myTasks.length,
+                assigned: myTasks.filter(t => t.status === 'assigned').length,
+                accepted: myTasks.filter(t => t.status === 'accepted').length,
+                in_progress: myTasks.filter(t => ['travelling', 'arrived', 'repairing', 'quoted', 'approved'].includes(t.status)).length,
+                completed: myTasks.filter(t => ['completed', 'verified'].includes(t.status)).length,
+                closed: myTasks.filter(t => t.status === 'closed').length
+            };
+            const setBadge = (id, count) => {
+                const el = document.getElementById(id);
+                if (el) el.textContent = count;
+            };
+            setBadge('countAll', counts.all);
+            setBadge('countAssigned', counts.assigned);
+            setBadge('countAccepted', counts.accepted);
+            setBadge('countProgress', counts.in_progress);
+            setBadge('countCompleted', counts.completed);
+            setBadge('countClosed', counts.closed);
         }
 
         function renderTasksTable() {
@@ -208,7 +393,7 @@
                 if (query && ![t.properties?.property_name, t.unit_number, t.issue_title, t.issue_category].join(' ').toLowerCase().includes(query)) return false;
                 if (activeFilter === 'all') return true;
                 if (activeFilter === 'in_progress') {
-                    return ['travelling', 'arrived', 'repairing'].includes(t.status);
+                    return ['travelling', 'arrived', 'repairing', 'quoted', 'approved'].includes(t.status);
                 }
                 if (activeFilter === 'completed') {
                     return ['completed', 'verified'].includes(t.status);
@@ -216,7 +401,10 @@
                 return t.status === activeFilter;
             });
 
-            document.getElementById('taskResultCount').textContent = `${filtered.length} of ${myTasks.length} tasks`;
+            const resultCount = document.getElementById('taskResultCount');
+            if (resultCount) {
+                resultCount.textContent = `${filtered.length} of ${myTasks.length} tasks`;
+            }
             if (filtered.length === 0) {
                 renderTaskMessage('No maintenance tasks match this filter. Select another status to view more work.');
                 return;
@@ -244,23 +432,30 @@
                             ? 'View report'
                             : 'Update progress';
 
+                const detailUrl = `task-details.html?id=${encodeURIComponent(task.id)}`;
+
                 const row = document.createElement('tr');
+                row.style.cursor = 'pointer';
+                row.title = `${actionLabel} — Click to view details`;
+                row.setAttribute('aria-label', `${task.issue_title || 'Task'} — ${actionLabel}`);
+                row.addEventListener('click', (e) => {
+                    if (e.target.closest('a, button')) return;
+                    window.location.href = detailUrl;
+                });
+
                 row.innerHTML = `
-                    <td data-label="Property and unit">
-                        <div class="maintenance-task-property">${window.domiknowEscapeHtml(task.properties?.property_name || 'Property not specified')}</div>
-                        <div class="maintenance-task-meta">Unit: ${window.domiknowEscapeHtml(task.unit_number || 'Not specified')}</div>
+                    <td data-label="Property and unit" style="text-align: left;">
+                        <div style="font-weight: 750; color: var(--color-text-primary, #0f172a); font-size: 0.875rem; line-height: 1.35; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${window.domiknowEscapeHtml(task.properties?.property_name || 'Property not specified')}</div>
+                        <div style="font-size: 0.78rem; color: var(--color-text-muted, #64748b); margin-top: 2px;">Unit: ${window.domiknowEscapeHtml(task.unit_number || 'Not specified')}</div>
                     </td>
-                    <td data-label="Problem and schedule">
-                        <div class="maintenance-task-title">${window.domiknowEscapeHtml(task.issue_title || 'Maintenance request')}</div>
-                        <div class="maintenance-task-meta">Preferred schedule: ${window.domiknowEscapeHtml(task.preferred_schedule || 'Not specified')}</div>
+                    <td data-label="Problem and schedule" style="text-align: left;">
+                        <div style="font-weight: 600; color: var(--color-text-primary, #1e293b); font-size: 0.875rem; line-height: 1.35; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${window.domiknowEscapeHtml(task.issue_title || 'Maintenance request')}</div>
+                        <div style="font-size: 0.78rem; color: var(--color-text-muted, #64748b); margin-top: 2px;">Schedule: ${window.domiknowEscapeHtml(task.preferred_schedule || 'Not specified')}</div>
                     </td>
-                    <td data-label="Category" class="maintenance-task-capitalize">${window.domiknowEscapeHtml(task.issue_category || 'Other')}</td>
-                    <td data-label="Priority"><span class="status-badge ${priorityBadgeClass}">${window.domiknowEscapeHtml(task.priority_level || 'Normal')}</span></td>
-                    <td data-label="Status"><span class="status-badge ${statusBadgeClass}">${window.domiknowEscapeHtml(taskStatus)}</span></td>
-                    <td data-label="Assigned">${assignedDate}</td>
-                    <td data-label="Action">
-                        <a href="task-details.html?id=${encodeURIComponent(task.id)}" class="action-btn">${actionLabel}</a>
-                    </td>
+                    <td data-label="Category" style="text-align: left; text-transform: capitalize; font-size: 0.84rem; font-weight: 500; color: var(--color-text-secondary, #334155); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${window.domiknowEscapeHtml(task.issue_category || 'Other')}</td>
+                    <td data-label="Priority" style="text-align: center;"><span class="status-badge ${priorityBadgeClass}">${window.domiknowEscapeHtml(task.priority_level || 'Normal')}</span></td>
+                    <td data-label="Status" style="text-align: center;"><span class="status-badge ${statusBadgeClass}">${window.domiknowEscapeHtml(taskStatus)}</span></td>
+                    <td data-label="Assigned" style="text-align: center; font-size: 0.8125rem; font-weight: 500; color: var(--color-text-secondary, #64748b); white-space: nowrap;">${assignedDate}</td>
                 `;
                 tableBody.appendChild(row);
             });
@@ -270,7 +465,7 @@
             const tableBody = document.getElementById('tasksTableBody');
             const row = document.createElement('tr');
             const cell = document.createElement('td');
-            cell.colSpan = 7;
+            cell.colSpan = 6;
             cell.className = `maintenance-table-message maintenance-table-message--${type}`;
             cell.setAttribute('role', type === 'error' ? 'alert' : 'status');
 

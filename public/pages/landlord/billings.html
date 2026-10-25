@@ -5,63 +5,89 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Billing & Revenue Dashboard - DomiKnow</title>
     <link href="../../css/input.css" rel="stylesheet">
+    <link href="../../css/design-system.css" rel="stylesheet">
+    <link href="../../css/landlord.css" rel="stylesheet">
     <style>
         /* Modern styling system */
         /* ── Billings Tabs & Action Header Row (consistent with tenant portal & properties.html) ── */
         .billings-header-row {
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            border-bottom: 1px solid var(--color-border-default);
-            margin-bottom: 1.5rem;
+            justify-content: space-between;
             gap: 16px;
-            flex-wrap: wrap;
+            margin-bottom: 20px;
+            border-bottom: none !important;
+            padding-bottom: 0px;
         }
         .billings-tabs-bar {
             display: flex;
             align-items: center;
-            gap: 22px;
-            overflow-x: auto;
-            scrollbar-width: thin;
-            padding-bottom: 12px;
+            gap: 24px;
         }
-        .m-tab-btn {
-            background: none !important;
+        .billings-tabs-bar .m-tab-btn,
+        .billings-tabs-bar button[role="tab"],
+        .billings-tabs-bar [role="tab"] {
+            background: transparent !important;
+            background-color: transparent !important;
+            background-image: none !important;
             border: none !important;
+            border-color: transparent !important;
+            box-shadow: none !important;
+            outline: none !important;
+            border-radius: 0 !important;
+            min-height: auto !important;
+            height: auto !important;
             padding: 4px 0 !important;
-            font-size: 0.9375rem !important;
-            font-weight: 700 !important;
-            color: var(--color-text-muted) !important;
+            margin: 0 !important;
+            font-size: 0.9375rem;
+            font-weight: 600 !important;
+            color: var(--color-text-secondary, #64748b) !important;
             cursor: pointer;
+            position: relative;
             display: inline-flex;
             align-items: center;
-            gap: 6px;
-            position: relative;
+            gap: 8px;
             transition: color 0.15s ease;
             white-space: nowrap;
+        }
+        .billings-tabs-bar .m-tab-btn:hover,
+        .billings-tabs-bar button[role="tab"]:hover,
+        .billings-tabs-bar [role="tab"]:hover {
+            background: transparent !important;
+            background-color: transparent !important;
+            color: var(--color-link, #0355f3) !important;
+            border: none !important;
+            border-color: transparent !important;
             box-shadow: none !important;
-            min-height: auto !important;
+            outline: none !important;
         }
-        .m-tab-btn:hover {
-            color: var(--color-link) !important;
-            background: none !important;
-        }
-        .m-tab-btn.active {
-            color: var(--color-link) !important;
+        .billings-tabs-bar .m-tab-btn.active,
+        .billings-tabs-bar button[role="tab"][aria-selected="true"],
+        .billings-tabs-bar [role="tab"][aria-selected="true"],
+        .billings-tabs-bar [role="tab"].active {
+            background: transparent !important;
+            background-color: transparent !important;
+            background-image: none !important;
+            border: none !important;
+            border-color: transparent !important;
+            box-shadow: none !important;
+            outline: none !important;
+            color: var(--color-link, #0355f3) !important;
             font-weight: 800 !important;
-            border-bottom: none !important;
-            background: none !important;
-            box-shadow: none !important;
         }
-        .m-tab-btn.active::after {
-            content: '';
-            position: absolute;
-            bottom: -13px;
-            left: 0;
-            right: 0;
-            height: 2.5px;
-            background: var(--color-action-primary);
-            border-radius: 2px;
+        .billings-tabs-bar .m-tab-btn:focus,
+        .billings-tabs-bar button[role="tab"]:focus,
+        .billings-tabs-bar [role="tab"]:focus {
+            background: transparent !important;
+            outline: none !important;
+            box-shadow: none !important;
+            border: none !important;
+        }
+        .billings-tabs-bar .m-tab-btn.active::after,
+        .billings-tabs-bar .m-tab-btn::after,
+        .billings-tabs-bar [role="tab"]::after {
+            display: none !important;
+            content: none !important;
         }
         .tab-count {
             background: var(--color-bg-subtle);
@@ -72,9 +98,125 @@
             border-radius: 999px;
             line-height: 1.2;
         }
+        .tab-count.count-danger {
+            background: var(--color-error-bg, #fef2f2);
+            color: var(--color-error, #dc2626);
+        }
+        .m-tab-btn.active .tab-count.count-danger {
+            background: var(--color-error, #dc2626);
+            color: #ffffff;
+        }
+
+        /* ── Timing Cell & Badges ── */
+        .timing-cell {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            align-items: flex-start;
+            text-align: left;
+        }
+        .timing-date {
+            font-weight: 600;
+            color: var(--color-text-primary);
+            font-size: 0.85rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .timing-sub {
+            font-size: 0.75rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .leeway-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
+            padding: 1px 7px;
+            border-radius: 999px;
+            font-size: 0.6875rem;
+            font-weight: 700;
+            background: var(--color-info-bg, #eff6ff);
+            color: var(--color-info-text, #1e40af);
+            border: 1px solid var(--color-info-border, #bfdbfe);
+            white-space: nowrap;
+        }
+        .timing-sub.sub-overdue {
+            color: var(--color-error, #dc2626);
+            font-weight: 600;
+        }
+        .timing-sub.sub-pending {
+            color: var(--color-text-secondary, #64748b);
+            font-weight: 500;
+        }
+        .timing-sub.sub-ontime {
+            color: var(--color-success, #16a34a);
+            font-weight: 600;
+        }
+        .timing-sub.sub-today {
+            color: var(--color-warning-text, #b45309);
+            font-weight: 600;
+        }
+
+        #historyTableBody .status-badge {
+            border: none !important;
+            box-shadow: none !important;
+            outline: none !important;
+            font-weight: 700 !important;
+            letter-spacing: 0.025em;
+            padding: 4px 10px !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+        }
+
         .m-tab-btn.active .tab-count {
             background: var(--color-info-bg);
             color: var(--color-link);
+        }
+
+        .billings-actions-wrap {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .btn-toggle-filters {
+            background: var(--color-bg-surface, #ffffff);
+            border: 1px solid var(--color-border-default, #e2e8f0);
+            border-radius: 8px;
+            padding: 8px 14px;
+            font-weight: 600;
+            font-size: 0.875rem;
+            color: var(--color-text-secondary, #475569);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+            white-space: nowrap;
+            position: relative;
+        }
+        .btn-toggle-filters:hover {
+            background: var(--color-bg-canvas, #f8fafc);
+            color: var(--color-text-primary, #0f172a);
+            border-color: var(--color-border-strong, #cbd5e1);
+        }
+        .btn-toggle-filters.active {
+            background: var(--color-info-bg, #eff6ff);
+            color: var(--color-link, #0355f3);
+            border-color: var(--color-info-border, #bfdbfe);
+        }
+        .filter-active-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background-color: var(--color-link, #0355f3);
+            display: inline-block;
+        }
+        .filter-active-dot.hidden {
+            display: none !important;
         }
 
         .btn-verify-payments {
@@ -93,7 +235,7 @@
             box-shadow: 0 1px 2px rgba(0,0,0,0.03);
             white-space: nowrap;
             text-decoration: none;
-            margin-bottom: 12px;
+            margin-bottom: 0;
         }
         .btn-verify-payments:hover {
             background: var(--color-bg-canvas);
@@ -103,103 +245,432 @@
         }
 
         .filter-panel {
-            background-color: var(--bg-secondary);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-md);
-            padding: 1rem 1.25rem;
-            margin-bottom: 1.5rem;
+            background-color: var(--color-bg-surface, #ffffff);
+            border: 1px solid var(--color-border-default, #e2e8f0);
+            border-radius: 8px;
+            padding: 0.75rem 1rem !important;
+            margin-bottom: 1rem;
             display: flex;
             flex-wrap: wrap;
-            gap: 1rem;
-            align-items: center;
+            gap: 12px;
+            align-items: flex-end;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+            animation: fadeInFilter 0.18s ease-out;
+        }
+        .filter-panel.hidden {
+            display: none !important;
+        }
+        @keyframes fadeInFilter {
+            from {
+                opacity: 0;
+                transform: translateY(-6px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
         .filter-group {
             display: flex;
             flex-direction: column;
-            gap: 0.25rem;
+            gap: 4px;
+            flex: 1 1 160px;
+            min-width: 130px;
+            max-width: 240px;
         }
         .filter-label {
-            font-size: 0.7rem;
+            font-size: 0.6875rem;
             font-weight: 700;
-            color: var(--text-muted);
+            color: var(--color-text-secondary, #64748b);
             text-transform: uppercase;
+            letter-spacing: 0.04em;
         }
-        .filter-input {
-            padding: 0.45rem 0.75rem;
-            font-size: 0.85rem;
-            border-radius: var(--radius-sm);
-            border: 1px solid var(--border-color);
-            background-color: var(--bg-primary);
-            color: var(--text-primary);
+        .filter-input,
+        select.filter-input,
+        input.filter-input {
+            height: 36px !important;
+            min-height: 36px !important;
+            max-height: 36px !important;
+            padding: 0 10px !important;
+            font-size: 0.8125rem !important;
+            line-height: normal !important;
+            border-radius: 6px !important;
+            border: 1px solid var(--color-border-default, #e2e8f0) !important;
+            background-color: var(--color-bg-surface, #ffffff) !important;
+            color: var(--color-text-primary, #0f172a) !important;
+            transition: border-color 0.15s ease, box-shadow 0.15s ease;
+            box-sizing: border-box !important;
+            width: 100%;
+        }
+        select.filter-input {
+            cursor: pointer;
+            padding: 0 28px 0 10px !important;
+            line-height: normal !important;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E") !important;
+            background-repeat: no-repeat !important;
+            background-position: right 10px center !important;
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+        }
+        input[type="month"].filter-input {
+            padding: 0 8px !important;
+            cursor: pointer;
+            line-height: normal !important;
+        }
+        .filter-input:focus,
+        select.filter-input:focus {
+            border-color: var(--color-action-primary, #0355f3) !important;
+            box-shadow: 0 0 0 3px rgba(3, 85, 243, 0.1) !important;
+            outline: none;
+        }
+        .filter-input:disabled,
+        select.filter-input:disabled {
+            background-color: var(--color-bg-muted, #f1f5f9) !important;
+            color: var(--color-text-muted, #94a3b8) !important;
+            cursor: not-allowed;
+            border-color: var(--color-border-default, #e2e8f0) !important;
+            opacity: 0.85;
+        }
+        .btn-icon-reset {
+            width: 36px;
+            height: 36px;
+            min-width: 36px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 6px;
+            border: 1px solid var(--color-border-default, #e2e8f0);
+            background-color: var(--color-bg-subtle, #f8fafc);
+            color: var(--color-text-secondary, #64748b);
+            cursor: pointer;
+            transition: all 0.15s ease;
+            padding: 0;
+            margin: 0;
+            box-sizing: border-box;
+        }
+        .btn-icon-reset:hover {
+            background-color: var(--color-bg-canvas, #f1f5f9);
+            color: var(--color-text-primary, #0f172a);
+            border-color: var(--color-border-strong, #cbd5e1);
+        }
+        .btn-icon-reset:active {
+            transform: scale(0.96);
         }
 
         .table-card {
-            background-color: var(--bg-secondary);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-lg);
-            padding: 1.5rem;
-            box-shadow: var(--shadow-md);
+            background-color: var(--color-bg-surface, #ffffff);
+            border: 1px solid var(--color-border-default, #e2e8f0);
+            border-radius: var(--radius-lg, 12px);
+            padding: 0 !important;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
             overflow-x: auto;
             margin-bottom: 2rem;
         }
+        /* ── Integrated Table Header Controls (Search & Record Count) ── */
+        .table-card .landlord-table-controls,
+        .landlord-table-controls {
+            display: flex !important;
+            align-items: center !important;
+            justify-content: space-between !important;
+            gap: 16px !important;
+            padding: 12px 20px !important;
+            border-bottom: 1px solid var(--color-border-default, #e2e8f0) !important;
+            background: var(--color-bg-surface, #ffffff) !important;
+            margin: 0 !important;
+            width: 100% !important;
+            box-sizing: border-box !important;
+        }
+        .table-card .landlord-table-search,
+        .landlord-table-search {
+            flex: 0 1 320px !important;
+            width: 320px !important;
+            max-width: 100% !important;
+            height: 38px !important;
+            min-height: 38px !important;
+            padding: 8px 14px 8px 38px !important;
+            border: 1px solid var(--color-border-default, #e2e8f0) !important;
+            border-radius: 8px !important;
+            background-color: var(--color-bg-subtle, #f8fafc) !important;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'%3E%3C/circle%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'%3E%3C/line%3E%3C/svg%3E") !important;
+            background-repeat: no-repeat !important;
+            background-position: 12px center !important;
+            color: var(--color-text-primary, #0f172a) !important;
+            font-size: 0.8125rem !important;
+            font-weight: 500 !important;
+            margin: 0 !important;
+            box-sizing: border-box !important;
+            transition: all 0.2s ease !important;
+            box-shadow: none !important;
+        }
+        .table-card .landlord-table-search:focus,
+        .landlord-table-search:focus {
+            border-color: var(--color-action-primary, #0355f3) !important;
+            box-shadow: 0 0 0 3px rgba(3, 85, 243, 0.12) !important;
+            background-color: var(--color-bg-surface, #ffffff) !important;
+            outline: none !important;
+        }
+        .table-card .landlord-table-count,
+        .landlord-table-count {
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            padding: 4px 12px !important;
+            border-radius: 999px !important;
+            background: var(--color-bg-subtle, #f1f5f9) !important;
+            border: 1px solid var(--color-border-subtle, #e2e8f0) !important;
+            color: var(--color-text-secondary, #475569) !important;
+            font-size: 0.75rem !important;
+            font-weight: 700 !important;
+            white-space: nowrap !important;
+            margin: 0 !important;
+            line-height: 1.2 !important;
+        }
         table {
             width: 100%;
-            border-collapse: collapse;
+            min-width: 960px;
+            border-collapse: separate;
+            border-spacing: 0;
             text-align: left;
-            font-size: 0.9125rem;
+            font-size: 0.875rem;
         }
         th {
-            font-weight: 700;
-            color: var(--text-secondary);
-            padding: 0.75rem 1rem;
-            border-bottom: 2px solid var(--border-color);
+            background-color: var(--color-bg-subtle, #f8fafc) !important;
+            color: var(--color-text-secondary, #64748b) !important;
+            font-size: 0.72rem !important;
+            font-weight: 700 !important;
             text-transform: uppercase;
-            font-size: 0.72rem;
             letter-spacing: 0.05em;
+            padding: 0.95rem 1.25rem !important;
+            border: none !important;
+            border-bottom: 1px solid var(--color-border-default, #e2e8f0) !important;
+            white-space: nowrap !important;
+            vertical-align: middle !important;
         }
         td {
-            padding: 1rem;
-            border-bottom: 1px solid var(--border-color);
-            color: var(--text-primary);
+            padding: 1rem 1.25rem !important;
+            border: none !important;
+            border-bottom: 1px solid var(--color-divider, #f1f5f9) !important;
+            color: var(--color-text-primary, #0f172a);
+            vertical-align: middle !important;
+            background: transparent;
+        }
+        tr:last-child td {
+            border-bottom: none !important;
         }
         tr:hover td {
-            background-color: var(--bg-primary);
+            background-color: var(--color-bg-hover, #f8fafc) !important;
         }
 
-        .action-btn {
-            padding: 0.4rem 0.8rem;
-            font-size: 0.78rem;
-            border-radius: var(--radius-sm);
-            cursor: pointer;
+        .col-mono {
+            font-family: monospace;
             font-weight: 700;
+            color: var(--color-link);
+            white-space: nowrap;
+        }
+        .col-currency {
+            font-weight: 700;
+            white-space: nowrap;
+            font-variant-numeric: tabular-nums;
+            color: var(--color-text-primary);
+        }
+        .col-date {
+            font-weight: 600;
+            white-space: nowrap;
+            color: var(--color-text-secondary);
+        }
+        .col-action {
+            white-space: nowrap;
+        }
+
+        /* ── Clickable Table Rows ── */
+        tbody tr.clickable-row {
+            cursor: pointer;
+            transition: background-color 0.15s ease;
+        }
+        tbody tr.clickable-row:hover td {
+            background-color: var(--color-bg-hover, #f8fafc) !important;
+        }
+        tbody tr.clickable-row:focus {
+            outline: 2px solid var(--color-action-primary, #0355f3);
+            outline-offset: -2px;
+        }
+
+        /* ── Action Buttons & Group Alignment ── */
+        .table-action-group {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            flex-wrap: nowrap;
+            white-space: nowrap;
+        }
+        .action-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            height: 32px;
+            padding: 0 12px;
+            font-size: 0.78rem;
+            font-weight: 600;
+            border-radius: 6px;
+            cursor: pointer;
             border: 1px solid transparent;
-            transition: all 0.2s ease;
+            transition: all 0.15s ease;
             text-decoration: none;
-            display: inline-block;
+            white-space: nowrap;
+            margin: 0 !important;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+            line-height: 1;
         }
         .btn-bill {
-            background-color: var(--landlord);
-            color: white;
+            background-color: var(--color-action-primary, #0355f3);
+            color: #ffffff;
+            border-color: var(--color-action-primary, #0355f3);
         }
         .btn-bill:hover {
-            background-color: var(--landlord-hover);
+            background-color: var(--color-action-primary-hover, #0247d1);
         }
         .btn-detail {
-            background-color: var(--bg-primary);
-            border-color: var(--border-color);
-            color: var(--text-primary);
+            background-color: var(--color-bg-surface, #ffffff);
+            border-color: var(--color-border-default, #d1d5db);
+            color: var(--color-text-primary, #374151);
         }
         .btn-detail:hover {
-            background-color: var(--border-color);
+            background-color: var(--color-bg-subtle, #f3f4f6);
+            border-color: var(--color-border-strong, #9ca3af);
+            color: var(--color-text-primary, #111827);
         }
         .btn-edit {
-            background-color: rgba(245, 158, 11, 0.1);
-            color: rgb(217, 119, 6);
-            border-color: rgba(245, 158, 11, 0.3);
-            margin-left: 0.5rem;
+            background-color: var(--color-warning-bg, #fffbeb);
+            color: var(--color-warning-text, #b45309);
+            border-color: var(--color-warning-border, #fde68a);
         }
         .btn-edit:hover {
-            background-color: rgba(245, 158, 11, 0.2);
+            background-color: #fef3c7;
+            border-color: #fcd34d;
+            color: #92400e;
+        }
+        .btn-override {
+            background-color: var(--color-info-bg, #eff6ff);
+            color: var(--color-link, #0355f3);
+            border: 1px solid var(--color-info-border, #bfdbfe);
+        }
+        .btn-override:hover {
+            background-color: #dbeafe;
+            border-color: #93c5fd;
+            color: var(--color-action-primary-hover, #0247d1);
+        }
+        .btn-delete {
+            background-color: var(--color-error-bg, #fef2f2);
+            color: var(--color-error-text, #991b1b);
+            border: 1px solid var(--color-error-border, #fecaca);
+        }
+        .btn-delete:hover {
+            background-color: var(--color-error, #dc2626);
+            color: #ffffff;
+            border-color: var(--color-error, #dc2626);
+        }
+
+        /* ── Status Pill Group & Current Month Bill Status Badges ── */
+        .status-pill-group {
+            display: inline-flex;
+            flex-direction: column;
+            gap: 4px;
+            align-items: flex-start;
+        }
+        #activeLeasesTableBody .status-badge {
+            border: none !important;
+            box-shadow: none !important;
+            outline: none !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            margin: 0 !important;
+            line-height: 1.2 !important;
+        }
+        .current-bill-cell {
+            vertical-align: middle !important;
+            text-align: left !important;
+        }
+        .current-bill-badge-wrap {
+            display: flex !important;
+            align-items: center !important;
+            justify-content: flex-start !important;
+            gap: 6px !important;
+            flex-wrap: wrap !important;
+            text-align: left !important;
+        }
+        .badge-auto-generated {
+            font-size: 0.75rem;
+            color: var(--color-text-muted, #6b7280);
+            font-weight: 600;
+            font-style: italic;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            white-space: nowrap;
+        }
+
+        /* ── Preset Pills for Due Date Extension ── */
+        .preset-pill {
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            font-size: 0.8125rem;
+            font-weight: 600;
+            padding: 0.35rem 0.75rem;
+            border-radius: var(--radius-sm, 6px);
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+        .preset-pill:hover {
+            background: var(--color-info-bg, #eff6ff);
+            border-color: var(--color-info-border, #bfdbfe);
+            color: var(--color-link, #0355f3);
+        }
+        .preset-pill:active,
+        .preset-pill.active {
+            background: var(--color-action-primary, #0355f3);
+            border-color: var(--color-action-primary, #0355f3);
+            color: #ffffff;
+        }
+
+        /* ── Override Modal Layout & Scroll Alignment ── */
+        #overrideModal .modal-container {
+            max-width: 620px;
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        #overrideModal #overrideForm {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            min-height: 0;
+            overflow: hidden;
+            margin: 0;
+        }
+        #overrideModal .modal-body {
+            flex: 1;
+            min-height: 0;
+            overflow-y: auto;
+            padding: 1.5rem 1.75rem;
+        }
+        #overrideModal .modal-footer {
+            flex-shrink: 0;
+            padding: 1rem 1.75rem;
+            border-top: 1px solid var(--border-color);
+            background: var(--bg-primary);
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        #groupWaivePenalty {
+            display: flex;
+            flex-direction: column !important;
+            gap: 0.35rem;
         }
 
         /* Modal system */
@@ -366,230 +837,531 @@
             font-weight: 600;
             text-align: right;
         }
+    
+        /* ── Billing Visualization Cards ── */
+        .billing-viz-section {
+            margin-bottom: 20px;
+        }
+
+        /* ── KPI Cards Grid (4 Columns) ── */
+        .billing-kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 14px;
+            margin-bottom: 0;
+        }
+
+        @media (max-width: 1024px) {
+            .billing-kpi-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+
+        @media (max-width: 600px) {
+            .billing-kpi-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .billing-kpi-card {
+            background: var(--color-bg-surface, #ffffff);
+            border: 1px solid var(--color-border-default, #e2e8f0);
+            border-radius: var(--radius-lg, 10px);
+            padding: 14px 16px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+            transition: border-color 0.15s ease, box-shadow 0.15s ease;
+        }
+
+        .billing-kpi-card:hover {
+            border-color: var(--color-border-strong, #cbd5e1);
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.06);
+        }
+
+        .kpi-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+
+        .kpi-icon-wrap {
+            width: 30px;
+            height: 30px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .icon-total {
+            background: rgba(99, 102, 241, 0.1);
+            color: #6366f1;
+        }
+
+        .icon-collected {
+            background: rgba(16, 185, 129, 0.1);
+            color: #10b981;
+        }
+
+        .icon-pending {
+            background: rgba(3, 85, 243, 0.1);
+            color: #0355f3;
+        }
+
+        .icon-overdue {
+            background: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+        }
+
+        .kpi-tag {
+            font-size: 0.6875rem;
+            font-weight: 700;
+            padding: 2px 6px;
+            border-radius: 4px;
+            line-height: 1.2;
+        }
+
+        .tag-total {
+            background: rgba(99, 102, 241, 0.1);
+            color: #4338ca;
+        }
+
+        .tag-collected {
+            background: rgba(16, 185, 129, 0.12);
+            color: #065f46;
+        }
+
+        .tag-pending {
+            background: rgba(3, 85, 243, 0.12);
+            color: #1e40af;
+        }
+
+        .tag-overdue {
+            background: rgba(239, 68, 68, 0.12);
+            color: #991b1b;
+        }
+
+        .kpi-label {
+            font-size: 0.72rem;
+            font-weight: 700;
+            color: var(--color-text-secondary, #64748b);
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .kpi-amount {
+            font-size: 1.1875rem;
+            font-weight: 700;
+            color: var(--color-text-primary, #0f172a);
+            margin: 2px 0 8px 0;
+            letter-spacing: -0.015em;
+            line-height: 1.25;
+        }
+
+        .kpi-footer {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .kpi-bar-bg {
+            height: 4px;
+            background: var(--color-border-subtle, #e2e8f0);
+            border-radius: 999px;
+            overflow: hidden;
+            width: 100%;
+        }
+
+        .kpi-bar-fill {
+            height: 100%;
+            border-radius: 999px;
+            transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .bar-total {
+            background: #6366f1;
+        }
+
+        .bar-collected {
+            background: #10b981;
+        }
+
+        .bar-pending {
+            background: #0355f3;
+        }
+
+        .bar-overdue {
+            background: #ef4444;
+        }
+
+        .kpi-subtext {
+            font-size: 0.72rem;
+            font-weight: 500;
+            color: var(--color-text-muted, #64748b);
+        }
+
+        /* ── Tenant Billing History in Statement Modal ── */
+        
+
+        .billing-history-section {
+            margin-top: 1.75rem;
+            border-top: 1px solid var(--border-color);
+            padding-top: 1.25rem;
+        }
+
+        .billing-history-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 0.875rem;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .billing-history-title {
+            margin: 0;
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .billing-history-badge {
+            font-size: 0.725rem;
+            font-weight: 600;
+            padding: 2px 8px;
+            border-radius: 9999px;
+            background: var(--color-bg-subtle, #f1f5f9);
+            color: var(--text-secondary);
+            border: 1px solid var(--border-color);
+        }
+
+        .billing-history-table-wrapper {
+            width: 100%;
+            overflow-x: auto;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md, 8px);
+            background: var(--bg-primary);
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .billing-history-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.8125rem;
+            text-align: left;
+            min-width: 680px;
+        }
+
+        .billing-history-table th {
+            padding: 0.65rem 0.85rem;
+            background: var(--color-bg-subtle, #f8fafc);
+            color: var(--text-secondary);
+            font-weight: 600;
+            font-size: 0.725rem;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+            border-bottom: 1px solid var(--border-color);
+            white-space: nowrap;
+        }
+
+        .billing-history-table td {
+            padding: 0.75rem 0.85rem;
+            border-bottom: 1px solid var(--divider, var(--border-color));
+            color: var(--text-primary);
+            vertical-align: middle;
+            white-space: nowrap;
+        }
+
+        .billing-history-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .billing-history-table tr:hover td {
+            background: var(--color-bg-subtle, rgba(0,0,0,0.02));
+        }
+
+        .billing-history-table tr.current-bill-row td {
+            background: var(--color-info-bg, rgba(37,99,235,0.06));
+            font-weight: 500;
+        }
+
+        .current-pill-tag {
+            display: inline-block;
+            margin-left: 6px;
+            padding: 1px 6px;
+            border-radius: 4px;
+            font-size: 0.6875rem;
+            font-weight: 700;
+            background: var(--color-link, #0355f3);
+            color: #fff;
+            text-transform: uppercase;
+            letter-spacing: 0.02em;
+        }
+
+        .punctuality-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 3px 8px;
+            border-radius: 9999px;
+            font-size: 0.725rem;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .punctuality-pill.pill-ontime {
+            background: var(--color-success-bg, #ecfdf5);
+            color: var(--color-success, #059669);
+            border: 1px solid var(--color-success-border, #a7f3d0);
+        }
+
+        .punctuality-pill.pill-delayed {
+            background: var(--color-warning-bg, #fffbeb);
+            color: var(--color-warning-text, #d97706);
+            border: 1px solid var(--color-warning-border, #fde68a);
+        }
+
+        .punctuality-pill.pill-overdue {
+            background: var(--color-error-bg, #fef2f2);
+            color: var(--color-error-text, #dc2626);
+            border: 1px solid var(--color-error-border, #fecaca);
+        }
+
+        .punctuality-pill.pill-pending {
+            background: var(--color-info-bg, #eff6ff);
+            color: var(--color-link, #2563eb);
+            border: 1px solid var(--color-info-border, #bfdbfe);
+        }
+
+        .punctuality-pill.pill-paid {
+            background: var(--color-success-bg, #ecfdf5);
+            color: var(--color-success, #059669);
+            border: 1px solid var(--color-success-border, #a7f3d0);
+        }
+
+        .leeway-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 2px 7px;
+            border-radius: 6px;
+            font-size: 0.725rem;
+            font-weight: 600;
+            background: rgba(147, 51, 234, 0.1);
+            color: #7e22ce;
+            border: 1px solid rgba(147, 51, 234, 0.25);
+        }
+
+        .leeway-none {
+            color: var(--text-muted);
+            font-size: 0.8rem;
+        }
+
+        .unpaid-text {
+            color: var(--color-error-text, #dc2626);
+            font-weight: 600;
+            font-size: 0.8rem;
+        }
     </style>
-    <link href="../../css/design-system.css" rel="stylesheet">
     <script src="../../js/ui.js" defer></script>
 </head>
 <body class="app-loading" data-role="landlord" data-page-title="Rent & Billings Management">
-    <!-- Navbar -->
-    <nav class="navbar navbar-landlord">
-        <div class="navbar-container">
-            <div class="navbar-brand-group">
-                <a href="dashboard.html" style="text-decoration:none;"><span class="navbar-logo">DomiKnow</span></a>
-                <span class="navbar-badge navbar-badge-landlord">Landlord</span>
-            </div>
-            <div class="navbar-menu">
-                <a href="dashboard.html" class="navbar-menu-link">Dashboard</a>
-                <a href="properties.html" class="navbar-menu-link">Properties</a>
-                <a href="applications.html" class="navbar-menu-link">Tenant Applications</a>
-                <a href="leases.html" class="navbar-menu-link">Leases</a>
-                <a href="billings.html" class="navbar-menu-link active">Billings</a>
-                <a href="payments.html" class="navbar-menu-link">Payments</a>
-            </div>
-            <div class="navbar-right">
-                <span class="navbar-user-welcome">Welcome, <span class="user-name">User</span></span>
-                <button id="logoutBtn" class="navbar-btn">Logout</button>
-            </div>
-        </div>
-    </nav>
-
     <!-- Main Content -->
     <main class="dashboard-container">
+
+        <!-- ── Billing & Revenue Summary Cards ── -->
+        <section class="billing-viz-section" aria-label="Billing Summary">
+            <div class="billing-kpi-grid">
+                <!-- Card 1: Total Due -->
+                <div class="billing-kpi-card kpi-total">
+                    <div class="kpi-top">
+                        <div class="kpi-icon-wrap icon-total">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="2" y="4" width="20" height="16" rx="2"></rect>
+                                <line x1="2" y1="10" x2="22" y2="10"></line>
+                            </svg>
+                        </div>
+                        <span class="kpi-tag tag-total" id="kpiTotalTag">Total</span>
+                    </div>
+                    <div class="kpi-body">
+                        <span class="kpi-label">Total to Collect</span>
+                        <div class="kpi-amount" id="kpiTotalAmount">₱0.00</div>
+                    </div>
+                    <div class="kpi-footer">
+                        <div class="kpi-bar-bg">
+                            <div class="kpi-bar-fill bar-total" id="kpiTotalBar" style="width: 100%;"></div>
+                        </div>
+                        <span class="kpi-subtext" id="kpiTotalSubtext">0 bills</span>
+                    </div>
+                </div>
+
+                <!-- Card 2: Collected -->
+                <div class="billing-kpi-card kpi-collected">
+                    <div class="kpi-top">
+                        <div class="kpi-icon-wrap icon-collected">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                            </svg>
+                        </div>
+                        <span class="kpi-tag tag-collected" id="kpiCollectedTag">0%</span>
+                    </div>
+                    <div class="kpi-body">
+                        <span class="kpi-label">Collected</span>
+                        <div class="kpi-amount" id="kpiCollectedAmount">₱0.00</div>
+                    </div>
+                    <div class="kpi-footer">
+                        <div class="kpi-bar-bg">
+                            <div class="kpi-bar-fill bar-collected" id="kpiCollectedBar" style="width: 0%;"></div>
+                        </div>
+                        <span class="kpi-subtext" id="kpiCollectedSubtext">0 paid</span>
+                    </div>
+                </div>
+
+                <!-- Card 3: Pending -->
+                <div class="billing-kpi-card kpi-pending">
+                    <div class="kpi-top">
+                        <div class="kpi-icon-wrap icon-pending">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <polyline points="12 6 12 12 16 14"></polyline>
+                            </svg>
+                        </div>
+                        <span class="kpi-tag tag-pending" id="kpiPendingTag">0%</span>
+                    </div>
+                    <div class="kpi-body">
+                        <span class="kpi-label">Pending</span>
+                        <div class="kpi-amount" id="kpiPendingAmount">₱0.00</div>
+                    </div>
+                    <div class="kpi-footer">
+                        <div class="kpi-bar-bg">
+                            <div class="kpi-bar-fill bar-pending" id="kpiPendingBar" style="width: 0%;"></div>
+                        </div>
+                        <span class="kpi-subtext" id="kpiPendingSubtext">0 pending</span>
+                    </div>
+                </div>
+
+                <!-- Card 4: Overdue -->
+                <div class="billing-kpi-card kpi-overdue">
+                    <div class="kpi-top">
+                        <div class="kpi-icon-wrap icon-overdue">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"></path>
+                                <line x1="12" y1="9" x2="12" y2="13"></line>
+                                <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                            </svg>
+                        </div>
+                        <span class="kpi-tag tag-overdue" id="kpiOverdueTag">0%</span>
+                    </div>
+                    <div class="kpi-body">
+                        <span class="kpi-label">Overdue</span>
+                        <div class="kpi-amount" id="kpiOverdueAmount">₱0.00</div>
+                    </div>
+                    <div class="kpi-footer">
+                        <div class="kpi-bar-bg">
+                            <div class="kpi-bar-fill bar-overdue" id="kpiOverdueBar" style="width: 0%;"></div>
+                        </div>
+                        <span class="kpi-subtext" id="kpiOverdueSubtext">0 overdue</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
         <!-- Header row with Tab Controls and Action Button (consistent with tenant portal & properties.html) -->
         <div class="billings-header-row">
-            <div class="billings-tabs-bar" role="tablist" aria-label="Billing views">
-                <button id="tabActiveLeases" class="m-tab-btn active" role="tab" aria-selected="true" type="button">
-                    Active Leases (Current Month Billing) <span class="tab-count" id="tabCountActiveLeases">0</span>
+            <div class="billings-tabs-bar" role="tablist" aria-label="Billing status views">
+                <button id="tabAll" class="m-tab-btn active" role="tab" aria-selected="true" type="button" data-status-filter="all">
+                    All Bills <span class="tab-count" id="tabCountAll">0</span>
                 </button>
-                <button id="tabHistory" class="m-tab-btn" role="tab" aria-selected="false" type="button">
-                    Billing Statement Logs <span class="tab-count" id="tabCountHistory">0</span>
+                <button id="tabOverdue" class="m-tab-btn" role="tab" aria-selected="false" type="button" data-status-filter="overdue">
+                    Overdue <span class="tab-count count-danger" id="tabCountOverdue">0</span>
+                </button>
+                <button id="tabPending" class="m-tab-btn" role="tab" aria-selected="false" type="button" data-status-filter="pending">
+                    Pending <span class="tab-count" id="tabCountPending">0</span>
+                </button>
+                <button id="tabLeeway" class="m-tab-btn" role="tab" aria-selected="false" type="button" data-status-filter="leeway">
+                    With Leeway <span class="tab-count" id="tabCountLeeway">0</span>
+                </button>
+                <button id="tabPaid" class="m-tab-btn" role="tab" aria-selected="false" type="button" data-status-filter="paid">
+                    Paid <span class="tab-count" id="tabCountPaid">0</span>
                 </button>
             </div>
-            <a href="payments.html" class="btn-verify-payments">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
-                    <line x1="1" y1="10" x2="23" y2="10"></line>
-                </svg>
-                <span>Verify Payments</span>
-            </a>
-        </div>
-
-        <!-- Tab 1: Active Leases Dashboard -->
-        <div id="sectionActiveLeases">
-            <div class="table-card">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Lease Number</th>
-                            <th>Tenant Name</th>
-                            <th>Property Unit</th>
-                            <th>Monthly Base Rent</th>
-                            <th>Current Month Bill</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody id="activeLeasesTableBody" aria-live="polite" aria-busy="true">
-                        <tr><td colspan="6" role="status" style="text-align:center;color:var(--text-muted);padding:2rem;">Loading active leases...</td></tr>
-                    </tbody>
-                </table>
+            <div class="billings-actions-wrap">
+                <button type="button" id="toggleFiltersBtn" class="btn-toggle-filters" aria-expanded="false" aria-controls="filterPanel">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+                    </svg>
+                    <span>Filters</span>
+                    <span id="filterActiveDot" class="filter-active-dot hidden" aria-hidden="true"></span>
+                </button>
+                <a href="payments.html" class="btn-verify-payments">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
+                        <line x1="1" y1="10" x2="23" y2="10"></line>
+                    </svg>
+                    <span>Verify Payments</span>
+                </a>
             </div>
         </div>
 
-        <!-- Tab 2: Billings History Logs -->
-        <div id="sectionHistory" class="hidden">
-            <!-- Filter Panel -->
-            <div class="filter-panel">
+        <!-- Billings History Logs -->
+        <div id="sectionHistory">
+            <!-- Filter Panel (Collapsible, closed by default) -->
+            <div id="filterPanel" class="filter-panel hidden">
                 <div class="filter-group">
-                    <span class="filter-label">Search Tenant</span>
-                    <input type="text" id="filterTenant" class="filter-input" placeholder="e.g. Juan">
-                </div>
-                <div class="filter-group">
-                    <span class="filter-label">Property Name</span>
-                    <input type="text" id="filterProperty" class="filter-input" placeholder="e.g. Unit A">
-                </div>
-                <div class="filter-group">
-                    <span class="filter-label">Month</span>
-                    <input type="month" id="filterMonth" class="filter-input">
-                </div>
-                <div class="filter-group">
-                    <span class="filter-label">Status</span>
-                    <select id="filterStatus" class="filter-input">
-                        <option value="">-- All Statuses --</option>
-                        <option value="draft">Draft</option>
-                        <option value="pending_payment">Pending Payment</option>
-                        <option value="waiting_verification">Waiting Verification</option>
-                        <option value="paid">Paid</option>
-                        <option value="overdue">Overdue</option>
+                    <label for="filterProperty" class="filter-label">Property</label>
+                    <select id="filterProperty" class="filter-input" aria-label="Filter by property">
+                        <option value="">All Properties</option>
                     </select>
                 </div>
-                <button id="resetFiltersBtn" class="action-btn btn-detail" style="margin-top:1rem;height:fit-content;padding:0.45rem 1rem;">Reset</button>
+                <div class="filter-group">
+                    <label for="filterUnit" class="filter-label">Unit / Room</label>
+                    <select id="filterUnit" class="filter-input" aria-label="Filter by unit">
+                        <option value="">All Units</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="filterTenant" class="filter-label">Tenant</label>
+                    <select id="filterTenant" class="filter-input" aria-label="Filter by tenant">
+                        <option value="">All Tenants</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="filterMonth" class="filter-label">Billing Month</label>
+                    <input type="month" id="filterMonth" class="filter-input">
+                </div>
+                <button type="button" id="resetFiltersBtn" class="btn-icon-reset" title="Reset all filters" aria-label="Reset all filters">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+                        <path d="M3 3v5h5"></path>
+                    </svg>
+                </button>
             </div>
 
             <div class="table-card">
                 <table>
                     <thead>
                         <tr>
-                            <th>Billing Month</th>
-                            <th>Tenant details</th>
-                            <th>Total Amount</th>
-                            <th>Due Date</th>
-                            <th>Billing Status</th>
-                            <th>Action</th>
+                            <th style="width: 14%;">Billing Cycle</th>
+                            <th style="width: 24%;">Tenant & Property</th>
+                            <th style="width: 16%;">Total Due</th>
+                            <th style="width: 26%;">Schedule & Timing</th>
+                            <th style="width: 20%;">Status</th>
                         </tr>
                     </thead>
                     <tbody id="historyTableBody" aria-live="polite" aria-busy="true">
-                        <tr><td colspan="6" role="status" style="text-align:center;color:var(--text-muted);">Loading historical logs...</td></tr>
+                        <tr><td colspan="5" role="status" style="text-align:center;color:var(--text-muted);padding:2rem;">Loading billing records...</td></tr>
                     </tbody>
                 </table>
             </div>
         </div>
     </main>
-
-    <!-- Generate Monthly Bill Modal -->
-    <div id="generateBillModal" class="modal-overlay hidden">
-        <div class="modal-container">
-            <div class="modal-header">
-                <h3 style="margin:0;color:var(--text-primary);">Generate Monthly Billing</h3>
-                <button id="closeGenerateModalBtn" class="modal-close-x" type="button" aria-label="Close billing form">&times;</button>
-            </div>
-            <form id="billingForm">
-                <div class="modal-body">
-                    <div id="errorMessage" class="modal-alert modal-alert-error hidden" role="alert"></div>
-                    
-                    <input type="hidden" id="formLeaseId" name="lease_id">
-
-                    <!-- Readonly Autofilled Summary -->
-                    <div class="bill-details-grid">
-                        <div class="bill-details-item"><span class="bill-details-lbl">Lease Number</span><span id="lblLeaseNumber" class="bill-details-val">—</span></div>
-                        <div class="bill-details-item"><span class="bill-details-lbl">Tenant</span><span id="lblTenantName" class="bill-details-val">—</span></div>
-                        <div class="bill-details-item"><span class="bill-details-lbl">Property Name</span><span id="lblPropertyName" class="bill-details-val">—</span></div>
-                        <div class="bill-details-item"><span class="bill-details-lbl">Standard Due Day</span><span id="lblDueDay" class="bill-details-val">—</span></div>
-                    </div>
-
-                    <!-- Editable Section -->
-                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;margin-bottom:1.5rem;">
-                        <div class="form-group">
-                            <label class="form-label" for="formBillingMonth">Billing Cycle Month</label>
-                            <input type="month" id="formBillingMonth" name="billing_month" class="form-input" required>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label" for="formDueDate">Payment Due Date <small style="color:var(--text-muted);font-weight:normal;">(Fixed by Lease)</small></label>
-                            <input type="date" id="formDueDate" name="due_date" class="form-input" disabled style="background-color: var(--bg-primary); cursor: not-allowed;">
-                        </div>
-                    </div>
-
-                    <h4 style="border-bottom:1px solid var(--border-color);padding-bottom:0.4rem;margin-bottom:0.75rem;">Account Specifications Breakdown</h4>
-                    
-                    <div class="calc-row">
-                        <span>Monthly Rent</span>
-                        <span style="font-weight:700;" id="lblBaseRent">₱0.00</span>
-                    </div>
-
-                    <div class="calc-row" id="rowWater">
-                        <label for="formWater" id="lblFormWater">Water Utility Charge</label>
-                        <div class="input-inline-group">
-                            <span class="input-inline-currency">₱</span>
-                            <input type="number" id="formWater" class="input-inline" value="0" min="0" step="0.01">
-                        </div>
-                    </div>
-
-                    <div class="calc-row" id="rowElectricity">
-                        <label for="formElectricity" id="lblFormElectricity">Electricity Utility Charge</label>
-                        <div class="input-inline-group">
-                            <span class="input-inline-currency">₱</span>
-                            <input type="number" id="formElectricity" class="input-inline" value="0" min="0" step="0.01">
-                        </div>
-                    </div>
-
-                    <div class="calc-row" id="rowInternet">
-                        <label for="formInternet" id="lblFormInternet">Internet Subscription Charge</label>
-                        <div class="input-inline-group">
-                            <span class="input-inline-currency">₱</span>
-                            <input type="number" id="formInternet" class="input-inline" value="0" min="0" step="0.01">
-                        </div>
-                    </div>
-
-                    <div class="calc-row" id="rowParking">
-                        <label for="formParking">Parking Slot Fee</label>
-                        <div class="input-inline-group">
-                            <span class="input-inline-currency">₱</span>
-                            <input type="number" id="formParking" class="input-inline" value="0" min="0" step="0.01">
-                        </div>
-                    </div>
-
-                    <div class="calc-row" id="rowOther">
-                        <label for="formOther" id="lblFormOther">Other Charges / Assoc Fee</label>
-                        <div class="input-inline-group">
-                            <span class="input-inline-currency">₱</span>
-                            <input type="number" id="formOther" class="input-inline" value="0" min="0" step="0.01">
-                        </div>
-                    </div>
-
-                    <div class="calc-row" id="rowPenalty" style="display:none;">
-                        <label for="formPenalty">Late Penalty Fine</label>
-                        <div class="input-inline-group">
-                            <span class="input-inline-currency">₱</span>
-                            <input type="number" id="formPenalty" class="input-inline" value="0" min="0" step="0.01">
-                        </div>
-                    </div>
-
-                    <div class="form-group" style="margin-top:1rem;">
-                        <label class="form-label" for="formRemarks">Remarks / Notes</label>
-                        <textarea id="formRemarks" class="form-input" style="height:60px;" placeholder="e.g. Month billing breakdown..."></textarea>
-                    </div>
-
-                    <div class="calc-row total">
-                        <span>ESTIMATED TOTAL DUE:</span>
-                        <span id="valTotalDue">₱0.00</span>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" id="btnSaveDraft" class="action-btn btn-detail" style="border-color:var(--text-secondary);color:var(--text-secondary);">Save Draft</button>
-                    <button type="button" id="btnSendBill" class="action-btn btn-bill">Send Bill</button>
-                </div>
-            </form>
-        </div>
-    </div>
 
     <!-- View Bill Details Modal -->
     <div id="viewBillModal" class="modal-overlay hidden">
@@ -601,9 +1373,157 @@
             <div class="modal-body" id="viewModalContent">
                 <!-- Loaded dynamically -->
             </div>
-            <div class="modal-footer">
-                <button id="closeViewModalFooterBtn" class="navbar-btn" style="background-color:var(--text-secondary);color:white;width:auto;padding:0.5rem 1.5rem;">Close</button>
+            <div class="modal-footer" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
+                <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+                    <button id="viewModalOverrideBtn" class="action-btn btn-override" type="button" style="display:none;">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line><path d="m9 16 2 2 4-4"></path></svg>
+                        <span>Grant Leeway</span>
+                    </button>
+                </div>
+                <button id="closeViewModalFooterBtn" class="action-btn btn-detail" type="button">Close</button>
             </div>
+        </div>
+    </div>
+
+    <!-- Manual Override / Grant Tenant Leeway Modal -->
+    <div id="overrideModal" class="modal-overlay hidden">
+        <div class="modal-container">
+            <div class="modal-header">
+                <div style="display:flex;align-items:center;gap:0.75rem;">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--color-action-primary, #0355f3);flex-shrink:0;">
+                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                        <line x1="16" y1="2" x2="16" y2="6"></line>
+                        <line x1="8" y1="2" x2="8" y2="6"></line>
+                        <line x1="3" y1="10" x2="21" y2="10"></line>
+                        <path d="m9 16 2 2 4-4"></path>
+                    </svg>
+                    <div>
+                        <h3 style="margin:0;color:var(--text-primary);font-weight:700;font-size:1.15rem;">Grant Tenant Leeway</h3>
+                        <div style="font-size:0.8125rem;color:var(--text-secondary);margin-top:0.2rem;">
+                            Extend payment deadlines, waive penalty fees, or apply rental concessions.
+                        </div>
+                    </div>
+                </div>
+                <button id="closeOverrideModalBtn" class="modal-close-x" type="button" aria-label="Close override modal">&times;</button>
+            </div>
+            <form id="overrideForm">
+                <div class="modal-body">
+                    <div id="overrideErrorMessage" class="modal-alert modal-alert-error hidden" role="alert"></div>
+
+                    <input type="hidden" id="overrideBillId">
+
+                    <!-- Statement Details Grid -->
+                    <div class="bill-details-grid">
+                        <div class="bill-details-item">
+                            <span class="bill-details-lbl">Tenant Name</span>
+                            <span id="lblOverrideTenant" class="bill-details-val">—</span>
+                        </div>
+                        <div class="bill-details-item">
+                            <span class="bill-details-lbl">Property / Unit</span>
+                            <span id="lblOverrideProperty" class="bill-details-val">—</span>
+                        </div>
+                        <div class="bill-details-item">
+                            <span class="bill-details-lbl">Billing Cycle</span>
+                            <span id="lblOverrideMonth" class="bill-details-val">—</span>
+                        </div>
+                        <div class="bill-details-item">
+                            <span class="bill-details-lbl">Current Status</span>
+                            <span id="lblOverrideStatus" class="bill-details-val">—</span>
+                        </div>
+                    </div>
+
+                    <!-- Due Date Extension Section -->
+                    <div class="form-group" style="margin-bottom:1.25rem;">
+                        <label class="form-label" for="overrideDueDate" style="display:flex;justify-content:space-between;align-items:center;">
+                            <span>Extended Payment Due Date</span>
+                            <small style="color:var(--text-muted);font-weight:normal;">Grace Extension</small>
+                        </label>
+                        <input type="date" id="overrideDueDate" class="form-input" required>
+                        <div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-top:0.5rem;">
+                            <button type="button" class="preset-pill preset-date-btn" data-days="3">+3 Days</button>
+                            <button type="button" class="preset-pill preset-date-btn" data-days="7">+7 Days (1 Wk)</button>
+                            <button type="button" class="preset-pill preset-date-btn" data-days="14">+14 Days (2 Wks)</button>
+                            <button type="button" class="preset-pill preset-date-btn" data-days="30">+30 Days (1 Mo)</button>
+                        </div>
+                        <div style="display:flex;align-items:flex-start;gap:0.4rem;margin-top:0.35rem;font-size:0.75rem;color:var(--text-muted);line-height:1.4;">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;margin-top:2px;color:var(--color-link, #0355f3);">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <line x1="12" y1="16" x2="12" y2="12"></line>
+                                <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                            </svg>
+                            <span>Extending the due date to today or a future date automatically resets an overdue invoice back to <strong>Pending Payment</strong>.</span>
+                        </div>
+                    </div>
+
+                    <!-- Late Penalty Waiver Section -->
+                    <div id="groupWaivePenalty" style="margin-bottom:1.25rem;background:var(--bg-primary);border:1px solid var(--border-color);border-radius:var(--radius-md);padding:0.875rem 1.15rem;display:flex;flex-direction:column;gap:0.35rem;">
+                        <div style="display:flex;align-items:center;justify-content:space-between;gap:0.75rem;">
+                            <label style="display:flex;align-items:center;gap:0.6rem;cursor:pointer;font-weight:600;font-size:0.875rem;color:var(--text-primary);margin:0;">
+                                <input type="checkbox" id="overrideWaivePenalty" style="width:18px;height:18px;accent-color:var(--color-action-primary, #0355f3);cursor:pointer;margin:0;">
+                                <span>Waive Late Penalty Fee</span>
+                            </label>
+                            <span id="lblOverridePenaltyVal" style="background:#fef2f2;color:#dc2626;border:1px solid #fecaca;font-size:0.75rem;padding:3px 10px;border-radius:4px;font-weight:700;white-space:nowrap;flex-shrink:0;">₱0.00</span>
+                        </div>
+                        <div style="color:var(--text-muted);font-size:0.75rem;margin-left:26px;">
+                            Check to zero out the late penalty fee for this billing statement.
+                        </div>
+                    </div>
+
+                    <!-- Rent Concession / Discount Field -->
+                    <div class="form-group" style="margin-bottom:1.25rem;">
+                        <label class="form-label" for="overrideDiscount" style="display:flex;justify-content:space-between;align-items:center;">
+                            <span>Rental Concession / Discount (₱)</span>
+                            <small style="color:var(--text-muted);font-weight:normal;">Optional</small>
+                        </label>
+                        <input type="number" id="overrideDiscount" class="form-input" value="0" min="0" step="0.01" placeholder="0.00">
+                        <small style="color:var(--text-muted);font-size:0.75rem;display:block;margin-top:0.25rem;">
+                            Enter any rental deduction or financial relief to subtract from the bill subtotal.
+                        </small>
+                    </div>
+
+                    <!-- Justification / Remarks -->
+                    <div class="form-group" style="margin-bottom:1.25rem;">
+                        <label class="form-label" for="overrideReason">Reason for Leeway / Concession Notes</label>
+                        <textarea id="overrideReason" class="form-input" style="height:70px;resize:vertical;" placeholder="e.g. Tenant requested payment extension to the 25th due to payroll delay. Waived late fees."></textarea>
+                        <small style="color:var(--text-muted);font-size:0.75rem;display:block;margin-top:0.25rem;">
+                            This explanation will appear on the tenant's invoice and be preserved in official audit logs.
+                        </small>
+                    </div>
+
+                    <!-- Real-time Live Calculation Summary -->
+                    <div style="background:var(--bg-primary);border:1px solid var(--border-color);border-radius:var(--radius-md);padding:1rem 1.25rem;margin-top:0.5rem;">
+                        <div style="font-size:0.75rem;font-weight:700;text-transform:uppercase;color:var(--text-muted);letter-spacing:0.05em;margin-bottom:0.75rem;display:flex;justify-content:space-between;align-items:center;">
+                            <span>Adjusted Statement Summary</span>
+                            <span style="font-size:0.6875rem;background:var(--color-info-bg, #eff6ff);color:var(--color-link, #0355f3);padding:2px 8px;border-radius:4px;font-weight:700;">Live Calculation</span>
+                        </div>
+                        <div class="calc-row">
+                            <span>Base Rent & Utilities Subtotal</span>
+                            <span id="previewOverrideSubtotal" style="font-weight:600;">₱0.00</span>
+                        </div>
+                        <div class="calc-row" id="rowPreviewPenalty">
+                            <span>Late Penalty Fine</span>
+                            <span id="previewOverridePenalty" style="font-weight:600;">₱0.00</span>
+                        </div>
+                        <div class="calc-row" id="rowPreviewDiscount">
+                            <span>Concession / Discount</span>
+                            <span id="previewOverrideDiscount" style="font-weight:600;color:var(--color-link, #0355f3);">- ₱0.00</span>
+                        </div>
+                        <div class="calc-row total">
+                            <span>NEW TOTAL DUE:</span>
+                            <span id="previewOverrideTotal">₱0.00 PHP</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="btnCancelOverride" class="action-btn btn-detail">Cancel</button>
+                    <button type="submit" id="btnConfirmOverride" class="action-btn btn-bill" style="display:inline-flex;align-items:center;gap:0.45rem;">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                        <span>Apply Leeway</span>
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 
@@ -611,10 +1531,24 @@
     <script src="../../js/dashboard.js"></script>
     <script>
         const token = localStorage.getItem('domiknow_token');
-        let activeLeases = [];
         let allBillings = [];
-        let currentFormBaseRent = 0;
-        let editBillId = null;
+        let currentActiveTab = 'all';
+        let landlordProperties = [];
+        let propertyUnitsMap = {};
+        let landlordLeases = [];
+let currentOverrideBill = null;
+        let currentViewBillId = null;
+
+        function escapeHtml(value) {
+            if (typeof window.domiknowEscapeHtml === 'function') return window.domiknowEscapeHtml(value);
+            if (!value) return '';
+            return String(value)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
 
         function parseUtilitiesConfig(raw) {
             if (!raw) return {};
@@ -632,620 +1566,743 @@
             loadBillingDashboard();
 
             // Tabs toggle
-            document.getElementById('tabActiveLeases').addEventListener('click', () => toggleTab('leases'));
-            document.getElementById('tabHistory').addEventListener('click', () => toggleTab('history'));
+            const tabHistoryBtn = document.getElementById('tabHistory');
+            if (tabHistoryBtn) tabHistoryBtn.addEventListener('click', () => renderHistoryTable());
 
-            // Modal closures
-            document.getElementById('closeGenerateModalBtn').addEventListener('click', closeGenerateModal);
-            document.getElementById('closeViewModalBtn').addEventListener('click', closeViewModal);
-            document.getElementById('closeViewModalFooterBtn').addEventListener('click', closeViewModal);
+            // ── View Modal Listeners ──
+            const closeViewModalBtn = document.getElementById('closeViewModalBtn');
+            if (closeViewModalBtn) closeViewModalBtn.addEventListener('click', closeViewModal);
 
-            // Calculations live updates
-            const calcInputs = ['formWater', 'formElectricity', 'formInternet', 'formParking', 'formOther', 'formPenalty'];
-            calcInputs.forEach(id => {
-                document.getElementById(id).addEventListener('input', calculateTotal);
+            const closeViewModalFooterBtn = document.getElementById('closeViewModalFooterBtn');
+            if (closeViewModalFooterBtn) closeViewModalFooterBtn.addEventListener('click', closeViewModal);
+
+            const viewModalOverrideBtn = document.getElementById('viewModalOverrideBtn');
+            if (viewModalOverrideBtn) {
+                viewModalOverrideBtn.addEventListener('click', () => {
+                    if (currentViewBillId) {
+                        const targetId = currentViewBillId;
+                        closeViewModal();
+                        openOverrideModal(targetId);
+                    }
+                });
+            }
+
+            // ── Override / Leeway Modal Listeners ──
+            const closeOverrideModalBtn = document.getElementById('closeOverrideModalBtn');
+            if (closeOverrideModalBtn) closeOverrideModalBtn.addEventListener('click', closeOverrideModal);
+
+            const btnCancelOverride = document.getElementById('btnCancelOverride');
+            if (btnCancelOverride) btnCancelOverride.addEventListener('click', closeOverrideModal);
+
+            // Modal backdrop clicks (clicking outside modal-container closes modal)
+            const viewBillModal = document.getElementById('viewBillModal');
+            if (viewBillModal) {
+                viewBillModal.addEventListener('click', (e) => {
+                    if (e.target === viewBillModal) closeViewModal();
+                });
+            }
+
+            const overrideModal = document.getElementById('overrideModal');
+            if (overrideModal) {
+                overrideModal.addEventListener('click', (e) => {
+                    if (e.target === overrideModal) closeOverrideModal();
+                });
+            }
+
+            // Global ESC key to close active modal
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    closeViewModal();
+                    closeOverrideModal();
+                }
             });
 
-            // Action buttons inside Generate Bill modal
-            document.getElementById('btnSaveDraft').addEventListener('click', () => submitBillingForm('draft'));
-            document.getElementById('btnSendBill').addEventListener('click', () => submitBillingForm('pending_payment'));
+            // Override modal inputs live preview listeners
+            const overrideDueDate = document.getElementById('overrideDueDate');
+            if (overrideDueDate) overrideDueDate.addEventListener('input', recalculateOverridePreview);
 
-            // Dynamic delegation on Tables
-            document.getElementById('activeLeasesTableBody').addEventListener('click', (e) => {
-                const btn = e.target.closest('[data-lease-id]');
-                if (btn) openGenerateModal(btn.dataset.leaseId);
+            const overrideWaivePenalty = document.getElementById('overrideWaivePenalty');
+            if (overrideWaivePenalty) overrideWaivePenalty.addEventListener('change', recalculateOverridePreview);
+
+            const overrideDiscount = document.getElementById('overrideDiscount');
+            if (overrideDiscount) overrideDiscount.addEventListener('input', recalculateOverridePreview);
+
+            // Preset date buttons (+3 Days, +7 Days, etc.)
+            document.querySelectorAll('.preset-date-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const days = parseInt(btn.dataset.days || 0);
+                    let baseDate = new Date();
+                    if (currentOverrideBill && currentOverrideBill.due_date) {
+                        const billDt = new Date(currentOverrideBill.due_date);
+                        if (billDt > baseDate) baseDate = billDt;
+                    }
+                    baseDate.setDate(baseDate.getDate() + days);
+                    const y = baseDate.getFullYear();
+                    const m = String(baseDate.getMonth() + 1).padStart(2, '0');
+                    const d = String(baseDate.getDate()).padStart(2, '0');
+                    const dueInput = document.getElementById('overrideDueDate');
+                    if (dueInput) {
+                        dueInput.value = `${y}-${m}-${d}`;
+                        recalculateOverridePreview();
+                    }
+                });
             });
 
+            // Clickable Row Delegation on Table 2 (Billing Statement Logs)
             document.getElementById('historyTableBody').addEventListener('click', (e) => {
-                const viewBtn = e.target.closest('[data-bill-id]');
-                if (viewBtn) openViewModal(viewBtn.dataset.billId);
-
-                const editBtn = e.target.closest('[data-edit-bill-id]');
-                if (editBtn) openEditModal(editBtn.dataset.editBillId);
-
-                const deleteBtn = e.target.closest('[data-delete-bill-id]');
-                if (deleteBtn) handleDeleteBilling(deleteBtn.dataset.deleteBillId);
+                const tr = e.target.closest('tr.clickable-row');
+                if (!tr) return;
+                const billId = tr.dataset.billId;
+                if (billId) {
+                    openViewModal(billId);
+                }
             });
 
-            // Billing history filters
-            document.getElementById('filterTenant').addEventListener('input', renderHistoryTable);
-            document.getElementById('filterProperty').addEventListener('input', renderHistoryTable);
-            document.getElementById('filterMonth').addEventListener('change', renderHistoryTable);
-            document.getElementById('filterStatus').addEventListener('change', renderHistoryTable);
-            document.getElementById('resetFiltersBtn').addEventListener('click', () => {
-                document.getElementById('filterTenant').value = '';
-                document.getElementById('filterProperty').value = '';
-                document.getElementById('filterMonth').value = '';
-                document.getElementById('filterStatus').value = '';
-                renderHistoryTable();
-            });
+            // Keyboard accessibility for clickable table rows
+            const handleRowKeydown = (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    const tr = e.target.closest('tr.clickable-row');
+                    if (tr) {
+                        e.preventDefault();
+                        tr.click();
+                    }
+                }
+            };
             
-            // Auto fill due date month changes and check for duplicate billing
-            document.getElementById('formBillingMonth').addEventListener('change', (e) => {
-                const val = e.target.value; // e.g. "2026-08"
-                if (!val) return;
-                const leaseId = document.getElementById('formLeaseId').value;
-                const lease = activeLeases.find(l => l.id === leaseId);
-                if (lease) {
-                    const parts = val.split('-');
-                    const year = parseInt(parts[0]);
-                    const month = parseInt(parts[1]);
-                    const dueDay = Math.min(parseInt(lease.payment_due_day || 5), 28);
-                    
-                    // Format due date: YYYY-MM-DD
-                    const dueMonthStr = month < 10 ? `0${month}` : `${month}`;
-                    const dueDayStr = dueDay < 10 ? `0${dueDay}` : `${dueDay}`;
-                    document.getElementById('formDueDate').value = `${year}-${dueMonthStr}-${dueDayStr}`;
+            document.getElementById('historyTableBody').addEventListener('keydown', handleRowKeydown);
 
-                    // Real-time check if bill already exists for this selected month
-                    if (!editBillId) {
-                        const targetMonthPrefix = val.slice(0, 7);
-                        const existing = allBillings.find(b => b.lease_id === leaseId && b.billing_month && b.billing_month.startsWith(targetMonthPrefix));
-                        if (existing) {
-                            showModalError(`A billing statement already exists for this month (${targetMonthPrefix}) with status <strong>${existing.billing_status.toUpperCase()}</strong>. You cannot generate another bill for the same month.`);
-                        } else {
-                            hideModalError();
+            // Override form submit
+            document.getElementById('overrideForm').addEventListener('submit', handleOverrideSubmit);
+
+            // Tab switching logic
+            const tabList = [
+                { id: 'tabAll', status: 'all' },
+                { id: 'tabOverdue', status: 'overdue' },
+                { id: 'tabPending', status: 'pending' },
+                { id: 'tabLeeway', status: 'leeway' },
+                { id: 'tabPaid', status: 'paid' }
+            ];
+
+            tabList.forEach(t => {
+                const btn = document.getElementById(t.id);
+                if (!btn) return;
+                btn.addEventListener('click', () => {
+                    currentActiveTab = t.status;
+                    tabList.forEach(other => {
+                        const el = document.getElementById(other.id);
+                        if (!el) return;
+                        const isMatch = other.status === t.status;
+                        el.classList.toggle('active', isMatch);
+                        el.setAttribute('aria-selected', isMatch ? 'true' : 'false');
+                    });
+                    renderHistoryTable();
+                });
+            });
+
+            // Filter toggle button & indicator
+            const toggleFiltersBtn = document.getElementById('toggleFiltersBtn');
+            const filterPanel = document.getElementById('filterPanel');
+            const filterActiveDot = document.getElementById('filterActiveDot');
+
+            function updateFilterActiveIndicator() {
+                const propVal = (document.getElementById('filterProperty')?.value || '').trim();
+                const unitVal = (document.getElementById('filterUnit')?.value || '').trim();
+                const tenantVal = (document.getElementById('filterTenant')?.value || '').trim();
+                const monthVal = (document.getElementById('filterMonth')?.value || '').trim();
+                const hasActiveFilter = Boolean(propVal || unitVal || tenantVal || monthVal);
+
+                if (filterActiveDot) {
+                    filterActiveDot.classList.toggle('hidden', !hasActiveFilter);
+                }
+            }
+
+            if (toggleFiltersBtn && filterPanel) {
+                toggleFiltersBtn.addEventListener('click', () => {
+                    const isCurrentlyHidden = filterPanel.classList.contains('hidden');
+                    if (isCurrentlyHidden) {
+                        filterPanel.classList.remove('hidden');
+                        toggleFiltersBtn.classList.add('active');
+                        toggleFiltersBtn.setAttribute('aria-expanded', 'true');
+                        const propSelect = document.getElementById('filterProperty');
+                        if (propSelect) propSelect.focus();
+                    } else {
+                        filterPanel.classList.add('hidden');
+                        toggleFiltersBtn.classList.remove('active');
+                        toggleFiltersBtn.setAttribute('aria-expanded', 'false');
+                    }
+                });
+            }
+
+            // Billing history cascading filters
+            const filterPropertyEl = document.getElementById('filterProperty');
+            const filterUnitEl = document.getElementById('filterUnit');
+            const filterTenantEl = document.getElementById('filterTenant');
+            const filterMonthEl = document.getElementById('filterMonth');
+
+            if (filterPropertyEl) {
+                filterPropertyEl.addEventListener('change', () => {
+                    if (filterUnitEl) filterUnitEl.value = '';
+                    updateUnitFilterOptions();
+                    if (filterTenantEl) filterTenantEl.value = '';
+                    updateTenantFilterOptions();
+                    updateFilterActiveIndicator();
+                    renderHistoryTable();
+                });
+            }
+
+            if (filterUnitEl) {
+                filterUnitEl.addEventListener('change', () => {
+                    if (filterTenantEl) filterTenantEl.value = '';
+                    updateTenantFilterOptions();
+                    updateFilterActiveIndicator();
+                    renderHistoryTable();
+                });
+            }
+
+            if (filterTenantEl) {
+                filterTenantEl.addEventListener('change', () => {
+                    updateFilterActiveIndicator();
+                    renderHistoryTable();
+                });
+            }
+
+            if (filterMonthEl) {
+                filterMonthEl.addEventListener('change', () => {
+                    updateFilterActiveIndicator();
+                    renderHistoryTable();
+                });
+            }
+
+            const resetFiltersBtn = document.getElementById('resetFiltersBtn');
+            if (resetFiltersBtn) {
+                resetFiltersBtn.addEventListener('click', () => {
+                    if (filterPropertyEl) filterPropertyEl.value = '';
+                    updateUnitFilterOptions();
+                    if (filterUnitEl) filterUnitEl.value = '';
+                    updateTenantFilterOptions();
+                    if (filterTenantEl) filterTenantEl.value = '';
+                    if (filterMonthEl) filterMonthEl.value = '';
+                    updateFilterActiveIndicator();
+
+                    currentActiveTab = 'all';
+                    tabList.forEach(t => {
+                        const el = document.getElementById(t.id);
+                        if (!el) return;
+                        const isMatch = t.status === 'all';
+                        el.classList.toggle('active', isMatch);
+                        el.setAttribute('aria-selected', isMatch ? 'true' : 'false');
+                    });
+                    renderHistoryTable();
+                });
+            }
+            
+            });
+
+        function getBillProperty(b) {
+            return (b.properties?.property_name || '').trim();
+        }
+
+        function getBillUnit(b) {
+            return (b.property_units?.unit_number || b.lease_records?.property_units?.unit_number || '').trim();
+        }
+
+        function getBillTenant(b) {
+            return (b.users?.full_name || '').trim();
+        }
+
+        async function populateCascadingFilters() {
+            await populatePropertyFilter();
+            updateUnitFilterOptions();
+            updateTenantFilterOptions();
+        }
+
+        async function populatePropertyFilter() {
+            const selectEl = document.getElementById('filterProperty');
+            if (!selectEl) return;
+
+            const currentVal = selectEl.value;
+            const propertyMap = new Map();
+            propertyUnitsMap = {};
+
+            // 1. Fetch landlord properties and their inventory units
+            try {
+                const res = await fetch('/api/landlord/properties', { headers: { 'Authorization': `Bearer ${token}` } });
+                if (res.ok) {
+                    const result = await res.json();
+                    landlordProperties = result.data || [];
+                    landlordProperties.forEach(p => {
+                        const name = (p.property_name || '').trim();
+                        if (name) {
+                            propertyMap.set(name.toLowerCase(), { name, id: p.id });
+                            propertyUnitsMap[name.toLowerCase()] = [];
                         }
+                    });
+
+                    // Pre-fetch units for each property in parallel
+                    await Promise.all(landlordProperties.map(async (p) => {
+                        if (!p.id) return;
+                        try {
+                            const unitRes = await fetch(`/api/properties/${p.id}/units`);
+                            if (unitRes.ok) {
+                                const unitData = await unitRes.json();
+                                const uList = (unitData.data || []).map(u => (u.unit_number || '').trim()).filter(Boolean);
+                                const propKey = (p.property_name || '').trim().toLowerCase();
+                                if (propKey) {
+                                    propertyUnitsMap[propKey] = uList;
+                                }
+                            }
+                        } catch (err) {
+                            // Non-blocking fallback
+                        }
+                    }));
+                }
+            } catch (e) {
+                // Non-blocking fallback
+            }
+
+            // 2. Fetch leases to capture all active units and tenants
+            try {
+                const leaseRes = await fetch('/api/leases', { headers: { 'Authorization': `Bearer ${token}` } });
+                if (leaseRes.ok) {
+                    const leaseData = await leaseRes.json();
+                    landlordLeases = leaseData.data || [];
+                    landlordLeases.forEach(l => {
+                        const propName = (l.properties?.property_name || '').trim();
+                        const unitNum = (l.property_units?.unit_number || '').trim();
+                        if (propName) {
+                            const key = propName.toLowerCase();
+                            if (!propertyMap.has(key)) {
+                                propertyMap.set(key, { name: propName, id: l.property_id });
+                                propertyUnitsMap[key] = [];
+                            }
+                            if (unitNum && propertyUnitsMap[key] && !propertyUnitsMap[key].includes(unitNum)) {
+                                propertyUnitsMap[key].push(unitNum);
+                            }
+                        }
+                    });
+                }
+            } catch (e) {
+                // Non-blocking fallback
+            }
+
+            // 3. Scan allBillings to ensure any billed property & unit is included
+            (allBillings || []).forEach(b => {
+                const propName = getBillProperty(b);
+                const unitNum = getBillUnit(b);
+                if (propName) {
+                    const key = propName.toLowerCase();
+                    if (!propertyMap.has(key)) {
+                        propertyMap.set(key, { name: propName, id: b.property_id || b.properties?.id });
+                        propertyUnitsMap[key] = [];
+                    }
+                    if (unitNum && propertyUnitsMap[key] && !propertyUnitsMap[key].includes(unitNum)) {
+                        propertyUnitsMap[key].push(unitNum);
                     }
                 }
             });
-        });
 
-        function toggleTab(tab) {
-            const activeLeasesTab = document.getElementById('tabActiveLeases');
-            const historyTab = document.getElementById('tabHistory');
-            const activeLeasesSec = document.getElementById('sectionActiveLeases');
-            const historySec = document.getElementById('sectionHistory');
+            const sortedNames = Array.from(propertyMap.values())
+                .map(item => item.name)
+                .sort((a, b) => a.localeCompare(b));
 
-            if (tab === 'leases') {
-                activeLeasesTab.classList.add('active');
-                activeLeasesTab.setAttribute('aria-selected', 'true');
-                historyTab.classList.remove('active');
-                historyTab.setAttribute('aria-selected', 'false');
-                activeLeasesSec.classList.remove('hidden');
-                historySec.classList.add('hidden');
+            let optionsHtml = '<option value="">All Properties</option>';
+            sortedNames.forEach(name => {
+                const isSelected = name.toLowerCase() === currentVal.toLowerCase() ? ' selected' : '';
+                optionsHtml += `<option value="${escapeHtml(name)}"${isSelected}>${escapeHtml(name)}</option>`;
+            });
+            selectEl.innerHTML = optionsHtml;
+        }
+
+        function updateUnitFilterOptions() {
+            const propSelect = document.getElementById('filterProperty');
+            const unitSelect = document.getElementById('filterUnit');
+            if (!unitSelect) return;
+
+            const selectedProperty = (propSelect?.value || '').toLowerCase().trim();
+            const currentVal = unitSelect.value;
+            const unitSet = new Set();
+
+            if (selectedProperty) {
+                // Specific property selected
+                const propUnits = propertyUnitsMap[selectedProperty] || [];
+                propUnits.forEach(u => unitSet.add(u));
+
+                (allBillings || []).forEach(b => {
+                    if (getBillProperty(b).toLowerCase() === selectedProperty) {
+                        const u = getBillUnit(b);
+                        if (u) unitSet.add(u);
+                    }
+                });
+
+                if (unitSet.size === 0) {
+                    unitSelect.innerHTML = '<option value="">No units (Single Property)</option>';
+                    unitSelect.disabled = true;
+                    unitSelect.value = '';
+                    return;
+                } else {
+                    unitSelect.disabled = false;
+                }
             } else {
-                activeLeasesTab.classList.remove('active');
-                activeLeasesTab.setAttribute('aria-selected', 'false');
-                historyTab.classList.add('active');
-                historyTab.setAttribute('aria-selected', 'true');
-                activeLeasesSec.classList.add('hidden');
-                historySec.classList.remove('hidden');
+                // All properties selected
+                unitSelect.disabled = false;
+                Object.values(propertyUnitsMap || {}).forEach(arr => {
+                    (arr || []).forEach(u => unitSet.add(u));
+                });
+                (allBillings || []).forEach(b => {
+                    const u = getBillUnit(b);
+                    if (u) unitSet.add(u);
+                });
+            }
+
+            const sortedUnits = Array.from(unitSet).sort((a, b) => {
+                const numA = parseFloat(a);
+                const numB = parseFloat(b);
+                if (!isNaN(numA) && !isNaN(numB) && String(numA) === a && String(numB) === b) {
+                    return numA - numB;
+                }
+                return a.localeCompare(b);
+            });
+
+            let optionsHtml = '<option value="">All Units</option>';
+            sortedUnits.forEach(u => {
+                const isSelected = u.toLowerCase() === currentVal.toLowerCase() ? ' selected' : '';
+                const displayLabel = u.toLowerCase().startsWith('unit') ? u : `Unit ${u}`;
+                optionsHtml += `<option value="${escapeHtml(u)}"${isSelected}>${escapeHtml(displayLabel)}</option>`;
+            });
+            unitSelect.innerHTML = optionsHtml;
+
+            if (currentVal && !sortedUnits.map(s => s.toLowerCase()).includes(currentVal.toLowerCase())) {
+                unitSelect.value = '';
+            }
+        }
+
+        function updateTenantFilterOptions() {
+            const propSelect = document.getElementById('filterProperty');
+            const unitSelect = document.getElementById('filterUnit');
+            const tenantSelect = document.getElementById('filterTenant');
+            if (!tenantSelect) return;
+
+            const selectedProperty = (propSelect?.value || '').toLowerCase().trim();
+            const selectedUnit = (unitSelect?.value || '').toLowerCase().trim();
+            const currentVal = tenantSelect.value;
+            const tenantSet = new Set();
+
+            (allBillings || []).forEach(b => {
+                const propName = getBillProperty(b).toLowerCase();
+                const unitName = getBillUnit(b).toLowerCase();
+
+                if (selectedProperty && propName !== selectedProperty) return;
+                if (selectedUnit && unitName !== selectedUnit) return;
+
+                const t = getBillTenant(b);
+                if (t) tenantSet.add(t);
+            });
+
+            (landlordLeases || []).forEach(l => {
+                const propName = (l.properties?.property_name || '').toLowerCase().trim();
+                const unitName = (l.property_units?.unit_number || '').toLowerCase().trim();
+
+                if (selectedProperty && propName !== selectedProperty) return;
+                if (selectedUnit && unitName !== selectedUnit) return;
+
+                const t = (l.users?.full_name || '').trim();
+                if (t) tenantSet.add(t);
+            });
+
+            const sortedTenants = Array.from(tenantSet).sort((a, b) => a.localeCompare(b));
+            let optionsHtml = '<option value="">All Tenants</option>';
+            sortedTenants.forEach(t => {
+                const isSelected = t.toLowerCase() === currentVal.toLowerCase() ? ' selected' : '';
+                optionsHtml += `<option value="${escapeHtml(t)}"${isSelected}>${escapeHtml(t)}</option>`;
+            });
+            tenantSelect.innerHTML = optionsHtml;
+
+            if (currentVal && !sortedTenants.map(s => s.toLowerCase()).includes(currentVal.toLowerCase())) {
+                tenantSelect.value = '';
             }
         }
 
         async function loadBillingDashboard() {
             try {
-                // Fetch Landlord Leases
-                const leaseRes = await fetch('/api/leases', { headers: { 'Authorization': `Bearer ${token}` } });
-                if (!leaseRes.ok) throw new Error(`Lease request failed with status ${leaseRes.status}`);
-                const leaseData = await leaseRes.json();
-                activeLeases = (leaseData.data || []).filter(l => l.lease_status === 'active');
-
                 // Fetch Billings
                 const billingRes = await fetch('/api/billings', { headers: { 'Authorization': `Bearer ${token}` } });
                 if (!billingRes.ok) throw new Error(`Billing request failed with status ${billingRes.status}`);
                 const billingData = await billingRes.json();
                 allBillings = billingData.data || [];
 
+                await populateCascadingFilters();
                 calculateSummaryStats();
-                const activeCountEl = document.getElementById('tabCountActiveLeases');
-                const historyCountEl = document.getElementById('tabCountHistory');
-                if (activeCountEl) activeCountEl.textContent = activeLeases.length;
-                if (historyCountEl) historyCountEl.textContent = allBillings.length;
 
-                renderActiveLeasesTable();
                 renderHistoryTable();
-                document.getElementById('activeLeasesTableBody').setAttribute('aria-busy', 'false');
-                document.getElementById('historyTableBody').setAttribute('aria-busy', 'false');
+                const tbody = document.getElementById('historyTableBody');
+                if (tbody) tbody.setAttribute('aria-busy', 'false');
 
             } catch (err) {
                 console.error(err);
-                document.getElementById('activeLeasesTableBody').innerHTML = '<tr><td colspan="6" role="alert" style="text-align:center;color:var(--error);padding:2rem;">Active lease billing could not be loaded. Check your connection and try again.</td></tr>';
-                document.getElementById('historyTableBody').innerHTML = '<tr><td colspan="6" role="alert" style="text-align:center;color:var(--error);padding:2rem;">Billing history could not be loaded. Check your connection and try again.</td></tr>';
-                document.getElementById('activeLeasesTableBody').setAttribute('aria-busy', 'false');
-                document.getElementById('historyTableBody').setAttribute('aria-busy', 'false');
+                const tbody = document.getElementById('historyTableBody');
+                if (tbody) {
+                    tbody.innerHTML = '<tr><td colspan="5" role="alert" style="text-align:center;color:var(--error);padding:2rem;">Billing history could not be loaded. Check your connection and try again.</td></tr>';
+                    tbody.setAttribute('aria-busy', 'false');
+                }
             }
         }
 
         function calculateSummaryStats() {
-            let totalActive = allBillings.length;
-            let paidCount = 0;
-            let pendingVerifyCount = 0;
+            let totalAmount = 0;
+            let collectedAmount = 0;
+            let pendingAmount = 0;
+            let overdueAmount = 0;
+            let leewayCount = 0;
+
+            let totalCount = allBillings.length;
+            let collectedCount = 0;
+            let pendingCount = 0;
             let overdueCount = 0;
-            let totalRevenue = 0;
 
             const today = new Date();
-            today.setHours(0,0,0,0);
+            today.setHours(0, 0, 0, 0);
 
             allBillings.forEach(b => {
-                const status = b.billing_status;
-                const dueDate = new Date(b.due_date);
+                const amt = parseFloat(b.total_amount || 0);
+                totalAmount += amt;
+                const status = (b.billing_status || '').toLowerCase();
+                const dueDate = b.due_date ? new Date(b.due_date) : null;
+                const remarks = b.remarks || '';
+                const hasLeeway = remarks.includes('[LEEWAY GRANTED]') || remarks.includes('[PINAGBIGYAN]') || remarks.includes('[OVERRIDE]');
 
-                totalRevenue += Number(b.paid_amount ?? (status === 'paid' ? b.total_amount : 0));
+                if (hasLeeway) leewayCount++;
+
                 if (status === 'paid') {
-                    paidCount++;
-                } else if (status === 'waiting_verification') {
-                    pendingVerifyCount++;
-                } else if (status === 'overdue' || (['pending_payment', 'unpaid', 'partially_paid'].includes(status) && dueDate < today)) {
+                    collectedAmount += amt;
+                    collectedCount++;
+                } else if (status === 'overdue' || (dueDate && dueDate < today)) {
+                    overdueAmount += amt;
                     overdueCount++;
+                } else {
+                    pendingAmount += amt;
+                    pendingCount++;
                 }
             });
 
-            const statTotalEl = document.getElementById('statTotalActive');
-            if (statTotalEl) statTotalEl.textContent = totalActive;
-            const statPaidEl = document.getElementById('statPaid');
-            if (statPaidEl) statPaidEl.textContent = paidCount;
-            const statPendingEl = document.getElementById('statPendingVerify');
-            if (statPendingEl) statPendingEl.textContent = pendingVerifyCount;
-            const statOverdueEl = document.getElementById('statOverdue');
-            if (statOverdueEl) statOverdueEl.textContent = overdueCount;
-            const statRevenueEl = document.getElementById('statRevenue');
-            if (statRevenueEl) statRevenueEl.textContent = `₱${totalRevenue.toLocaleString(undefined, { minimumFractionDigits: 2 })}`;
-        }
+            // Update Tab Badge Counters
+            const elAll = document.getElementById('tabCountAll');
+            if (elAll) elAll.textContent = totalCount;
+            const elOvd = document.getElementById('tabCountOverdue');
+            if (elOvd) elOvd.textContent = overdueCount;
+            const elPen = document.getElementById('tabCountPending');
+            if (elPen) elPen.textContent = pendingCount;
+            const elLwy = document.getElementById('tabCountLeeway');
+            if (elLwy) elLwy.textContent = leewayCount;
+            const elPd = document.getElementById('tabCountPaid');
+            if (elPd) elPd.textContent = collectedCount;
 
-        function renderActiveLeasesTable() {
-            const tbody = document.getElementById('activeLeasesTableBody');
-            tbody.innerHTML = '';
+            const formatPhp = (val) => `₱${val.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
-            if (activeLeases.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;color:var(--text-muted);padding:2rem;">No active leases currently registered.</td></tr>`;
-                return;
-            }
+            const elTotalAmt = document.getElementById('kpiTotalAmount');
+            if (elTotalAmt) elTotalAmt.textContent = formatPhp(totalAmount);
+            const elTotalSub = document.getElementById('kpiTotalSubtext');
+            if (elTotalSub) elTotalSub.textContent = `${totalCount} bill${totalCount === 1 ? '' : 's'}`;
 
-            activeLeases.forEach(lease => {
-                const tenantName = lease.users?.full_name || '—';
-                const propertyName = lease.properties?.property_name || '—';
-                const rentVal = parseFloat(lease.monthly_rent || 0);
+            const elCollectedAmt = document.getElementById('kpiCollectedAmount');
+            if (elCollectedAmt) elCollectedAmt.textContent = formatPhp(collectedAmount);
+            const elCollectedTag = document.getElementById('kpiCollectedTag');
+            const collectedPct = totalAmount > 0 ? Math.round((collectedAmount / totalAmount) * 100) : 0;
+            if (elCollectedTag) elCollectedTag.textContent = `${collectedPct}%`;
+            const elCollectedBar = document.getElementById('kpiCollectedBar');
+            if (elCollectedBar) elCollectedBar.style.width = `${collectedPct}%`;
+            const elCollectedSub = document.getElementById('kpiCollectedSubtext');
+            if (elCollectedSub) elCollectedSub.textContent = `${collectedCount} collected`;
 
-                // Check if this lease already has a bill issued for the current calendar month or Move-In bill
-                const currentMonthStr = new Date().toISOString().slice(0, 7); // e.g. "2026-08"
-                const matchingBill = allBillings.find(b => b.lease_id === lease.id && b.billing_month && b.billing_month.startsWith(currentMonthStr));
-                
-                let billStatusHtml = `<span style="color:var(--text-muted);font-style:italic;">No bill generated</span>`;
-                if (matchingBill) {
-                    const badgeClass = matchingBill.billing_status === 'paid' ? 'status-active' : (matchingBill.billing_status === 'waiting_verification' ? 'status-pending' : 'status-rejected');
-                    const isMoveIn = matchingBill.billing_month.includes('Move-In');
-                    const labelText = isMoveIn ? `MOVE-IN BILL (${matchingBill.billing_status.toUpperCase()})` : matchingBill.billing_status.toUpperCase();
-                    billStatusHtml = `<span class="status-badge ${badgeClass}">${labelText}</span>`;
-                }
+            const elPendingAmt = document.getElementById('kpiPendingAmount');
+            if (elPendingAmt) elPendingAmt.textContent = formatPhp(pendingAmount);
+            const elPendingTag = document.getElementById('kpiPendingTag');
+            const pendingPct = totalAmount > 0 ? Math.round((pendingAmount / totalAmount) * 100) : 0;
+            if (elPendingTag) elPendingTag.textContent = `${pendingPct}%`;
+            const elPendingBar = document.getElementById('kpiPendingBar');
+            if (elPendingBar) elPendingBar.style.width = `${pendingPct}%`;
+            const elPendingSub = document.getElementById('kpiPendingSubtext');
+            if (elPendingSub) elPendingSub.textContent = `${pendingCount} pending`;
 
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td style="font-weight:700;font-family:monospace;color: var(--color-link);">${lease.lease_number || 'DRAFT'}</td>
-                    <td style="font-weight:600;">${tenantName}</td>
-                    <td>${propertyName}</td>
-                    <td style="font-weight:700;">₱${rentVal.toLocaleString(undefined, { minimumFractionDigits:2 })}</td>
-                    <td>${billStatusHtml}</td>
-                    <td>
-                        <button class="action-btn btn-bill" data-lease-id="${lease.id}">Generate Bill</button>
-                    </td>
-                `;
-                tbody.appendChild(tr);
-            });
+            const elOverdueAmt = document.getElementById('kpiOverdueAmount');
+            if (elOverdueAmt) elOverdueAmt.textContent = formatPhp(overdueAmount);
+            const elOverdueTag = document.getElementById('kpiOverdueTag');
+            const overduePct = totalAmount > 0 ? Math.round((overdueAmount / totalAmount) * 100) : 0;
+            if (elOverdueTag) elOverdueTag.textContent = `${overduePct}%`;
+            const elOverdueBar = document.getElementById('kpiOverdueBar');
+            if (elOverdueBar) elOverdueBar.style.width = `${overduePct}%`;
+            const elOverdueSub = document.getElementById('kpiOverdueSubtext');
+            if (elOverdueSub) elOverdueSub.textContent = `${overdueCount} overdue`;
         }
 
         function renderHistoryTable() {
             const tbody = document.getElementById('historyTableBody');
             tbody.innerHTML = '';
 
-            const searchTenant = document.getElementById('filterTenant').value.toLowerCase();
-            const searchProperty = document.getElementById('filterProperty').value.toLowerCase();
-            const searchMonth = document.getElementById('filterMonth').value;
-            const searchStatus = document.getElementById('filterStatus').value;
+            const selectedProperty = (document.getElementById('filterProperty')?.value || '').toLowerCase().trim();
+            const selectedUnit = (document.getElementById('filterUnit')?.value || '').toLowerCase().trim();
+            const selectedTenant = (document.getElementById('filterTenant')?.value || '').toLowerCase().trim();
+            const searchMonth = document.getElementById('filterMonth')?.value || '';
+
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
 
             const filtered = allBillings.filter(b => {
-                const tenant = (b.users?.full_name || '').toLowerCase();
-                const prop = (b.properties?.property_name || '').toLowerCase();
+                const prop = getBillProperty(b).toLowerCase();
+                const unit = getBillUnit(b).toLowerCase();
+                const tenant = getBillTenant(b).toLowerCase();
+                const cycle = (b.billing_month || '').toLowerCase();
                 
-                if (searchTenant && !tenant.includes(searchTenant)) return false;
-                if (searchProperty && !prop.includes(searchProperty)) return false;
-                if (searchMonth && b.billing_month !== searchMonth) return false;
-                if (searchStatus && b.billing_status !== searchStatus) return false;
+                if (selectedProperty && prop !== selectedProperty) return false;
+                if (selectedUnit && unit !== selectedUnit) return false;
+                if (selectedTenant && tenant !== selectedTenant) return false;
+                if (searchMonth && !cycle.startsWith(searchMonth.toLowerCase()) && !cycle.includes(searchMonth.toLowerCase())) return false;
+                
+                const st = (b.billing_status || '').toLowerCase();
+                const dueDate = b.due_date ? new Date(b.due_date) : null;
+                const isPaid = st === 'paid';
+                const isOverdue = st === 'overdue' || (!isPaid && dueDate && dueDate < today);
+                const isPending = !isPaid && !isOverdue;
+                const remarks = b.remarks || '';
+                const hasLeeway = remarks.includes('[LEEWAY GRANTED]') || remarks.includes('[PINAGBIGYAN]') || remarks.includes('[OVERRIDE]');
+
+                if (currentActiveTab === 'overdue' && !isOverdue) return false;
+                if (currentActiveTab === 'pending' && !isPending) return false;
+                if (currentActiveTab === 'leeway' && !hasLeeway) return false;
+                if (currentActiveTab === 'paid' && !isPaid) return false;
+
                 return true;
             });
 
             if (filtered.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;color:var(--text-muted);padding:2rem;">No matching billing statements found.</td></tr>`;
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--text-muted);padding:3rem 1.5rem;">No matching billing statements found.</td></tr>';
                 return;
             }
 
             filtered.forEach(bill => {
-                const rent = parseFloat(bill.total_amount || 0).toLocaleString(undefined, { minimumFractionDigits: 2 });
-                const due = new Date(bill.due_date).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
-                
-                const tenantName = bill.users?.full_name || '—';
-                const propertyName = bill.properties?.property_name || '—';
+                const tenantName = getBillTenant(bill) || '—';
+                const propertyName = getBillProperty(bill) || '—';
+                const unitName = getBillUnit(bill);
+                const propUnitLabel = unitName ? `${propertyName} • Unit ${unitName}` : propertyName;
+                const totalAmt = parseFloat(bill.total_amount || 0);
+                const totalFormatted = `₱${totalAmt.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
-                const today = new Date();
-                today.setHours(0,0,0,0);
-                let statusLabel = bill.billing_status;
-                let badgeClass = 'status-pending';
-
-                if (statusLabel === 'paid') badgeClass = 'status-active';
-                else if (statusLabel === 'cancelled') badgeClass = 'status-rejected';
-                else if (statusLabel === 'overdue' || (['pending_payment', 'unpaid', 'partially_paid'].includes(statusLabel) && new Date(bill.due_date) < today)) {
-                    statusLabel = 'overdue';
-                    badgeClass = 'status-rejected';
+                // Due Date
+                let dueFormatted = '—';
+                let dueDateObj = null;
+                if (bill.due_date) {
+                    dueDateObj = new Date(bill.due_date);
+                    dueDateObj.setHours(0, 0, 0, 0);
+                    dueFormatted = dueDateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
                 }
 
-                // Move-In bills are auto-generated based on signed lease terms and cannot be edited or deleted
-                const isMoveIn = bill.billing_month && bill.billing_month.includes('Move-In');
-                const isEditable = !isMoveIn && ['draft', 'pending_payment', 'unpaid'].includes(bill.billing_status);
-                const isDeletable = !isMoveIn && ['draft', 'pending_payment', 'unpaid', 'overdue'].includes(bill.billing_status);
+                // Leeway
+                const remarks = bill.remarks || '';
+                const hasLeeway = remarks.includes('[LEEWAY GRANTED]') || remarks.includes('[PINAGBIGYAN]') || remarks.includes('[OVERRIDE]');
 
-                const editBtn = isEditable 
-                    ? `<button class="action-btn btn-edit" data-edit-bill-id="${bill.id}">Edit</button>` 
-                    : (isMoveIn ? `<span style="font-size:0.75rem;color:var(--text-muted);font-weight:600;font-style:italic;display:inline-flex;align-items:center;gap:0.3rem;" title="Move-In bill terms are locked to the signed lease agreement"><span data-icon="lock"></span> Auto-Generated</span>` : '');
+                // Status & Timing
+                const statusLower = (bill.billing_status || '').toLowerCase();
+                const isPaid = statusLower === 'paid';
 
-                const deleteBtn = isDeletable
-                    ? `<button class="action-btn" data-delete-bill-id="${bill.id}" style="background-color:#ef4444;color:white;padding:0.35rem 0.65rem;font-size:0.75rem;border-radius:4px;border:none;margin-left:0.25rem;cursor:pointer;">Delete</button>`
-                    : '';
+                const payments = Array.isArray(bill.payment_records) ? bill.payment_records : [];
+                const verifiedPay = payments.find(p => p.payment_status === 'verified') || payments[0];
+
+                let timingHtml = '';
+
+                if (isPaid) {
+                    const payDateRaw = verifiedPay?.verified_at || verifiedPay?.submitted_at || verifiedPay?.created_at || bill.updated_at;
+                    let payDateFormatted = 'Settled';
+                    let payDateObj = null;
+                    if (payDateRaw) {
+                        payDateObj = new Date(payDateRaw);
+                        payDateObj.setHours(0, 0, 0, 0);
+                        payDateFormatted = payDateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+                    }
+
+                    let punctualityTag = '';
+                    if (dueDateObj && payDateObj) {
+                        const diffDays = Math.round((payDateObj - dueDateObj) / (1000 * 60 * 60 * 24));
+                        if (diffDays <= 0) {
+                            punctualityTag = `<span class="timing-sub sub-ontime">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                On Time
+                            </span>`;
+                        } else {
+                            punctualityTag = `<span class="timing-sub sub-overdue">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"></polyline></svg>
+                                ${diffDays}d delayed
+                            </span>`;
+                        }
+                    } else {
+                        punctualityTag = `<span class="timing-sub sub-ontime">Settled</span>`;
+                    }
+
+                    timingHtml = `
+                        <div class="timing-cell">
+                            <span class="timing-date">Paid ${payDateFormatted}</span>
+                            ${punctualityTag}
+                        </div>
+                    `;
+                } else {
+                    let delaySub = '';
+                    if (dueDateObj) {
+                        const overdueDays = Math.round((today - dueDateObj) / (1000 * 60 * 60 * 24));
+                        if (overdueDays > 0) {
+                            delaySub = `<span class="timing-sub sub-overdue">${overdueDays}d overdue</span>`;
+                        } else if (overdueDays === 0) {
+                            delaySub = `<span class="timing-sub sub-today">Due today</span>`;
+                        } else {
+                            const leftDays = Math.abs(overdueDays);
+                            delaySub = `<span class="timing-sub sub-pending">${leftDays}d left</span>`;
+                        }
+                    } else {
+                        delaySub = `<span class="timing-sub sub-pending">—</span>`;
+                    }
+
+                    const leewayBadge = hasLeeway ? `<span class="leeway-tag" title="${escapeHtml(remarks)}"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> Leeway</span>` : '';
+
+                    timingHtml = `
+                        <div class="timing-cell">
+                            <div class="timing-date">
+                                <span>Due ${dueFormatted}</span>
+                                ${leewayBadge}
+                            </div>
+                            ${delaySub}
+                        </div>
+                    `;
+                }
+
+                // Status Badge
+                let statusBadgeClass = 'status-pending';
+                let statusText = (bill.billing_status || 'PENDING').replace(/_/g, ' ').toUpperCase();
+                if (isPaid) {
+                    statusBadgeClass = 'status-active';
+                } else if (statusLower === 'overdue' || (dueDateObj && dueDateObj < today && !isPaid)) {
+                    statusBadgeClass = 'status-rejected';
+                    statusText = 'OVERDUE';
+                } else if (statusLower === 'waiting_verification') {
+                    statusBadgeClass = 'status-pending';
+                    statusText = 'WAITING VERIFICATION';
+                }
 
                 const tr = document.createElement('tr');
+                tr.className = 'clickable-row';
+                tr.dataset.billId = bill.id;
+                tr.setAttribute('tabindex', '0');
+                tr.setAttribute('role', 'button');
+                tr.setAttribute('aria-label', `View statement for ${tenantName}, ${bill.billing_month || 'billing cycle'}`);
+
                 tr.innerHTML = `
-                    <td style="font-weight:700;color: var(--color-link);">${bill.billing_month}</td>
+                    <td style="font-weight:700;color:var(--color-link);font-family:monospace;">${escapeHtml(bill.billing_month || '—')}</td>
                     <td>
-                        <div style="font-weight:700;">${tenantName}</div>
-                        <div style="font-size:0.75rem;color:var(--text-muted);">${propertyName}</div>
+                        <div style="font-weight:700;color:var(--color-text-primary);margin-bottom:2px;">${escapeHtml(tenantName)}</div>
+                        <div style="font-size:0.75rem;color:var(--color-text-secondary);">${escapeHtml(propUnitLabel)}</div>
                     </td>
-                    <td style="font-weight:700;">₱${rent} PHP</td>
-                    <td style="font-weight:600;">${due}</td>
-                    <td><span class="status-badge ${badgeClass}">${statusLabel.replace('_',' ').toUpperCase()}</span></td>
-                    <td>
-                        <button class="action-btn btn-detail" data-bill-id="${bill.id}">View</button>
-                        ${editBtn}
-                        ${deleteBtn}
-                    </td>
+                    <td style="font-weight:700;color:var(--color-text-primary);font-variant-numeric:tabular-nums;">${totalFormatted}</td>
+                    <td>${timingHtml}</td>
+                    <td><span class="status-badge ${statusBadgeClass}" style="border:none !important;box-shadow:none !important;outline:none !important;">${statusText}</span></td>
                 `;
                 tbody.appendChild(tr);
             });
-        }
-
-        // Open Monthly Billing Generate dialog
-        function openGenerateModal(leaseId) {
-            const lease = activeLeases.find(l => l.id === leaseId);
-            if (!lease) return;
-
-            document.getElementById('formLeaseId').value = lease.id;
-            document.getElementById('lblLeaseNumber').textContent = lease.lease_number || 'DRAFT';
-            document.getElementById('lblTenantName').textContent = lease.users?.full_name || '—';
-            document.getElementById('lblPropertyName').textContent = lease.properties?.property_name || '—';
-            document.getElementById('lblDueDay').textContent = `${lease.payment_due_day || 5}th day of month`;
-            
-            currentFormBaseRent = parseFloat(lease.monthly_rent || 0);
-            document.getElementById('lblBaseRent').textContent = `₱${currentFormBaseRent.toLocaleString(undefined, { minimumFractionDigits: 2 })}`;
-
-            // Auto-calculate Billing month: if move-in month already billed, default to next month!
-            let defaultMonthDate = new Date();
-            const currentMonthStr = defaultMonthDate.toISOString().slice(0, 7); // e.g. "2026-08"
-            
-            // Check if a bill for current month (or move-in bill) exists for this lease
-            const existingForCurrent = allBillings.some(b => b.lease_id === lease.id && b.billing_month && b.billing_month.startsWith(currentMonthStr));
-            if (existingForCurrent) {
-                // Advance to next month
-                defaultMonthDate.setMonth(defaultMonthDate.getMonth() + 1);
-            }
-
-            const targetMonthStr = defaultMonthDate.toISOString().slice(0, 7);
-            const monthInput = document.getElementById('formBillingMonth');
-            if (monthInput) {
-                monthInput.disabled = false;
-                if (lease.lease_start_date) {
-                    monthInput.min = lease.lease_start_date.slice(0, 7);
-                }
-                monthInput.value = targetMonthStr;
-            }
-
-            // Compute standard due date for target month
-            const parts = targetMonthStr.split('-');
-            const year = parseInt(parts[0]);
-            const month = parseInt(parts[1]);
-            const dueDay = Math.min(parseInt(lease.payment_due_day || 5), 28);
-            const dueMonthStr = month < 10 ? `0${month}` : `${month}`;
-            const dueDayStr = dueDay < 10 ? `0${dueDay}` : `${dueDay}`;
-            document.getElementById('formDueDate').value = `${year}-${dueMonthStr}-${dueDayStr}`;
-
-            // Reset inputs & apply Utilities Configuration rules from lease
-            const uConfig = parseUtilitiesConfig(lease.utilities_covered);
-            const isInc = (type) => {
-                if (typeof uConfig === 'object' && uConfig !== null && !Array.isArray(uConfig)) {
-                    return uConfig[type] === 'included';
-                }
-                if (Array.isArray(uConfig)) return uConfig.includes(type);
-                return false;
-            };
-
-            const setUtilField = (fieldId, utilKey, labelElId, labelText, containerId) => {
-                const el = document.getElementById(fieldId);
-                const lbl = document.getElementById(labelElId);
-                const container = document.getElementById(containerId);
-                if (isInc(utilKey)) {
-                    el.value = 0;
-                    el.disabled = true;
-                    if (container) container.style.display = 'none';
-                } else {
-                    el.value = 0;
-                    el.disabled = false;
-                    if (container) container.style.display = 'flex';
-                    if (lbl) lbl.innerHTML = `${labelText} <span style="font-size:0.75rem;color: var(--color-link);font-weight:700;">(Billed Separately)</span>`;
-                }
-            };
-
-            setUtilField('formWater', 'water', 'lblFormWater', 'Water Utility (₱)', 'rowWater');
-            setUtilField('formElectricity', 'electricity', 'lblFormElectricity', 'Electricity (₱)', 'rowElectricity');
-            setUtilField('formInternet', 'internet', 'lblFormInternet', 'Internet (₱)', 'rowInternet');
-            setUtilField('formOther', 'association_fee', 'lblFormOther', 'Association Fee / Other (₱)', 'rowOther');
-
-            // Check Parking policy
-            const rowParking = document.getElementById('rowParking');
-            if (rowParking) {
-                const hasParking = lease.parking_policy && !['Not Applicable', 'Not Included'].includes(lease.parking_policy);
-                rowParking.style.display = hasParking ? 'flex' : 'none';
-            }
-            document.getElementById('formParking').value = 0;
-            document.getElementById('formPenalty').value = 0;
-            document.getElementById('formRemarks').value = '';
-            
-            // Check if default target month already has a billing statement
-            const existingDefault = allBillings.find(b => b.lease_id === lease.id && b.billing_month && b.billing_month.startsWith(targetMonthStr.slice(0, 7)));
-            if (existingDefault) {
-                showModalError(`A billing statement already exists for this month (${targetMonthStr.slice(0, 7)}) with status <strong>${existingDefault.billing_status.toUpperCase()}</strong>. You cannot generate another bill for the same month.`);
-            } else {
-                hideModalError();
-            }
-
-            calculateTotal();
-            document.getElementById('generateBillModal').classList.remove('hidden');
-        }
-
-        function showModalError(msg) {
-            const errorDiv = document.getElementById('errorMessage');
-            if (!errorDiv) return;
-            errorDiv.innerHTML = `
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0; margin-top: 1px;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-                <div style="flex: 1; min-width: 0; word-break: break-word; overflow-wrap: break-word; white-space: normal;">${msg}</div>
-            `;
-            errorDiv.classList.remove('hidden');
-        }
-
-        function hideModalError() {
-            const errorDiv = document.getElementById('errorMessage');
-            if (errorDiv) {
-                errorDiv.classList.add('hidden');
-                errorDiv.innerHTML = '';
-            }
-        }
-
-        // Open Edit Modal for Billing modification
-        async function openEditModal(billId) {
-            const bill = allBillings.find(b => b.id === billId);
-            if (!bill) return;
-
-            editBillId = bill.id;
-            
-            // Set header
-            document.getElementById('generateBillModal').querySelector('h3').textContent = 'Modify Billing Statement';
-
-            document.getElementById('formLeaseId').value = bill.lease_id;
-            document.getElementById('lblLeaseNumber').textContent = bill.lease_records?.lease_number || 'DRAFT';
-            document.getElementById('lblTenantName').textContent = bill.users?.full_name || '—';
-            document.getElementById('lblPropertyName').textContent = bill.properties?.property_name || '—';
-
-            // Enforce lease utility configuration rules on edit
-            const lease = activeLeases.find(l => l.id === bill.lease_id) || bill.lease_records || {};
-            const dueDay = lease.payment_due_day || 5;
-            document.getElementById('lblDueDay').textContent = `${dueDay}th day of month`;
-            
-            currentFormBaseRent = parseFloat(bill.rent_amount || 0);
-            document.getElementById('lblBaseRent').textContent = `₱${currentFormBaseRent.toLocaleString(undefined, { minimumFractionDigits: 2 })}`;
-
-            document.getElementById('formBillingMonth').value = bill.billing_month;
-            document.getElementById('formDueDate').value = bill.due_date;
-            
-            // Disable changing billing month on edit to prevent unique constraint conflicts
-            document.getElementById('formBillingMonth').disabled = true;
-
-            const uConfig = parseUtilitiesConfig(lease.utilities_covered);
-            const isInc = (type) => {
-                if (typeof uConfig === 'object' && uConfig !== null && !Array.isArray(uConfig)) {
-                    return uConfig[type] === 'included';
-                }
-                if (Array.isArray(uConfig)) return uConfig.includes(type);
-                return false;
-            };
-
-            const setUtilFieldEdit = (fieldId, utilKey, labelElId, labelText, containerId, val) => {
-                const el = document.getElementById(fieldId);
-                const lbl = document.getElementById(labelElId);
-                const container = document.getElementById(containerId);
-                if (isInc(utilKey)) {
-                    el.value = 0;
-                    el.disabled = true;
-                    if (container) container.style.display = 'none';
-                } else {
-                    el.value = val;
-                    el.disabled = false;
-                    if (container) container.style.display = 'flex';
-                    if (lbl) lbl.innerHTML = `${labelText} <span style="font-size:0.75rem;color: var(--color-link);font-weight:700;">(Billed Separately)</span>`;
-                }
-            };
-
-            setUtilFieldEdit('formWater', 'water', 'lblFormWater', 'Water Utility (₱)', 'rowWater', bill.water || 0);
-            setUtilFieldEdit('formElectricity', 'electricity', 'lblFormElectricity', 'Electricity (₱)', 'rowElectricity', bill.electricity || 0);
-            setUtilFieldEdit('formInternet', 'internet', 'lblFormInternet', 'Internet (₱)', 'rowInternet', bill.internet || 0);
-            setUtilFieldEdit('formOther', 'association_fee', 'lblFormOther', 'Association Fee / Other (₱)', 'rowOther', bill.other_charges || 0);
-
-            const rowParkingEdit = document.getElementById('rowParking');
-            if (rowParkingEdit) {
-                const hasParking = (lease.parking_policy && !['Not Applicable', 'Not Included'].includes(lease.parking_policy)) || parseFloat(bill.parking || 0) > 0;
-                rowParkingEdit.style.display = hasParking ? 'flex' : 'none';
-            }
-            document.getElementById('formParking').value = bill.parking || 0;
-            document.getElementById('formPenalty').value = bill.penalty_amount || 0;
-            document.getElementById('formRemarks').value = bill.remarks || '';
-            hideModalError();
-
-            // Set button text styles
-            document.getElementById('btnSaveDraft').textContent = 'Update Draft';
-            document.getElementById('btnSendBill').textContent = 'Update & Send';
-
-            calculateTotal();
-            document.getElementById('generateBillModal').classList.remove('hidden');
-        }
-
-        async function handleDeleteBilling(billId) {
-            const bill = allBillings.find(b => b.id === billId);
-            if (!bill) return;
-
-            if (bill.billing_month && bill.billing_month.includes('Move-In')) {
-                alert('Initial Move-In Billing Statements cannot be deleted as they are bound to the active lease agreement.');
-                return;
-            }
-
-            const deleteBilling = await window.domiknowConfirm({
-                variant: 'danger',
-                eyebrow: 'Delete pending statement',
-                title: `Delete the ${bill.billing_month} billing?`,
-                message: 'This pending billing statement will be permanently removed and will no longer be available to the tenant.',
-                confirmLabel: 'Delete statement',
-                cancelLabel: 'Keep statement'
-            });
-            if (!deleteBilling) {
-                return;
-            }
-
-            try {
-                const res = await fetch(`/api/billings/${billId}`, {
-                    method: 'DELETE',
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
-                const result = await res.json();
-                if (res.ok) {
-                    alert('Billing statement deleted successfully.');
-                    loadBillingDashboard();
-                } else {
-                    alert(result.message || 'Failed to delete billing statement.');
-                }
-            } catch (err) {
-                console.error(err);
-                alert('Connection error deleting billing statement.');
-            }
-        }
-
-        function calculateTotal() {
-            const w = parseFloat(document.getElementById('formWater').value) || 0;
-            const e = parseFloat(document.getElementById('formElectricity').value) || 0;
-            const i = parseFloat(document.getElementById('formInternet').value) || 0;
-            const p = parseFloat(document.getElementById('formParking').value) || 0;
-            const other = parseFloat(document.getElementById('formOther').value) || 0;
-            const penalty = parseFloat(document.getElementById('formPenalty').value) || 0;
-
-            const total = currentFormBaseRent + w + e + i + p + other + penalty;
-            document.getElementById('valTotalDue').textContent = `₱${total.toLocaleString(undefined, { minimumFractionDigits: 2 })} PHP`;
-        }
-
-        async function submitBillingForm(status) {
-            hideModalError();
-
-            const leaseId = document.getElementById('formLeaseId').value;
-            const billingMonth = document.getElementById('formBillingMonth').value;
-            const dueDate = document.getElementById('formDueDate').value;
-
-            if (!billingMonth || !dueDate) {
-                showModalError('Please fill out all date parameters.');
-                return;
-            }
-
-            if (!editBillId) {
-                const targetMonthPrefix = billingMonth.slice(0, 7);
-                const existing = allBillings.find(b => b.lease_id === leaseId && b.billing_month && b.billing_month.startsWith(targetMonthPrefix));
-                if (existing) {
-                    showModalError(`A billing statement already exists for this month (${targetMonthPrefix}) with status <strong>${existing.billing_status.toUpperCase()}</strong>. You cannot generate another bill for the same month.`);
-                    return;
-                }
-            }
-
-            const bodyData = {
-                lease_id: leaseId,
-                billing_month: billingMonth,
-                rent_amount: currentFormBaseRent,
-                water: parseFloat(document.getElementById('formWater').value) || 0,
-                electricity: parseFloat(document.getElementById('formElectricity').value) || 0,
-                internet: parseFloat(document.getElementById('formInternet').value) || 0,
-                parking: parseFloat(document.getElementById('formParking').value) || 0,
-                other_charges: parseFloat(document.getElementById('formOther').value) || 0,
-                penalty_amount: parseFloat(document.getElementById('formPenalty').value) || 0,
-                due_date: dueDate,
-                billing_status: status,
-                remarks: document.getElementById('formRemarks').value.trim()
-            };
-
-            let apiUrl = '/api/billings';
-            let method = 'POST';
-
-            if (editBillId) {
-                apiUrl = `/api/billings/${editBillId}`;
-                method = 'PUT';
-            }
-
-            try {
-                const response = await fetch(apiUrl, {
-                    method: method,
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`
-                    },
-                    body: JSON.stringify(bodyData)
-                });
-
-                const result = await response.json();
-                if (response.ok) {
-                    alert(editBillId ? `Billing updated successfully as ${status.toUpperCase()}.` : `Billing generated successfully as ${status.toUpperCase()}.`);
-                    closeGenerateModal();
-                    loadBillingDashboard();
-                } else {
-                    showModalError(result.message || 'Failed to submit billing details.');
-                }
-            } catch (err) {
-                console.error(err);
-                showModalError('Connection error transmitting billing payload.');
-            }
-        }
-
-        function closeGenerateModal() {
-            document.getElementById('generateBillModal').classList.add('hidden');
-            document.getElementById('billingForm').reset();
-            hideModalError();
-            
-            // Restore modal title & labels
-            document.getElementById('generateBillModal').querySelector('h3').textContent = 'Generate Monthly Billing';
-            document.getElementById('btnSaveDraft').textContent = 'Save Draft';
-            document.getElementById('btnSendBill').textContent = 'Send Bill';
-            document.getElementById('formBillingMonth').disabled = false;
-            
-            currentFormBaseRent = 0;
-            editBillId = null;
         }
 
         // Open bill logs detail modal
@@ -1258,12 +2315,23 @@
             modal.classList.remove('hidden');
 
             try {
-                const res = await fetch(`/api/billings/${billId}`, { headers: { 'Authorization': `Bearer ${token}` } });
-                const { data: bill } = await res.json();
+                let bill = allBillings.find(b => String(b.id) === String(billId));
+                try {
+                    const res = await fetch(`/api/billings/${billId}`, { headers: { 'Authorization': `Bearer ${token}` } });
+                    if (res.ok) {
+                        const json = await res.json();
+                        if (json && json.data) bill = json.data;
+                    }
+                } catch (netErr) {
+                    console.warn('Network fetch for bill details warning:', netErr);
+                }
+
+                if (!bill) throw new Error('Billing record could not be loaded.');
 
                 document.getElementById('viewModalLeaseNum').textContent = `Statement: ${bill.lease_records?.lease_number || 'DRAFT'}`;
+                currentViewBillId = bill.id;
                 
-                const tenantName = bill.tenant?.full_name || '—';
+                const tenantName = bill.tenant?.full_name || bill.users?.full_name || '—';
                 const propertyName = bill.properties?.property_name || '—';
                 const baseRent = parseFloat(bill.rent_amount || 0);
                 const water = parseFloat(bill.water || 0);
@@ -1324,7 +2392,22 @@
                 // 8. Total Amount Due
                 breakdownRows.push(`<div class="calc-row total"><span>TOTAL AMOUNT DUE:</span><span>₱${total.toLocaleString(undefined, {minimumFractionDigits:2})} PHP</span></div>`);
 
+                const isPinagbigyan = bill.remarks && (bill.remarks.includes('[LEEWAY GRANTED]') || bill.remarks.includes('[PINAGBIGYAN]') || bill.remarks.includes('[OVERRIDE]'));
+                const pinagbigyanAlert = isPinagbigyan ? `
+                    <div style="background:var(--color-info-bg, #eff6ff);border:1px solid var(--color-info-border, #bfdbfe);border-radius:var(--radius-md, 8px);padding:12px 16px;margin-bottom:1rem;color:var(--color-info-text, #1e40af);font-size:0.85rem;line-height:1.45;">
+                        <div style="font-weight:700;display:flex;align-items:center;gap:0.45rem;margin-bottom:0.25rem;">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;">
+                                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                                <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                            </svg>
+                            <span>Leeway Accommodation Granted by Landlord</span>
+                        </div>
+                        <div style="color:var(--text-secondary);font-size:0.825rem;">${escapeHtml(bill.remarks)}</div>
+                    </div>
+                ` : '';
+
                 content.innerHTML = `
+                    ${pinagbigyanAlert}
                     <div class="bill-details-grid">
                         <div class="bill-details-item"><span class="bill-details-lbl">Tenant</span><span class="bill-details-val">${tenantName}</span></div>
                         <div class="bill-details-item"><span class="bill-details-lbl">Property Unit</span><span class="bill-details-val">${propertyName}</span></div>
@@ -1339,6 +2422,12 @@
                     ${bill.remarks ? `<div style="margin-top:1.5rem;"><span class="bill-details-lbl">Landlord Remarks & Breakdown Details</span><div class="contract-textarea" style="padding:0.75rem;background-color:var(--bg-primary);border-radius:4px;font-size:0.85rem;margin-top:0.25rem;border:1px solid var(--border-color);">${bill.remarks}</div></div>` : ''}
                 `;
 
+                const canOverride = bill.billing_status !== 'paid' && bill.billing_status !== 'cancelled';
+                const overrideBtn = document.getElementById('viewModalOverrideBtn');
+                if (overrideBtn) {
+                    overrideBtn.style.display = canOverride ? 'inline-flex' : 'none';
+                }
+
             } catch (err) {
                 console.error(err);
                 content.innerHTML = '<div style="text-align:center;padding:2rem;color:var(--error);">Failed to load details.</div>';
@@ -1348,6 +2437,172 @@
         function closeViewModal() {
             document.getElementById('viewBillModal').classList.add('hidden');
             document.getElementById('viewModalContent').innerHTML = '';
+            currentViewBillId = null;
+            const overrideBtn = document.getElementById('viewModalOverrideBtn');
+            if (overrideBtn) overrideBtn.style.display = 'none';
+        }
+
+        function openOverrideModal(billId) {
+            const bill = allBillings.find(b => b.id === billId);
+            if (!bill) return;
+            currentOverrideBill = bill;
+
+            document.getElementById('overrideBillId').value = bill.id;
+            document.getElementById('lblOverrideTenant').textContent = bill.users?.full_name || '—';
+            document.getElementById('lblOverrideProperty').textContent = bill.properties?.property_name || '—';
+            document.getElementById('lblOverrideMonth').textContent = bill.billing_month || '—';
+
+            let statusDisplay = (bill.billing_status || 'PENDING').replace(/_/g, ' ').toUpperCase();
+            document.getElementById('lblOverrideStatus').textContent = statusDisplay;
+
+            const dueDateInput = document.getElementById('overrideDueDate');
+            dueDateInput.value = bill.due_date || '';
+
+            const penaltyAmt = parseFloat(bill.penalty_amount || 0);
+            const waiveCheckbox = document.getElementById('overrideWaivePenalty');
+            const penaltyValSpan = document.getElementById('lblOverridePenaltyVal');
+            penaltyValSpan.textContent = `₱${penaltyAmt.toLocaleString(undefined, { minimumFractionDigits: 2 })}`;
+            
+            const groupWaivePenalty = document.getElementById('groupWaivePenalty');
+            if (penaltyAmt > 0) {
+                groupWaivePenalty.style.display = 'flex';
+                waiveCheckbox.checked = true;
+            } else {
+                groupWaivePenalty.style.display = 'none';
+                waiveCheckbox.checked = false;
+            }
+
+            document.getElementById('overrideDiscount').value = 0;
+            document.getElementById('overrideReason').value = '';
+
+            hideOverrideError();
+            recalculateOverridePreview();
+
+            document.getElementById('overrideModal').classList.remove('hidden');
+        }
+
+        function closeOverrideModal() {
+            document.getElementById('overrideModal').classList.add('hidden');
+            document.getElementById('overrideForm').reset();
+            hideOverrideError();
+            currentOverrideBill = null;
+        }
+
+        function showOverrideError(msg) {
+            const errorDiv = document.getElementById('overrideErrorMessage');
+            if (!errorDiv) return;
+            errorDiv.innerHTML = `
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0; margin-top: 1px;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                <div style="flex: 1; min-width: 0; word-break: break-word; overflow-wrap: break-word; white-space: normal;">${escapeHtml(msg)}</div>
+            `;
+            errorDiv.classList.remove('hidden');
+        }
+
+        function hideOverrideError() {
+            const errorDiv = document.getElementById('overrideErrorMessage');
+            if (errorDiv) {
+                errorDiv.classList.add('hidden');
+                errorDiv.innerHTML = '';
+            }
+        }
+
+        function recalculateOverridePreview() {
+            if (!currentOverrideBill) return;
+
+            const baseRent = parseFloat(currentOverrideBill.rent_amount || 0);
+            const water = parseFloat(currentOverrideBill.water || 0);
+            const electricity = parseFloat(currentOverrideBill.electricity || 0);
+            const internet = parseFloat(currentOverrideBill.internet || 0);
+            const parking = parseFloat(currentOverrideBill.parking || 0);
+            const other = parseFloat(currentOverrideBill.other_charges || 0);
+            const subtotal = baseRent + water + electricity + internet + parking + other;
+
+            const waiveChecked = document.getElementById('overrideWaivePenalty').checked;
+            const origPenalty = parseFloat(currentOverrideBill.penalty_amount || 0);
+            const effectivePenalty = waiveChecked ? 0 : origPenalty;
+
+            const discountVal = Math.max(0, parseFloat(document.getElementById('overrideDiscount').value) || 0);
+
+            const adjustedRent = Math.max(0, baseRent - discountVal);
+            const newTotal = adjustedRent + water + electricity + internet + parking + other + effectivePenalty;
+
+            document.getElementById('previewOverrideSubtotal').textContent = `₱${subtotal.toLocaleString(undefined, { minimumFractionDigits: 2 })}`;
+            
+            const rowPenalty = document.getElementById('rowPreviewPenalty');
+            if (origPenalty > 0) {
+                rowPenalty.style.display = 'flex';
+                document.getElementById('previewOverridePenalty').textContent = waiveChecked ? '₱0.00 (Waived)' : `₱${origPenalty.toLocaleString(undefined, { minimumFractionDigits: 2 })}`;
+            } else {
+                rowPenalty.style.display = 'none';
+            }
+
+            const rowDiscount = document.getElementById('rowPreviewDiscount');
+            if (discountVal > 0) {
+                rowDiscount.style.display = 'flex';
+                document.getElementById('previewOverrideDiscount').textContent = `- ₱${discountVal.toLocaleString(undefined, { minimumFractionDigits: 2 })}`;
+            } else {
+                rowDiscount.style.display = 'none';
+            }
+
+            document.getElementById('previewOverrideTotal').textContent = `₱${newTotal.toLocaleString(undefined, { minimumFractionDigits: 2 })} PHP`;
+        }
+
+        async function handleOverrideSubmit(e) {
+            e.preventDefault();
+            hideOverrideError();
+
+            if (!currentOverrideBill) return;
+
+            const billId = document.getElementById('overrideBillId').value;
+            const newDueDate = document.getElementById('overrideDueDate').value;
+            const waivePenalty = document.getElementById('overrideWaivePenalty').checked;
+            const discountAmount = parseFloat(document.getElementById('overrideDiscount').value) || 0;
+            const reason = document.getElementById('overrideReason').value.trim();
+
+            if (!newDueDate) {
+                showOverrideError('Please select a valid extended due date for this leeway.');
+                return;
+            }
+
+            const confirmBtn = document.getElementById('btnConfirmOverride');
+            confirmBtn.disabled = true;
+            confirmBtn.textContent = 'Applying leeway...';
+
+            try {
+                const res = await fetch(`/api/billings/${billId}/override`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        extended_due_date: newDueDate,
+                        waive_penalty: waivePenalty,
+                        discount_amount: discountAmount,
+                        override_reason: reason
+                    })
+                });
+
+                const result = await res.json();
+                if (res.ok) {
+                    alert('Leeway has been applied successfully for this billing statement.');
+                    closeOverrideModal();
+                    loadBillingDashboard();
+                } else {
+                    showOverrideError(result.message || 'Failed to apply billing leeway.');
+                }
+            } catch (err) {
+                console.error(err);
+                showOverrideError('A network error occurred. Please try again.');
+            } finally {
+                confirmBtn.disabled = false;
+                confirmBtn.innerHTML = `
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                    <span>Apply Leeway</span>
+                `;
+            }
         }
     </script>
 </body>

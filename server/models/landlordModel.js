@@ -219,6 +219,89 @@ const landlordModel = {
         return data;
     },
 
+    computeTenantOverallRating({ tenant, screening, tenantHistory, docCount }) {
+        tenantHistory = tenantHistory || { leases: [], violations: [], unpaid_balance: 0, unpaid_bills_count: 0 };
+        const leases = tenantHistory.leases || [];
+        const vios = tenantHistory.violations || [];
+        const unpaid = Number(tenantHistory.unpaid_balance) || 0;
+        const unpaidBillsCount = Number(tenantHistory.unpaid_bills_count) || 0;
+        const hasPriorLeases = leases.length > 0;
+
+        const directRating = Number(tenant?.landlord_average_rating) || 0;
+
+        let score = 100;
+        let label = 'Exceptional';
+        let badgeClass = 'status-active';
+        let summary = 'Clean Record · 0 Overdue';
+        let isFirstTime = false;
+
+        if (!hasPriorLeases && (!screening || !screening.previous_rental_history)) {
+            isFirstTime = true;
+            score = 90;
+            if (docCount >= 2 || tenant?.is_verified) {
+                score = 94; // 4.7 Stars
+            } else if (docCount >= 1) {
+                score = 90; // 4.5 Stars
+            } else {
+                score = 82; // 4.1 Stars
+            }
+            label = 'First-Time Renter';
+            summary = 'Verified Credentials · Clean Record';
+        } else {
+            if (unpaid > 0 || unpaidBillsCount > 0) {
+                score -= Math.min(45, (unpaidBillsCount * 15) + (unpaid > 5000 ? 20 : 10));
+            }
+
+            const terminatedCount = leases.filter(l => l.lease_status === 'terminated' || l.lease_status === 'cancelled').length;
+            if (terminatedCount > 0) {
+                score -= Math.min(30, terminatedCount * 20);
+            }
+
+            if (vios.length > 0) {
+                score -= Math.min(25, vios.length * 10);
+            }
+
+            if (screening && String(screening.previous_rental_history).toLowerCase() === 'negative') {
+                score -= 20;
+            }
+
+            if (directRating > 0) {
+                score = Math.round((score * 0.6) + ((directRating * 20) * 0.4));
+            }
+        }
+
+        score = Math.max(20, Math.min(100, score));
+        const starRating = Number((score / 20).toFixed(1));
+
+        if (starRating >= 4.5) {
+            label = isFirstTime ? 'First-Time Renter' : 'Exceptional';
+            badgeClass = 'status-active';
+            if (!isFirstTime) summary = 'Clean Record · In Good Standing';
+        } else if (starRating >= 4.0) {
+            label = isFirstTime ? 'First-Time Renter' : 'Good Standing';
+            badgeClass = 'status-active';
+            if (!isFirstTime) summary = 'Clean Record · In Good Standing';
+        } else if (starRating >= 3.0) {
+            label = 'Moderate Risk';
+            badgeClass = 'status-pending';
+            summary = 'Moderate Record · Discretion Advised';
+        } else {
+            label = 'High Risk';
+            badgeClass = 'status-rejected';
+            summary = 'Adverse Track Record · Discretion Advised';
+        }
+
+        return {
+            score: starRating,
+            numeric_score: score,
+            stars: Math.round(starRating),
+            label,
+            badge_class: badgeClass,
+            summary,
+            is_first_time: isFirstTime
+        };
+    },
+
     async findTenantApplications(landlordId) {
         // Find tenant applications submitted to properties owned by this landlord
         const { data, error } = await supabase
@@ -238,7 +321,9 @@ const landlordModel = {
                 users!tenant_id (
                     full_name,
                     email,
-                    contact_number
+                    contact_number,
+                    is_verified,
+                    landlord_average_rating
                 ),
                 properties (
                     id,
@@ -267,23 +352,75 @@ const landlordModel = {
         const filtered = data || [];
         if (filtered.length === 0) return [];
 
-        // Fetch document counts
+        // Fetch document counts and screening/history records in parallel
         const appIds = filtered.map(a => a.id);
-        const { data: docRecords, error: docsErr } = await supabase
-            .from('tenant_application_documents')
-            .select('application_id')
-            .in('application_id', appIds);
-        if (docsErr) throw docsErr;
+        const tenantIds = Array.from(new Set(filtered.map(a => a.tenant_id).filter(Boolean)));
+
+        const [docsRes, screeningsRes, leasesRes, viosRes, unpaidRes] = await Promise.all([
+            supabase.from('tenant_application_documents').select('application_id').in('application_id', appIds),
+            tenantIds.length > 0 ? supabase.from('tenant_screening').select('*').in('tenant_id', tenantIds) : Promise.resolve({ data: [] }),
+            tenantIds.length > 0 ? supabase.from('lease_records').select('id, tenant_id, lease_status').in('tenant_id', tenantIds) : Promise.resolve({ data: [] }),
+            tenantIds.length > 0 ? supabase.from('policy_violations').select('id, violator_id, status').in('violator_id', tenantIds) : Promise.resolve({ data: [] }),
+            tenantIds.length > 0 ? supabase.from('billing_records').select('tenant_id, total_amount, billing_status').in('tenant_id', tenantIds).in('billing_status', ['unpaid', 'overdue']) : Promise.resolve({ data: [] })
+        ]);
 
         const docsMap = {};
-        (docRecords || []).forEach(doc => {
+        (docsRes.data || []).forEach(doc => {
             docsMap[doc.application_id] = (docsMap[doc.application_id] || 0) + 1;
         });
 
-        return filtered.map(a => ({
-            ...a,
-            document_count: docsMap[a.id] || 0
-        }));
+        const screeningsMap = {};
+        (screeningsRes.data || []).forEach(s => {
+            if (s.application_id) screeningsMap[s.application_id] = s;
+            if (s.tenant_id && !screeningsMap[s.tenant_id]) screeningsMap[s.tenant_id] = s;
+        });
+
+        const leasesMap = {};
+        (leasesRes.data || []).forEach(l => {
+            leasesMap[l.tenant_id] = leasesMap[l.tenant_id] || [];
+            leasesMap[l.tenant_id].push(l);
+        });
+
+        const viosMap = {};
+        (viosRes.data || []).forEach(v => {
+            viosMap[v.violator_id] = viosMap[v.violator_id] || [];
+            viosMap[v.violator_id].push(v);
+        });
+
+        const unpaidMap = {};
+        (unpaidRes.data || []).forEach(b => {
+            unpaidMap[b.tenant_id] = unpaidMap[b.tenant_id] || { balance: 0, count: 0 };
+            unpaidMap[b.tenant_id].balance += Number(b.total_amount) || 0;
+            unpaidMap[b.tenant_id].count += 1;
+        });
+
+        return filtered.map(a => {
+            const docCount = docsMap[a.id] || 0;
+            const tenantLeases = leasesMap[a.tenant_id] || [];
+            const tenantVios = viosMap[a.tenant_id] || [];
+            const tenantUnpaid = unpaidMap[a.tenant_id] || { balance: 0, count: 0 };
+            const screening = screeningsMap[a.id] || screeningsMap[a.tenant_id] || null;
+
+            const tenantHistory = {
+                leases: tenantLeases,
+                violations: tenantVios,
+                unpaid_balance: tenantUnpaid.balance,
+                unpaid_bills_count: tenantUnpaid.count
+            };
+
+            const tenantRating = landlordModel.computeTenantOverallRating({
+                tenant: a.users,
+                screening,
+                tenantHistory,
+                docCount
+            });
+
+            return {
+                ...a,
+                document_count: docCount,
+                tenant_rating: tenantRating
+            };
+        });
     },
 
     async findApplicationDetails(id, landlordId) {
@@ -451,11 +588,19 @@ const landlordModel = {
             }
         }
 
+        const tenantRating = landlordModel.computeTenantOverallRating({
+            tenant: application.users,
+            screening,
+            tenantHistory,
+            docCount: (documents || []).length
+        });
+
         return {
             ...application,
             documents,
             screening,
-            tenant_history: tenantHistory
+            tenant_history: tenantHistory,
+            tenant_rating: tenantRating
         };
     },
 

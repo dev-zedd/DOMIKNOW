@@ -5,7 +5,6 @@
         { key: 'access', label: 'Access', href: 'users.html' },
         { key: 'verify', label: 'Verify', href: 'property-review.html' },
         { key: 'monitor', label: 'Monitor', href: 'payments.html' },
-        { key: 'resolve', label: 'Resolve', href: 'reports.html' },
         { key: 'govern', label: 'Govern', href: 'policy-management.html' }
     ];
 
@@ -37,18 +36,10 @@
             description: 'Audit submitted payment evidence, reference codes, parties, billing periods, and verification outcomes.',
             stage: 'monitor'
         },
-        'reports.html': {
-            eyebrow: 'Trust & safety operations',
-            description: 'Triage reports by urgency, collect balanced evidence, and record proportionate, traceable outcomes.',
-            stage: 'resolve',
-            showSummary: false
-        },
-        'report-detail.html': {
-            eyebrow: 'Case investigation',
-            description: 'Keep allegations, evidence, inquiries, explanations, and the final administrative decision in one case record.',
-            stage: 'resolve',
-            showSummary: false,
-            action: { label: 'Back to case queue', href: 'reports.html', secondary: true }
+        'maintenance.html': {
+            eyebrow: 'Maintenance',
+            description: 'Manage work orders, technician assignments, and repair costs.',
+            stage: 'monitor'
         },
         'policy-management.html': {
             eyebrow: 'Policy governance',
@@ -106,18 +97,8 @@
         });
         content.querySelectorAll('form').forEach(form => form.classList.add('admin-form'));
 
-        if (['users.html', 'reservations.html'].includes(page)) {
-            content.querySelectorAll('.nav-back').forEach(back => {
-                if (back.querySelector('a[href="reports.html"]')) back.remove();
-            });
-        }
-
         removeDuplicatePageHeading(content, page);
         addDirectoryControls(content, page);
-
-        if (page === 'reports.html') {
-            document.getElementById('investigateModal')?.remove();
-        }
     }
 
     function removeDuplicatePageHeading(content, page) {
@@ -322,31 +303,17 @@
 
     function renderOverviewAnalytics(data) {
         const availableValue = (source, records) => data.availability[source] ? records.length : null;
-        const reportsAvailable = data.availability.tenantReports || data.availability.landlordReports;
-        const reportsComplete = data.availability.tenantReports && data.availability.landlordReports;
         const workload = [
             { label: 'Account approvals', value: availableValue('users', data.pendingUsers), tone: 'primary' },
             { label: 'Property reviews', value: availableValue('properties', data.pendingProperties), tone: 'navy' },
             { label: 'Reservation decisions', value: availableValue('reservations', data.pendingReservations), tone: 'cyan' },
-            { label: 'Payment checks', value: availableValue('payments', data.pendingPayments), tone: 'violet' },
-            { label: reportsComplete ? 'Open cases' : 'Open cases (partial)', value: reportsAvailable ? data.openReports.length : null, tone: 'amber' }
+            { label: 'Payment checks', value: availableValue('payments', data.pendingPayments), tone: 'violet' }
         ];
-        const urgentSeverities = new Set(['critical', 'major', 'high', 'urgent']);
-        const lowSeverities = new Set(['low', 'minor']);
-        const urgentCases = data.openReports.filter(report => urgentSeverities.has(String(report.severity || '').toLowerCase()));
-        const lowCases = data.openReports.filter(report => lowSeverities.has(String(report.severity || '').toLowerCase()));
-        const standardCases = data.openReports.filter(report => !urgentCases.includes(report) && !lowCases.includes(report));
 
         renderBarChart('adminWorkloadChart', workload);
-        renderBarChart('adminCaseChart', [
-            { label: 'Urgent', value: reportsAvailable ? urgentCases.length : null, tone: 'amber' },
-            { label: 'Standard', value: reportsAvailable ? standardCases.length : null, tone: 'primary' },
-            { label: 'Low', value: reportsAvailable ? lowCases.length : null, tone: 'teal' }
-        ]);
 
         const knownWorkload = workload.map(item => item.value).filter(Number.isFinite);
         setMetric('adminAnalyticsWorkloadTotal', knownWorkload.length ? knownWorkload.reduce((sum, value) => sum + value, 0) : Number.NaN);
-        setMetric('adminUrgentCases', reportsAvailable ? urgentCases.length : Number.NaN);
         const oldest = document.getElementById('adminOldestQueueAge');
         if (oldest) {
             oldest.textContent = data.availableSources
@@ -354,8 +321,7 @@
                     ...data.pendingUsers,
                     ...data.pendingProperties,
                     ...data.pendingReservations,
-                    ...data.pendingPayments,
-                    ...data.openReports
+                    ...data.pendingPayments
                 ])
                 : 'Unavailable';
         }
@@ -378,34 +344,23 @@
             requestData('/api/users', token),
             requestData('/api/admin/properties/review', token),
             requestData('/api/reservations', token),
-            requestData('/api/admin/monitor/payments', token),
-            requestData('/api/admin/tenant-reports', token),
-            requestData('/api/admin/landlord-reports', token)
+            requestData('/api/admin/monitor/payments', token)
         ]);
-        const [usersResult, propertiesResult, reservationsResult, paymentsResult, tenantReportsResult, landlordReportsResult] = requests;
+        const [usersResult, propertiesResult, reservationsResult, paymentsResult] = requests;
         const users = usersResult.status === 'fulfilled' ? usersResult.value : [];
         const properties = propertiesResult.status === 'fulfilled' ? propertiesResult.value : [];
         const reservations = reservationsResult.status === 'fulfilled' ? reservationsResult.value : [];
         const payments = paymentsResult.status === 'fulfilled' ? paymentsResult.value : [];
-        const tenantReports = tenantReportsResult.status === 'fulfilled'
-            ? tenantReportsResult.value.map(item => ({ ...item, _type: 'tenant_report' })) : [];
-        const landlordReports = landlordReportsResult.status === 'fulfilled'
-            ? landlordReportsResult.value.map(item => ({ ...item, _type: 'landlord_report' })) : [];
-        const reports = [...tenantReports, ...landlordReports];
-        const openStatuses = new Set(['pending', 'pending_admin_review', 'in_review', 'needs_more_evidence']);
 
         const pendingUsers = users.filter(user => user.account_status === 'pending');
         const pendingProperties = properties.filter(property => property.status === 'pending_review');
         const pendingReservations = reservations.filter(reservation => reservation.status === 'pending');
         const pendingPayments = payments.filter(payment => ['pending', 'pending_verification'].includes(payment.payment_status));
-        const openReports = reports.filter(report => openStatuses.has(report.status));
         const availability = {
             users: usersResult.status === 'fulfilled',
             properties: propertiesResult.status === 'fulfilled',
             reservations: reservationsResult.status === 'fulfilled',
-            payments: paymentsResult.status === 'fulfilled',
-            tenantReports: tenantReportsResult.status === 'fulfilled',
-            landlordReports: landlordReportsResult.status === 'fulfilled'
+            payments: paymentsResult.status === 'fulfilled'
         };
 
         renderOverviewAnalytics({
@@ -413,7 +368,6 @@
             pendingProperties,
             pendingReservations,
             pendingPayments,
-            openReports,
             availability,
             availableSources: requests.filter(result => result.status === 'fulfilled').length,
             totalSources: requests.length
@@ -423,17 +377,8 @@
         setMetric('overviewPendingProperties', availability.properties ? pendingProperties.length : Number.NaN);
         setMetric('overviewPendingReservations', availability.reservations ? pendingReservations.length : Number.NaN);
         setMetric('overviewPendingPayments', availability.payments ? pendingPayments.length : Number.NaN);
-        setMetric('overviewOpenCases', availability.tenantReports || availability.landlordReports ? openReports.length : Number.NaN);
 
         const priorityItems = [
-            ...openReports.map(report => ({
-                kind: 'Case',
-                title: formatLabel(report.report_category || 'Incident report'),
-                meta: `${formatLabel(report.severity || 'normal')} priority · ${formatLabel(report.status)}`,
-                date: report.created_at,
-                href: `report-detail.html?id=${encodeURIComponent(report.id)}&type=${encodeURIComponent(report._type)}`,
-                priority: ['critical', 'major', 'high'].includes(report.severity) ? 4 : 3
-            })),
             ...pendingProperties.map(property => ({
                 kind: 'Property',
                 title: property.property_name || 'Property submission',
@@ -510,20 +455,14 @@
         const layout = document.querySelector('.dashboard-layout-admin');
         const content = layout?.querySelector('.main-content-inner');
         const page = currentPage();
-        const meta = PAGE_META[page];
-        if (!layout || !content || !meta || content.querySelector('.admin-module-intro')) return;
+
+        if (!layout || !content) return;
 
         document.body.setAttribute('data-admin-page', page.replace('.html', ''));
-        const intro = document.createElement('div');
-        intro.className = 'admin-module-intro';
-        if (meta.showSummary === true) intro.appendChild(createSummary(meta));
-        const flow = createGovernanceFlow(meta.stage);
-        if (flow) intro.appendChild(flow);
-        if (intro.childNodes.length > 0) {
-            const breadcrumbs = content.querySelector(':scope > [data-domiknow-breadcrumbs]');
-            if (breadcrumbs) breadcrumbs.insertAdjacentElement('afterend', intro);
-            else content.insertBefore(intro, content.firstChild);
-        }
+
+        // Remove admin operating workflow navigation bar and intro across all pages
+        content.querySelectorAll('.admin-module-intro, .admin-page-summary').forEach((el) => el.remove());
+
         enhanceAdminContent(content, page);
     }
 

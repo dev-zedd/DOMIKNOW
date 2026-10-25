@@ -1,13 +1,6 @@
 (function () {
     'use strict';
 
-    const OPERATING_STEPS = [
-        { key: 'portfolio', label: 'Portfolio', href: 'properties.html' },
-        { key: 'applicants', label: 'Tenant Applications', href: 'applications.html' },
-        { key: 'leases', label: 'Lease Agreements', href: 'leases.html' },
-        { key: 'revenue', label: 'Financials', href: 'billings.html' }
-    ];
-
     const nativeAlert = window.alert.bind(window);
     let presentingLandlordNotice = false;
 
@@ -112,19 +105,6 @@
             eyebrow: 'Maintenance case',
             description: 'Review the issue, evidence, assignment, work updates, costs, and tenant confirmation in one record.'
         },
-        'reports.html': {
-            eyebrow: 'Safety & accountability',
-            description: 'File tenant concerns, respond to reports involving you, and follow administrative inquiries and outcomes.'
-        },
-        'tenant-report-form.html': {
-            eyebrow: 'New incident report',
-            description: 'Connect the incident to a verified tenancy, explain what occurred, and attach relevant evidence.'
-        },
-        'landlord-reports.html': {
-            eyebrow: 'Reports involving you',
-            description: 'Review allegations, administrative status, available evidence, and submit your explanation when requested.',
-            action: { label: 'Reports center', href: 'reports.html', secondary: true }
-        },
         'disputes.html': {
             eyebrow: 'Resolution center',
             description: 'Track complaints and disputes by status, respond with context, and preserve a clear case history.'
@@ -152,32 +132,6 @@
 
     function currentPage() {
         return window.location.pathname.split('/').pop() || 'properties.html';
-    }
-
-    function createOperatingFlow(activeStep) {
-        if (!activeStep) return null;
-
-        const nav = document.createElement('nav');
-        nav.className = 'landlord-flow';
-        nav.setAttribute('aria-label', 'Landlord operating flow');
-
-        OPERATING_STEPS.forEach((step, index) => {
-            const link = document.createElement('a');
-            link.href = step.href;
-            link.className = `landlord-flow-step${step.key === activeStep ? ' active' : ''}`;
-            if (step.key === activeStep) link.setAttribute('aria-current', 'step');
-
-            const number = document.createElement('span');
-            number.className = 'landlord-flow-number';
-            number.textContent = String(index + 1);
-
-            const label = document.createElement('span');
-            label.textContent = step.label;
-            link.append(number, label);
-            nav.appendChild(link);
-        });
-
-        return nav;
     }
 
     function createSummary(meta) {
@@ -253,6 +207,9 @@
 
     function addTableControls(table) {
         if (!table.tHead
+            || table.dataset.noControls === 'true'
+            || table.closest('[data-no-auto-controls]')
+            || table.closest('.list-card')?.querySelector('#maintenanceSearchInput')
             || table.closest('.modal-overlay, .chat-head-modal')
             || table.previousElementSibling?.classList.contains('landlord-table-controls')) return;
 
@@ -451,7 +408,6 @@
         const layout = document.querySelector('.dashboard-layout-landlord');
         const content = layout && layout.querySelector('.main-content-inner');
         const page = currentPage();
-        const meta = PAGE_META[page];
 
         if (!layout || !content) return;
 
@@ -463,21 +419,8 @@
             document.body.dataset.landlordEnhanced = 'true';
         }
 
-        if (!meta) return;
-
-        if (content.querySelector('.landlord-module-intro')) return;
-
-        const intro = document.createElement('div');
-        intro.className = 'landlord-module-intro';
-
-        const flow = createOperatingFlow(meta.step);
-        if (flow) intro.appendChild(flow);
-
-        if (!intro.hasChildNodes()) return;
-
-        const breadcrumbs = content.querySelector(':scope > [data-domiknow-breadcrumbs]');
-        if (breadcrumbs) breadcrumbs.insertAdjacentElement('afterend', intro);
-        else content.insertBefore(intro, content.firstChild);
+        // Remove landlord operating workflow navigation bar across all pages
+        content.querySelectorAll('.landlord-module-intro, .landlord-flow').forEach((el) => el.remove());
     }
 
     if (document.readyState === 'loading') {

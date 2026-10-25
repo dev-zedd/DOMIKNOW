@@ -1,0 +1,833 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DOMIKNOW - System Flowcharts (Thesis & Documentation Standard)</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background-color: #f1f3f5;
+            color: #000000;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Top Bar */
+        header {
+            background-color: #ffffff;
+            border-bottom: 2px solid #000000;
+            padding: 12px 24px;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+
+        .header-wrap {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .title-group h1 {
+            font-size: 1.25rem;
+            font-weight: bold;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .title-group p {
+            font-size: 0.8rem;
+            color: #444444;
+            margin-top: 2px;
+        }
+
+        .btn-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            background-color: #ffffff;
+            color: #000000;
+            border: 1.5px solid #000000;
+            padding: 7px 14px;
+            font-size: 0.82rem;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: all 0.15s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-family: inherit;
+        }
+
+        .btn:hover {
+            background-color: #000000;
+            color: #ffffff;
+        }
+
+        .btn-active {
+            background-color: #000000;
+            color: #ffffff;
+        }
+
+        /* Role Navigation Tabs */
+        .tabs-nav {
+            background-color: #ffffff;
+            border-bottom: 1.5px solid #000000;
+            padding: 6px 24px 0;
+        }
+
+        .tabs-wrap {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            gap: 6px;
+            overflow-x: auto;
+        }
+
+        .tab-btn {
+            background-color: #ffffff;
+            border: 1.5px solid #000000;
+            border-bottom: none;
+            padding: 9px 16px;
+            font-size: 0.86rem;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 4px 4px 0 0;
+            color: #000000;
+            white-space: nowrap;
+            transition: all 0.15s;
+        }
+
+        .tab-btn:hover {
+            background-color: #eeeeee;
+        }
+
+        .tab-btn.active {
+            background-color: #000000;
+            color: #ffffff;
+        }
+
+        /* Controls / Sub-Bar */
+        .controls-bar {
+            max-width: 1400px;
+            margin: 14px auto 0;
+            padding: 0 24px;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .format-toggle {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.82rem;
+            font-weight: bold;
+        }
+
+        .zoom-wrap {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            background: #ffffff;
+            border: 1px solid #000000;
+            border-radius: 4px;
+            padding: 2px 6px;
+        }
+
+        .zoom-btn {
+            background: transparent;
+            border: none;
+            font-weight: bold;
+            font-size: 1rem;
+            cursor: pointer;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .zoom-btn:hover {
+            background: #eeeeee;
+        }
+
+        .zoom-label {
+            font-size: 0.78rem;
+            font-weight: bold;
+            padding: 0 4px;
+        }
+
+        /* Main Canvas Sheet */
+        .workspace {
+            max-width: 1400px;
+            width: 100%;
+            margin: 14px auto 30px;
+            padding: 0 24px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .paper-sheet {
+            background-color: #ffffff;
+            border: 1px solid #cccccc;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+            padding: 30px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: auto;
+            max-width: 100%;
+            border-radius: 2px;
+        }
+
+        .flowchart-svg {
+            display: block;
+            background-color: #ffffff;
+            transition: transform 0.2s ease-out;
+            transform-origin: top center;
+        }
+
+        /* Toast Feedback */
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            background-color: #000000;
+            color: #ffffff;
+            padding: 10px 18px;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            opacity: 0;
+            pointer-events: none;
+            transform: translateY(10px);
+            transition: all 0.25s;
+            z-index: 1000;
+        }
+
+        .toast.show {
+            opacity: 1;
+            pointer-events: auto;
+            transform: translateY(0);
+        }
+
+        /* Print Media Styles */
+        @media print {
+            header, .tabs-nav, .controls-bar, .toast {
+                display: none !important;
+            }
+            body, .workspace, .paper-sheet {
+                background: #ffffff !important;
+                box-shadow: none !important;
+                border: none !important;
+                padding: 0 !important;
+                margin: 0 !important;
+            }
+            .flowchart-svg {
+                transform: scale(1) !important;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <header>
+        <div class="header-wrap">
+            <div class="title-group">
+                <h1>DOMIKNOW &bull; SYSTEM FLOWCHART</h1>
+                <p>Black &amp; White Academic Documentation &amp; Thesis Specification Standard</p>
+            </div>
+
+            <div class="btn-group">
+                <button class="btn" onclick="copyCurrentToClipboard()" title="Copy PNG image to clipboard for Word/Docs">
+                    📋 Copy PNG
+                </button>
+                <button class="btn btn-active" onclick="downloadCurrentPNG()" title="Download high-resolution 300 DPI PNG">
+                    📥 Download PNG (Thesis Ready)
+                </button>
+                <button class="btn" onclick="downloadAllRolesPNG()" title="Download all role flowcharts">
+                    📦 Download All (5 Roles)
+                </button>
+                <button class="btn" onclick="window.print()" title="Print page or save as PDF">
+                    🖨️ Print
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Role Navigation Tabs -->
+    <nav class="tabs-nav">
+        <div class="tabs-wrap">
+            <button class="tab-btn active" data-role="tenant" onclick="selectRole('tenant', this)">
+                TENANT
+            </button>
+            <button class="tab-btn" data-role="landlord" onclick="selectRole('landlord', this)">
+                LANDLORD
+            </button>
+            <button class="tab-btn" data-role="maintenance" onclick="selectRole('maintenance', this)">
+                MAINTENANCE PERSONNEL
+            </button>
+            <button class="tab-btn" data-role="admin" onclick="selectRole('admin', this)">
+                ADMINISTRATOR
+            </button>
+            <button class="tab-btn" data-role="public" onclick="selectRole('public', this)">
+                PUBLIC VISITOR
+            </button>
+        </div>
+    </nav>
+
+    <!-- Controls Bar -->
+    <div class="controls-bar">
+        <div class="format-toggle">
+            <span>Layout Style:</span>
+            <button class="btn btn-active" id="btnLayoutLinear" onclick="setLayoutMode('linear')" style="padding: 4px 10px; font-size: 0.78rem;">
+                Standard 2-Column (Matched to Photo)
+            </button>
+            <button class="btn" id="btnLayoutDecision" onclick="setLayoutMode('decision')" style="padding: 4px 10px; font-size: 0.78rem;">
+                With Decision Diamonds (Yes/No)
+            </button>
+        </div>
+
+        <div class="zoom-wrap">
+            <button class="zoom-btn" onclick="zoom(-0.1)" title="Zoom Out">−</button>
+            <span class="zoom-label" id="zoomText">100%</span>
+            <button class="zoom-btn" onclick="zoom(0.1)" title="Zoom In">+</button>
+            <button class="zoom-btn" onclick="resetZoom()" title="Reset Zoom">⟲</button>
+        </div>
+    </div>
+
+    <!-- Main Workspace -->
+    <main class="workspace">
+        <div class="paper-sheet" id="paperSheet">
+            <div id="svgContainer"></div>
+        </div>
+    </main>
+
+    <!-- Toast -->
+    <div class="toast" id="toast">Diagram PNG exported successfully!</div>
+
+    <script>
+        let currentRole = 'tenant';
+        let currentLayout = 'linear'; // 'linear' or 'decision'
+        let currentScale = 1.0;
+
+        // Filename and Titles Mapping
+        const meta = {
+            tenant: { title: "TENANT", filename: "DOMIKNOW_Flowchart_Tenant_BW.png" },
+            landlord: { title: "LANDLORD", filename: "DOMIKNOW_Flowchart_Landlord_BW.png" },
+            maintenance: { title: "MAINTENANCE PERSONNEL", filename: "DOMIKNOW_Flowchart_Maintenance_BW.png" },
+            admin: { title: "ADMINISTRATOR", filename: "DOMIKNOW_Flowchart_Admin_BW.png" },
+            public: { title: "PUBLIC VISITOR", filename: "DOMIKNOW_Flowchart_Public_BW.png" }
+        };
+
+        // Common SVG Definitions (Black & White Marker)
+        const svgDefs = `
+        <defs>
+            <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                <path d="M 0 1.5 L 9 5 L 0 8.5 z" fill="#000000" />
+            </marker>
+        </defs>`;
+
+        // Helper to generate text lines inside rectangle
+        function renderBox(x, y, w, h, lines) {
+            let svg = `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="#ffffff" stroke="#000000" stroke-width="1.3" />`;
+            const cx = x + w / 2;
+            if (lines.length === 1) {
+                const cy = y + h / 2 + 4;
+                svg += `<text x="${cx}" y="${cy}" text-anchor="middle" font-family="Arial, sans-serif" font-size="12.5" fill="#000000">${lines[0]}</text>`;
+            } else if (lines.length === 2) {
+                const cy1 = y + h / 2 - 4;
+                const cy2 = y + h / 2 + 12;
+                svg += `<text x="${cx}" y="${cy1}" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#000000">${lines[0]}</text>`;
+                svg += `<text x="${cx}" y="${cy2}" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#000000">${lines[1]}</text>`;
+            } else if (lines.length === 3) {
+                const cy1 = y + h / 2 - 12;
+                const cy2 = y + h / 2 + 3;
+                const cy3 = y + h / 2 + 18;
+                svg += `<text x="${cx}" y="${cy1}" text-anchor="middle" font-family="Arial, sans-serif" font-size="11.5" fill="#000000">${lines[0]}</text>`;
+                svg += `<text x="${cx}" y="${cy2}" text-anchor="middle" font-family="Arial, sans-serif" font-size="11.5" fill="#000000">${lines[1]}</text>`;
+                svg += `<text x="${cx}" y="${cy3}" text-anchor="middle" font-family="Arial, sans-serif" font-size="11.5" fill="#000000">${lines[2]}</text>`;
+            }
+            return svg;
+        }
+
+        // Helper for Oval (Start / End)
+        function renderOval(cx, cy, rx, ry, text) {
+            return `
+            <ellipse cx="${cx}" cy="${cy}" rx="${rx}" ry="${ry}" fill="#ffffff" stroke="#000000" stroke-width="1.3" />
+            <text x="${cx}" y="${cy + 4.5}" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" font-weight="bold" fill="#000000">${text}</text>`;
+        }
+
+        // ==========================================
+        // 1. LINEAR 2-COLUMN FLOWCHARTS (MATCHED TO PHOTO)
+        // ==========================================
+        function getLinearSVG(role) {
+            const W = 700;
+            const H = 780;
+            let svg = `<svg id="activeFlowchart" class="flowchart-svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">`;
+            svg += svgDefs;
+            svg += `<rect width="${W}" height="${H}" fill="#ffffff" />`;
+            // Outer Frame (Thesis page figure border)
+            svg += `<rect x="25" y="25" width="${W - 50}" height="${H - 50}" fill="#ffffff" stroke="#000000" stroke-width="1.2" />`;
+            // Top Title
+            svg += `<text x="${W / 2}" y="65" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#000000" letter-spacing="1">${meta[role].title}</text>`;
+
+            const col1X = 205; // Center X of col 1
+            const col2X = 495; // Center X of col 2
+            const boxW = 190;
+            const boxH = 46;
+            const startY = 105;
+            const gapY = 66;
+
+            let col1Steps = [];
+            let col2Steps = [];
+
+            if (role === 'tenant') {
+                col1Steps = [
+                    ["Register tenant", "account"],
+                    ["Verify email address", "via 6-digit code"],
+                    ["Log in to system"],
+                    ["Search and filter", "rental properties"],
+                    ["View property details", "and GIS map"],
+                    ["Fill out rental", "application form"],
+                    ["Upload required", "documents (ID, income)"]
+                ];
+                col2Steps = [
+                    ["Wait for landlord", "application approval"],
+                    ["Review and sign", "digital lease agreement"],
+                    ["View monthly utility bill", "and submeter readings"],
+                    ["Upload proof of", "payment receipt"],
+                    ["Submit maintenance", "ticket or repair request"],
+                    ["Submit rating", "and feedback"]
+                ];
+            } else if (role === 'landlord') {
+                col1Steps = [
+                    ["Register landlord", "account"],
+                    ["Verify email address", "via 6-digit code"],
+                    ["Wait for administrator", "account approval"],
+                    ["Log in to system"],
+                    ["Add property listing", "and unit details"],
+                    ["Upload business permit", "and proof of ownership"],
+                    ["Wait for admin", "property review"]
+                ];
+                col2Steps = [
+                    ["Receive tenant", "rental application"],
+                    ["Evaluate applicant", "screening score (0-100)"],
+                    ["Approve application and", "generate digital lease"],
+                    ["Record electric and", "water submeter readings"],
+                    ["Verify tenant payment", "receipt and reference #"],
+                    ["Assign maintenance", "ticket to personnel"]
+                ];
+            } else if (role === 'maintenance') {
+                col1Steps = [
+                    ["Register maintenance", "personnel account"],
+                    ["Verify email address", "via 6-digit code"],
+                    ["Wait for administrator", "account approval"],
+                    ["Log in to system"],
+                    ["View assigned", "maintenance task queue"]
+                ];
+                col2Steps = [
+                    ["Inspect unit and", "diagnose reported issue"],
+                    ["Update task status", "to In Progress"],
+                    ["Perform required", "technical repair work"],
+                    ["Upload photo proof", "of completed repair"],
+                    ["Mark maintenance task", "as Completed"]
+                ];
+            } else if (role === 'admin') {
+                col1Steps = [
+                    ["Log in to system", "administrator portal"],
+                    ["View pending user", "registration list"],
+                    ["Verify landlord and", "maintenance accounts"],
+                    ["Approve or reject", "user accounts"],
+                    ["View submitted", "property review queue"]
+                ];
+                col2Steps = [
+                    ["Verify business permit", "and proof of ownership"],
+                    ["Approve or reject", "property listings"],
+                    ["Monitor active leases", "and billing records"],
+                    ["Investigate user reports", "and policy violations"],
+                    ["Review system-wide", "audit logs"]
+                ];
+            } else if (role === 'public') {
+                col1Steps = [
+                    ["Visit DOMIKNOW", "web platform"],
+                    ["Browse available", "rental properties"],
+                    ["Filter by price,", "bedrooms, and amenities"],
+                    ["Explore property", "locations on GIS map"]
+                ];
+                col2Steps = [
+                    ["Compare selected", "rental properties"],
+                    ["View complete", "property details"],
+                    ["Click Apply Now", "button on selected unit"],
+                    ["Redirect to account", "registration or login"]
+                ];
+            }
+
+            // Render Column 1
+            // Start Oval
+            svg += renderOval(col1X, startY, 60, 20, "Start");
+            svg += `<line x1="${col1X}" y1="${startY + 20}" x2="${col1X}" y2="${startY + 40}" stroke="#000000" stroke-width="1.3" marker-end="url(#arrow)" />`;
+
+            let currentY = startY + 40;
+            for (let i = 0; i < col1Steps.length; i++) {
+                const boxX = col1X - boxW / 2;
+                svg += renderBox(boxX, currentY, boxW, boxH, col1Steps[i]);
+                if (i < col1Steps.length - 1) {
+                    svg += `<line x1="${col1X}" y1="${currentY + boxH}" x2="${col1X}" y2="${currentY + gapY}" stroke="#000000" stroke-width="1.3" marker-end="url(#arrow)" />`;
+                    currentY += gapY;
+                }
+            }
+
+            const col1EndY = currentY + boxH;
+
+            // Connector path from Column 1 bottom to Column 2 top (Exact book style)
+            const connectorRightX = col1X + boxW / 2 + 25; // x = 325
+            const topTurnY = startY + 15; // y = 120
+            const col1BottomTurnY = col1EndY + 22; // below col 1
+
+            svg += `
+            <path d="M ${col1X} ${col1EndY} V ${col1BottomTurnY} H ${connectorRightX} V ${topTurnY} H ${col2X} V ${startY + 38}" 
+                  fill="none" stroke="#000000" stroke-width="1.3" marker-end="url(#arrow)" />`;
+
+            // Render Column 2
+            let currentY2 = startY + 40;
+            for (let i = 0; i < col2Steps.length; i++) {
+                const boxX = col2X - boxW / 2;
+                svg += renderBox(boxX, currentY2, boxW, boxH, col2Steps[i]);
+                svg += `<line x1="${col2X}" y1="${currentY2 + boxH}" x2="${col2X}" y2="${currentY2 + gapY}" stroke="#000000" stroke-width="1.3" marker-end="url(#arrow)" />`;
+                currentY2 += gapY;
+            }
+
+            // End Oval
+            svg += renderOval(col2X, currentY2 + 18, 60, 20, "End");
+
+            svg += `</svg>`;
+            return svg;
+        }
+
+        // ==========================================
+        // 2. DECISION-BRANCHING FLOWCHARTS (BLACK & WHITE)
+        // ==========================================
+        function getDecisionSVG(role) {
+            const W = 720;
+            const H = 960;
+            let svg = `<svg id="activeFlowchart" class="flowchart-svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">`;
+            svg += svgDefs;
+            svg += `<rect width="${W}" height="${H}" fill="#ffffff" />`;
+            svg += `<rect x="25" y="25" width="${W - 50}" height="${H - 50}" fill="#ffffff" stroke="#000000" stroke-width="1.2" />`;
+            svg += `<text x="${W / 2}" y="65" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#000000" letter-spacing="1">${meta[role].title}</text>`;
+
+            const cx = W / 2;
+            const bw = 210;
+            const bh = 44;
+
+            if (role === 'tenant') {
+                // Vertical Flow with Decisions
+                svg += renderOval(cx, 105, 55, 18, "Start");
+                svg += `<line x1="${cx}" y1="123" x2="${cx}" y2="150" stroke="#000000" stroke-width="1.3" marker-end="url(#arrow)" />`;
+
+                svg += renderBox(cx - bw/2, 150, bw, bh, ["Register and verify email"]);
+                svg += `<line x1="${cx}" y1="194" x2="${cx}" y2="220" stroke="#000000" stroke-width="1.3" marker-end="url(#arrow)" />`;
+
+                svg += renderBox(cx - bw/2, 220, bw, bh, ["Search properties on map"]);
+                svg += `<line x1="${cx}" y1="264" x2="${cx}" y2="295" stroke="#000000" stroke-width="1.3" marker-end="url(#arrow)" />`;
+
+                // Decision 1: Interested?
+                svg += `<polygon points="${cx},295 ${cx + 75},335 ${cx},375 ${cx - 75},335" fill="#ffffff" stroke="#000000" stroke-width="1.3" />`;
+                svg += `<text x="${cx}" y="339" text-anchor="middle" font-family="Arial, sans-serif" font-size="11.5" font-weight="bold">Interested in unit?</text>`;
+
+                // Decision 1 - No Loop
+                svg += `<path d="M ${cx + 75} 335 H ${cx + 150} V 242 H ${cx + bw/2}" fill="none" stroke="#000000" stroke-width="1.3" marker-end="url(#arrow)" />`;
+                svg += `<text x="${cx + 105}" y="327" font-family="Arial, sans-serif" font-size="11" font-weight="bold">No</text>`;
+
+                // Decision 1 - Yes
+                svg += `<line x1="${cx}" y1="375" x2="${cx}" y2="415" stroke="#000000" stroke-width="1.3" marker-end="url(#arrow)" />`;
+                svg += `<text x="${cx + 8}" y="398" font-family="Arial, sans-serif" font-size="11" font-weight="bold">Yes</text>`;
+
+                svg += renderBox(cx - bw/2, 415, bw, bh, ["Submit rental application", "and required documents"]);
+                svg += `<line x1="${cx}" y1="459" x2="${cx}" y2="495" stroke="#000000" stroke-width="1.3" marker-end="url(#arrow)" />`;
+
+                // Decision 2: Landlord Approved?
+                svg += `<polygon points="${cx},495 ${cx + 85},540 ${cx},585 ${cx - 85},540" fill="#ffffff" stroke="#000000" stroke-width="1.3" />`;
+                svg += `<text x="${cx}" y="537" text-anchor="middle" font-family="Arial, sans-serif" font-size="11.5" font-weight="bold">Application</text>`;
+                svg += `<text x="${cx}" y="551" text-anchor="middle" font-family="Arial, sans-serif" font-size="11.5" font-weight="bold">approved?</text>`;
+
+                // Decision 2 - Rejected
+                svg += `<path d="M ${cx - 85} 540 H ${cx - 160} V 580" fill="none" stroke="#000000" stroke-width="1.3" marker-end="url(#arrow)" />`;
+                svg += `<text x="${cx - 130}" y="532" font-family="Arial, sans-serif" font-size="11" font-weight="bold">No</text>`;
+                svg += renderBox(cx - 240, 580, 160, 40, ["Application rejected", "View remarks"]);
+
+                // Decision 2 - Approved
+                svg += `<line x1="${cx}" y1="585" x2="${cx}" y2="625" stroke="#000000" stroke-width="1.3" marker-end="url(#arrow)" />`;
+                svg += `<text x="${cx + 8}" y="608" font-family="Arial, sans-serif" font-size="11" font-weight="bold">Yes</text>`;
+
+                svg += renderBox(cx - bw/2, 625, bw, bh, ["Review and sign digital lease"]);
+                svg += `<line x1="${cx}" y1="669" x2="${cx}" y2="705" stroke="#000000" stroke-width="1.3" marker-end="url(#arrow)" />`;
+
+                svg += renderBox(cx - bw/2, 705, bw, bh, ["View monthly bill and submeters,", "upload payment receipt"]);
+                svg += `<line x1="${cx}" y1="749" x2="${cx}" y2="785" stroke="#000000" stroke-width="1.3" marker-end="url(#arrow)" />`;
+
+                svg += renderBox(cx - bw/2, 785, bw, bh, ["Submit maintenance ticket", "and feedback rating"]);
+                svg += `<line x1="${cx}" y1="829" x2="${cx}" y2="865" stroke="#000000" stroke-width="1.3" marker-end="url(#arrow)" />`;
+
+                svg += renderOval(cx, 885, 55, 18, "End");
+            } else if (role === 'landlord') {
+                svg += renderOval(cx, 105, 55, 18, "Start");
+                svg += `<line x1="${cx}" y1="123" x2="${cx}" y2="150" stroke="#000000" stroke-width="1.3" marker-end="url(#arrow)" />`;
+
+                svg += renderBox(cx - bw/2, 150, bw, bh, ["Register landlord account"]);
+                svg += `<line x1="${cx}" y1="194" x2="${cx}" y2="225" stroke="#000000" stroke-width="1.3" marker-end="url(#arrow)" />`;
+
+                // Decision: Admin Approved?
+                svg += `<polygon points="${cx},225 ${cx + 75},265 ${cx},305 ${cx - 75},265" fill="#ffffff" stroke="#000000" stroke-width="1.3" />`;
+                svg += `<text x="${cx}" y="269" text-anchor="middle" font-family="Arial, sans-serif" font-size="11.5" font-weight="bold">Admin approved?</text>`;
+
+                svg += `<path d="M ${cx - 75} 265 H ${cx - 140} V 305" fill="none" stroke="#000000" stroke-width="1.3" marker-end="url(#arrow)" />`;
+                svg += `<text x="${cx - 120}" y="257" font-family="Arial, sans-serif" font-size="11" font-weight="bold">No</text>`;
+                svg += renderBox(cx - 210, 305, 140, 36, ["Account pending"]);
+
+                svg += `<line x1="${cx}" y1="305" x2="${cx}" y2="345" stroke="#000000" stroke-width="1.3" marker-end="url(#arrow)" />`;
+                svg += `<text x="${cx + 8}" y="328" font-family="Arial, sans-serif" font-size="11" font-weight="bold">Yes</text>`;
+
+                svg += renderBox(cx - bw/2, 345, bw, bh, ["Add property & upload permits"]);
+                svg += `<line x1="${cx}" y1="389" x2="${cx}" y2="425" stroke="#000000" stroke-width="1.3" marker-end="url(#arrow)" />`;
+
+                // Decision: Property Approved?
+                svg += `<polygon points="${cx},425 ${cx + 80},465 ${cx},505 ${cx - 80},465" fill="#ffffff" stroke="#000000" stroke-width="1.3" />`;
+                svg += `<text x="${cx}" y="469" text-anchor="middle" font-family="Arial, sans-serif" font-size="11.5" font-weight="bold">Property approved?</text>`;
+
+                svg += `<path d="M ${cx - 80} 465 H ${cx - 160} V 367 H ${cx - bw/2}" fill="none" stroke="#000000" stroke-width="1.3" stroke-dasharray="4,4" marker-end="url(#arrow)" />`;
+                svg += `<text x="${cx - 140}" y="457" font-family="Arial, sans-serif" font-size="11" font-weight="bold">Revise</text>`;
+
+                svg += `<line x1="${cx}" y1="505" x2="${cx}" y2="545" stroke="#000000" stroke-width="1.3" marker-end="url(#arrow)" />`;
+                svg += `<text x="${cx + 8}" y="528" font-family="Arial, sans-serif" font-size="11" font-weight="bold">Yes</text>`;
+
+                svg += renderBox(cx - bw/2, 545, bw, bh, ["Review applicant screening score", "and approve application"]);
+                svg += `<line x1="${cx}" y1="589" x2="${cx}" y2="625" stroke="#000000" stroke-width="1.3" marker-end="url(#arrow)" />`;
+
+                svg += renderBox(cx - bw/2, 625, bw, bh, ["Create digital lease agreement"]);
+                svg += `<line x1="${cx}" y1="669" x2="${cx}" y2="705" stroke="#000000" stroke-width="1.3" marker-end="url(#arrow)" />`;
+
+                svg += renderBox(cx - bw/2, 705, bw, bh, ["Input monthly submeter readings", "& verify payment receipt"]);
+                svg += `<line x1="${cx}" y1="749" x2="${cx}" y2="785" stroke="#000000" stroke-width="1.3" marker-end="url(#arrow)" />`;
+
+                svg += renderBox(cx - bw/2, 785, bw, bh, ["Assign maintenance requests"]);
+                svg += `<line x1="${cx}" y1="829" x2="${cx}" y2="865" stroke="#000000" stroke-width="1.3" marker-end="url(#arrow)" />`;
+
+                svg += renderOval(cx, 885, 55, 18, "End");
+            } else {
+                // Fallback to Linear view
+                return getLinearSVG(role);
+            }
+
+            svg += `</svg>`;
+            return svg;
+        }
+
+        // Render Current Flowchart
+        function renderCurrent() {
+            const container = document.getElementById('svgContainer');
+            if (currentLayout === 'linear') {
+                container.innerHTML = getLinearSVG(currentRole);
+            } else {
+                container.innerHTML = getDecisionSVG(currentRole);
+            }
+            applyZoom();
+        }
+
+        // Role Selection
+        function selectRole(roleKey, btn) {
+            currentRole = roleKey;
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            if (btn) btn.classList.add('active');
+            renderCurrent();
+        }
+
+        // Layout Toggle
+        function setLayoutMode(mode) {
+            currentLayout = mode;
+            document.getElementById('btnLayoutLinear').classList.toggle('btn-active', mode === 'linear');
+            document.getElementById('btnLayoutDecision').classList.toggle('btn-active', mode === 'decision');
+            renderCurrent();
+        }
+
+        // Zoom Logic
+        function zoom(delta) {
+            currentScale = Math.min(Math.max(currentScale + delta, 0.5), 2.0);
+            applyZoom();
+        }
+
+        function resetZoom() {
+            currentScale = 1.0;
+            applyZoom();
+        }
+
+        function applyZoom() {
+            document.getElementById('zoomText').innerText = Math.round(currentScale * 100) + '%';
+            const svg = document.querySelector('#svgContainer svg');
+            if (svg) svg.style.transform = `scale(${currentScale})`;
+        }
+
+        // Toast Feedback
+        function showToast(msg) {
+            const t = document.getElementById('toast');
+            t.innerText = msg;
+            t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 3000);
+        }
+
+        // High Resolution PNG Converter (Canvas 300 DPI)
+        function getSVGToCanvas(svgElement, scaleMultiplier = 2.5) {
+            return new Promise((resolve, reject) => {
+                try {
+                    const serializer = new XMLSerializer();
+                    let svgStr = serializer.serializeToString(svgElement);
+                    if (!svgStr.match(/^<svg[^>]+xmlns="http\:\/\/www\.w3\.org\/2000\/svg"/)) {
+                        svgStr = svgStr.replace(/^<svg/, '<svg xmlns="http://www.w3.org/2000/svg"');
+                    }
+
+                    const width = svgElement.viewBox.baseVal.width || 700;
+                    const height = svgElement.viewBox.baseVal.height || 780;
+
+                    const canvas = document.createElement('canvas');
+                    canvas.width = width * scaleMultiplier;
+                    canvas.height = height * scaleMultiplier;
+                    const ctx = canvas.getContext('2d');
+
+                    // Crisp anti-aliasing
+                    ctx.imageSmoothingEnabled = true;
+                    ctx.imageSmoothingQuality = 'high';
+
+                    // Pure white background for thesis document
+                    ctx.fillStyle = '#ffffff';
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                    const img = new Image();
+                    const blob = new Blob([svgStr], { type: 'image/svg+xml;charset=utf-8' });
+                    const url = URL.createObjectURL(blob);
+
+                    img.onload = () => {
+                        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                        URL.revokeObjectURL(url);
+                        resolve({ canvas, dataURL: canvas.toDataURL('image/png') });
+                    };
+
+                    img.onerror = (e) => {
+                        URL.revokeObjectURL(url);
+                        reject(e);
+                    };
+
+                    img.src = url;
+                } catch (err) {
+                    reject(err);
+                }
+            });
+        }
+
+        // Download Single PNG
+        async function downloadCurrentPNG() {
+            const svg = document.querySelector('#svgContainer svg');
+            if (!svg) return;
+            showToast("Generating crisp B&W PNG...");
+            try {
+                const { dataURL } = await getSVGToCanvas(svg, 2.5);
+                const filename = meta[currentRole].filename;
+                const a = document.createElement('a');
+                a.href = dataURL;
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                showToast(`Downloaded ${filename} for documentation!`);
+            } catch (err) {
+                console.error(err);
+                showToast("Failed to generate image.");
+            }
+        }
+
+        // Copy Single PNG to Clipboard
+        async function copyCurrentToClipboard() {
+            const svg = document.querySelector('#svgContainer svg');
+            if (!svg) return;
+            showToast("Rendering to clipboard...");
+            try {
+                const { canvas } = await getSVGToCanvas(svg, 2.0);
+                canvas.toBlob(async (blob) => {
+                    if (!blob) return;
+                    try {
+                        const item = new ClipboardItem({ "image/png": blob });
+                        await navigator.clipboard.write([item]);
+                        showToast("Copied PNG directly to clipboard! Ready to paste (Ctrl+V) in Word.");
+                    } catch (e) {
+                        downloadCurrentPNG();
+                    }
+                }, "image/png");
+            } catch (err) {
+                showToast("Clipboard copy failed.");
+            }
+        }
+
+        // Download All Roles PNGs (Batch Download)
+        async function downloadAllRolesPNG() {
+            showToast("Exporting all 5 role flowcharts as PNG...");
+            const roles = ['tenant', 'landlord', 'maintenance', 'admin', 'public'];
+            const hiddenDiv = document.createElement('div');
+            hiddenDiv.style.position = 'absolute';
+            hiddenDiv.style.left = '-9999px';
+            document.body.appendChild(hiddenDiv);
+
+            for (const r of roles) {
+                hiddenDiv.innerHTML = getLinearSVG(r);
+                const svg = hiddenDiv.querySelector('svg');
+                if (svg) {
+                    try {
+                        const { dataURL } = await getSVGToCanvas(svg, 2.5);
+                        const a = document.createElement('a');
+                        a.href = dataURL;
+                        a.download = meta[r].filename;
+                        document.body.appendChild(a);
+                        a.click();
+                        document.body.removeChild(a);
+                        await new Promise(res => setTimeout(res, 350));
+                    } catch (e) {
+                        console.error(e);
+                    }
+                }
+            }
+
+            document.body.removeChild(hiddenDiv);
+            showToast("All 5 role flowcharts downloaded successfully!");
+        }
+
+        // Initialize
+        window.addEventListener('DOMContentLoaded', () => {
+            renderCurrent();
+        });
+    </script>
+</body>
+</html>

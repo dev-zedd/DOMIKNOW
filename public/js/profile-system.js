@@ -404,19 +404,20 @@
         root.querySelector('[data-profile-photo-input]').click();
     }
 
-    function handlePhotoSelection(root, event) {
-        const file = event.target.files?.[0];
+    function processPhotoFile(root, file) {
         const status = root.querySelector('[data-photo-status]');
         showStatus(status);
         if (!file) return;
         if (!PHOTO_TYPES.includes(file.type)) {
             showStatus(status, 'Choose a JPG, PNG, or WEBP image.');
-            event.target.value = '';
+            const input = root.querySelector('[data-profile-photo-input]');
+            if (input) input.value = '';
             return;
         }
         if (file.size > MAX_PHOTO_BYTES) {
             showStatus(status, 'Choose an image smaller than 3 MB.');
-            event.target.value = '';
+            const input = root.querySelector('[data-profile-photo-input]');
+            if (input) input.value = '';
             return;
         }
 
@@ -430,6 +431,11 @@
         };
         reader.onerror = () => showStatus(status, 'The selected image could not be read.');
         reader.readAsDataURL(file);
+    }
+
+    function handlePhotoSelection(root, event) {
+        const file = event.target.files?.[0];
+        if (file) processPhotoFile(root, file);
     }
 
     async function savePhoto(root) {
@@ -569,6 +575,36 @@
         root.querySelector('[data-profile-reset]').addEventListener('click', () => resetProfileForm(root));
         root.querySelector('[data-profile-photo-select]').addEventListener('click', () => selectPhoto(root));
         root.querySelector('[data-profile-photo-input]').addEventListener('change', event => handlePhotoSelection(root, event));
+
+        const avatarBlock = root.querySelector('.profile-avatar-block');
+        if (avatarBlock) {
+            let dragCounter = 0;
+            ['dragenter', 'dragover'].forEach(evt => {
+                avatarBlock.addEventListener(evt, (e) => {
+                    e.preventDefault();
+                    dragCounter++;
+                    avatarBlock.classList.add('dragover');
+                });
+            });
+            avatarBlock.addEventListener('dragleave', (e) => {
+                e.preventDefault();
+                dragCounter--;
+                if (dragCounter <= 0) {
+                    dragCounter = 0;
+                    avatarBlock.classList.remove('dragover');
+                }
+            });
+            avatarBlock.addEventListener('drop', (e) => {
+                e.preventDefault();
+                dragCounter = 0;
+                avatarBlock.classList.remove('dragover');
+                const file = e.dataTransfer?.files?.[0];
+                if (file) {
+                    processPhotoFile(root, file);
+                }
+            });
+        }
+
         root.querySelector('[data-profile-photo-save]').addEventListener('click', () => savePhoto(root));
         root.querySelector('[data-profile-photo-remove]').addEventListener('click', () => removePhoto(root));
         root.querySelector('[data-password-form]').addEventListener('submit', event => changePassword(root, event));

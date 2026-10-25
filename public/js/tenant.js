@@ -91,20 +91,6 @@
             description: 'Share verified feedback after a tenancy or maintenance experience and review your submissions.',
             eyebrow: 'Ratings & feedback'
         },
-        'reports.html': {
-            description: 'File a safety or conduct concern, respond to cases involving you, and follow administrative decisions.',
-            eyebrow: 'Safety & accountability'
-        },
-        'landlord-report-form.html': {
-            description: 'Document what happened, connect it to an active lease, and attach evidence for administrative review.',
-            eyebrow: 'New incident report',
-            action: { label: 'Reports center', href: 'reports.html', secondary: true }
-        },
-        'tenant-reports.html': {
-            description: 'Review reports filed against you, see the current decision, and provide your explanation when requested.',
-            eyebrow: 'Reports involving you',
-            action: { label: 'Reports center', href: 'reports.html', secondary: true }
-        },
         'policy-violations.html': {
             description: 'Review recorded policy concerns and submit a violation connected to an active lease.',
             eyebrow: 'Policy records'
@@ -116,31 +102,7 @@
     }
 
     function createWorkflow(activeStep) {
-        if (!activeStep) return null;
-
-        const nav = document.createElement('nav');
-        nav.className = 'tenant-journey';
-        nav.setAttribute('aria-label', 'Rental journey');
-
-        WORKFLOW_STEPS.forEach((step, index) => {
-            const link = document.createElement('a');
-            link.href = step.href;
-            link.className = `tenant-journey-step${step.key === activeStep ? ' active' : ''}`;
-            if (step.key === activeStep) link.setAttribute('aria-current', 'step');
-
-            const number = document.createElement('span');
-            number.className = 'tenant-journey-number';
-            number.textContent = String(index + 1);
-
-            const label = document.createElement('span');
-            label.className = 'tenant-journey-label';
-            label.textContent = step.label;
-
-            link.append(number, label);
-            nav.appendChild(link);
-        });
-
-        return nav;
+        return null;
     }
 
     function createPageSummary(meta) {
@@ -427,23 +389,13 @@
         const layout = document.querySelector('.dashboard-layout-tenant');
         const content = layout && layout.querySelector('.main-content-inner');
         const page = currentPage();
-        const meta = PAGE_META[page];
 
-        if (!layout || !content || !meta || content.querySelector('.tenant-module-intro')) return;
+        if (!layout || !content) return;
 
         document.body.setAttribute('data-tenant-page', page.replace('.html', ''));
 
-        const intro = document.createElement('div');
-        intro.className = 'tenant-module-intro';
-
-        const journey = createWorkflow(meta.step);
-        if (journey) intro.appendChild(journey);
-
-        if (!intro.hasChildNodes()) return;
-
-        const breadcrumbs = content.querySelector(':scope > [data-domiknow-breadcrumbs], :scope > .app-details-back-link, :scope > .app-back-nav');
-        if (breadcrumbs) breadcrumbs.insertAdjacentElement('afterend', intro);
-        else content.insertBefore(intro, content.firstChild);
+        // Remove tenant journey navigation bar across all pages
+        content.querySelectorAll('.tenant-module-intro, .tenant-journey').forEach((el) => el.remove());
         improveTables();
         improveForms();
         improveControls(document);

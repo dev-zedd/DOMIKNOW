@@ -2,14 +2,14 @@ const supabase = require('../config/supabaseClient');
 
 const feedbackModel = {
     async checkLeaseEligibility(tenantId, propertyId, leaseId) {
-        // Checks if tenant has active or ended lease for this property
+        // Checks if tenant has an ended, terminated, completed, or expired lease for this property
         const { data, error } = await supabase
             .from('lease_records')
             .select('id, landlord_id')
             .eq('id', leaseId)
             .eq('tenant_id', tenantId)
             .eq('property_id', propertyId)
-            .in('lease_status', ['active', 'ended', 'terminated'])
+            .in('lease_status', ['ended', 'terminated', 'completed', 'expired'])
             .maybeSingle();
 
         if (error) throw error;

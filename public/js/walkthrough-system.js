@@ -23,7 +23,7 @@
             steps: [
                 [() => mobileTarget('.topbar-left', '.app-brand'), 'Welcome to Landlord Console', 'Manage your rental properties, tenant applications, active leases, monthly revenue, and maintenance.'],
                 [() => mobileTarget('.bottom-nav-bar', '.sidebar-menu'), 'Navigation Menu', 'Access your property portfolio, review applicants, monitor active leases, track payments, and manage tasks.'],
-                ['.landlord-flow, .landlord-module-intro, .status-card, .properties-header, .main-content-inner > :first-child', 'Workflow & Status', 'Follow the operating workflow to easily manage listings, approve applications, and track lease milestones.'],
+                ['.status-card, .properties-header, .main-content-inner > :first-child', 'Workflow & Status', 'Follow the operating workflow to easily manage listings, approve applications, and track lease milestones.'],
                 ['.properties-layout, .table-container, .main-content-inner', 'Operations Workspace', 'Add and edit properties, review tenant documents, manage payment confirmations, and oversee repairs.'],
                 ['.topbar-right', 'Account & Quick Settings', 'Check notifications, switch to dark mode, replay this guide, or log out from your account menu.']
             ]

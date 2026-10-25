@@ -34,23 +34,42 @@ const billingModel = {
                 other_charges,
                 penalty_amount,
                 total_amount,
-                payment_records (payment_amount, payment_status),
+                payment_records (
+                    id,
+                    payment_amount,
+                    payment_status,
+                    submitted_at,
+                    verified_at,
+                    created_at
+                ),
                 due_date,
                 billing_status,
                 remarks,
                 created_at,
+                updated_at,
                 users!billing_records_tenant_id_fkey (
                     full_name,
                     email
                 ),
                 properties (
+                    id,
                     property_name,
                     address
                 ),
+                property_units (
+                    id,
+                    unit_number
+                ),
                 lease_records (
+                    id,
                     lease_number,
                     monthly_rent,
-                    utilities_covered
+                    payment_due_day,
+                    utilities_covered,
+                    property_units (
+                        id,
+                        unit_number
+                    )
                 )
             `)
             .eq('landlord_id', landlordId)
@@ -78,23 +97,42 @@ const billingModel = {
                 other_charges,
                 penalty_amount,
                 total_amount,
-                payment_records (payment_amount, payment_status),
+                payment_records (
+                    id,
+                    payment_amount,
+                    payment_status,
+                    submitted_at,
+                    verified_at,
+                    created_at
+                ),
                 due_date,
                 billing_status,
                 remarks,
                 created_at,
+                updated_at,
                 users!billing_records_landlord_id_fkey (
                     full_name,
                     email
                 ),
                 properties (
+                    id,
                     property_name,
                     address
                 ),
+                property_units (
+                    id,
+                    unit_number
+                ),
                 lease_records (
+                    id,
                     lease_number,
                     monthly_rent,
-                    utilities_covered
+                    payment_due_day,
+                    utilities_covered,
+                    property_units (
+                        id,
+                        unit_number
+                    )
                 )
             `)
             .eq('tenant_id', tenantId)
@@ -122,7 +160,15 @@ const billingModel = {
                 other_charges,
                 penalty_amount,
                 total_amount,
-                payment_records (payment_amount, payment_status),
+                payment_records (
+                    id,
+                    payment_amount,
+                    payment_method,
+                    payment_reference_number,
+                    payment_status,
+                    submitted_at,
+                    verified_at
+                ),
                 due_date,
                 billing_status,
                 remarks,
@@ -138,13 +184,24 @@ const billingModel = {
                     contact_number
                 ),
                 properties (
+                    id,
                     property_name,
                     address
                 ),
+                property_units (
+                    id,
+                    unit_number
+                ),
                 lease_records (
+                    id,
                     lease_number,
                     monthly_rent,
-                    utilities_covered
+                    payment_due_day,
+                    utilities_covered,
+                    property_units (
+                        id,
+                        unit_number
+                    )
                 )
             `)
             .eq('id', id)
@@ -265,15 +322,45 @@ const billingModel = {
         if (!checkData) return null;
 
         // Limit editing based on the current status of the billing
-        const editableStatuses = ['draft', 'pending_payment', 'unpaid'];
+        const editableStatuses = ['draft', 'pending_payment', 'unpaid', 'overdue'];
         if (!editableStatuses.includes(checkData.billing_status)) {
-            throw new Error(`Only billings in Draft or Pending status can be updated. Current status is ${checkData.billing_status.toUpperCase()}.`);
+            throw new Error(`Only billings in Draft, Pending, or Overdue status can be updated. Current status is ${checkData.billing_status.toUpperCase()}.`);
         }
 
         const { data, error } = await supabase
             .from('billing_records')
             .update({
                 ...billingData,
+                updated_at: new Date()
+            })
+            .eq('id', id)
+            .select()
+            .single();
+
+        if (error) throw error;
+        return data;
+    },
+
+    async overrideBilling(id, landlordId, overrideData) {
+        // Enforce ownership
+        const { data: checkData, error: checkError } = await supabase
+            .from('billing_records')
+            .select('id, billing_status')
+            .eq('id', id)
+            .eq('landlord_id', landlordId)
+            .maybeSingle();
+
+        if (checkError) throw checkError;
+        if (!checkData) return null;
+
+        if (checkData.billing_status === 'paid') {
+            throw new Error('Cannot apply leeway or override to a fully paid billing statement.');
+        }
+
+        const { data, error } = await supabase
+            .from('billing_records')
+            .update({
+                ...overrideData,
                 updated_at: new Date()
             })
             .eq('id', id)

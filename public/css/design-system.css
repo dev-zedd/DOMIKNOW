@@ -2446,10 +2446,12 @@ progress::-webkit-progress-value {
    ========================================================================== */
 
 /* Role changes content priority, not the component palette. */
+.navbar,
 .navbar-tenant,
 .navbar-landlord,
 .navbar-maintenance,
 .navbar-admin {
+  display: none !important;
   border-top: 0 !important;
 }
 
@@ -4685,3 +4687,85 @@ body.auth-page {
   background: color-mix(in srgb, var(--color-error-text, #ef4444) 10%, transparent) !important;
   color: var(--color-error-text, #ef4444) !important;
 }
+
+/* ===========================================================================
+   Drag and Drop Upload Feedback (Universal System)
+   =========================================================================== */
+
+.dragover,
+[data-dragover="true"] {
+  border-color: var(--color-action-primary, #0355f3) !important;
+  background-color: rgba(3, 85, 243, 0.06) !important;
+  box-shadow: 0 0 0 3px rgba(3, 85, 243, 0.2) !important;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.upload-zone.dragover,
+.app-drag-drop-zone.dragover,
+.stmt-file-wrapper.dragover,
+.doc-upload-section.dragover,
+.upload-card.dragover,
+.photo-slot-card.dragover,
+.photo-frame.dragover,
+.doc-slot-card.dragover,
+.upload-zone-compact.dragover,
+.chat-head-window.dragover,
+.chat-input-wrapper.dragover,
+#roomPhotoDropZone.dragover {
+  border-color: var(--color-action-primary, #0355f3) !important;
+  background-color: rgba(3, 85, 243, 0.08) !important;
+  box-shadow: 0 0 0 3px rgba(3, 85, 243, 0.22) !important;
+  transform: scale(1.008);
+}
+
+.profile-avatar-block.dragover .profile-avatar {
+  outline: 3px dashed var(--color-action-primary, #0355f3) !important;
+  outline-offset: 4px;
+  transform: scale(1.05);
+  transition: transform 0.2s ease, outline-color 0.2s ease;
+}
+
+.stmt-file-wrapper {
+  position: relative;
+  transition: border-color 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.stmt-file-wrapper.dragover {
+  border-radius: var(--radius-md, 8px);
+}
+
+.doc-upload-section {
+  transition: border-color 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
+  border-radius: var(--radius-md, 8px);
+  padding: 0.75rem;
+}
+
+.doc-upload-section.dragover {
+  border: 2px dashed var(--color-action-primary, #0355f3) !important;
+}
+
+.upload-card {
+  transition: border-color 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.photo-slot-card {
+  transition: border-color 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.photo-slot-card.dragover .photo-frame {
+  border: 2px dashed var(--color-action-primary, #0355f3) !important;
+}
+
+/* Hide in-page workflow stage navigation bars across all roles */
+.tenant-journey,
+.tenant-module-intro,
+.landlord-flow,
+.landlord-module-intro,
+.maintenance-workflow,
+.maintenance-module-intro,
+.admin-module-intro,
+.admin-page-summary,
+nav.navbar {
+  display: none !important;
+}
+

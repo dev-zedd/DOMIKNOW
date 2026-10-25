@@ -219,6 +219,77 @@
             color: #bfdbfe !important;
         }
 
+        /* ── Primary Source Tabs (Tenant Requests vs Owner Work Orders) ── */
+        .landlord-main-tabs-bar {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            overflow-x: auto;
+            scrollbar-width: thin;
+            padding-bottom: 4px;
+            width: 100%;
+            margin-bottom: 1.25rem;
+        }
+        .l-main-tab-btn {
+            background: var(--bg-secondary, #ffffff) !important;
+            border: 1px solid var(--border-color, #e2e8f0) !important;
+            padding: 7px 16px !important;
+            border-radius: 8px !important;
+            font-size: 0.84rem !important;
+            font-weight: 600 !important;
+            color: var(--text-secondary, #475569) !important;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.15s ease;
+            white-space: nowrap;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.03) !important;
+            outline: none;
+        }
+        .l-main-tab-btn:hover {
+            color: var(--color-link, #0355f3) !important;
+            border-color: var(--color-border-strong, #cbd5e1) !important;
+            background: var(--color-bg-subtle, #f8fafc) !important;
+        }
+        .l-main-tab-btn.active {
+            background: var(--color-action-primary, #0355f3) !important;
+            border-color: var(--color-action-primary, #0355f3) !important;
+            color: #ffffff !important;
+            font-weight: 700 !important;
+            box-shadow: 0 2px 6px rgba(3, 85, 243, 0.25) !important;
+        }
+        .l-main-tab-btn.active svg {
+            stroke: #ffffff;
+        }
+        .l-main-tab-btn .tab-count {
+            background: var(--color-bg-subtle, #f1f5f9);
+            color: var(--text-secondary, #475569);
+            font-size: 0.7rem;
+            font-weight: 750;
+            padding: 2px 7px;
+            border-radius: 999px;
+            line-height: 1.2;
+        }
+        .l-main-tab-btn.active .tab-count {
+            background: rgba(255, 255, 255, 0.25) !important;
+            color: #ffffff !important;
+        }
+        [data-theme="dark"] .l-main-tab-btn {
+            background: var(--bg-primary, #0f172a) !important;
+            border-color: var(--border-color, #334155) !important;
+            color: #94a3b8 !important;
+        }
+        [data-theme="dark"] .l-main-tab-btn:hover {
+            background: #1e293b !important;
+            color: #ffffff !important;
+        }
+        [data-theme="dark"] .l-main-tab-btn.active {
+            background: var(--color-action-primary, #0355f3) !important;
+            border-color: var(--color-action-primary, #0355f3) !important;
+            color: #ffffff !important;
+        }
+
         /* Worker Modal Tabs & Cards */
         .worker-modal-tab {
             background: none;
@@ -291,195 +362,239 @@
             border-color: #ef4444;
             color: #fecaca;
         }
+            .maintenance-row-clickable {
+            cursor: pointer;
+            transition: background-color 0.15s ease;
+        }
+        .maintenance-row-clickable:hover td {
+            background-color: var(--color-bg-subtle, #f8fafc) !important;
+        }
+        .maintenance-row-clickable:focus-visible {
+            outline: 2px solid var(--color-action-primary, #0355f3);
+            outline-offset: -2px;
+        }
+        [data-theme="dark"] .maintenance-row-clickable:hover td {
+            background-color: #1e293b !important;
+        }
+        .landlord-table-controls {
+            display: none !important;
+        }
     </style>
     <link href="../../css/design-system.css" rel="stylesheet">
+    <link href="../../css/landlord.css" rel="stylesheet">
     <script src="../../js/ui.js" defer></script>
 </head>
 <body class="app-loading" data-role="landlord" data-page-title="Maintenance Management">
-    <!-- Navbar -->
-    <nav class="navbar navbar-landlord">
-        <div class="navbar-container">
-            <div class="navbar-brand-group">
-                <a href="dashboard.html" style="text-decoration: none;"><span class="navbar-logo">DomiKnow</span></a>
-                <span class="navbar-badge navbar-badge-landlord">Landlord</span>
-            </div>
-            <div class="navbar-menu">
-                <a href="dashboard.html" class="navbar-menu-link">Dashboard</a>
-                <a href="properties.html" class="navbar-menu-link">Properties</a>
-                <a href="applications.html" class="navbar-menu-link">Tenant Applications</a>
-                <a href="leases.html" class="navbar-menu-link">Lease Agreements</a>
-                <a href="billings.html" class="navbar-menu-link">Billings</a>
-                <a href="payments.html" class="navbar-menu-link">Payments</a>
-                <a href="maintenance.html" class="navbar-menu-link active">Maintenance</a>
-            </div>
-            <div class="navbar-right">
-                <span class="navbar-user-welcome">Welcome, <span class="user-name">User</span></span>
-                <button id="logoutBtn" class="navbar-btn">Logout</button>
-            </div>
-        </div>
-    </nav>
-
     <!-- Main Content -->
     <main class="dashboard-container">
-        <!-- Status Filter Tabs Bar (Full Width, Consistent System) -->
-        <div class="maintenance-tabs-bar" role="tablist" aria-label="Maintenance status filters">
-            <button class="m-tab-btn active" data-filter="all" role="tab" aria-selected="true" type="button">
-                All Requests <span class="tab-count" id="countAll">0</span>
+        <!-- Primary Category Tabs: Tenant Requests vs Owner Work Orders -->
+        <div class="landlord-main-tabs-bar" role="tablist" aria-label="Maintenance source categories">
+            <button class="l-main-tab-btn active" data-source="tenant" role="tab" aria-selected="true" type="button" id="tabTenantRequests">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                <span>Tenant Requests</span>
+                <span class="tab-count" id="countTenantRequests">0</span>
             </button>
-            <button class="m-tab-btn" data-filter="pending" role="tab" aria-selected="false" type="button">
-                Pending <span class="tab-count" id="countPending">0</span>
-            </button>
-            <button class="m-tab-btn" data-filter="approved" role="tab" aria-selected="false" type="button">
-                Approved <span class="tab-count" id="countApproved">0</span>
-            </button>
-            <button class="m-tab-btn" data-filter="assigned" role="tab" aria-selected="false" type="button">
-                Assigned <span class="tab-count" id="countAssigned">0</span>
-            </button>
-            <button class="m-tab-btn" data-filter="accepted" role="tab" aria-selected="false" type="button">
-                Accepted <span class="tab-count" id="countAccepted">0</span>
-            </button>
-            <button class="m-tab-btn" data-filter="in_progress" role="tab" aria-selected="false" type="button">
-                In Progress <span class="tab-count" id="countInProgress">0</span>
-            </button>
-            <button class="m-tab-btn" data-filter="completed" role="tab" aria-selected="false" type="button">
-                Completed <span class="tab-count" id="countCompleted">0</span>
-            </button>
-            <button class="m-tab-btn" data-filter="closed" role="tab" aria-selected="false" type="button">
-                Closed / Verified <span class="tab-count" id="countClosed">0</span>
-            </button>
-            <button class="m-tab-btn" data-filter="rejected" role="tab" aria-selected="false" type="button">
-                Rejected <span class="tab-count" id="countRejected">0</span>
+            <button class="l-main-tab-btn" data-source="owner" role="tab" aria-selected="false" type="button" id="tabOwnerOrders">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+                <span>Owner Work Orders</span>
+                <span class="tab-count" id="countOwnerOrders">0</span>
             </button>
         </div>
 
-        <div class="list-card">
-            <div class="card-header-row">
-                <div>
-                    <h3 class="card-header-title">Maintenance Requests</h3>
-                    <div class="card-header-subtitle">Track, assign, and manage repair requests submitted by your tenants</div>
+        <!-- Operational Maintenance Cost & Activity Summary Cards -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-bottom: 1.25rem;">
+            <div style="background: var(--color-bg-surface); border: 1px solid var(--color-border-default); border-radius: 10px; padding: 1.1rem 1.25rem; box-shadow: 0 1px 3px rgba(0,0,0,0.03);">
+                <div style="font-size: 0.72rem; font-weight: 700; color: var(--color-text-secondary); text-transform: uppercase; letter-spacing: 0.05em;">Total Cost</div>
+                <div style="font-size: 1.5rem; font-weight: 800; color: var(--color-text-primary); margin-top: 4px;" id="kpiTotalCost">₱0.00</div>
+            </div>
+            <div style="background: var(--color-bg-surface); border: 1px solid var(--color-border-default); border-radius: 10px; padding: 1.1rem 1.25rem; box-shadow: 0 1px 3px rgba(0,0,0,0.03);">
+                <div style="font-size: 0.72rem; font-weight: 700; color: var(--color-info-text); text-transform: uppercase; letter-spacing: 0.05em;">Covered by Landlord</div>
+                <div style="font-size: 1.5rem; font-weight: 800; color: var(--color-info-text); margin-top: 4px;" id="kpiLandlordCost">₱0.00</div>
+            </div>
+            <div style="background: var(--color-bg-surface); border: 1px solid var(--color-border-default); border-radius: 10px; padding: 1.1rem 1.25rem; box-shadow: 0 1px 3px rgba(0,0,0,0.03);">
+                <div style="font-size: 0.72rem; font-weight: 700; color: var(--color-warning-text); text-transform: uppercase; letter-spacing: 0.05em;">Billed to Tenant</div>
+                <div style="font-size: 1.5rem; font-weight: 800; color: var(--color-warning-text); margin-top: 4px;" id="kpiTenantCost">₱0.00</div>
+            </div>
+            <div style="background: var(--color-bg-surface); border: 1px solid var(--color-border-default); border-radius: 10px; padding: 1.1rem 1.25rem; box-shadow: 0 1px 3px rgba(0,0,0,0.03);">
+                <div style="font-size: 0.72rem; font-weight: 700; color: var(--color-error-text, #dc2626); text-transform: uppercase; letter-spacing: 0.05em;">Landlord Balance</div>
+                <div style="font-size: 1.5rem; font-weight: 800; color: var(--color-error-text, #dc2626); margin-top: 4px;" id="kpiLandlordBalance">₱0.00</div>
+            </div>
+            <div style="background: var(--color-bg-surface); border: 1px solid var(--color-border-default); border-radius: 10px; padding: 1.1rem 1.25rem; box-shadow: 0 1px 3px rgba(0,0,0,0.03);">
+                <div style="font-size: 0.72rem; font-weight: 700; color: var(--color-text-secondary); text-transform: uppercase; letter-spacing: 0.05em;">Active Orders</div>
+                <div style="font-size: 1.5rem; font-weight: 800; color: var(--color-action-primary); margin-top: 4px;" id="kpiActiveOrders">0</div>
+            </div>
+        </div>
+
+        <div class="list-card" data-no-auto-controls="true">
+            <div class="card-header-row" style="margin-bottom: 1rem; border-bottom: 1px solid var(--border-color, #e2e8f0); padding-bottom: 0.75rem;">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <h3 class="card-header-title" id="tableHeaderTitle" style="font-size: 1.05rem; font-weight: 750;">Tenant Requests</h3>
                 </div>
-                <button type="button" id="openManageWorkersBtn" class="btn-add-worker">
-                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                        <circle cx="9" cy="7" r="4"></circle>
-                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-                        <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-                    </svg>
-                    <span>Manage Workers</span>
+                <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                    <input type="text" id="maintenanceSearchInput" placeholder="Search property, unit, tenant..." class="form-input" style="padding: 6px 12px; font-size: 0.8125rem; border-radius: 6px; width: 220px; height: 34px;">
+                    <button type="button" id="openCreateWorkOrderBtn" class="btn-add-worker" style="background: var(--color-action-primary); color: #ffffff; border-color: var(--color-action-primary); padding: 6px 14px; font-size: 0.8125rem; height: 34px;">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="12" y1="5" x2="12" y2="19"></line>
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                        </svg>
+                        <span>New Work Order</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Status Filter Tabs Bar (Placed AFTER KPI cards, immediately before table) -->
+            <div class="maintenance-tabs-bar" role="tablist" aria-label="Maintenance status filters" style="margin-bottom: 1.25rem; border-bottom: 1px solid var(--border-color, #e2e8f0); padding-bottom: 10px;">
+                <button class="m-tab-btn active" data-filter="all" role="tab" aria-selected="true" type="button">
+                    All <span class="tab-count" id="countAll">0</span>
+                </button>
+                <button class="m-tab-btn" data-filter="pending" role="tab" aria-selected="false" type="button">
+                    Pending <span class="tab-count" id="countPending">0</span>
+                </button>
+                <button class="m-tab-btn" data-filter="approved" role="tab" aria-selected="false" type="button">
+                    Approved <span class="tab-count" id="countApproved">0</span>
+                </button>
+                <button class="m-tab-btn" data-filter="in_progress" role="tab" aria-selected="false" type="button">
+                    In Progress <span class="tab-count" id="countInProgress">0</span>
+                </button>
+                <button class="m-tab-btn" data-filter="completed" role="tab" aria-selected="false" type="button">
+                    Completed <span class="tab-count" id="countCompleted">0</span>
+                </button>
+                <button class="m-tab-btn" data-filter="closed" role="tab" aria-selected="false" type="button">
+                    Closed / Verified <span class="tab-count" id="countClosed">0</span>
+                </button>
+                <button class="m-tab-btn" data-filter="rejected" role="tab" aria-selected="false" type="button">
+                    Rejected <span class="tab-count" id="countRejected">0</span>
                 </button>
             </div>
-            <table>
+            <table data-no-controls="true">
                 <thead>
                     <tr>
                         <th>Property & Unit</th>
-                        <th>Tenant</th>
+                        <th id="thTenantOrRequester">Tenant</th>
                         <th>Issue Details</th>
                         <th>Category</th>
                         <th>Priority</th>
                         <th>Status</th>
                         <th>Assigned Worker</th>
-                        <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody id="maintenanceQueueBody">
                     <tr>
-                        <td colspan="8" style="text-align: center; color: var(--text-muted);">Loading maintenance requests...</td>
+                        <td colspan="7" style="text-align: center; color: var(--text-muted);">Loading maintenance requests...</td>
                     </tr>
                 </tbody>
             </table>
         </div>
     </main>
 
-    <!-- Manage & Add Maintenance Worker Modal -->
-    <div class="modal-overlay hidden" id="addWorkerModal" style="position: fixed; inset: 0; background: rgba(15,23,42,0.6); backdrop-filter: blur(4px); display: none; justify-content: center; align-items: center; z-index: 1000; padding: 1.5rem;">
-        <div class="modal-box" style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 1.75rem; max-width: 580px; width: 100%; box-shadow: var(--shadow-premium); max-height: 88vh; display: flex; flex-direction: column;">
+    
+
+    <!-- Landlord Create Work Order Modal (Civil Code Art. 1654) -->
+    
+    <div class="modal-overlay hidden" id="createWorkOrderModal"    <div class="modal-overlay hidden" id="createWorkOrderModal" style="position: fixed; inset: 0; background: rgba(15,23,42,0.6); backdrop-filter: blur(4px); display: none; justify-content: center; align-items: center; z-index: 1000; padding: 1.5rem;">
+        <div class="modal-box" style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 1.75rem; max-width: 620px; width: 100%; box-shadow: var(--shadow-premium); max-height: 90vh; display: flex; flex-direction: column;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.85rem; flex-shrink: 0;">
-                <h3 style="margin: 0; font-size: 1.15rem; color: var(--text-primary);" id="workerModalTitle">Maintenance Personnel</h3>
-                <button type="button" id="closeWorkerModalBtn" aria-label="Close worker modal" style="background:none;border:none;cursor:pointer;color:var(--text-muted);line-height:1;"><span data-icon="x"></span></button>
-            </div>
-
-            <!-- Tabs: Active Workers vs Add New -->
-            <div style="display: flex; gap: 8px; border-bottom: 1px solid var(--border-color); margin-bottom: 1.25rem; flex-shrink: 0;">
-                <button type="button" id="tabWorkerListBtn" class="worker-modal-tab active">
-                    Active Workers (<span id="workerListCount">0</span>)
-                </button>
-                <button type="button" id="tabWorkerAddBtn" class="worker-modal-tab">
-                    + Add New Worker
-                </button>
-            </div>
-
-            <div id="workerAlertErr" style="display: none; background: rgba(239,68,68,.1); color: var(--color-error-text); border: 1px solid rgba(239,68,68,.3); padding: 0.65rem 1rem; border-radius: 6px; font-size: 0.83rem; margin-bottom: 1rem; flex-shrink: 0;"></div>
-            <div id="workerAlertOk" style="display: none; background: rgba(16,185,129,.1); color: #10b981; border: 1px solid rgba(16,185,129,.3); padding: 0.65rem 1rem; border-radius: 6px; font-size: 0.83rem; margin-bottom: 1rem; flex-shrink: 0;"></div>
-
-            <!-- View 1: Active Workers List & Delete -->
-            <div id="workerListView" style="overflow-y: auto; flex: 1;">
-                <div id="workerListContainer" style="display: flex; flex-direction: column; gap: 0.75rem; padding-right: 2px;">
-                    <div style="text-align: center; color: var(--text-muted); padding: 2.5rem 1rem; font-size: 0.875rem;">Loading maintenance workers…</div>
+                <div>
+                    <h3 style="margin: 0; font-size: 1.15rem; color: var(--text-primary);">Report Issue &amp; Request Inspection</h3>\n                    <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 2px;">Report Observed Symptoms &bull; Technical Diagnosis by Specialist &bull; Admin Adjudication</div>
                 </div>
+                <button type="button" id="closeCreateWorkOrderModalBtn" aria-label="Close work order modal" style="background:none;border:none;cursor:pointer;color:var(--text-muted);line-height:1;"><span data-icon="x"></span></button>
             </div>
 
-            <!-- View 2: Add Worker Form -->
-            <div id="workerAddView" style="display: none; overflow-y: auto; flex: 1;">
-                <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 1.25rem;">
-                    Create a login account for your electrician, plumber, carpenter, or repair technician so they can receive job assignments and submit repair reports.
-                </p>
+            <!-- Civil Code Art. 1654 Information Callout -->
+            <div style="background: rgba(3, 85, 243, 0.05); border: 1px solid var(--color-info-border, #bfdbfe); border-radius: 8px; padding: 0.75rem 1rem; margin-bottom: 1.25rem; font-size: 0.8rem; color: var(--color-text-secondary); line-height: 1.45; flex-shrink: 0;">
+                <div style="font-weight: 700; color: var(--color-link); margin-bottom: 2px; display: flex; align-items: center; gap: 6px;">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                    <span>Neutral Technical Inspection &amp; Admin Adjudication</span>
+                </div>
+                Provide the observed symptoms and location. To protect all parties and prevent premature assumptions, an accredited technician will be dispatched to assess the root cause on-site. Platform Administration will then impartially adjudicate financial responsibility (Civil Code Art. 1654 vs Art. 1657) based on empirical evidence.
+            </div>
 
-                <form id="addWorkerForm">
-                    <div class="form-group" style="margin-bottom: 1rem;">
-                        <label class="form-label" for="workerFullName">Full Name <span style="color: var(--error);">*</span></label>
-                        <input type="text" id="workerFullName" class="form-input" placeholder="e.g. Juan Dela Cruz" required>
-                    </div>
+            <div id="woAlertErr" style="display: none; background: rgba(239,68,68,.1); color: var(--color-error-text); border: 1px solid rgba(239,68,68,.3); padding: 0.65rem 1rem; border-radius: 6px; font-size: 0.83rem; margin-bottom: 1rem; flex-shrink: 0;"></div>
+            <div id="woAlertOk" style="display: none; background: rgba(16,185,129,.1); color: #10b981; border: 1px solid rgba(16,185,129,.3); padding: 0.65rem 1rem; border-radius: 6px; font-size: 0.83rem; margin-bottom: 1rem; flex-shrink: 0;"></div>
 
-                    <div class="form-group" style="margin-bottom: 1rem;">
-                        <label class="form-label" for="workerTrade">Specialization / Trade <span style="color: var(--text-muted); font-weight: normal;">(Optional)</span></label>
-                        <select id="workerTrade" class="form-input">
-                            <option value="">-- Select Trade --</option>
-                            <option value="General Repair">General Maintenance & Repair</option>
-                            <option value="Plumber">Plumber (Pipes and water systems)</option>
-                            <option value="Electrician">Electrician (Electrical and wiring)</option>
-                            <option value="Aircon Technician">Aircon Technician (HVAC)</option>
-                            <option value="Carpenter">Carpenter (Woodwork and fixtures)</option>
-                            <option value="Painter">Painter (Walls and finishes)</option>
-                            <option value="Roofer">Roofer / Leak Repair</option>
-                            <option value="Locksmith">Locksmith / Doors & Keys</option>
+            <form id="createWorkOrderForm" style="overflow-y: auto; flex: 1; padding-right: 4px;">
+                <!-- Property Selection -->
+                <div class="form-group" style="margin-bottom: 1rem;">
+                    <label class="form-label" for="woPropertySelect">Target Property <span style="color: var(--error);">*</span></label>
+                    <select id="woPropertySelect" class="form-input" required>
+                        <option value="">-- Select Property --</option>
+                    </select>
+                </div>
+
+                <!-- Scope Selection: Common Area vs Specific Unit -->
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 1rem;">
+                    <div class="form-group">
+                        <label class="form-label" for="woScopeSelect">Location Scope <span style="color: var(--error);">*</span></label>
+                        <select id="woScopeSelect" class="form-input" required>
+                            <option value="common_area">Common Area / Facility</option>
+                            <option value="unit">Specific Unit</option>
                         </select>
                     </div>
-
-                    <div class="form-group" style="margin-bottom: 1rem;">
-                        <label class="form-label" for="workerEmail">Email Address (Login Username) <span style="color: var(--error);">*</span></label>
-                        <input type="email" id="workerEmail" class="form-input" placeholder="e.g. worker.juan@gmail.com" required>
+                    <div class="form-group" id="woUnitGroup" style="display: none;">
+                        <label class="form-label" for="woUnitSelect">Select Unit</label>
+                        <select id="woUnitSelect" class="form-input">
+                            <option value="">-- Select Unit --</option>
+                        </select>
                     </div>
+                </div>
 
-                    <div class="form-group" style="margin-bottom: 1rem;">
-                        <label class="form-label" for="workerContact">Contact Number</label>
-                        <input type="tel" id="workerContact" class="form-input" placeholder="e.g. 09123456789">
+                <!-- Category & Priority -->
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 1rem;">
+                    <div class="form-group">
+                        <label class="form-label" for="woCategorySelect">Issue Category <span style="color: var(--error);">*</span></label>
+                        <select id="woCategorySelect" class="form-input" required>
+                            <option value="">-- Select Category --</option>
+                            <option value="plumbing">Plumbing (Pipes, leaks, drainage)</option>
+                            <option value="electrical">Electrical (Wiring, breakers, switches)</option>
+                            <option value="aircon">Air Conditioning / HVAC</option>
+                            <option value="door">Doors, Locks &amp; Carpentry</option>
+                            <option value="roof">Roofing, Ceiling &amp; Waterproofing</option>
+                            <option value="internet">Internet &amp; Utility Lines</option>
+                            <option value="appliance">Major Appliances</option>
+                            <option value="others">Other Facility Repairs</option>
+                        </select>
                     </div>
+                    <div class="form-group">
+                        <label class="form-label" for="woPrioritySelect">Priority Level <span style="color: var(--error);">*</span></label>
+                        <select id="woPrioritySelect" class="form-input" required>
+                            <option value="low">Low (Routine maintenance)</option>
+                            <option value="medium" selected>Medium (Standard repair)</option>
+                            <option value="high">High (Urgent tenant disruption)</option>
+                            <option value="emergency">Emergency (Flooding, fire hazard)</option>
+                        </select>
+                    </div>
+                </div>
 
-                    <div class="form-group" style="margin-bottom: 1.5rem;">
-                        <label class="form-label" for="workerPassword">Password <span style="color: var(--error);">*</span></label>
-                        <div style="position: relative; display: flex; align-items: center;">
-                            <input type="password" id="workerPassword" class="form-input" placeholder="Minimum 6 characters" minlength="6" required style="padding-right: 42px; width: 100%;">
-                            <button type="button" id="toggleWorkerPasswordBtn" aria-label="Show password" title="Toggle password visibility" style="position: absolute; right: 8px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: var(--text-muted, #64748b); padding: 6px; display: inline-flex; align-items: center; justify-content: center; border-radius: 6px; transition: color 0.15s ease;">
-                                <svg id="eyeIconOpen" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                                    <circle cx="12" cy="12" r="3"></circle>
-                                </svg>
-                                <svg id="eyeIconClosed" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: none;">
-                                    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
-                                    <line x1="1" y1="1" x2="23" y2="23"></line>
-                                </svg>
-                            </button>
-                        </div>
-                    </div>
+                <!-- Work Order Title -->
+                <div class="form-group" style="margin-bottom: 1rem;">
+                    <label class="form-label" for="woTitle">Work Order Title <span style="color: var(--error);">*</span></label>
+                    <input type="text" id="woTitle" class="form-input" placeholder="e.g. Hallway roof leak repair / Vacant Unit 102 turnover re-piping" required>
+                </div>
 
-                    <div style="display: flex; justify-content: flex-end; gap: 0.75rem;">
-                        <button type="button" id="cancelWorkerModalBtn" class="navbar-btn" style="background: var(--bg-primary); border: 1px solid var(--border-color); color: var(--text-secondary);">Cancel</button>
-                        <button type="submit" id="submitWorkerBtn" class="action-btn" style="background: var(--landlord); color: #fff; padding: 0.6rem 1.25rem; font-weight: 700;">
-                            Create Worker Account
-                        </button>
-                    </div>
-                </form>
-            </div>
+                <!-- Schedule Preference -->
+                <div class="form-group" style="margin-bottom: 1rem;">
+                    <label class="form-label" for="woSchedule">Target / Preferred Schedule <span style="color: var(--text-muted); font-weight: normal;">(Optional)</span></label>
+                    <input type="text" id="woSchedule" class="form-input" placeholder="e.g. This Saturday morning / ASAP / Oct 25, 2026">
+                </div>
+
+                <!-- Detailed Description -->
+                <div class="form-group" style="margin-bottom: 1rem;">
+                    <label class="form-label" for="woDescription">Detailed Description &amp; Symptoms <span style="color: var(--error);">*</span></label>
+                    <textarea id="woDescription" class="form-input" rows="3" placeholder="Describe the damage, scope of repair required, materials needed if known, or inspection details." required></textarea>
+                </div>
+
+                <!-- Photo Attachment -->
+                <div class="form-group" style="margin-bottom: 1.25rem;">
+                    <label class="form-label" for="woFile">Photo / Document Attachment <span style="color: var(--text-muted); font-weight: normal;">(Optional, Max 10MB)</span></label>
+                    <input type="file" id="woFile" class="form-input" accept="image/*,application/pdf">
+                    <div style="font-size: 0.72rem; color: var(--text-muted); margin-top: 3px;">Supports JPG, PNG, WEBP, or PDF inspection documents.</div>
+                </div>
+
+                <div style="display: flex; justify-content: flex-end; gap: 10px; padding-top: 0.5rem; border-top: 1px solid var(--border-color);">
+                    <button type="button" id="cancelCreateWorkOrderBtn" class="navbar-btn" style="background: var(--bg-primary); border: 1px solid var(--border-color); color: var(--text-secondary); padding: 7px 16px; border-radius: 6px; font-weight: 600; font-size: 0.85rem; cursor: pointer;">Cancel</button>
+                    <button type="submit" id="submitCreateWorkOrderBtn" class="action-btn" style="background: var(--color-action-primary); color: #fff; padding: 7px 20px; border-radius: 6px; font-weight: 700; font-size: 0.85rem; cursor: pointer;">Submit Work Order</button>
+                </div>
+            </form>
         </div>
     </div>
 
@@ -488,14 +603,92 @@
     <script>
         const token = localStorage.getItem('domiknow_token');
         let requestQueue = [];
+        let activeSource = 'tenant';
         let activeFilter = 'all';
+        let searchQuery = '';
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
+        function isOwnerWorkOrder(req) {
+            if (!req) return false;
+            if (req.meta?.initiated_by === 'landlord') return true;
+            if (req.meta?.initiated_by === 'tenant') return false;
+
+            const rec = (req.recommendations || '') + ' ' + (req.landlord_remarks || '');
+            if (/\[INITIATED_BY:\s*LANDLORD\]/i.test(rec)) return true;
+            if (/\[INITIATED_BY:\s*TENANT\]/i.test(rec)) return false;
+            if (rec.includes('Work order initiated by property owner')) return true;
+            if (req.users && req.users.role === 'landlord') return true;
+            return false;
+        }
+
+        function updateHeaderCopy() {
+            const titleEl = document.getElementById('tableHeaderTitle');
+            if (titleEl) {
+                titleEl.textContent = activeSource === 'owner' ? 'Owner Work Orders' : 'Tenant Requests';
+            }
+            const colHeader = document.getElementById('thTenantOrRequester');
+            if (colHeader) {
+                colHeader.textContent = activeSource === 'owner' ? 'Origin & Occupant' : 'Tenant';
+            }
+        }
 
         document.addEventListener('DOMContentLoaded', () => {
             if (!token) return;
             fetchMaintenanceQueue();
-            bindWorkerModalEvents();
+            bindWorkOrderModalEvents();
 
-            // Filters delegation
+            // Source tabs delegation (Tenant Requests vs Owner Work Orders)
+            const sourceTabsContainer = document.querySelector('.landlord-main-tabs-bar');
+            if (sourceTabsContainer) {
+                sourceTabsContainer.addEventListener('click', (e) => {
+                    const btn = e.target.closest('[data-source]');
+                    if (!btn) return;
+
+                    sourceTabsContainer.querySelectorAll('[data-source]').forEach(b => {
+                        b.classList.remove('active');
+                        b.setAttribute('aria-selected', 'false');
+                    });
+                    btn.classList.add('active');
+                    btn.setAttribute('aria-selected', 'true');
+
+                    activeSource = btn.dataset.source;
+
+                    // Reset sub-filter to 'all' when switching categories for maximum clarity
+                    activeFilter = 'all';
+                    const tabsContainer = document.querySelector('.maintenance-tabs-bar');
+                    if (tabsContainer) {
+                        tabsContainer.querySelectorAll('[data-filter]').forEach(b => {
+                            const isAll = b.dataset.filter === 'all';
+                            b.classList.toggle('active', isAll);
+                            b.setAttribute('aria-selected', isAll ? 'true' : 'false');
+                        });
+                    }
+
+                    updateHeaderCopy();
+                    updateTabCounts();
+                    renderQueueTable();
+                });
+            }
+
+            // Search input listener
+            const searchInput = document.getElementById('maintenanceSearchInput');
+            if (searchInput) {
+                searchInput.addEventListener('input', (e) => {
+                    searchQuery = e.target.value.toLowerCase().trim();
+                    renderQueueTable();
+                });
+            }
+
+            // Status filters delegation
             const tabsContainer = document.querySelector('.maintenance-tabs-bar') || document.querySelector('.filters-group');
             if (tabsContainer) {
                 tabsContainer.addEventListener('click', (e) => {
@@ -515,262 +708,227 @@
             }
         });
 
-        function bindWorkerModalEvents() {
-            const modal = document.getElementById('addWorkerModal');
-            const openAddBtn = document.getElementById('openAddWorkerBtn');
-            const openManageBtn = document.getElementById('openManageWorkersBtn');
-            const closeBtn = document.getElementById('closeWorkerModalBtn');
-            const cancelBtn = document.getElementById('cancelWorkerModalBtn');
-            const form = document.getElementById('addWorkerForm');
+        let landlordProperties = [];
 
-            const tabListBtn = document.getElementById('tabWorkerListBtn');
-            const tabAddBtn = document.getElementById('tabWorkerAddBtn');
-            const listView = document.getElementById('workerListView');
-            const addView = document.getElementById('workerAddView');
+        
+        function bindWorkOrderModalEvents() {
+            const modal = document.getElementById('createWorkOrderModal');
+            const openBtn = document.getElementById('openCreateWorkOrderBtn');
+            const closeBtn = document.getElementById('closeCreateWorkOrderModalBtn');
+            const cancelBtn = document.getElementById('cancelCreateWorkOrderBtn');
+            const form = document.getElementById('createWorkOrderForm');
+            const propSelect = document.getElementById('woPropertySelect');
+            const scopeSelect = document.getElementById('woScopeSelect');
+            const unitGroup = document.getElementById('woUnitGroup');
+            const unitSelect = document.getElementById('woUnitSelect');
 
-            function switchWorkerTab(tab) {
-                clearWorkerAlerts();
-                if (tab === 'list') {
-                    tabListBtn.classList.add('active');
-                    tabAddBtn.classList.remove('active');
-                    listView.style.display = 'block';
-                    addView.style.display = 'none';
-                    loadWorkerList();
-                } else {
-                    tabAddBtn.classList.add('active');
-                    tabListBtn.classList.remove('active');
-                    addView.style.display = 'block';
-                    listView.style.display = 'none';
-                }
-            }
-
-            const openModal = (tab = 'list') => {
+            const openModal = async () => {
                 modal.classList.remove('hidden');
                 modal.style.display = 'flex';
-                switchWorkerTab(tab);
-            };
-
-            const toggleWorkerPassBtn = document.getElementById('toggleWorkerPasswordBtn');
-            const workerPassInput = document.getElementById('workerPassword');
-            const eyeOpen = document.getElementById('eyeIconOpen');
-            const eyeClosed = document.getElementById('eyeIconClosed');
-
-            const resetPasswordVisibility = () => {
-                if (workerPassInput) workerPassInput.type = 'password';
-                if (eyeOpen) eyeOpen.style.display = 'block';
-                if (eyeClosed) eyeClosed.style.display = 'none';
-                if (toggleWorkerPassBtn) toggleWorkerPassBtn.setAttribute('aria-label', 'Show password');
+                clearWoAlerts();
+                await loadLandlordProperties();
             };
 
             const closeModal = () => {
                 modal.classList.add('hidden');
                 modal.style.display = 'none';
                 form.reset();
-                resetPasswordVisibility();
-                clearWorkerAlerts();
+                if (unitGroup) unitGroup.style.display = 'none';
+                clearWoAlerts();
             };
 
-            if (toggleWorkerPassBtn && workerPassInput) {
-                toggleWorkerPassBtn.addEventListener('click', () => {
-                    const isPassword = workerPassInput.type === 'password';
-                    workerPassInput.type = isPassword ? 'text' : 'password';
-                    if (eyeOpen && eyeClosed) {
-                        eyeOpen.style.display = isPassword ? 'none' : 'block';
-                        eyeClosed.style.display = isPassword ? 'block' : 'none';
-                    }
-                    toggleWorkerPassBtn.setAttribute('aria-label', isPassword ? 'Hide password' : 'Show password');
-                });
-            }
-
-            if (openManageBtn) openManageBtn.addEventListener('click', () => openModal('list'));
-            if (openAddBtn) openAddBtn.addEventListener('click', () => openModal('add'));
-            if (tabListBtn) tabListBtn.addEventListener('click', () => switchWorkerTab('list'));
-            if (tabAddBtn) tabAddBtn.addEventListener('click', () => switchWorkerTab('add'));
-
+            if (openBtn) openBtn.addEventListener('click', openModal);
             if (closeBtn) closeBtn.addEventListener('click', closeModal);
             if (cancelBtn) cancelBtn.addEventListener('click', closeModal);
             modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
 
-            // Listen for delete button clicks on worker items
-            document.getElementById('workerListContainer').addEventListener('click', async (e) => {
-                const deleteBtn = e.target.closest('.btn-delete-worker');
-                if (!deleteBtn) return;
-
-                const workerId = deleteBtn.dataset.id;
-                const workerName = deleteBtn.dataset.name || 'Worker';
-
-                const confirmed = typeof window.domiknowConfirm === 'function'
-                    ? await window.domiknowConfirm({
-                        title: 'Delete Maintenance Worker',
-                        message: `Are you sure you want to remove "${workerName}"? They will no longer be able to log in or receive repair tasks.`,
-                        confirmText: 'Delete Worker',
-                        cancelText: 'Cancel',
-                        danger: true
-                    })
-                    : confirm(`Are you sure you want to remove worker "${workerName}"?`);
-
-                if (!confirmed) return;
-
-                deleteBtn.disabled = true;
-                deleteBtn.textContent = 'Removing…';
-                clearWorkerAlerts();
-
-                try {
-                    const res = await fetch(`/api/maintenance/workers/${workerId}`, {
-                        method: 'DELETE',
-                        headers: {
-                            'Authorization': `Bearer ${token}`
-                        }
-                    });
-                    const json = await res.json();
-                    if (res.ok) {
-                        showWorkerOk(json.message || `Worker "${workerName}" removed successfully.`);
-                        await loadWorkerList();
-                        // Also refresh the maintenance requests table to update any visible technician info
-                        await fetchMaintenanceQueue();
+            if (scopeSelect) {
+                scopeSelect.addEventListener('change', () => {
+                    if (scopeSelect.value === 'unit') {
+                        unitGroup.style.display = 'block';
                     } else {
-                        showWorkerErr(json.message || 'Failed to delete maintenance worker.');
-                        deleteBtn.disabled = false;
-                        deleteBtn.innerHTML = `
-                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
-                            <span>Delete</span>
-                        `;
+                        unitGroup.style.display = 'none';
+                        unitSelect.value = '';
                     }
-                } catch (err) {
-                    console.error(err);
-                    showWorkerErr('Network error. Please try again.');
-                    deleteBtn.disabled = false;
-                }
-            });
+                });
+            }
+
+            if (propSelect) {
+                propSelect.addEventListener('change', async () => {
+                    const propId = propSelect.value;
+                    unitSelect.innerHTML = '<option value="">-- Select Unit --</option>';
+                    if (!propId) return;
+
+                    try {
+                        const res = await fetch('/api/properties/' + propId + '/units', {
+                            headers: { 'Authorization': `Bearer ${token}` }
+                        });
+                        if (res.ok) {
+                            const json = await res.json();
+                            const units = json.data || [];
+                            units.forEach(u => {
+                                const opt = document.createElement('option');
+                                opt.value = u.id;
+                                opt.textContent = 'Unit ' + (u.unit_number || u.id);
+                                opt.dataset.unitNumber = u.unit_number || '';
+                                unitSelect.appendChild(opt);
+                            });
+                        }
+                    } catch (err) {
+                        console.error('Failed to load units for property:', err);
+                    }
+                });
+            }
 
             form.addEventListener('submit', async (e) => {
                 e.preventDefault();
-                clearWorkerAlerts();
+                clearWoAlerts();
 
-                const fullName = document.getElementById('workerFullName').value.trim();
-                const trade = document.getElementById('workerTrade').value.trim();
-                const email = document.getElementById('workerEmail').value.trim();
-                const contact = document.getElementById('workerContact').value.trim();
-                const password = document.getElementById('workerPassword').value;
+                const propertyId = propSelect.value;
+                const scope = scopeSelect.value;
+                const unitId = unitSelect.value || null;
+                const selectedUnitOpt = unitSelect.selectedOptions[0];
+                const unitNumber = selectedUnitOpt?.dataset.unitNumber || (scope === 'common_area' ? 'Common Area / Facility' : '');
+                const category = document.getElementById('woCategorySelect').value;
+                const priority = document.getElementById('woPrioritySelect').value;
+                const title = document.getElementById('woTitle').value.trim();
+                const schedule = document.getElementById('woSchedule').value.trim();
+                const description = document.getElementById('woDescription').value.trim();
+                const fileInput = document.getElementById('woFile');
 
-                const submitBtn = document.getElementById('submitWorkerBtn');
+                if (!propertyId) {
+                    showWoErr('Please select a target property.');
+                    return;
+                }
+                if (!title || !description || !category || !priority) {
+                    showWoErr('Please complete all required fields.');
+                    return;
+                }
+
+                const submitBtn = document.getElementById('submitCreateWorkOrderBtn');
                 submitBtn.disabled = true;
-                submitBtn.textContent = 'Creating...';
+                submitBtn.textContent = 'Submitting...';
 
                 try {
-                    const res = await fetch('/api/maintenance/workers', {
+                    let base64Content = null;
+                    let fileName = null;
+                    let mimeType = null;
+                    let fileSize = null;
+
+                    if (fileInput.files && fileInput.files[0]) {
+                        const file = fileInput.files[0];
+                        if (file.size > 10 * 1024 * 1024) {
+                            showWoErr('Attached file exceeds 10MB limit.');
+                            submitBtn.disabled = false;
+                            submitBtn.textContent = 'Submit Work Order';
+                            return;
+                        }
+                        const reader = new FileReader();
+                        const base64Promise = new Promise((resolve, reject) => {
+                            reader.onload = () => resolve(reader.result.split(',')[1]);
+                            reader.onerror = reject;
+                        });
+                        reader.readAsDataURL(file);
+                        base64Content = await base64Promise;
+                        fileName = file.name;
+                        mimeType = file.type;
+                        fileSize = file.size;
+                    }
+
+                    const payload = {
+                        property_id: propertyId,
+                        unit_id: unitId,
+                        unit_number: unitNumber,
+                        scope,
+                        issue_title: title,
+                        issue_description: description,
+                        issue_category: category,
+                        priority_level: priority,
+                        preferred_schedule: schedule || null,
+                        base64_content: base64Content,
+                        file_name: fileName,
+                        mime_type: mimeType,
+                        file_size: fileSize
+                    };
+
+                    const res = await fetch('/api/maintenance/landlord/requests', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
                             'Authorization': `Bearer ${token}`
                         },
-                        body: JSON.stringify({
-                            full_name: fullName,
-                            trade,
-                            email,
-                            contact_number: contact,
-                            password
-                        })
+                        body: JSON.stringify(payload)
                     });
-                    const json = await res.json();
 
+                    const json = await res.json();
                     if (res.ok) {
-                        showWorkerOk('Worker account created successfully! The worker can now log in.');
+                        showWoOk('Work order submitted successfully! Pre-approved and ready for Admin dispatch.');
                         form.reset();
+                        // Automatically switch to Owner Work Orders view after creating one
+                        activeSource = 'owner';
+                        const sourceTabsContainer = document.querySelector('.landlord-main-tabs-bar');
+                        if (sourceTabsContainer) {
+                            sourceTabsContainer.querySelectorAll('[data-source]').forEach(b => {
+                                const isOwner = b.dataset.source === 'owner';
+                                b.classList.toggle('active', isOwner);
+                                b.setAttribute('aria-selected', isOwner ? 'true' : 'false');
+                            });
+                        }
+                        updateHeaderCopy();
+                        await fetchMaintenanceQueue();
                         setTimeout(() => {
-                            switchWorkerTab('list');
-                        }, 1200);
+                            closeModal();
+                        }, 1400);
                     } else {
-                        showWorkerErr(json.message || 'Failed to create worker account.');
+                        showWoErr(json.message || 'Failed to submit maintenance work order.');
                     }
                 } catch (err) {
-                    console.error(err);
-                    showWorkerErr('Network error. Please try again.');
+                    console.error('Work order submission error:', err);
+                    showWoErr('Network error. Please try again.');
                 } finally {
                     submitBtn.disabled = false;
-                    submitBtn.textContent = 'Create Worker Account';
+                    submitBtn.textContent = 'Submit Work Order';
                 }
             });
         }
 
-        async function loadWorkerList() {
-            const container = document.getElementById('workerListContainer');
-            const countBadge = document.getElementById('workerListCount');
+        async function loadLandlordProperties() {
+            const propSelect = document.getElementById('woPropertySelect');
+            if (landlordProperties.length > 0) return;
 
             try {
-                const res = await fetch('/api/maintenance/personnel', {
+                const res = await fetch('/api/landlord/properties', {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
-                const json = await res.json();
-                const workers = json.data || [];
-
-                if (countBadge) countBadge.textContent = workers.length;
-
-                if (!workers || workers.length === 0) {
-                    container.innerHTML = `
-                        <div style="text-align: center; color: var(--text-muted); padding: 2.5rem 1rem;">
-                            <div style="font-size: 1rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.35rem;">No active workers found</div>
-                            <div style="font-size: 0.825rem; margin-bottom: 1rem;">You have not registered any maintenance personnel yet.</div>
-                            <button type="button" class="btn-add-worker" onclick="document.getElementById('tabWorkerAddBtn').click()">+ Add Worker</button>
-                        </div>
-                    `;
-                    return;
+                if (res.ok) {
+                    const json = await res.json();
+                    landlordProperties = json.data || [];
+                    propSelect.innerHTML = '<option value="">-- Select Property --</option>';
+                    landlordProperties.forEach(p => {
+                        const opt = document.createElement('option');
+                        opt.value = p.id;
+                        opt.textContent = p.property_name;
+                        propSelect.appendChild(opt);
+                    });
                 }
-
-                container.innerHTML = workers.map(w => {
-                    const rawName = (w.full_name || 'Worker').trim();
-                    const tradeMatch = rawName.match(/^(.*?)\s*\((.*?)\)$/);
-                    const nameOnly = tradeMatch ? tradeMatch[1].trim() : rawName;
-                    const tradeOnly = tradeMatch ? tradeMatch[2].trim() : (w.trade || '');
-
-                    // Extract clean alphabetic initials (e.g., "Zedrick" -> "ZE", "Juan Dela Cruz" -> "JC")
-                    const cleanLetters = nameOnly.replace(/[^a-zA-Z\s]/g, '').trim();
-                    const nameParts = cleanLetters.split(/\s+/).filter(Boolean);
-                    const initials = nameParts.length > 1
-                        ? (nameParts[0][0] + nameParts[nameParts.length - 1][0]).toUpperCase()
-                        : (cleanLetters.slice(0, 2).toUpperCase() || 'W');
-
-                    return `
-                        <div class="worker-manage-card">
-                            <div style="display: flex; align-items: center; gap: 0.85rem; min-width: 0;">
-                                <div style="width: 40px; height: 40px; border-radius: 50%; background: var(--color-action-primary); color: #ffffff; display: flex; align-items: center; justify-content: center; font-weight: 750; font-size: 0.85rem; flex-shrink: 0; letter-spacing: 0.5px;">
-                                    ${initials}
-                                </div>
-                                <div style="min-width: 0;">
-                                    <div style="font-weight: 750; font-size: 0.925rem; color: var(--text-primary); display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
-                                        <span>${nameOnly}</span>
-                                        ${tradeOnly ? `<span style="font-size: 0.72rem; padding: 2px 8px; border-radius: 9999px; background: rgba(3, 85, 243, 0.1); color: var(--color-link, #0355F3); font-weight: 600;">${tradeOnly}</span>` : ''}
-                                    </div>
-                                    <div style="font-size: 0.775rem; color: var(--text-muted); margin-top: 3px;">
-                                        ${w.email} ${w.contact_number ? '· ' + w.contact_number : ''}
-                                    </div>
-                                </div>
-                            </div>
-                            <button type="button" class="btn-delete-worker" data-id="${w.id}" data-name="${rawName.replace(/"/g, '&quot;')}">
-                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
-                                <span>Delete</span>
-                            </button>
-                        </div>
-                    `;
-                }).join('');
-
             } catch (err) {
-                console.error(err);
-                container.innerHTML = `<div style="text-align:center; color:var(--error); padding:2rem;">Failed to load maintenance personnel.</div>`;
+                console.error('Failed to load landlord properties:', err);
             }
         }
 
-        function showWorkerErr(msg) {
-            const el = document.getElementById('workerAlertErr');
+        function showWoErr(msg) {
+            const el = document.getElementById('woAlertErr');
             el.textContent = msg; el.style.display = 'block';
         }
-        function showWorkerOk(msg) {
-            const el = document.getElementById('workerAlertOk');
+        function showWoOk(msg) {
+            const el = document.getElementById('woAlertOk');
             el.textContent = msg; el.style.display = 'block';
         }
-        function clearWorkerAlerts() {
-            document.getElementById('workerAlertErr').style.display = 'none';
-            document.getElementById('workerAlertOk').style.display = 'none';
+        function clearWoAlerts() {
+            const errEl = document.getElementById('woAlertErr');
+            const okEl = document.getElementById('woAlertOk');
+            if (errEl) errEl.style.display = 'none';
+            if (okEl) okEl.style.display = 'none';
         }
 
         async function fetchMaintenanceQueue() {
@@ -795,48 +953,162 @@
             }
         }
 
+        function parseClientMeta(req) {
+            if (req && req.meta && typeof req.meta.total_cost === 'number') {
+                return {
+                    ...req.meta,
+                    liable_party: req.meta.liable_party || (req.meta.liability_party ? req.meta.liability_party.toUpperCase() : 'LANDLORD')
+                };
+            }
+            const rec = (req?.recommendations || '') + ' ' + (req?.landlord_remarks || '');
+            const liabMatch = rec.match(/\[LIABILITY:(LANDLORD|TENANT|SHARED)\]/i);
+            const basisMatch = rec.match(/\[BASIS:([A-Z0-9_]+)\]/i);
+            const quoteMatch = rec.match(/\[QUOTE:([A-Z_]+)\]/i);
+            const payMatch = rec.match(/\[PAYMENT:([A-Z_]+)\]/i);
+            const labor = Number(req?.labor_cost) || 0;
+            const material = Number(req?.material_cost) || 0;
+            const chosenParty = liabMatch ? liabMatch[1].toUpperCase() : (['appliance', 'other', 'others'].includes(req?.issue_category) ? 'TENANT' : 'LANDLORD');
+            return {
+                liable_party: chosenParty,
+                liability_party: chosenParty.toLowerCase(),
+                liability_basis: basisMatch ? basisMatch[1] : (chosenParty === 'TENANT' ? 'ART_1657_NEGLIGENCE' : 'ART_1654_WEAR_AND_TEAR'),
+                quote_status: quoteMatch ? quoteMatch[1] : (req?.status === 'quoted' ? 'PENDING_APPROVAL' : (req?.status === 'approved' ? 'APPROVED' : 'NOT_SUBMITTED')),
+                payment_status: payMatch ? payMatch[1] : 'UNPAID',
+                labor_cost: labor,
+                material_cost: material,
+                total_cost: labor + material
+            };
+        }
+    
         function updateTabCounts() {
+            let tenantCount = 0;
+            let ownerCount = 0;
+
+            requestQueue.forEach(req => {
+                if (isOwnerWorkOrder(req)) {
+                    ownerCount++;
+                } else {
+                    tenantCount++;
+                }
+            });
+
+            const elTenant = document.getElementById('countTenantRequests');
+            const elOwner = document.getElementById('countOwnerOrders');
+            if (elTenant) elTenant.textContent = tenantCount;
+            if (elOwner) elOwner.textContent = ownerCount;
+
+            // Subset for active primary source (tenant vs owner)
+            const subset = requestQueue.filter(req => {
+                const isOwner = isOwnerWorkOrder(req);
+                if (activeSource === 'tenant' && isOwner) return false;
+                if (activeSource === 'owner' && !isOwner) return false;
+                return true;
+            });
+
             const counts = {
-                all: requestQueue.length,
+                all: subset.length,
                 pending: 0,
                 approved: 0,
-                assigned: 0,
-                accepted: 0,
                 in_progress: 0,
                 completed: 0,
                 closed: 0,
                 rejected: 0
             };
-            requestQueue.forEach(req => {
-                if (['travelling', 'arrived', 'repairing'].includes(req.status)) counts.in_progress++;
-                else if (['verified', 'closed'].includes(req.status)) counts.closed++;
-                else if (counts[req.status] !== undefined) counts[req.status]++;
+
+            subset.forEach(req => {
+                if (['assigned', 'accepted', 'in_progress', 'travelling', 'arrived', 'repairing', 'quoted', 'inspection_submitted'].includes(req.status)) {
+                    counts.in_progress++;
+                } else if (['verified', 'closed'].includes(req.status)) {
+                    counts.closed++;
+                } else if (counts[req.status] !== undefined) {
+                    counts[req.status]++;
+                }
             });
 
             const countEls = {
                 all: document.getElementById('countAll'),
                 pending: document.getElementById('countPending'),
                 approved: document.getElementById('countApproved'),
-                assigned: document.getElementById('countAssigned'),
-                accepted: document.getElementById('countAccepted'),
                 in_progress: document.getElementById('countInProgress'),
                 completed: document.getElementById('countCompleted'),
                 closed: document.getElementById('countClosed'),
                 rejected: document.getElementById('countRejected')
             };
-            Object.keys(counts).forEach(key => {
-                if (countEls[key]) countEls[key].textContent = counts[key];
+
+            Object.keys(countEls).forEach(key => {
+                if (countEls[key]) countEls[key].textContent = counts[key] ?? 0;
             });
+
+            // Update KPI metric summaries (accurate calculations)
+            let totalCost = 0;
+            let landlordCost = 0;
+            let tenantCost = 0;
+            let landlordBalance = 0;
+            let activeOrders = 0;
+
+            requestQueue.forEach(req => {
+                const meta = parseClientMeta(req);
+                const cost = meta.total_cost || 0;
+                const payStatus = String(meta.payment_status || '').toUpperCase();
+                const isSettledOrPending = payStatus === 'PAID' || payStatus === 'VERIFIED' || payStatus === 'WAITING_VERIFICATION';
+                const liable = String(meta.liable_party || meta.liability_party || '').toUpperCase();
+
+                if (['completed', 'verified', 'closed'].includes(req.status)) {
+                    totalCost += cost;
+                    if (liable === 'TENANT') {
+                        tenantCost += cost;
+                    } else if (liable === 'SHARED') {
+                        const half = Math.round((cost / 2) * 100) / 100;
+                        tenantCost += half;
+                        landlordCost += half;
+                        if (!isSettledOrPending) landlordBalance += half;
+                    } else {
+                        landlordCost += cost;
+                        if (!isSettledOrPending) landlordBalance += cost;
+                    }
+                }
+                if (['pending', 'approved', 'assigned', 'accepted', 'travelling', 'arrived', 'repairing', 'quoted', 'inspection_submitted'].includes(req.status)) {
+                    activeOrders++;
+                }
+            });
+
+            const kpiTotalEl = document.getElementById('kpiTotalCost');
+            const kpiLandlordEl = document.getElementById('kpiLandlordCost');
+            const kpiTenantEl = document.getElementById('kpiTenantCost');
+            const kpiLandlordBalanceEl = document.getElementById('kpiLandlordBalance');
+            const kpiActiveEl = document.getElementById('kpiActiveOrders');
+
+            if (kpiTotalEl) kpiTotalEl.textContent = '₱' + totalCost.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            if (kpiLandlordEl) kpiLandlordEl.textContent = '₱' + landlordCost.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            if (kpiTenantEl) kpiTenantEl.textContent = '₱' + tenantCost.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            if (kpiLandlordBalanceEl) kpiLandlordBalanceEl.textContent = '₱' + landlordBalance.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            if (kpiActiveEl) kpiActiveEl.textContent = activeOrders;
         }
 
         function renderQueueTable() {
             const tableBody = document.getElementById('maintenanceQueueBody');
+            if (!tableBody) return;
             
             // Filter queue logic
             const filtered = requestQueue.filter(req => {
+                const isOwner = isOwnerWorkOrder(req);
+                if (activeSource === 'tenant' && isOwner) return false;
+                if (activeSource === 'owner' && !isOwner) return false;
+
+                if (searchQuery) {
+                    const title = (req.issue_title || '').toLowerCase();
+                    const prop = (req.properties?.property_name || '').toLowerCase();
+                    const tenant = (req.users?.full_name || '').toLowerCase();
+                    const unit = (req.unit_number || '').toLowerCase();
+                    const cat = (req.issue_category || '').toLowerCase();
+                    if (!title.includes(searchQuery) && !prop.includes(searchQuery) && !tenant.includes(searchQuery) && !unit.includes(searchQuery) && !cat.includes(searchQuery)) {
+                        return false;
+                    }
+                }
+
                 if (activeFilter === 'all') return true;
                 if (activeFilter === 'in_progress') {
-                    return ['travelling', 'arrived', 'repairing'].includes(req.status);
+                    return ['assigned', 'accepted', 'in_progress', 'travelling', 'arrived', 'repairing', 'quoted', 'inspection_submitted'].includes(req.status);
                 }
                 if (activeFilter === 'closed') {
                     return ['verified', 'closed'].includes(req.status);
@@ -844,8 +1116,13 @@
                 return req.status === activeFilter;
             });
 
+            updateHeaderCopy();
+
             if (filtered.length === 0) {
-                tableBody.innerHTML = `<tr><td colspan="8" style="text-align: center; padding: 3rem; color: var(--text-muted);">No maintenance requests found under this category.</td></tr>`;
+                let emptyMsg = activeSource === 'owner'
+                    ? 'No owner work orders found in this view.'
+                    : 'No tenant maintenance requests found in this view.';
+                tableBody.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 3rem; color: var(--text-muted);">${emptyMsg}</td></tr>`;
                 return;
             }
 
@@ -860,27 +1137,57 @@
                 else if (req.status === 'rejected') statusBadgeClass = 'status-rejected';
 
                 let technicianName = req.assigned_maintenance?.full_name || 'Unassigned';
-                const schedDisplay = req.preferred_schedule ? `Schedule: ${req.preferred_schedule}` : 'Schedule: Flexible';
+                const schedDisplay = req.preferred_schedule ? `Schedule: ${escapeHtml(req.preferred_schedule)}` : 'Schedule: Flexible';
 
                 const row = document.createElement('tr');
+                row.className = 'maintenance-row-clickable';
+                row.dataset.id = req.id;
+                row.tabIndex = 0;
+                row.setAttribute('role', 'button');
+                row.setAttribute('aria-label', `View request details for ${escapeHtml(req.issue_title)}`);
+
+                const isOwner = isOwnerWorkOrder(req);
+                const tenantName = req.users?.full_name || '';
+                const tenantContact = req.users?.contact_number || req.users?.email || '';
+                let tenantDisplay = '';
+
+                if (isOwner) {
+                    tenantDisplay = '<div style="font-weight:700; color: var(--color-info-text);">Owner (Landlord)</div>';
+                    if (tenantName && req.users?.role === 'tenant') {
+                        tenantDisplay += `<div style="font-size:0.75rem; color:var(--text-muted); margin-top:1px;">Occupant: ${escapeHtml(tenantName)}</div>`;
+                    } else if (req.unit_number && req.unit_number.toLowerCase().includes('common')) {
+                        tenantDisplay += '<div style="font-size:0.75rem; color:var(--text-muted); margin-top:1px;">Common Facility</div>';
+                    }
+                } else {
+                    tenantDisplay = `<div style="font-weight:700; color:var(--text-primary);">${escapeHtml(tenantName || 'Tenant')}</div>${tenantContact ? `<div style="font-size:0.75rem; color:var(--text-muted); margin-top:1px;">${escapeHtml(tenantContact)}</div>` : ''}`;
+                }
+
                 row.innerHTML = `
                     <td>
-                        <div style="font-weight:750; color:var(--text-primary);">${req.properties?.property_name || 'Property'}</div>
-                        <div style="font-size:0.75rem; color:var(--text-muted);">Unit: ${req.unit_number || 'N/A'}</div>
+                        <div style="font-weight:750; color:var(--text-primary);">${escapeHtml(req.properties?.property_name || 'Property')}</div>
+                        <div style="font-size:0.75rem; color:var(--text-muted); margin-top:2px;">Unit: ${escapeHtml(req.unit_number || 'N/A')}</div>
                     </td>
-                    <td style="font-weight:600; color:var(--text-primary);">${req.users?.full_name || '—'}</td>
+                    <td style="font-weight:600; color:var(--text-primary);">${tenantDisplay}</td>
                     <td>
-                        <div style="font-weight:700; color: var(--color-link);">${req.issue_title}</div>
+                        <div style="font-weight:700; color: var(--color-link);">${escapeHtml(req.issue_title)}</div>
                         <div style="font-size:0.75rem; color:var(--text-muted); margin-top:2px;">${schedDisplay}</div>
                     </td>
-                    <td style="text-transform: capitalize;">${req.issue_category}</td>
-                    <td><span class="status-badge ${priorityBadgeClass}" style="text-transform:capitalize;">${req.priority_level}</span></td>
-                    <td><span class="status-badge ${statusBadgeClass}" style="text-transform:capitalize;">${req.status.replace('_', ' ')}</span></td>
-                    <td style="font-weight:600; color:var(--text-secondary);">${technicianName}</td>
-                    <td>
-                        <a href="maintenance-details.html?id=${req.id}" class="action-btn btn-view">Manage</a>
-                    </td>
+                    <td style="text-transform: capitalize;">${escapeHtml(req.issue_category)}</td>
+                    <td><span class="status-badge ${priorityBadgeClass}" style="text-transform:capitalize;">${escapeHtml(req.priority_level)}</span></td>
+                    <td><span class="status-badge ${statusBadgeClass}" style="text-transform:capitalize;">${escapeHtml((req.status || '').replace('_', ' '))}</span></td>
+                    <td style="font-weight:600; color:var(--text-secondary);">${escapeHtml(technicianName)}</td>
                 `;
+
+                row.addEventListener('click', () => {
+                    window.location.href = `maintenance-details.html?id=${encodeURIComponent(req.id)}`;
+                });
+                row.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        window.location.href = `maintenance-details.html?id=${encodeURIComponent(req.id)}`;
+                    }
+                });
+
                 tableBody.appendChild(row);
             });
         }

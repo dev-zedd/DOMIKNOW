@@ -39,7 +39,7 @@ const ratingsController = {
             // 2. Check lease eligibility
             const lease = await ratingsModel.findEligibleLease(tenantId, lease_id);
             if (!lease) {
-                return responseHelper.error(res, 'You can only rate active, ended, or terminated leases you are a party to.');
+                return responseHelper.error(res, 'You can only rate ended, terminated, or completed leases you are a party to.');
             }
 
             // 3. Block duplicate
