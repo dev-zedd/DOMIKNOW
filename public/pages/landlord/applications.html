@@ -99,9 +99,11 @@
             border-bottom: 1px solid var(--color-border-default, #e2e8f0);
             background: var(--color-bg-surface, #ffffff);
         }
+        .dashboard-layout-landlord .landlord-table-search,
         .landlord-table-search {
-            flex: 1 1 260px;
-            min-width: 200px;
+            flex: 0 1 380px !important;
+            width: 380px !important;
+            max-width: 100% !important;
             min-height: 38px;
             height: 38px;
             padding: 6px 14px 6px 36px !important;
@@ -256,6 +258,7 @@
         .date-cell {
             display: inline-flex;
             align-items: center;
+            justify-content: center;
             gap: 6px;
             white-space: nowrap;
         }
@@ -265,27 +268,58 @@
             white-space: nowrap;
         }
 
-        /* ── Doc Chip ── */
-        .doc-chip {
+        /* ── Clickable Application Row ── */
+        .clickable-application-row {
+            cursor: pointer;
+            transition: background-color 0.16s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .clickable-application-row:hover td {
+            background-color: var(--color-bg-hover, #f8fafc) !important;
+        }
+        .clickable-application-row:focus-visible {
+            outline: 2px solid var(--color-action-primary, #0355f3);
+            outline-offset: -2px;
+        }
+
+        /* ── Tenant Overall Rating Cell & Badge ── */
+        .tenant-rating-cell {
             display: inline-flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
+            gap: 3px;
+            white-space: nowrap;
+            margin: 0 auto;
+        }
+        .tenant-rating-badge {
+            display: inline-flex;
+            align-items: center;
             gap: 5px;
             padding: 3px 10px;
             border-radius: 999px;
-            font-size: 0.72rem;
-            font-weight: 650;
-            white-space: nowrap;
+            font-size: 0.8125rem;
+            font-weight: 800;
+            line-height: 1;
         }
-        .doc-chip--has-docs {
-            background: rgba(16, 185, 129, 0.08);
+        .tenant-rating-badge--high {
+            background: rgba(16, 185, 129, 0.1);
             color: var(--color-success-text, #059669);
-            border: 1px solid rgba(16, 185, 129, 0.22);
+            border: 1px solid rgba(16, 185, 129, 0.25);
         }
-        .doc-chip--no-docs {
-            background: rgba(245, 158, 11, 0.08);
+        .tenant-rating-badge--mid {
+            background: rgba(245, 158, 11, 0.1);
             color: var(--color-warning-text, #d97706);
-            border: 1px solid rgba(245, 158, 11, 0.22);
+            border: 1px solid rgba(245, 158, 11, 0.25);
+        }
+        .tenant-rating-badge--low {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--color-error-text, #dc2626);
+            border: 1px solid rgba(239, 68, 68, 0.25);
+        }
+        .tenant-rating-label {
+            font-size: 0.72rem;
+            color: var(--color-text-muted, #64748b);
+            font-weight: 600;
         }
 
         /* ── Status Badges ── */
@@ -326,40 +360,6 @@
             background: rgba(239, 68, 68, 0.1) !important;
             color: var(--color-error-text, #dc2626) !important;
             border: 1px solid rgba(239, 68, 68, 0.25) !important;
-        }
-
-        /* ── Action Button ── */
-        .btn-action-verify {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 5px;
-            height: 32px;
-            min-height: 32px;
-            padding: 0 14px;
-            border-radius: 8px;
-            background: var(--color-action-primary, #0355f3);
-            color: #ffffff !important;
-            font-size: 0.78rem;
-            font-weight: 650;
-            text-decoration: none !important;
-            border: 1px solid var(--color-action-primary, #0355f3);
-            box-shadow: 0 1px 3px rgba(3, 85, 243, 0.2);
-            transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
-            white-space: nowrap;
-        }
-        .btn-action-verify:hover {
-            background: #0243c2;
-            border-color: #0243c2;
-            transform: translateY(-1px);
-            box-shadow: 0 3px 8px rgba(3, 85, 243, 0.3);
-            color: #ffffff !important;
-        }
-        .btn-action-verify svg {
-            transition: transform 0.18s ease;
-        }
-        .btn-action-verify:hover svg {
-            transform: translateX(2px);
         }
 
         /* ── Empty State ── */
@@ -422,28 +422,27 @@
         </div>
 
         <!-- Modern Table Card with Integrated Search Controls -->
-        <div class="table-card landlord-table-card">
+        <div class="table-card landlord-table-card" data-no-auto-controls>
             <div class="landlord-table-controls">
-                <input type="search" id="applicationSearchInput" class="form-input landlord-table-search" placeholder="Search applicant name, email, property, room..." aria-label="Search applications">
+                <input type="search" id="applicationSearchInput" class="form-input landlord-table-search" placeholder="Search applicant, property, room..." aria-label="Search applications">
                 <span class="landlord-table-result-count" id="applicationResultCount" aria-live="polite">Loading applications…</span>
             </div>
 
             <div class="ui-table-wrapper">
-                <table class="landlord-data-table landlord-record-table">
+                <table class="landlord-data-table landlord-record-table" data-no-controls="true">
                     <thead>
                         <tr>
-                            <th scope="col" style="width: 25%;">Applicant</th>
-                            <th scope="col" style="width: 25%;">Target Property</th>
-                            <th scope="col" style="width: 14%;">Desired Move-in</th>
-                            <th scope="col" style="width: 11%; text-align: center;">Docs</th>
+                            <th scope="col" style="width: 27%;">Applicant</th>
+                            <th scope="col" style="width: 23%;">Target Property</th>
+                            <th scope="col" style="width: 14%; text-align: center;">Desired Move-in</th>
                             <th scope="col" style="width: 12%; text-align: center;">Submitted</th>
-                            <th scope="col" style="width: 10%; text-align: center;">Status</th>
-                            <th scope="col" style="width: 100px; min-width: 100px; text-align: right;">Action</th>
+                            <th scope="col" style="width: 11%; text-align: center;">Status</th>
+                            <th scope="col" style="width: 13%; text-align: center;">Overall Rating</th>
                         </tr>
                     </thead>
                     <tbody id="applicationsTableBody">
                         <tr>
-                            <td colspan="7" style="text-align: center; color: var(--color-text-muted); padding: 48px 20px;">
+                            <td colspan="6" style="text-align: center; color: var(--color-text-muted); padding: 48px 20px;">
                                 <div class="empty-state-container" style="padding: 1rem;">
                                     <p style="color: var(--color-text-muted); font-size: 0.875rem;">Loading tenant applications…</p>
                                 </div>
@@ -496,7 +495,7 @@
                 if (!response.ok) {
                     tableBody.innerHTML = `
                         <tr>
-                            <td colspan="7" style="text-align: center; color: var(--color-error-text, #dc2626); padding: 36px 16px;">
+                            <td colspan="6" style="text-align: center; color: var(--color-error-text, #dc2626); padding: 36px 16px;">
                                 Failed to load applications. Please try refreshing.
                             </td>
                         </tr>
@@ -513,7 +512,7 @@
                 console.error('Error fetching tenant applications:', err);
                 tableBody.innerHTML = `
                     <tr>
-                        <td colspan="7" style="text-align: center; color: var(--color-error-text, #dc2626); padding: 36px 16px;">
+                        <td colspan="6" style="text-align: center; color: var(--color-error-text, #dc2626); padding: 36px 16px;">
                             Error contacting server. Please check your connection.
                         </td>
                     </tr>
@@ -574,14 +573,18 @@
                 filtered = filtered.filter(app => {
                     const applicantName = (app.users?.full_name || '').toLowerCase();
                     const applicantEmail = (app.users?.email || '').toLowerCase();
+                    const applicantPhone = (app.users?.contact_number || '').toLowerCase();
                     const propName = (app.properties?.property_name || '').toLowerCase();
                     const unitInfo = (app.unit?.unit_number || app.property_units?.unit_number || '').toString().toLowerCase();
                     const bedInfo = (app.bed?.bed_label || app.unit_beds?.bed_label || '').toString().toLowerCase();
+                    const ratingLabel = (app.tenant_rating?.label || '').toLowerCase();
                     return applicantName.includes(searchQuery) ||
                            applicantEmail.includes(searchQuery) ||
+                           applicantPhone.includes(searchQuery) ||
                            propName.includes(searchQuery) ||
                            unitInfo.includes(searchQuery) ||
-                           bedInfo.includes(searchQuery);
+                           bedInfo.includes(searchQuery) ||
+                           ratingLabel.includes(searchQuery);
                 });
             }
 
@@ -596,7 +599,7 @@
             if (filtered.length === 0) {
                 tableBody.innerHTML = `
                     <tr>
-                        <td colspan="7">
+                        <td colspan="6">
                             <div class="empty-state-container">
                                 <div class="empty-icon" aria-hidden="true">
                                     <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -649,9 +652,40 @@
                     }
                 }
 
-                const docCount = Number(app.document_count || 0);
+                // Overall Tenant Rating
+                const ratingObj = app.tenant_rating || {
+                    score: 4.5,
+                    label: 'First-Time Renter',
+                    badge_class: 'status-active',
+                    summary: 'Clean Record · Applicant'
+                };
+                const ratingScore = Number(ratingObj.score || 4.5);
+                const ratingLabel = ratingObj.label || 'Good Standing';
+                let badgeModifier = 'tenant-rating-badge--high';
+                if (ratingScore < 3.0) {
+                    badgeModifier = 'tenant-rating-badge--low';
+                } else if (ratingScore < 4.0) {
+                    badgeModifier = 'tenant-rating-badge--mid';
+                }
 
                 const row = document.createElement('tr');
+                row.className = 'clickable-application-row';
+                row.setAttribute('tabindex', '0');
+                row.setAttribute('role', 'button');
+                row.setAttribute('aria-label', `Review application for ${tName}`);
+                row.title = `Click to view application details for ${tName}`;
+
+                const navigateToDetails = () => {
+                    window.location.href = `application-details.html?id=${encodeURIComponent(app.id)}`;
+                };
+                row.addEventListener('click', navigateToDetails);
+                row.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        navigateToDetails();
+                    }
+                });
+
                 row.innerHTML = `
                     <td>
                         <div class="user-identity-cell">
@@ -669,17 +703,11 @@
                             ${unitBedHtml ? `<div class="property-unit-badge">${unitBedHtml}</div>` : ''}
                         </div>
                     </td>
-                    <td>
+                    <td style="text-align: center;">
                         <div class="date-cell">
                             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--color-text-muted); flex-shrink: 0;"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
                             <span class="user-date-text" style="font-weight: 600; color: var(--color-text-primary);">${moveInDate}</span>
                         </div>
-                    </td>
-                    <td style="text-align: center;">
-                        <span class="doc-chip ${docCount > 0 ? 'doc-chip--has-docs' : 'doc-chip--no-docs'}">
-                            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
-                            ${docCount} ${docCount === 1 ? 'doc' : 'docs'}
-                        </span>
                     </td>
                     <td style="text-align: center;">
                         <span class="user-date-text">${submittedDate}</span>
@@ -687,11 +715,14 @@
                     <td style="text-align: center;">
                         <span class="status-badge ${statusClass}">${domiknowEscapeHtml(statusLabel)}</span>
                     </td>
-                    <td style="text-align: right; white-space: nowrap;">
-                        <a href="application-details.html?id=${encodeURIComponent(app.id)}" class="btn-action-verify">
-                            <span>Review</span>
-                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
-                        </a>
+                    <td style="text-align: center;">
+                        <div class="tenant-rating-cell">
+                            <div class="tenant-rating-badge ${badgeModifier}">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                                <span>${ratingScore.toFixed(1)}</span>
+                            </div>
+                            <span class="tenant-rating-label">${domiknowEscapeHtml(ratingLabel)}</span>
+                        </div>
                     </td>
                 `;
                 tableBody.appendChild(row);

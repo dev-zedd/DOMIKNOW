@@ -49,9 +49,7 @@
         { title: 'User Accounts', url: '/api/users', field: 'account_status', href: 'users.html', icon: 'users', color: 'blue' },
         { title: 'Property Submissions', url: '/api/admin/properties/review', field: 'status', href: 'property-review.html', icon: 'building', color: 'amber' },
         { title: 'Monitored Leases', url: '/api/admin/monitor/leases', field: 'lease_status', href: 'payments.html', icon: 'file-text', color: 'purple' },
-        { title: 'Payment Submissions', url: '/api/admin/monitor/payments', field: 'payment_status', href: 'payments.html', icon: 'credit-card', color: 'green' },
-        { title: 'Reports (Tenants)', url: '/api/admin/tenant-reports', field: 'status', href: 'reports.html', icon: 'alert-triangle', color: 'amber' },
-        { title: 'Reports (Landlords)', url: '/api/admin/landlord-reports', field: 'status', href: 'reports.html', icon: 'alert-circle', color: 'amber' }
+        { title: 'Payment Submissions', url: '/api/admin/monitor/payments', field: 'payment_status', href: 'payments.html', icon: 'credit-card', color: 'green' }
     ];
 
     let results = [], loadedAt = '';

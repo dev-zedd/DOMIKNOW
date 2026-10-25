@@ -2,7 +2,7 @@ const supabase = require('../config/supabaseClient');
 
 const ratingsModel = {
     /**
-     * Check if tenant has an active, ended, or terminated lease for this property.
+     * Check if tenant has an ended, terminated, or completed lease for this property.
      * Returns the lease record (with landlord_id) or null.
      */
     async findEligibleLease(tenantId, leaseId) {
@@ -11,7 +11,7 @@ const ratingsModel = {
             .select('id, landlord_id, property_id, lease_status, lease_number')
             .eq('id', leaseId)
             .eq('tenant_id', tenantId)
-            .in('lease_status', ['active', 'ended', 'terminated'])
+            .in('lease_status', ['ended', 'terminated', 'completed', 'expired'])
             .maybeSingle();
 
         if (error) throw error;
@@ -19,7 +19,7 @@ const ratingsModel = {
     },
 
     /**
-     * Get all eligible leases for rating for a tenant (active/ended/terminated).
+     * Get all eligible leases for rating for a tenant (ended/terminated/completed/expired).
      * Returns leases with property name and landlord info, including whether
      * a rating has already been submitted for each.
      */
@@ -41,7 +41,7 @@ const ratingsModel = {
                 )
             `)
             .eq('tenant_id', tenantId)
-            .in('lease_status', ['active', 'ended', 'terminated'])
+            .in('lease_status', ['ended', 'terminated', 'completed', 'expired'])
             .order('created_at', { ascending: false });
 
         if (leaseErr) throw leaseErr;

@@ -334,3 +334,88 @@ body[data-tenant-page="properties"] .recommendation-controls {
     transition: none !important;
   }
 }
+
+/* Location permission notice toast */
+.location-permission-notice {
+  position: fixed;
+  right: 18px;
+  bottom: 18px;
+  z-index: 1600;
+  display: grid;
+  width: min(460px, calc(100vw - 32px));
+  grid-template-columns: auto minmax(0, 1fr) auto auto;
+  gap: 12px;
+  align-items: center;
+  padding: 14px;
+  border: 1px solid var(--color-info-border);
+  border-radius: var(--radius-lg);
+  background: color-mix(in srgb, var(--color-bg-surface) 96%, transparent);
+  box-shadow: var(--shadow-dropdown);
+  color: var(--color-text-primary);
+  backdrop-filter: blur(16px);
+}
+
+.location-permission-notice__icon {
+  display: grid;
+  width: 38px;
+  height: 38px;
+  place-items: center;
+  border-radius: var(--radius-md);
+  background: var(--color-action-primary-subtle);
+  color: var(--color-link);
+}
+
+.location-permission-notice__icon .ui-icon { width: 19px; height: 19px; }
+.location-permission-notice__content { display: grid; min-width: 0; gap: 2px; }
+.location-permission-notice__content strong { font-size: var(--font-size-body-sm); }
+.location-permission-notice__message { color: var(--color-text-secondary); font-size: var(--font-size-label-sm); line-height: 1.4; }
+
+.location-permission-notice__action {
+  min-height: 36px;
+  padding: 7px 10px;
+  border: 1px solid var(--color-action-primary);
+  border-radius: var(--radius-md);
+  background: var(--color-action-primary);
+  color: #ffffff;
+  font: 700 var(--font-size-label-sm)/1 var(--font-family);
+  cursor: pointer;
+}
+
+.location-permission-notice__action:disabled {
+  cursor: wait;
+  opacity: 0.7;
+}
+
+.location-permission-notice__close {
+  display: inline-grid;
+  width: 36px;
+  min-width: 36px;
+  height: 36px;
+  min-height: 36px;
+  padding: 0;
+  place-items: center;
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-md);
+  background: var(--color-bg-surface);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+}
+
+.location-permission-notice__close:hover,
+.location-permission-notice__close:focus-visible {
+  border-color: var(--color-border-strong);
+  background: var(--color-bg-hover);
+  color: var(--color-text-primary);
+}
+
+.location-permission-notice__close .ui-icon { width: 17px; height: 17px; }
+
+@media (max-width: 540px) {
+  .location-permission-notice {
+    right: 16px;
+    bottom: 16px;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+  }
+  .location-permission-notice__action { grid-column: 1 / -1; width: 100%; }
+}
+

@@ -21,7 +21,6 @@ const billingRoutes = require('./routes/billingRoutes');
 const paymentRoutes = require('./routes/paymentRoutes');
 const adminMonitorRoutes = require('./routes/adminMonitorRoutes');
 const maintenanceRoutes = require('./routes/maintenanceRoutes');
-const reportRoutes = require('./routes/reportRoutes');
 const feedbackRoutes = require('./routes/feedbackRoutes');
 const storageRoutes = require('./routes/storageRoutes');
 const ratingsRoutes = require('./routes/ratingsRoutes');
@@ -89,6 +88,10 @@ app.get('/pages/tenant/notifications.html', (req, res) => res.redirect(302, '/pa
 app.get('/pages/landlord/notifications.html', (req, res) => res.redirect(302, '/pages/landlord/properties.html'));
 app.get('/pages/admin/notifications.html', (req, res) => res.redirect(302, '/pages/admin/users.html'));
 app.get('/pages/maintenance/notifications.html', (req, res) => res.redirect(302, '/pages/maintenance/dashboard.html'));
+app.get('/pages/maintenance/task-details.htm', (req, res) => {
+    const qs = req.url.includes('?') ? req.url.slice(req.url.indexOf('?')) : '';
+    res.redirect(302, '/pages/maintenance/task-details.html' + qs);
+});
 
 // Serve static files from the 'public' folder
 app.use(express.static(path.join(__dirname, '../public')));
@@ -135,7 +138,6 @@ app.use('/api', unitRoutes);
 // /api routers so their router-level guards cannot intercept it.
 app.use('/api', feedbackRoutes);
 app.use('/api', maintenanceRoutes);
-app.use('/api', reportRoutes);
 app.use('/api', ratingsRoutes);
 app.use('/api', propertyRatingRoutes);
 app.use('/api', landlordRatingRoutes);

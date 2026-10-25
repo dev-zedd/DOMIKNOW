@@ -64,6 +64,148 @@ async function checkAndApplyOverduePenalties(userId, isLandlord = true) {
     }
 }
 
+async function autoGenerateMonthlyBillings(userId, isLandlord = true) {
+    try {
+        const today = new Date();
+        const currentYear = today.getFullYear();
+        const currentMonth = today.getMonth() + 1; // 1-12
+        const currentYearMonth = `${currentYear}-${String(currentMonth).padStart(2, '0')}`;
+
+        let leaseQuery = supabase
+            .from('lease_records')
+            .select('*')
+            .eq('lease_status', 'active');
+
+        if (isLandlord) {
+            leaseQuery = leaseQuery.eq('landlord_id', userId);
+        } else {
+            leaseQuery = leaseQuery.eq('tenant_id', userId);
+        }
+
+        const { data: leases, error: leaseErr } = await leaseQuery;
+        if (leaseErr || !leases || leases.length === 0) return;
+
+        for (const lease of leases) {
+            if (!lease.lease_start_date) continue;
+
+            const startDt = new Date(lease.lease_start_date);
+            const startYear = startDt.getFullYear();
+            const startMonth = startDt.getMonth() + 1;
+
+            const endDt = lease.lease_end_date ? new Date(lease.lease_end_date) : null;
+            const endYear = endDt ? endDt.getFullYear() : currentYear;
+            const endMonth = endDt ? endDt.getMonth() + 1 : currentMonth;
+
+            // Fetch all existing bills for this lease to check which months are already billed
+            const { data: existingBills } = await supabase
+                .from('billing_records')
+                .select('id, billing_month')
+                .eq('lease_id', lease.id);
+
+            const existingMonthPrefixes = new Set(
+                (existingBills || []).map(b => (b.billing_month || '').slice(0, 7))
+            );
+
+            let iterYear = startYear;
+            let iterMonth = startMonth;
+
+            while (
+                (iterYear < currentYear || (iterYear === currentYear && iterMonth <= currentMonth)) &&
+                (!endDt || (iterYear < endYear || (iterYear === endYear && iterMonth <= endMonth)))
+            ) {
+                const iterYearMonth = `${iterYear}-${String(iterMonth).padStart(2, '0')}`;
+
+                if (!existingMonthPrefixes.has(iterYearMonth)) {
+                    const isStartMonth = (iterYear === startYear && iterMonth === startMonth);
+                    const dueDay = Math.min(Math.max(parseInt(lease.payment_due_day || 5, 10), 1), 28);
+                    const dueDayStr = String(dueDay).padStart(2, '0');
+                    const dueDateStr = `${iterYearMonth}-${dueDayStr}`;
+                    const rentAmt = parseFloat(lease.monthly_rent || 0);
+
+                    if (isStartMonth) {
+                        // Generate Initial Move-In statement
+                        const secDep = parseFloat(lease.security_deposit || 0);
+                        const advPay = parseFloat(lease.advance_payment || 0);
+                        const totalAmt = rentAmt + secDep + advPay;
+
+                        const moveInBill = await billingModel.createBilling({
+                            lease_id: lease.id,
+                            tenant_id: lease.tenant_id,
+                            landlord_id: lease.landlord_id,
+                            property_id: lease.property_id,
+                            unit_id: lease.unit_id || null,
+                            billing_month: `${iterYearMonth} (Move-In)`,
+                            rent_amount: rentAmt,
+                            utility_amount: 0,
+                            water: 0,
+                            electricity: 0,
+                            internet: 0,
+                            parking: 0,
+                            other_charges: secDep + advPay,
+                            penalty_amount: 0,
+                            total_amount: totalAmt,
+                            due_date: lease.lease_start_date || dueDateStr,
+                            billing_status: 'pending_payment',
+                            remarks: `Initial Move-In Billing: Monthly Rent (₱${rentAmt.toLocaleString()}) + Security Deposit (₱${secDep.toLocaleString()}) + Advance Payment (₱${advPay.toLocaleString()})`
+                        });
+
+                        existingMonthPrefixes.add(iterYearMonth);
+
+                        await notificationModel.create({
+                            user_id: lease.tenant_id,
+                            type: 'billing_issued',
+                            title: 'Move-in billing statement ready',
+                            message: `Your initial move-in statement is ready. Total due: ₱${totalAmt.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}.`,
+                            reference_id: moveInBill.id
+                        });
+                    } else {
+                        // Regular monthly recurring billing
+                        const monthlyBill = await billingModel.createBilling({
+                            lease_id: lease.id,
+                            tenant_id: lease.tenant_id,
+                            landlord_id: lease.landlord_id,
+                            property_id: lease.property_id,
+                            unit_id: lease.unit_id || null,
+                            billing_month: iterYearMonth,
+                            rent_amount: rentAmt,
+                            utility_amount: 0,
+                            water: 0,
+                            electricity: 0,
+                            internet: 0,
+                            parking: 0,
+                            other_charges: 0,
+                            penalty_amount: 0,
+                            total_amount: rentAmt,
+                            due_date: dueDateStr,
+                            billing_status: 'pending_payment',
+                            remarks: `Automatic recurring monthly billing statement for ${iterYearMonth}.`
+                        });
+
+                        existingMonthPrefixes.add(iterYearMonth);
+
+                        await notificationModel.create({
+                            user_id: lease.tenant_id,
+                            type: 'billing_issued',
+                            title: `New Monthly Billing Statement (${iterYearMonth})`,
+                            message: `Your recurring monthly billing statement for ${iterYearMonth} is ready. Total due: ₱${rentAmt.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}. Due date: ${dueDateStr}.`,
+                            reference_id: monthlyBill.id
+                        });
+                    }
+                }
+
+                iterMonth++;
+                if (iterMonth > 12) {
+                    iterMonth = 1;
+                    iterYear++;
+                }
+            }
+        }
+    } catch (err) {
+        console.error('Error auto-generating monthly billings:', err);
+    }
+}
+
+
 const billingController = {
     async createBilling(req, res) {
         try {
@@ -278,11 +420,19 @@ const billingController = {
 
             // If target billing status is specified, validate it
             if (billing_status) {
-                const allowedStatusTransitions = ['draft', 'pending_payment', 'cancelled'];
+                const allowedStatusTransitions = ['draft', 'pending_payment', 'cancelled', 'overdue'];
                 if (!allowedStatusTransitions.includes(billing_status)) {
-                    return responseHelper.error(res, 'Invalid target billing status. Can only set to draft, pending_payment, or cancelled.');
+                    return responseHelper.error(res, 'Invalid target billing status. Can only set to draft, pending_payment, overdue, or cancelled.');
                 }
                 updateData.billing_status = billing_status;
+            } else if (existingBill.billing_status === 'overdue') {
+                const dueDt = new Date(due_date);
+                dueDt.setHours(0, 0, 0, 0);
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                if (dueDt >= today) {
+                    updateData.billing_status = 'pending_payment';
+                }
             }
 
             const updated = await billingModel.updateBilling(id, landlordId, updateData);
@@ -309,6 +459,109 @@ const billingController = {
         } catch (error) {
             console.error('Update billing details error:', error);
             return responseHelper.error(res, error.message || 'Failed to update billing details', error, 500);
+        }
+    },
+
+    async manualOverrideBilling(req, res) {
+        try {
+            const { id } = req.params;
+            const { 
+                extended_due_date, 
+                due_date, 
+                waive_penalty, 
+                discount_amount, 
+                override_reason,
+                remarks 
+            } = req.body;
+            
+            const landlordId = req.user.id;
+
+            const existingBill = await billingModel.findById(id);
+            if (!existingBill || existingBill.landlord_id !== landlordId) {
+                return responseHelper.error(res, 'Billing statement not found or unauthorized access.', null, 404);
+            }
+
+            if (existingBill.billing_status === 'paid') {
+                return responseHelper.error(res, 'Cannot apply manual override to an already paid billing statement.');
+            }
+
+            const targetDueDate = extended_due_date || due_date || existingBill.due_date;
+            if (!targetDueDate) {
+                return responseHelper.error(res, 'Valid due date is required for manual override.');
+            }
+
+            // Penalty waiver
+            const shouldWaivePenalty = waive_penalty === true || waive_penalty === 'true';
+            const penalty = shouldWaivePenalty ? 0 : parseFloat(existingBill.penalty_amount || 0);
+
+            // Concession / discount
+            const discount = Math.max(0, parseFloat(discount_amount || 0));
+
+            // Breakdown
+            const rent = parseFloat(existingBill.rent_amount || 0);
+            const water = parseFloat(existingBill.water || 0);
+            const electricity = parseFloat(existingBill.electricity || 0);
+            const internet = parseFloat(existingBill.internet || 0);
+            const parking = parseFloat(existingBill.parking || 0);
+            const other = parseFloat(existingBill.other_charges || 0);
+
+            const adjustedRent = Math.max(0, rent - discount);
+            const newTotal = adjustedRent + water + electricity + internet + parking + other + penalty;
+
+            // Status transition: if overdue and due date is >= today, reset to pending_payment
+            let newStatus = existingBill.billing_status;
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const newDueDt = new Date(targetDueDate);
+            newDueDt.setHours(0, 0, 0, 0);
+
+            if (existingBill.billing_status === 'overdue' && newDueDt >= today) {
+                newStatus = 'pending_payment';
+            }
+
+            // Clean previous leeway / override headers to avoid clutter
+            const reasonText = (override_reason || remarks || '').trim() || 'Leeway accommodation granted by landlord.';
+            const concessionDetails = [];
+            if (targetDueDate !== existingBill.due_date) concessionDetails.push(`Extended Due Date: ${targetDueDate}`);
+            if (shouldWaivePenalty && parseFloat(existingBill.penalty_amount || 0) > 0) concessionDetails.push('Waived Late Penalty (₱0.00)');
+            if (discount > 0) concessionDetails.push(`Discount: ₱${discount.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`);
+
+            const overrideTag = `[LEEWAY GRANTED] ${concessionDetails.join(' | ')}. Reason: ${reasonText}`;
+            const priorRemarksCleaned = (existingBill.remarks || '')
+                .replace(/\[(LEEWAY GRANTED|PINAGBIGYAN|OVERRIDE)\][^\n]*\n?/gi, '')
+                .trim();
+            const updatedRemarks = priorRemarksCleaned 
+                ? `${overrideTag}\n${priorRemarksCleaned}` 
+                : overrideTag;
+
+            const updateData = {
+                due_date: targetDueDate,
+                penalty_amount: penalty,
+                total_amount: newTotal,
+                billing_status: newStatus,
+                remarks: updatedRemarks
+            };
+
+            const updated = await billingModel.overrideBilling(id, landlordId, updateData);
+
+            await auditLogModel.log(
+                landlordId, 
+                'BILLING_OVERRIDE', 
+                `Landlord applied manual leeway to billing ${id} (${existingBill.billing_month}): due_date=${targetDueDate}, waived_penalty=${shouldWaivePenalty}, discount=₱${discount}, new_total=₱${newTotal}`
+            );
+
+            await notificationModel.create({
+                user_id: existingBill.tenant_id,
+                type: 'billing_override',
+                title: 'Billing Statement Leeway Granted',
+                message: `Your landlord granted leeway on your billing statement for ${existingBill.billing_month}. New due date: ${targetDueDate}. Updated total due: ₱${newTotal.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}.`,
+                reference_id: updated.id
+            });
+
+            return responseHelper.success(res, 'Billing statement leeway applied successfully.', updated);
+        } catch (error) {
+            console.error('Manual override billing error:', error);
+            return responseHelper.error(res, error.message || 'Failed to apply manual override.', error, 500);
         }
     },
 
@@ -344,6 +597,7 @@ const billingController = {
 
     async getLandlordBillings(req, res) {
         try {
+            await autoGenerateMonthlyBillings(req.user.id, true);
             await checkAndApplyOverduePenalties(req.user.id, true);
             const list = await billingModel.findByLandlordId(req.user.id);
             return responseHelper.success(res, 'Landlord billings retrieved successfully', list);
@@ -356,65 +610,8 @@ const billingController = {
     async getTenantBillings(req, res) {
         try {
             const tenantId = req.user.id;
+            await autoGenerateMonthlyBillings(tenantId, false);
             await checkAndApplyOverduePenalties(tenantId, false);
-
-            // Auto-check if tenant has active leases missing initial move-in billing statements
-            const { data: activeLeases } = await supabase
-                .from('lease_records')
-                .select('*')
-                .eq('tenant_id', tenantId)
-                .eq('lease_status', 'active');
-
-            if (activeLeases && activeLeases.length > 0) {
-                for (const lease of activeLeases) {
-                    const { data: existingBills } = await supabase
-                        .from('billing_records')
-                        .select('id')
-                        .eq('lease_id', lease.id)
-                        .limit(1);
-
-                    const existingBill = existingBills && existingBills.length > 0 ? existingBills[0] : null;
-
-                    if (!existingBill) {
-                        const leaseStartDt = new Date(lease.lease_start_date || new Date());
-                        const monthStr = leaseStartDt.toISOString().slice(0, 7);
-                        const initMonth = `${monthStr} (Move-In)`;
-                        const rentAmt = parseFloat(lease.monthly_rent || 0);
-                        const secDep  = parseFloat(lease.security_deposit || 0);
-                        const advPay  = parseFloat(lease.advance_payment || 0);
-                        const totalAmt = rentAmt + secDep + advPay;
-
-                        const initialBilling = await billingModel.createBilling({
-                            lease_id: lease.id,
-                            tenant_id: lease.tenant_id,
-                            landlord_id: lease.landlord_id,
-                            property_id: lease.property_id,
-                            unit_id: lease.unit_id || null,
-                            billing_month: initMonth,
-                            rent_amount: rentAmt,
-                            utility_amount: 0,
-                            water: 0,
-                            electricity: 0,
-                            internet: 0,
-                            parking: 0,
-                            other_charges: secDep + advPay,
-                            penalty_amount: 0,
-                            total_amount: totalAmt,
-                            due_date: lease.lease_start_date || new Date().toISOString().slice(0, 10),
-                            billing_status: 'pending_payment',
-                            remarks: `Initial Move-In Billing: Monthly Rent (₱${rentAmt.toLocaleString()}) + Security Deposit (₱${secDep.toLocaleString()}) + Advance Payment (₱${advPay.toLocaleString()})`
-                        });
-
-                        await notificationModel.create({
-                            user_id: tenantId,
-                            type: 'billing_issued',
-                            title: 'Move-in billing statement ready',
-                            message: `Your initial move-in statement is ready. Total due: ₱${totalAmt.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}.`,
-                            reference_id: initialBilling.id
-                        });
-                    }
-                }
-            }
 
             const list = await billingModel.findByTenantId(tenantId);
             return responseHelper.success(res, 'Tenant billings retrieved successfully', list);
@@ -441,6 +638,50 @@ const billingController = {
             }
             if (role === 'tenant' && billing.tenant_id !== userId) {
                 return responseHelper.error(res, 'Access denied.', null, 403);
+            }
+
+            // Fetch complete billing history for this lease/tenancy to power tenant billing history
+            try {
+                let historyQuery = supabase
+                    .from('billing_records')
+                    .select(`
+                        id,
+                        lease_id,
+                        tenant_id,
+                        billing_month,
+                        due_date,
+                        total_amount,
+                        billing_status,
+                        remarks,
+                        created_at,
+                        updated_at,
+                        payment_records (
+                            id,
+                            payment_amount,
+                            payment_method,
+                            payment_reference_number,
+                            payment_status,
+                            submitted_at,
+                            verified_at
+                        )
+                    `);
+
+                if (billing.lease_id) {
+                    historyQuery = historyQuery.eq('lease_id', billing.lease_id);
+                } else {
+                    historyQuery = historyQuery.eq('tenant_id', billing.tenant_id);
+                }
+
+                const { data: history, error: historyErr } = await historyQuery.order('created_at', { ascending: true });
+                if (historyErr) {
+                    console.warn('History query notice:', historyErr.message);
+                    billing.tenant_billing_history = [billing];
+                } else {
+                    billing.tenant_billing_history = (history && history.length > 0) ? history : [billing];
+                }
+            } catch (histErr) {
+                console.warn('History query error in getBillingById:', histErr);
+                billing.tenant_billing_history = [billing];
             }
 
             return responseHelper.success(res, 'Billing details retrieved successfully', billing);
@@ -470,5 +711,8 @@ const billingController = {
         }
     }
 };
+
+billingController.autoGenerateMonthlyBillings = autoGenerateMonthlyBillings;
+billingController.checkAndApplyOverduePenalties = checkAndApplyOverduePenalties;
 
 module.exports = billingController;

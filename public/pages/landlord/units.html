@@ -983,29 +983,10 @@
         }
     </style>
     <link href="../../css/design-system.css" rel="stylesheet">
+    <link href="../../css/landlord.css" rel="stylesheet">
     <script src="../../js/ui.js" defer></script>
 </head>
 <body data-landlord-page="units">
-    <!-- Navbar (handled dynamically by dashboard.js sidebar script) -->
-    <nav class="navbar navbar-landlord">
-        <div class="navbar-container">
-            <div class="navbar-brand-group">
-                <a href="dashboard.html" style="text-decoration: none;"><span class="navbar-logo">DomiKnow</span></a>
-                <span class="navbar-badge navbar-badge-landlord">Landlord</span>
-            </div>
-            <div class="navbar-menu">
-                <a href="dashboard.html" class="navbar-menu-link">Dashboard</a>
-                <a href="properties.html" class="navbar-menu-link active">Properties</a>
-                <a href="property-create.html" class="navbar-menu-link">Register Property</a>
-                <a href="applications.html" class="navbar-menu-link">Tenant Applications</a>
-            </div>
-            <div class="navbar-right">
-                <span class="navbar-user-welcome">Welcome, <span class="user-name">User</span></span>
-                <button id="logoutBtn" class="navbar-btn">Logout</button>
-            </div>
-        </div>
-    </nav>
-
     <!-- Main Content -->
     <main class="units-layout">
         <!-- Top Navigation & Actions -->
@@ -1306,7 +1287,7 @@
                         <label class="form-label" style="margin-bottom: 0.4rem; display: block;">Room Gallery Photos (Max 3)</label>
                         <input type="file" id="roomPhotoInput" accept="image/png, image/jpeg, image/jpg, image/webp" multiple style="display: none;" onchange="handleRoomPhotoSelect()">
                         
-                        <div style="border: 2px dashed var(--border-color); border-radius: var(--radius-md); padding: 1.25rem; text-align: center; background-color: var(--bg-primary); transition: border-color var(--transition-fast);">
+                        <div id="roomPhotoDropZone" style="border: 2px dashed var(--border-color); border-radius: var(--radius-md); padding: 1.25rem; text-align: center; background-color: var(--bg-primary); transition: border-color var(--transition-fast);">
                             <div style="color: var(--text-muted); margin-bottom: 0.5rem;">
                                 <svg width="32" height="32" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6.827 6.175A2.31 2.31 0 015.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 00-1.134-.175 2.31 2.31 0 01-1.64-1.055l-.822-1.316a2.192 2.192 0 00-1.736-1.039 48.774 48.774 0 00-5.232 0c-.653.036-1.259.422-1.736 1.039l-.821 1.316z"/><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 12.75a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0zM18.75 10.5h.008v.008h-.008V10.5z"/></svg>
                             </div>
@@ -1470,6 +1451,39 @@
                 notifBtn.addEventListener('click', () => {
                     const bell = document.querySelector('[data-notification-trigger]');
                     if (bell) bell.click();
+                });
+            }
+
+            // Bind Drag & Drop on Room Photo Drop Zone
+            const roomDropZone = document.getElementById('roomPhotoDropZone');
+            const roomPhotoInput = document.getElementById('roomPhotoInput');
+            if (roomDropZone && roomPhotoInput) {
+                let dragCounter = 0;
+                roomDropZone.addEventListener('dragenter', (e) => {
+                    e.preventDefault();
+                    dragCounter++;
+                    roomDropZone.classList.add('dragover');
+                });
+                roomDropZone.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    e.dataTransfer.dropEffect = 'copy';
+                });
+                roomDropZone.addEventListener('dragleave', (e) => {
+                    e.preventDefault();
+                    dragCounter--;
+                    if (dragCounter <= 0) {
+                        dragCounter = 0;
+                        roomDropZone.classList.remove('dragover');
+                    }
+                });
+                roomDropZone.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    dragCounter = 0;
+                    roomDropZone.classList.remove('dragover');
+                    if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+                        roomPhotoInput.files = e.dataTransfer.files;
+                        handleRoomPhotoSelect();
+                    }
                 });
             }
 

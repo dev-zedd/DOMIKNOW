@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DOMIKNOW - System Context & Data Flow Diagrams (Thesis Standard)</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background-color: #f1f3f5;
+            color: #111827;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Top Bar */
+        header {
+            background-color: #ffffff;
+            border-bottom: 2px solid #111827;
+            padding: 12px 24px;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+
+        .header-wrap {
+            max-width: 1440px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .title-group h1 {
+            font-size: 1.25rem;
+            font-weight: bold;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .title-group p {
+            font-size: 0.8rem;
+            color: #4b5563;
+            margin-top: 2px;
+        }
+
+        .btn-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            background-color: #ffffff;
+            color: #111827;
+            border: 1.5px solid #111827;
+            padding: 7px 14px;
+            font-size: 0.82rem;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: all 0.15s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-family: inherit;
+            text-decoration: none;
+        }
+
+        .btn:hover {
+            background-color: #111827;
+            color: #ffffff;
+        }
+
+        .btn-active {
+            background-color: #111827;
+            color: #ffffff;
+        }
+
+        /* Sub-Header / Controls */
+        .controls-bar {
+            max-width: 1440px;
+            margin: 14px auto 0;
+            padding: 0 24px;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .tabs-wrap {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: #e5e7eb;
+            padding: 4px;
+            border-radius: 6px;
+        }
+
+        .tab-btn {
+            background: transparent;
+            border: none;
+            padding: 6px 16px;
+            font-size: 0.84rem;
+            font-weight: bold;
+            color: #4b5563;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: all 0.15s;
+            font-family: inherit;
+        }
+
+        .tab-btn:hover {
+            color: #111827;
+        }
+
+        .tab-btn.active {
+            background-color: #ffffff;
+            color: #111827;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .zoom-wrap {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            background: #ffffff;
+            border: 1.5px solid #111827;
+            border-radius: 4px;
+            padding: 2px 6px;
+        }
+
+        .zoom-btn {
+            background: transparent;
+            border: none;
+            font-weight: bold;
+            font-size: 1rem;
+            cursor: pointer;
+            width: 26px;
+            height: 26px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .zoom-btn:hover {
+            background: #f3f4f6;
+        }
+
+        .zoom-label {
+            font-size: 0.8rem;
+            font-weight: bold;
+            padding: 0 6px;
+        }
+
+        /* Workspace & Canvas */
+        .workspace {
+            max-width: 1440px;
+            width: 100%;
+            margin: 14px auto 30px;
+            padding: 0 24px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .paper-sheet {
+            background-color: #ffffff;
+            border: 1px solid #9ca3af;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            overflow: auto;
+            max-width: 100%;
+            border-radius: 3px;
+        }
+
+        .diag-svg {
+            display: block;
+            background-color: #ffffff;
+            transition: transform 0.2s ease-out;
+            transform-origin: top center;
+        }
+
+        /* Toast Feedback */
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            background-color: #111827;
+            color: #ffffff;
+            padding: 11px 20px;
+            border-radius: 4px;
+            font-size: 0.86rem;
+            font-weight: bold;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.3);
+            opacity: 0;
+            pointer-events: none;
+            transform: translateY(10px);
+            transition: all 0.25s;
+            z-index: 1000;
+        }
+
+        .toast.show {
+            opacity: 1;
+            pointer-events: auto;
+            transform: translateY(0);
+        }
+
+        /* Print Media Styles */
+        @media print {
+            header, .controls-bar, .toast {
+                display: none !important;
+            }
+            body, .workspace, .paper-sheet {
+                background: #ffffff !important;
+                box-shadow: none !important;
+                border: none !important;
+                padding: 0 !important;
+                margin: 0 !important;
+            }
+            .diag-svg {
+                transform: scale(1) !important;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <header>
+        <div class="header-wrap">
+            <div class="title-group">
+                <h1 id="headerTitle">DOMIKNOW &bull; SYSTEM CONTEXT DIAGRAM</h1>
+                <p id="headerSubtitle">Standard Thesis Architecture &bull; Clean Categorized System Overview</p>
+            </div>
+
+            <div class="btn-group">
+                <a href="flowcharts.html" class="btn" title="View Per-User Process Flows">
+                    &larr; Process Flows
+                </a>
+                <a href="usecase.html" class="btn" title="View Use Case Diagram">
+                    Use Case Diagram
+                </a>
+                <a href="hipo.html" class="btn" title="View HIPO Model">
+                    HIPO Model &rarr;
+                </a>
+                <button class="btn" onclick="copyCurrentToClipboard()" title="Copy high-res PNG image to clipboard for Word/Docs">
+                    Copy PNG
+                </button>
+                <button class="btn btn-active" onclick="downloadCurrentPNG()" title="Download high-resolution 300 DPI PNG">
+                    Download PNG
+                </button>
+                <button class="btn" onclick="window.print()" title="Print page or save as PDF">
+                    Print / PDF
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Controls Bar -->
+    <div class="controls-bar">
+        <div class="tabs-wrap">
+            <button class="tab-btn active" id="tabContext" onclick="switchDiagram('context')">
+                System Context Diagram
+            </button>
+            <button class="tab-btn" id="tabDfd" onclick="switchDiagram('dfd')">
+                Data Flow Diagram
+            </button>
+        </div>
+
+        <div class="zoom-wrap">
+            <button class="zoom-btn" onclick="zoom(-0.1)" title="Zoom Out">−</button>
+            <span class="zoom-label" id="zoomText">100%</span>
+            <button class="zoom-btn" onclick="zoom(0.1)" title="Zoom In">+</button>
+            <button class="zoom-btn" onclick="resetZoom()" title="Reset Zoom">⟲</button>
+        </div>
+    </div>
+
+    <!-- Main Workspace -->
+    <main class="workspace">
+        <div class="paper-sheet" id="paperSheet">
+            <div id="svgContainer"></div>
+        </div>
+    </main>
+
+    <!-- Toast -->
+    <div class="toast" id="toast">Diagram PNG exported successfully!</div>
+
+    <script>
+        let currentDiagram = 'context'; // 'context' or 'dfd'
+        let currentScale = 1.0;
+
+        // Shared SVG Defs
+        const svgDefs = `
+        <defs>
+            <marker id="arrow" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                <path d="M 0 1.5 L 9 5 L 0 8.5 z" fill="#111827" />
+            </marker>
+            <marker id="arrowStart" viewBox="0 0 10 10" refX="2" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+                <path d="M 9 1.5 L 0 5 L 9 8.5 z" fill="#111827" />
+            </marker>
+        </defs>`;
+
+        // Helper: Card with Rounded Corners
+        function renderBlueCard(x, y, w, h, title, sublines = []) {
+            let svg = `
+            <g class="card-node">
+                <rect x="${x}" y="${y}" width="${w}" height="${h}" rx="5" fill="#4da8da" stroke="#1b4f72" stroke-width="1.8" />
+                <text x="${x + w / 2}" y="${y + (sublines.length === 0 ? h / 2 + 5 : 24)}" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#ffffff" letter-spacing="0.6">${title}</text>`;
+            
+            if (sublines.length === 1) {
+                svg += `<text x="${x + w / 2}" y="${y + 44}" text-anchor="middle" font-family="Arial, sans-serif" font-size="9.5" fill="#f0f9ff">${sublines[0]}</text>`;
+            } else if (sublines.length === 2) {
+                svg += `<text x="${x + w / 2}" y="${y + 43}" text-anchor="middle" font-family="Arial, sans-serif" font-size="9.5" fill="#f0f9ff">${sublines[0]}</text>`;
+                svg += `<text x="${x + w / 2}" y="${y + 59}" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="#e0f2fe">${sublines[1]}</text>`;
+            }
+            svg += `</g>`;
+            return svg;
+        }
+
+        // Helper: Cylinder / Database
+        function renderCylinder(x, y, w, h, title, sublines = []) {
+            const rx = w / 2;
+            const ry = 14;
+            const cyTop = y + ry;
+            const cyBot = y + h - ry;
+
+            let svg = `
+            <g class="cylinder-node">
+                <!-- Body -->
+                <path d="M ${x} ${cyTop} V ${cyBot} A ${rx} ${ry} 0 0 0 ${x + w} ${cyBot} V ${cyTop} Z" fill="#4da8da" stroke="#1b4f72" stroke-width="1.8" />
+                <!-- Bottom ellipse curve -->
+                <ellipse cx="${x + rx}" cy="${cyBot}" rx="${rx}" ry="${ry}" fill="#4da8da" stroke="#1b4f72" stroke-width="1.8" />
+                <!-- Top ellipse cap -->
+                <ellipse cx="${x + rx}" cy="${cyTop}" rx="${rx}" ry="${ry}" fill="#60a5fa" stroke="#1b4f72" stroke-width="1.8" />
+                
+                <!-- Text inside cylinder -->
+                <text x="${x + rx}" y="${y + 48}" text-anchor="middle" font-family="Arial, sans-serif" font-size="12.5" font-weight="bold" fill="#ffffff" letter-spacing="0.6">${title}</text>`;
+            if (sublines[0]) {
+                svg += `<text x="${x + rx}" y="${y + 68}" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#f0f9ff">${sublines[0]}</text>`;
+            }
+            if (sublines[1]) {
+                svg += `<text x="${x + rx}" y="${y + 84}" text-anchor="middle" font-family="Arial, sans-serif" font-size="9.5" fill="#e0f2fe">${sublines[1]}</text>`;
+            }
+            svg += `</g>`;
+            return svg;
+        }
+
+        // ==========================================
+        // 1. SYSTEM CONTEXT DIAGRAM
+        // ==========================================
+        function getSystemContextSVG() {
+            const W = 1200;
+            const H = 820;
+
+            let svg = `<svg id="activeFlowchart" class="diag-svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">`;
+            svg += svgDefs;
+            svg += `<rect width="${W}" height="${H}" fill="#ffffff" />`;
+
+            // Clean Outer Bounding Frame
+            svg += `<rect x="35" y="35" width="${W - 70}" height="${H - 70}" fill="#ffffff" stroke="#111827" stroke-width="1.4" />`;
+
+            // Center Circle (DOMIKNOW)
+            const cX = 600, cY = 410, cR = 80;
+
+            // Connector Lines & Curves with Labels
+            // 1. Top Connector: RECOMMENDATION -> DOMIKNOW
+            svg += `<line x1="600" y1="166" x2="600" y2="${cY - cR}" stroke="#111827" stroke-width="1.3" marker-end="url(#arrow)" />`;
+            svg += `<text x="612" y="240" font-family="Arial, sans-serif" font-size="10" font-style="italic" fill="#111827">property scoring /</text>`;
+            svg += `<text x="612" y="254" font-family="Arial, sans-serif" font-size="10" font-style="italic" fill="#111827">match metrics</text>`;
+
+            // 2. Top-Left Connector: AUTH <-> DOMIKNOW
+            svg += `<path d="M 330 228 C 440 228, 490 320, 542 352" fill="none" stroke="#111827" stroke-width="1.3" marker-start="url(#arrowStart)" marker-end="url(#arrow)" />`;
+            svg += `<text x="390" y="265" font-family="Arial, sans-serif" font-size="10" font-style="italic" fill="#111827">auth tokens /</text>`;
+            svg += `<text x="390" y="279" font-family="Arial, sans-serif" font-size="10" font-style="italic" fill="#111827">validation</text>`;
+
+            // 3. Bottom-Left Connector: DATABASE <-> DOMIKNOW
+            svg += `<path d="M 330 588 C 440 588, 490 500, 542 468" fill="none" stroke="#111827" stroke-width="1.3" marker-start="url(#arrowStart)" marker-end="url(#arrow)" />`;
+            svg += `<text x="360" y="550" font-family="Arial, sans-serif" font-size="10" font-style="italic" fill="#111827">account read/write &amp;</text>`;
+            svg += `<text x="360" y="564" font-family="Arial, sans-serif" font-size="10" font-style="italic" fill="#111827">data persistence</text>`;
+
+            // 4. Bottom Connector: USERS -> DOMIKNOW
+            svg += `<line x1="600" y1="650" x2="600" y2="${cY + cR}" stroke="#111827" stroke-width="1.3" marker-end="url(#arrow)" />`;
+            svg += `<text x="612" y="575" font-family="Arial, sans-serif" font-size="10" font-style="italic" fill="#111827">user actions /</text>`;
+            svg += `<text x="612" y="589" font-family="Arial, sans-serif" font-size="10" font-style="italic" fill="#111827">submissions</text>`;
+
+            // 5. Bottom-Right Connector: DOMIKNOW -> NOTIFICATIONS
+            svg += `<path d="M 658 468 C 710 500, 760 588, 870 588" fill="none" stroke="#111827" stroke-width="1.3" marker-end="url(#arrow)" />`;
+            svg += `<text x="740" y="550" font-family="Arial, sans-serif" font-size="10" font-style="italic" fill="#111827">in-app alerts /</text>`;
+            svg += `<text x="740" y="564" font-family="Arial, sans-serif" font-size="10" font-style="italic" fill="#111827">status updates</text>`;
+
+            // 6. Top-Right Connector: FRONTEND <-> DOMIKNOW
+            svg += `<path d="M 870 228 C 760 228, 710 320, 658 352" fill="none" stroke="#111827" stroke-width="1.3" marker-start="url(#arrowStart)" marker-end="url(#arrow)" />`;
+            svg += `<text x="740" y="265" font-family="Arial, sans-serif" font-size="10" font-style="italic" fill="#111827">API requests /</text>`;
+            svg += `<text x="740" y="279" font-family="Arial, sans-serif" font-size="10" font-style="italic" fill="#111827">responses</text>`;
+
+            // Central DOMIKNOW Circle
+            svg += `
+            <g class="center-system">
+                <circle cx="${cX}" cy="${cY}" r="${cR}" fill="#1b4f72" stroke="#0f172a" stroke-width="2.5" />
+                <circle cx="${cX}" cy="${cY}" r="${cR - 5}" fill="none" stroke="#4da8da" stroke-width="1" />
+                <text x="${cX}" y="${cY + 6}" text-anchor="middle" font-family="Arial, sans-serif" font-size="17" font-weight="bold" fill="#ffffff" letter-spacing="1.5">DOMIKNOW</text>
+            </g>`;
+
+            // Surrounding 6 Entity Cards (Wide, Generous Padding)
+            // Top: RECOMMENDATION ENGINE
+            svg += renderBlueCard(505, 90, 190, 76, "RECOMMENDATION", ["Multi-Criteria Scoring Engine", "TOPSIS &bull; Preference Match"]);
+
+            // Top-Left: AUTH
+            svg += renderBlueCard(140, 190, 190, 76, "AUTH", ["JWT Tokens, Bcrypt Hasher &", "Role-Based Access (RBAC)"]);
+
+            // Bottom-Left: ACCOUNTS DB
+            svg += renderBlueCard(140, 550, 190, 76, "ACCOUNTS DB", ["PostgreSQL & Supabase DB", "Users, Leases, Payments"]);
+
+            // Bottom: USERS
+            svg += renderBlueCard(505, 650, 190, 76, "USERS", ["Tenant &bull; Landlord &bull;", "Maintenance &bull; Admin"]);
+
+            // Bottom-Right: NOTIFICATIONS
+            svg += renderBlueCard(870, 550, 190, 76, "NOTIFICATIONS", ["In-App Status Notifications", "(Hard-coded Internal Engine)"]);
+
+            // Top-Right: FRONTEND
+            svg += renderBlueCard(870, 190, 190, 76, "FRONTEND", ["HTML5, CSS & Vanilla JS", "Client Dashboards & Portals"]);
+
+            svg += `</svg>`;
+            return svg;
+        }
+
+        // ==========================================
+        // 2. DATA FLOW DIAGRAM (DFD)
+        // ==========================================
+        function getDataFlowSVG() {
+            const W = 1200;
+            const H = 820;
+
+            let svg = `<svg id="activeFlowchart" class="diag-svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">`;
+            svg += svgDefs;
+            svg += `<rect width="${W}" height="${H}" fill="#ffffff" />`;
+
+            // Clean Outer Bounding Frame
+            svg += `<rect x="35" y="35" width="${W - 70}" height="${H - 70}" fill="#ffffff" stroke="#111827" stroke-width="1.4" />`;
+
+            // Connectors (Carefully routed with generous spacing to avoid text collisions)
+            // 1. USER -> FRONTEND (Horizontal)
+            svg += `<line x1="845" y1="702" x2="715" y2="702" stroke="#111827" stroke-width="1.3" marker-end="url(#arrow)" />`;
+            svg += `<text x="780" y="682" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-style="italic" fill="#111827">Uses UI / dashboards /</text>`;
+            svg += `<text x="780" y="694" text-anchor="middle" font-family="Arial, sans-serif" font-size="9.5" font-style="italic" fill="#111827">forms</text>`;
+
+            // 2. FRONTEND -> GATEWAY (Horizontal)
+            svg += `<line x1="485" y1="702" x2="330" y2="702" stroke="#111827" stroke-width="1.3" marker-end="url(#arrow)" />`;
+            svg += `<text x="407" y="691" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-style="italic" fill="#111827">HTTPS / WS</text>`;
+
+            // 3. FRONTEND <-> BACKEND (Vertical Bidirectional)
+            svg += `<line x1="600" y1="660" x2="600" y2="580" stroke="#111827" stroke-width="1.3" marker-start="url(#arrowStart)" marker-end="url(#arrow)" />`;
+            svg += `<text x="614" y="616" font-family="Arial, sans-serif" font-size="10" font-style="italic" fill="#111827">REST &amp; WS endpoints /</text>`;
+            svg += `<text x="614" y="630" font-family="Arial, sans-serif" font-size="9.5" font-style="italic" fill="#111827">real-time updates</text>`;
+
+            // 4. GATEWAY -> BACKEND (Routes Request, TLS) - Routed cleanly above Database
+            svg += `<path d="M 225 660 V 230 H 425" fill="none" stroke="#111827" stroke-width="1.3" marker-end="url(#arrow)" />`;
+            svg += `<text x="325" y="210" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-style="italic" fill="#111827">Routes Request, TLS</text>`;
+            svg += `<text x="325" y="223" text-anchor="middle" font-family="Arial, sans-serif" font-size="9.5" font-style="italic" fill="#111827">&amp; Rate Limiting</text>`;
+
+            // 5. DATABASE <-> BACKEND (Horizontal Bidirectional)
+            svg += `<line x1="315" y1="325" x2="425" y2="325" stroke="#111827" stroke-width="1.3" marker-start="url(#arrowStart)" marker-end="url(#arrow)" />`;
+            svg += `<text x="370" y="312" text-anchor="middle" font-family="Arial, sans-serif" font-size="10.5" font-style="italic" fill="#111827">CRUD / queries</text>`;
+
+            // 6. BACKEND -> NOTIFICATIONS (Horizontal)
+            svg += `<line x1="765" y1="372" x2="850" y2="372" stroke="#111827" stroke-width="1.3" marker-end="url(#arrow)" />`;
+            svg += `<text x="807" y="360" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-style="italic" fill="#111827">Trigger Alerts</text>`;
+
+            // 7. STORAGE & MAPS -> BACKEND (Clear Overhead Route: 100% visible, zero container collision)
+            svg += `<path d="M 850 115 H 630 V 150" fill="none" stroke="#111827" stroke-width="1.3" marker-start="url(#arrowStart)" marker-end="url(#arrow)" />`;
+            svg += `<text x="740" y="103" text-anchor="middle" font-family="Arial, sans-serif" font-size="10.5" font-style="italic" fill="#111827">Uploads / Evidence / Geocoding</text>`;
+
+            // ------------------------------------------
+            // NODES & CONTAINERS
+            // ------------------------------------------
+
+            // 1. Bottom Right: USER (Width 230)
+            svg += renderBlueCard(845, 660, 230, 85, "USER", ["Tenant / Landlord /", "Maintenance / Admin"]);
+
+            // 2. Bottom Center: FRONTEND (Width 230)
+            svg += renderBlueCard(485, 660, 230, 85, "FRONTEND", ["Browser \u2014 HTTP(S) / Web Client", "(HTML5 / CSS / Vanilla JS)"]);
+
+            // 3. Bottom Left: GATEWAY / EDGE (Width 210)
+            svg += renderBlueCard(120, 660, 210, 85, "GATEWAY / EDGE", ["Express Middleware / Security", "Helmet \u2014 CORS \u2014 Rate Limit"]);
+
+            // 4. DATABASE (Top Left Cylinder - Width 195)
+            svg += renderCylinder(120, 265, 195, 118, "DATABASE", ["PostgreSQL \u2014 users,", "properties, leases, logs"]);
+
+            // 5. NOTIFICATION (Middle Right Card - Width 230)
+            svg += renderBlueCard(850, 330, 230, 85, "NOTIFICATION", ["In-App Notification Dispatcher", "(Internal Alerts & Reminders)"]);
+
+            // 6. STORAGE & MAPS (Top Right Card - Width 230, Height 80)
+            svg += renderBlueCard(850, 100, 230, 80, "STORAGE &amp; MAPS", ["Supabase Storage (ID Proofs)", "OpenStreetMap Geocoding API"]);
+
+            // 7. BACKEND CONTAINER (Top Center - Width 340, Height 430)
+            const bX = 425, bY = 150, bW = 340, bH = 430;
+            svg += `
+            <g class="backend-container">
+                <!-- Outer Container Box -->
+                <rect x="${bX}" y="${bY}" width="${bW}" height="${bH}" fill="#f8fafc" stroke="#1b4f72" stroke-width="2.2" rx="5" />
+                
+                <!-- Backend Header -->
+                <rect x="${bX}" y="${bY}" width="${bW}" height="40" fill="#1b4f72" rx="5" />
+                <rect x="${bX}" y="${bY + 34}" width="${bW}" height="6" fill="#1b4f72" />
+                <text x="${bX + bW / 2}" y="${bY + 25}" text-anchor="middle" font-family="Arial, sans-serif" font-size="13.5" font-weight="bold" fill="#ffffff" letter-spacing="1">&lt;/&gt; BACKEND (Node.js &amp; Express 5)</text>
+
+                <!-- 6 Sub-Service Modules Inside Backend (2 Columns x 3 Rows, Width 148, Height 96) -->
+                <!-- Row 1 -->
+                <rect x="${bX + 15}" y="${bY + 52}" width="148" height="96" rx="4" fill="#ffffff" stroke="#1b4f72" stroke-width="1.2" />
+                <text x="${bX + 89}" y="${bY + 72}" text-anchor="middle" font-family="Arial, sans-serif" font-size="10.5" font-weight="bold" fill="#111827">API Gateway &amp; Auth</text>
+                <text x="${bX + 89}" y="${bY + 91}" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="#4b5563">JWT Verification</text>
+                <text x="${bX + 89}" y="${bY + 107}" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="#4b5563">Bcrypt Password Hasher</text>
+                <text x="${bX + 89}" y="${bY + 123}" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="#4b5563">Static Files Serve</text>
+
+                <rect x="${bX + 177}" y="${bY + 52}" width="148" height="96" rx="4" fill="#ffffff" stroke="#1b4f72" stroke-width="1.2" />
+                <text x="${bX + 251}" y="${bY + 72}" text-anchor="middle" font-family="Arial, sans-serif" font-size="10.5" font-weight="bold" fill="#111827">Recommendation</text>
+                <text x="${bX + 251}" y="${bY + 91}" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="#4b5563">Multi-Criteria Engine</text>
+                <text x="${bX + 251}" y="${bY + 107}" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="#4b5563">TOPSIS Scoring</text>
+                <text x="${bX + 251}" y="${bY + 123}" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="#4b5563">Property Matcher</text>
+
+                <!-- Row 2 -->
+                <rect x="${bX + 15}" y="${bY + 162}" width="148" height="96" rx="4" fill="#ffffff" stroke="#1b4f72" stroke-width="1.2" />
+                <text x="${bX + 89}" y="${bY + 182}" text-anchor="middle" font-family="Arial, sans-serif" font-size="10.5" font-weight="bold" fill="#111827">Lease &amp; Tenancy</text>
+                <text x="${bX + 89}" y="${bY + 201}" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="#4b5563">Digital Agreement</text>
+                <text x="${bX + 89}" y="${bY + 217}" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="#4b5563">Tenant Screening</text>
+                <text x="${bX + 89}" y="${bY + 233}" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="#4b5563">Application CRUD</text>
+
+                <rect x="${bX + 177}" y="${bY + 162}" width="148" height="96" rx="4" fill="#ffffff" stroke="#1b4f72" stroke-width="1.2" />
+                <text x="${bX + 251}" y="${bY + 182}" text-anchor="middle" font-family="Arial, sans-serif" font-size="10.5" font-weight="bold" fill="#111827">Property Ops</text>
+                <text x="${bX + 251}" y="${bY + 201}" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="#4b5563">Listing Moderation</text>
+                <text x="${bX + 251}" y="${bY + 217}" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="#4b5563">Unit Inventory</text>
+                <text x="${bX + 251}" y="${bY + 233}" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="#4b5563">Landlord Control</text>
+
+                <!-- Row 3 -->
+                <rect x="${bX + 15}" y="${bY + 272}" width="148" height="96" rx="4" fill="#ffffff" stroke="#1b4f72" stroke-width="1.2" />
+                <text x="${bX + 89}" y="${bY + 292}" text-anchor="middle" font-family="Arial, sans-serif" font-size="10.5" font-weight="bold" fill="#111827">Billing &amp; Submeter</text>
+                <text x="${bX + 89}" y="${bY + 311}" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="#4b5563">Rent Billing</text>
+                <text x="${bX + 89}" y="${bY + 327}" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="#4b5563">Electric &amp; Water Logs</text>
+                <text x="${bX + 89}" y="${bY + 343}" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="#4b5563">Payment Receipts</text>
+
+                <rect x="${bX + 177}" y="${bY + 272}" width="148" height="96" rx="4" fill="#ffffff" stroke="#1b4f72" stroke-width="1.2" />
+                <text x="${bX + 251}" y="${bY + 292}" text-anchor="middle" font-family="Arial, sans-serif" font-size="10.5" font-weight="bold" fill="#111827">Governance &amp; Maint</text>
+                <text x="${bX + 251}" y="${bY + 311}" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="#4b5563">Maintenance Tickets</text>
+                <text x="${bX + 251}" y="${bY + 327}" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="#4b5563">Case Triage / Dispute</text>
+                <text x="${bX + 251}" y="${bY + 343}" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="#4b5563">Audit Trail System</text>
+            </g>`;
+
+            svg += `</svg>`;
+            return svg;
+        }
+
+        // Render Current Diagram
+        function renderCurrent() {
+            const container = document.getElementById('svgContainer');
+            if (currentDiagram === 'context') {
+                container.innerHTML = getSystemContextSVG();
+                document.getElementById('headerTitle').innerHTML = 'DOMIKNOW &bull; SYSTEM CONTEXT DIAGRAM';
+                document.getElementById('headerSubtitle').innerText = 'Standard Thesis Architecture \u2022 Clean System Context Overview';
+                document.getElementById('tabContext').classList.add('active');
+                document.getElementById('tabDfd').classList.remove('active');
+            } else {
+                container.innerHTML = getDataFlowSVG();
+                document.getElementById('headerTitle').innerHTML = 'DOMIKNOW &bull; DATA FLOW DIAGRAM';
+                document.getElementById('headerSubtitle').innerText = 'Standard Thesis Architecture \u2022 Multi-Tier Data Flow Architecture';
+                document.getElementById('tabContext').classList.remove('active');
+                document.getElementById('tabDfd').classList.add('active');
+            }
+            applyZoom();
+        }
+
+        // Switch diagram tab
+        function switchDiagram(type) {
+            currentDiagram = type;
+            renderCurrent();
+        }
+
+        // Zoom Logic
+        function zoom(delta) {
+            currentScale = Math.min(Math.max(currentScale + delta, 0.5), 2.0);
+            applyZoom();
+        }
+
+        function resetZoom() {
+            currentScale = 1.0;
+            applyZoom();
+        }
+
+        function applyZoom() {
+            document.getElementById('zoomText').innerText = Math.round(currentScale * 100) + '%';
+            const svg = document.querySelector('#svgContainer svg');
+            if (svg) svg.style.transform = `scale(${currentScale})`;
+        }
+
+        // Toast Feedback
+        function showToast(msg) {
+            const t = document.getElementById('toast');
+            t.innerText = msg;
+            t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 3000);
+        }
+
+        // High Resolution PNG Converter (Canvas 300 DPI)
+        function getSVGToCanvas(svgElement, scaleMultiplier = 2.5) {
+            return new Promise((resolve, reject) => {
+                try {
+                    const serializer = new XMLSerializer();
+                    let svgStr = serializer.serializeToString(svgElement);
+                    if (!svgStr.match(/^<svg[^>]+xmlns="http\:\/\/www\.w3\.org\/2000\/svg"/)) {
+                        svgStr = svgStr.replace(/^<svg/, '<svg xmlns="http://www.w3.org/2000/svg"');
+                    }
+
+                    const width = svgElement.viewBox.baseVal.width || 1200;
+                    const height = svgElement.viewBox.baseVal.height || 820;
+
+                    const canvas = document.createElement('canvas');
+                    canvas.width = width * scaleMultiplier;
+                    canvas.height = height * scaleMultiplier;
+                    const ctx = canvas.getContext('2d');
+
+                    ctx.imageSmoothingEnabled = true;
+                    ctx.imageSmoothingQuality = 'high';
+
+                    ctx.fillStyle = '#ffffff';
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                    const img = new Image();
+                    const blob = new Blob([svgStr], { type: 'image/svg+xml;charset=utf-8' });
+                    const url = URL.createObjectURL(blob);
+
+                    img.onload = () => {
+                        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                        URL.revokeObjectURL(url);
+                        resolve({ canvas, dataURL: canvas.toDataURL('image/png') });
+                    };
+
+                    img.onerror = (e) => {
+                        URL.revokeObjectURL(url);
+                        reject(e);
+                    };
+
+                    img.src = url;
+                } catch (err) {
+                    reject(err);
+                }
+            });
+        }
+
+        // Download Single PNG
+        async function downloadCurrentPNG() {
+            const svg = document.querySelector('#svgContainer svg');
+            if (!svg) return;
+            const diagramName = currentDiagram === 'context' ? 'System_Context_Diagram' : 'Data_Flow_Diagram';
+            showToast("Generating crisp thesis-ready PNG...");
+            try {
+                const { dataURL } = await getSVGToCanvas(svg, 2.5);
+                const filename = `DOMIKNOW_${diagramName}.png`;
+                const a = document.createElement('a');
+                a.href = dataURL;
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                showToast(`Downloaded ${filename} successfully!`);
+            } catch (err) {
+                console.error(err);
+                showToast("Failed to generate image.");
+            }
+        }
+
+        // Copy Single PNG to Clipboard
+        async function copyCurrentToClipboard() {
+            const svg = document.querySelector('#svgContainer svg');
+            if (!svg) return;
+            showToast("Rendering to clipboard...");
+            try {
+                const { canvas } = await getSVGToCanvas(svg, 2.0);
+                canvas.toBlob(async (blob) => {
+                    if (!blob) return;
+                    try {
+                        const item = new ClipboardItem({ "image/png": blob });
+                        await navigator.clipboard.write([item]);
+                        showToast("Copied PNG directly to clipboard! Ready to paste (Ctrl+V) in Word or Docs.");
+                    } catch (e) {
+                        downloadCurrentPNG();
+                    }
+                }, "image/png");
+            } catch (err) {
+                showToast("Clipboard copy failed.");
+            }
+        }
+
+        // Initialize on load with query param support (?diag=dfd or ?diag=context)
+        window.addEventListener('DOMContentLoaded', () => {
+            const params = new URLSearchParams(window.location.search);
+            if (params.get('diag') === 'dfd') {
+                currentDiagram = 'dfd';
+            }
+            renderCurrent();
+        });
+    </script>
+</body>
+</html>

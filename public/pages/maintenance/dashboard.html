@@ -6,31 +6,21 @@
     <title>Maintenance Dashboard - DomiKnow</title>
     <link href="../../css/input.css" rel="stylesheet">
     <link href="../../css/design-system.css?v=20260827-1" rel="stylesheet">
+    <link href="../../css/maintenance.css" rel="stylesheet">
+    <style>
+        .worker-stat-card:hover {
+            transform: translateY(-2px);
+            border-color: var(--color-action-primary, #0355f3) !important;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.06) !important;
+        }
+    </style>
     <script src="../../js/ui.js?v=20260827-2" defer></script>
 </head>
 <body class="app-loading" data-role="maintenance" data-page-title="Maintenance Dashboard">
-    <!-- Navbar -->
-    <nav class="navbar navbar-maintenance">
-        <div class="navbar-container">
-            <div class="navbar-brand-group">
-                <a href="dashboard.html" style="text-decoration: none;"><span class="navbar-logo">DomiKnow</span></a>
-                <span class="navbar-badge navbar-badge-maintenance">Maintenance</span>
-            </div>
-            <div class="navbar-menu">
-                <a href="dashboard.html" class="navbar-menu-link active">Dashboard</a>
-                <a href="tasks.html" class="navbar-menu-link">Assigned Tasks</a>
-            </div>
-            <div class="navbar-right">
-                <span class="navbar-user-welcome">Welcome, <span class="user-name">User</span></span>
-                <button id="logoutBtn" class="navbar-btn">Logout</button>
-            </div>
-        </div>
-    </nav>
-
     <!-- Main Content -->
     <main class="dashboard-container">
         <!-- Pending Approval Message -->
-        <div id="pendingApprovalMsg" class="alert alert-warning hidden">
+        <div id="pendingApprovalMsg" class="alert alert-warning hidden" style="margin-bottom: 1.25rem;">
             <span class="alert-icon">Attention:</span>
             <div class="alert-content">
                 <h3>Account pending administrator approval</h3>
@@ -38,28 +28,120 @@
             </div>
         </div>
 
-        <!-- Status Header -->
-        <div class="status-card status-card-maintenance">
-            <div class="status-card-info">
-                <h2>Field work status</h2>
-                <p>Check your account access before accepting an assignment.</p>
-            </div>
-            <div class="status-badge-container">
-                <span class="status-badge-label">Account Status</span>
-                <span id="accountStatus" class="status-badge status-pending">LOADING</span>
-            </div>
-        </div>
-
-        <section class="maintenance-overview-grid" aria-label="Your work at a glance">
-            <a class="maintenance-overview-card" href="tasks.html"><span>New offers</span><strong data-work-count="offers">?</strong><small>Assignments ready for review</small></a>
-            <a class="maintenance-overview-card" href="tasks.html"><span>Active work</span><strong data-work-count="active">?</strong><small>Accepted and ongoing repairs</small></a>
-            <a class="maintenance-overview-card" href="tasks.html"><span>Awaiting confirmation</span><strong data-work-count="review">?</strong><small>Reports submitted or verified</small></a>
-            <a class="maintenance-overview-card" href="tasks.html"><span>Closed tasks</span><strong data-work-count="closed">?</strong><small>Confirmed completed work</small></a>
+        <!-- 4 Metric Cards Grid -->
+        <section class="worker-stats-grid" aria-label="Work summary" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
+            <a class="worker-stat-card" href="tasks.html" style="display: flex; align-items: center; gap: 1rem; padding: 1.25rem 1.5rem; background: var(--color-bg-surface); border: 1px solid var(--color-border-default); border-radius: 14px; text-decoration: none; color: inherit; transition: all 0.2s ease; box-shadow: 0 1px 3px rgba(0,0,0,0.03);">
+                <div class="worker-stat-icon" style="width: 48px; height: 48px; border-radius: 12px; background: rgba(245, 158, 11, 0.1); color: #d97706; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+                </div>
+                <div>
+                    <span style="display: block; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--color-text-muted);">New Offers</span>
+                    <strong data-work-count="offers" style="font-size: 1.75rem; font-weight: 800; color: var(--color-text-primary); line-height: 1.2;">0</strong>
+                </div>
+            </a>
+            <a class="worker-stat-card" href="tasks.html" style="display: flex; align-items: center; gap: 1rem; padding: 1.25rem 1.5rem; background: var(--color-bg-surface); border: 1px solid var(--color-border-default); border-radius: 14px; text-decoration: none; color: inherit; transition: all 0.2s ease; box-shadow: 0 1px 3px rgba(0,0,0,0.03);">
+                <div class="worker-stat-icon" style="width: 48px; height: 48px; border-radius: 12px; background: rgba(3, 85, 243, 0.1); color: var(--color-action-primary, #0355f3); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+                </div>
+                <div>
+                    <span style="display: block; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--color-text-muted);">Active Work</span>
+                    <strong data-work-count="active" style="font-size: 1.75rem; font-weight: 800; color: var(--color-text-primary); line-height: 1.2;">0</strong>
+                </div>
+            </a>
+            <a class="worker-stat-card" href="tasks.html" style="display: flex; align-items: center; gap: 1rem; padding: 1.25rem 1.5rem; background: var(--color-bg-surface); border: 1px solid var(--color-border-default); border-radius: 14px; text-decoration: none; color: inherit; transition: all 0.2s ease; box-shadow: 0 1px 3px rgba(0,0,0,0.03);">
+                <div class="worker-stat-icon" style="width: 48px; height: 48px; border-radius: 12px; background: rgba(139, 92, 246, 0.1); color: #7c3aed; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                </div>
+                <div>
+                    <span style="display: block; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--color-text-muted);">Awaiting Review</span>
+                    <strong data-work-count="review" style="font-size: 1.75rem; font-weight: 800; color: var(--color-text-primary); line-height: 1.2;">0</strong>
+                </div>
+            </a>
+            <a class="worker-stat-card" href="tasks.html" style="display: flex; align-items: center; gap: 1rem; padding: 1.25rem 1.5rem; background: var(--color-bg-surface); border: 1px solid var(--color-border-default); border-radius: 14px; text-decoration: none; color: inherit; transition: all 0.2s ease; box-shadow: 0 1px 3px rgba(0,0,0,0.03);">
+                <div class="worker-stat-icon" style="width: 48px; height: 48px; border-radius: 12px; background: rgba(22, 163, 74, 0.1); color: #16a34a; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                </div>
+                <div>
+                    <span style="display: block; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--color-text-muted);">Closed Tasks</span>
+                    <strong data-work-count="closed" style="font-size: 1.75rem; font-weight: 800; color: var(--color-text-primary); line-height: 1.2;">0</strong>
+                </div>
+            </a>
         </section>
-        <p id="workSummaryStatus" role="status">Loading your work summary...</p>
-        <section class="maintenance-overview-actions">
-            <div><h2>Your task queue</h2><p>Review new offers, coordinate visits and submit repair reports.</p></div>
-            <a href="tasks.html" class="btn btn-primary">Open task queue</a>
+
+        <!-- Operational & KPI Graphs Section -->
+        <section class="worker-charts-section" aria-label="Performance and Operational Graphs">
+            <!-- Top Row: Monthly Trend (Left) & Category Distribution (Right) -->
+            <div class="worker-charts-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.25rem; margin-bottom: 1.25rem;">
+                <!-- Graph 1: Monthly Jobs Completed Trend -->
+                <div class="worker-chart-card">
+                    <div class="worker-chart-header">
+                        <div>
+                            <h4 class="worker-chart-title">Monthly Completed Jobs Trend</h4>
+                            <p class="worker-chart-subtitle">Completed repairs over recent months</p>
+                        </div>
+                        <span id="monthlyTrendTotalBadge" class="status-badge status-approved" style="font-size: 0.75rem;">0 Completed</span>
+                    </div>
+                    <div id="chartMonthlyTrend" style="min-height: 150px; display: flex; align-items: center; justify-content: center; flex: 1;">
+                        <span style="font-size: 0.8125rem; color: var(--color-text-muted);">Loading monthly trend...</span>
+                    </div>
+                </div>
+
+                <!-- Graph 2: Task Distribution by Category -->
+                <div class="worker-chart-card">
+                    <div class="worker-chart-header">
+                        <div>
+                            <h4 class="worker-chart-title">Task Distribution by Category</h4>
+                            <p class="worker-chart-subtitle">Work volume by issue category</p>
+                        </div>
+                        <span id="categoryActiveCountBadge" class="status-badge" style="font-size: 0.75rem; background: rgba(3, 85, 243, 0.1); color: var(--color-action-primary, #0355f3);">0 Tasks</span>
+                    </div>
+                    <div id="chartCategoryDistribution" style="min-height: 150px; display: flex; align-items: center; justify-content: center; flex: 1;">
+                        <span style="font-size: 0.8125rem; color: var(--color-text-muted);">Loading category breakdown...</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bottom Row: Pipeline Stages, Resolution Speed vs SLA, Quality Gauge -->
+            <div class="worker-charts-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.25rem; margin-bottom: 1.5rem;">
+                <!-- Graph 3: Workload Pipeline Stages -->
+                <div class="worker-chart-card">
+                    <div class="worker-chart-header">
+                        <div>
+                            <h4 class="worker-chart-title">Workload Pipeline Stages</h4>
+                            <p class="worker-chart-subtitle">Live distribution across workflow steps</p>
+                        </div>
+                    </div>
+                    <div id="chartPipelineStages" style="min-height: 180px; flex: 1;">
+                        <span style="font-size: 0.8125rem; color: var(--color-text-muted);">Loading pipeline status...</span>
+                    </div>
+                </div>
+
+                <!-- Graph 4: Resolution Speed vs SLA Target -->
+                <div class="worker-chart-card">
+                    <div class="worker-chart-header">
+                        <div>
+                            <h4 class="worker-chart-title">Resolution Speed vs SLA</h4>
+                            <p class="worker-chart-subtitle">Average turnaround hours vs benchmark</p>
+                        </div>
+                    </div>
+                    <div id="chartResolutionSpeed" style="min-height: 180px; flex: 1;">
+                        <span style="font-size: 0.8125rem; color: var(--color-text-muted);">Loading resolution speed...</span>
+                    </div>
+                </div>
+
+                <!-- Graph 5: First-Time Fix & Quality Score -->
+                <div class="worker-chart-card">
+                    <div class="worker-chart-header">
+                        <div>
+                            <h4 class="worker-chart-title">First-Time Fix Quality Score</h4>
+                            <p class="worker-chart-subtitle">Repairs resolved without rework requests</p>
+                        </div>
+                    </div>
+                    <div id="chartQualityScore" style="min-height: 180px; display: flex; flex-direction: column; align-items: center; justify-content: center; flex: 1;">
+                        <span style="font-size: 0.8125rem; color: var(--color-text-muted);">Loading quality score...</span>
+                    </div>
+                </div>
+            </div>
         </section>
     </main>
 

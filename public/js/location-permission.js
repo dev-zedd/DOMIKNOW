@@ -170,13 +170,17 @@
         if (activeRequest) return activeRequest;
         if (!navigator.geolocation) {
             const message = 'This browser does not support device location.';
-            showNotice(message, 'Unavailable', { actionable: false, force: Boolean(options.userInitiated) });
+            if (options.userInitiated) {
+                showNotice(message, 'Unavailable', { actionable: false, force: true });
+            }
             dispatch('domiknow:location-error', { message, code: 'unsupported' });
             return Promise.resolve(null);
         }
         if (!window.isSecureContext) {
             const message = 'Location permission requires a secure HTTPS connection.';
-            showNotice(message, 'HTTPS required', { actionable: false, force: Boolean(options.userInitiated) });
+            if (options.userInitiated) {
+                showNotice(message, 'HTTPS required', { actionable: false, force: true });
+            }
             dispatch('domiknow:location-error', { message, code: 'insecure' });
             return Promise.resolve(null);
         }
@@ -186,7 +190,9 @@
                 if (!isWithinServiceRegion(position)) {
                     clearStoredLocation();
                     const message = 'The browser returned a location outside DOMIKNOW’s Siniloan service region. Turn off VPN or location spoofing, enable device GPS, then try again.';
-                    showNotice(message, 'Try again', { force: Boolean(options.userInitiated) });
+                    if (options.userInitiated) {
+                        showNotice(message, 'Try again', { force: true });
+                    }
                     dispatch('domiknow:location-error', { message, code: 'outside_service_region' });
                     resolve(null);
                     return;
@@ -196,8 +202,9 @@
                 dispatch('domiknow:location-ready', location);
                 resolve(location);
             }, error => {
-                const message = permissionErrorMessage(error);
-                showNotice(message, error?.code === 1 ? 'Check permission' : 'Try again', { force: Boolean(options.userInitiated) });
+                if (options.userInitiated) {
+                    showNotice(message, error?.code === 1 ? 'Check permission' : 'Try again', { force: true });
+                }
                 dispatch('domiknow:location-error', { message, code: error?.code || 'unavailable', userInitiated: Boolean(options.userInitiated) });
                 resolve(null);
             }, {

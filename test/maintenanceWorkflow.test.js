@@ -115,3 +115,56 @@ test('invalid completion costs do not write reports, materials, or status', asyn
         assert.equal(flow.updates.length, 0);
     }
 });
+
+test('landlord directly initiates work order (Art. 1654) which starts as pre-approved', async () => {
+    let createdRequest = null;
+    let progressNotes = null;
+    const deps = {
+        '../utils/responseHelper': responseHelper,
+        '../models/maintenanceModel': {
+            createRequest: async (data) => { createdRequest = { id: 'wo-1', ...data }; return createdRequest; },
+            createProgressUpdate: async ({ notes }) => { progressNotes = notes; }
+        },
+        '../config/supabaseClient': {
+            from(table) {
+                return {
+                    select() { return this; },
+                    eq() { return this; },
+                    order() { return this; },
+                    limit() { return this; },
+                    maybeSingle: async () => {
+                        if (table === 'properties') return { data: { id: 'prop-1', property_name: 'Sunset Apartments', landlord_id: 'landlord-1' }, error: null };
+                        if (table === 'lease_records') return { data: { id: 'lease-1', tenant_id: 'tenant-1' }, error: null };
+                        return { data: null, error: null };
+                    },
+                    update: () => ({ eq: async () => ({ error: null }) })
+                };
+            }
+        },
+        '../models/auditLogModel': { log: async () => {} },
+        '../models/notificationModel': { create: async () => {} },
+        '../utils/storageHelper': { uploadFile: async () => ({ url: 'test', path: 'test' }) }
+    };
+    const context = vm.createContext({ require: name => deps[name] || {}, module: { exports: {} }, console, Date, Promise });
+    vm.runInContext(fs.readFileSync(path.join(__dirname, '../server/controllers/maintenanceController.js'), 'utf8'), context);
+
+    const res = { status(code) { this.statusCode = code; return this; }, json(value) { this.body = value; return this; } };
+    await context.module.exports.createLandlordMaintenanceRequest({
+        user: { id: 'landlord-1' },
+        body: {
+            property_id: 'prop-1',
+            scope: 'common_area',
+            issue_title: 'Main Roof Leak',
+            issue_description: 'Waterproofing required on common roof terrace',
+            issue_category: 'roof',
+            priority_level: 'high'
+        }
+    }, res);
+
+    assert.equal(res.statusCode, 201);
+    assert.equal(createdRequest.status, 'approved');
+    assert.match(createdRequest.recommendations, /\[INITIATED_BY:LANDLORD\]/);
+    assert.match(createdRequest.recommendations, /\[BASIS:ART_1654_MAINTENANCE\]/);
+    assert.match(progressNotes, /Civil Code Art\. 1654/);
+});
+

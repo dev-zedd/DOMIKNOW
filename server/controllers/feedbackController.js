@@ -41,10 +41,10 @@ const feedbackController = {
                 return responseHelper.error(res, 'Invalid feedback type. Allowed: property, landlord, rental_experience.');
             }
 
-            // 2. Check lease eligibility (active, ended, or terminated)
+            // 2. Check lease eligibility (contract must be finished)
             const lease = await feedbackModel.checkLeaseEligibility(tenantId, property_id, lease_id);
             if (!lease) {
-                return responseHelper.error(res, 'You must have an active or ended lease for this property to submit feedback.');
+                return responseHelper.error(res, 'You can only submit feedback after your lease contract for this property has ended or completed.');
             }
 
             // 3. Block duplicates (no duplicate feedback of the same type for the same lease)

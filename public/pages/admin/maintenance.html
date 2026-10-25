@@ -1,0 +1,2888 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Maintenance - DomiKnow</title>
+    <link href="../../css/input.css" rel="stylesheet">
+    <link href="../../css/design-system.css" rel="stylesheet">
+    <link href="../../css/admin.css" rel="stylesheet">
+    <style>
+        .admin-maintenance-page {
+            max-width: 100%;
+        }
+
+        /* ── Metric Cards Strip ── */
+        .metric-cards-strip {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        .metric-card {
+            background-color: var(--color-bg-surface, #ffffff);
+            border: 1px solid var(--color-border-default, #e2e8f0);
+            border-radius: 12px;
+            padding: 1.25rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        .metric-label {
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: var(--color-text-secondary, #64748b);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .metric-value {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--color-text-primary, #0f172a);
+        }
+        .metric-subtext {
+            font-size: 0.75rem;
+            color: var(--color-text-muted, #94a3b8);
+        }
+
+        /* ── Subnav Tabs Bar ── */
+        .subnav-tabs-bar {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            overflow-x: auto;
+            padding-bottom: 0.25rem;
+            margin-bottom: 1.25rem;
+            scrollbar-width: thin;
+        }
+        .subnav-tab-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.55rem 1.1rem;
+            border-radius: 999px;
+            font-size: 0.8125rem;
+            font-weight: 700;
+            color: var(--color-text-secondary, #475569);
+            background: var(--color-bg-surface, #ffffff);
+            border: 1px solid var(--color-border-default, #e2e8f0);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+        .subnav-tab-btn:hover {
+            color: var(--color-text-primary, #0f172a);
+            border-color: var(--color-border-strong, #cbd5e1);
+            background: var(--color-bg-subtle, #f8fafc);
+        }
+        .subnav-tab-btn.active {
+            background: var(--color-action-primary, #0355f3);
+            border-color: var(--color-action-primary, #0355f3);
+            color: #ffffff;
+            box-shadow: 0 2px 8px rgba(3, 85, 243, 0.2);
+        }
+        .subnav-tab-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.15rem 0.55rem;
+            border-radius: 999px;
+            font-size: 0.7rem;
+            font-weight: 800;
+            background: var(--color-bg-subtle, #f1f5f9);
+            color: var(--color-text-secondary, #475569);
+        }
+        .subnav-tab-btn.active .subnav-tab-badge {
+            background: rgba(255, 255, 255, 0.25);
+            color: #ffffff;
+        }
+
+        /* ── Tabs & Actions Bar ── */
+        .tabs-actions-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.25rem;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .subnav-tabs-bar {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin-bottom: 0;
+        }
+        .maintenance-actions-wrap {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .btn-toggle-filters {
+            background: var(--color-bg-surface, #ffffff);
+            border: 1px solid var(--color-border-default, #e2e8f0);
+            border-radius: 6px;
+            height: 36px;
+            padding: 0 14px;
+            font-weight: 700;
+            font-size: 0.8125rem;
+            color: var(--color-text-secondary, #475569);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+            white-space: nowrap;
+            position: relative;
+            box-sizing: border-box;
+        }
+        .btn-toggle-filters:hover {
+            background: var(--color-bg-canvas, #f8fafc);
+            color: var(--color-text-primary, #0f172a);
+            border-color: var(--color-border-strong, #cbd5e1);
+        }
+        .btn-toggle-filters.active {
+            background: var(--color-info-bg, #eff6ff);
+            color: var(--color-link, #0355f3);
+            border-color: var(--color-info-border, #bfdbfe);
+        }
+        .filter-active-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background-color: var(--color-link, #0355f3);
+            display: inline-block;
+        }
+        .filter-active-dot.hidden {
+            display: none !important;
+        }
+
+        /* ── Filter Panel (Collapsible, closed by default) ── */
+        .filter-panel {
+            background-color: var(--color-bg-surface, #ffffff);
+            border: 1px solid var(--color-border-default, #e2e8f0);
+            border-radius: 8px;
+            padding: 0.75rem 1rem !important;
+            margin-bottom: 1.25rem;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            align-items: flex-end;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+            animation: fadeInFilter 0.18s ease-out;
+        }
+        .filter-panel.hidden {
+            display: none !important;
+        }
+        @keyframes fadeInFilter {
+            from {
+                opacity: 0;
+                transform: translateY(-6px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            flex: 1 1 180px;
+            min-width: 140px;
+        }
+        .filter-label {
+            font-size: 0.6875rem;
+            font-weight: 700;
+            color: var(--color-text-secondary, #64748b);
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+        .search-input-wrap {
+            position: relative;
+            width: 100%;
+        }
+        .search-input-wrap svg {
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--color-text-muted, #94a3b8);
+            pointer-events: none;
+        }
+        .filter-input,
+        select.filter-input,
+        input.filter-input {
+            height: 36px !important;
+            min-height: 36px !important;
+            max-height: 36px !important;
+            padding: 0 10px !important;
+            font-size: 0.8125rem !important;
+            line-height: normal !important;
+            border-radius: 6px !important;
+            border: 1px solid var(--color-border-default, #e2e8f0) !important;
+            background-color: var(--color-bg-surface, #ffffff) !important;
+            color: var(--color-text-primary, #0f172a) !important;
+            transition: border-color 0.15s ease, box-shadow 0.15s ease;
+            box-sizing: border-box !important;
+            width: 100%;
+        }
+        .filter-search-input {
+            padding: 0 10px 0 32px !important;
+        }
+        select.filter-input {
+            cursor: pointer;
+            padding: 0 28px 0 10px !important;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E") !important;
+            background-repeat: no-repeat !important;
+            background-position: right 10px center !important;
+            appearance: none;
+            -webkit-appearance: none;
+        }
+        .filter-input:focus,
+        select.filter-input:focus {
+            border-color: var(--color-action-primary, #0355f3) !important;
+            box-shadow: 0 0 0 3px rgba(3, 85, 243, 0.1) !important;
+            outline: none;
+        }
+        .btn-icon-reset {
+            width: 36px;
+            height: 36px;
+            min-width: 36px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 6px;
+            border: 1px solid var(--color-border-default, #e2e8f0);
+            background-color: var(--color-bg-subtle, #f8fafc);
+            color: var(--color-text-secondary, #64748b);
+            cursor: pointer;
+            transition: all 0.15s ease;
+            padding: 0;
+            margin: 0;
+            box-sizing: border-box;
+        }
+        .btn-icon-reset:hover {
+            background-color: var(--color-bg-canvas, #f1f5f9);
+            color: var(--color-text-primary, #0f172a);
+            border-color: var(--color-border-strong, #cbd5e1);
+        }
+        .btn-icon-reset:active {
+            transform: scale(0.96);
+        }
+        .btn-action-primary {
+            height: 36px;
+            padding: 0 14px;
+            background: var(--color-action-primary, #0355f3);
+            color: #ffffff;
+            font-weight: 700;
+            font-size: 0.8125rem;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            transition: all 0.15s ease;
+            white-space: nowrap;
+        }
+        .btn-action-primary:hover {
+            opacity: 0.92;
+        }
+
+        /* ── Table Card ── */
+        .table-card {
+            background-color: var(--color-bg-surface, #ffffff);
+            border: 1px solid var(--color-border-default, #e2e8f0);
+            border-radius: 12px;
+            overflow-x: auto;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+            margin-bottom: 2rem;
+        }
+        table {
+            width: 100%;
+            table-layout: fixed;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 0.84rem;
+        }
+        th {
+            background-color: var(--color-bg-subtle, #f8fafc);
+            color: var(--color-text-secondary, #64748b);
+            font-weight: 700;
+            font-size: 0.72rem;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            padding: 0.85rem 1rem;
+            border-bottom: 1px solid var(--color-border-default, #e2e8f0);
+            white-space: nowrap;
+        }
+        td {
+            padding: 0.85rem 1rem;
+            border-bottom: 1px solid var(--color-border-default, #e2e8f0);
+            color: var(--color-text-primary, #0f172a);
+            vertical-align: middle;
+            word-break: break-word;
+        }
+        tr:last-child td {
+            border-bottom: none;
+        }
+        tr:hover td {
+            background-color: var(--color-bg-subtle, #f8fafc);
+        }
+        .clickable-row {
+            cursor: pointer;
+            transition: background-color 0.15s ease;
+        }
+        .clickable-row:hover td {
+            background-color: var(--color-bg-subtle, #f1f5f9) !important;
+        }
+        .clickable-row:focus-visible {
+            outline: 2px solid var(--color-action-primary, #0355f3);
+            outline-offset: -2px;
+        }
+
+        /* ── Table Empty States & Colspan Center Alignment ── */
+        .dashboard-layout-admin .admin-data-table td[colspan],
+        .table-card td[colspan],
+        table td[colspan] {
+            text-align: center !important;
+            white-space: normal !important;
+        }
+
+        /* ── Center Alignment for Status Columns across Tables ── */
+        #viewPayments table th:last-child,
+        #viewPayments table td:last-child:not([colspan]),
+        #viewRequests table th:last-child,
+        #viewRequests table td:last-child:not([colspan]),
+        #viewLiability table th:last-child,
+        #viewLiability table td:last-child:not([colspan]) {
+            text-align: center !important;
+        }
+
+        /* ── Sub-Filter Pills Uniform Spacing ── */
+        .pay-filter-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 2px;
+        }
+
+        /* ── Status & Liability Badges ── */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            padding: 0.2rem 0.6rem;
+            border-radius: 999px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+        .badge-landlord {
+            background-color: #eff6ff;
+            color: #1d4ed8;
+            border: 1px solid #bfdbfe;
+        }
+        .badge-tenant {
+            background-color: #fef3c7;
+            color: #92400e;
+            border: 1px solid #fde68a;
+        }
+        .badge-pending {
+            background-color: #f1f5f9;
+            color: #475569;
+            border: 1px solid #cbd5e1;
+        }
+        .badge-active {
+            background-color: #ecfdf5;
+            color: #047857;
+            border: 1px solid #a7f3d0;
+        }
+        .badge-completed {
+            background-color: #f0fdf4;
+            color: #15803d;
+            border: 1px solid #bbf7d0;
+        }
+        .badge-shared {
+            background-color: #fef3c7;
+            color: #92400e;
+            border: 1px solid #fde68a;
+        }
+        .badge-priority-emergency {
+            background-color: #fef2f2;
+            color: #dc2626;
+            border: 1px solid #fecaca;
+        }
+        .badge-priority-high {
+            background-color: #fff7ed;
+            color: #ea580c;
+            border: 1px solid #ffedd5;
+        }
+        .badge-priority-medium {
+            background-color: #fefce8;
+            color: #ca8a04;
+            border: 1px solid #fef08a;
+        }
+        .badge-priority-low {
+            background-color: #f0fdf4;
+            color: #16a34a;
+            border: 1px solid #bbf7d0;
+        }
+        .badge-transit {
+            background-color: #f5f3ff;
+            color: #7c3aed;
+            border: 1px solid #ddd6fe;
+        }
+        .badge-arrived {
+            background-color: #f0fdfa;
+            color: #0d9488;
+            border: 1px solid #99f6e4;
+        }
+        .badge-inspection {
+            background-color: #eef2ff;
+            color: #4338ca;
+            border: 1px solid #c7d2fe;
+        }
+        .btn-table-primary {
+            background-color: var(--color-action-primary, #0355f3) !important;
+            color: #ffffff !important;
+            border-color: var(--color-action-primary, #0355f3) !important;
+        }
+        .btn-table-primary:hover {
+            opacity: 0.92;
+            color: #ffffff !important;
+        }
+
+        /* ── Modal Extended / Details Styles ── */
+        .modal-container-large {
+            max-width: 740px !important;
+            width: 92% !important;
+        }
+        .detail-section-title {
+            font-size: 0.72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: var(--color-text-muted, #64748b);
+            border-bottom: 1px solid var(--color-border-default, #e2e8f0);
+            padding-bottom: 0.25rem;
+            margin-top: 0.65rem;
+            margin-bottom: 0.45rem;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+        .admin-grid-2 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 0.65rem 1rem;
+        }
+        .admin-info-item {
+            display: flex;
+            flex-direction: column;
+            gap: 0.15rem;
+        }
+        .admin-info-label {
+            font-size: 0.6875rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+            color: var(--color-text-muted, #94a3b8);
+        }
+        .admin-info-value {
+            font-size: 0.8125rem;
+            font-weight: 600;
+            color: var(--color-text-primary, #0f172a);
+            word-break: break-word;
+        }
+            word-break: break-word;
+        }
+        .admin-proof-gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 0.85rem;
+            margin-top: 0.5rem;
+        }
+        .admin-proof-card {
+            border: 1px solid var(--color-border-default, #e2e8f0);
+            border-radius: 8px;
+            overflow: hidden;
+            background: var(--color-bg-subtle, #f8fafc);
+        }
+        .admin-proof-card img {
+            width: 100%;
+            height: 140px;
+            object-fit: cover;
+            display: block;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+        .admin-proof-card img:hover {
+            transform: scale(1.02);
+        }
+        .admin-proof-cap {
+            font-size: 0.72rem;
+            font-weight: 700;
+            padding: 0.4rem 0.6rem;
+            color: var(--color-text-secondary, #64748b);
+            background: var(--color-bg-surface, #ffffff);
+            border-top: 1px solid var(--color-border-default, #e2e8f0);
+        }
+        .admin-mat-table {
+            width: 100%;
+            border: 1px solid var(--color-border-default, #e2e8f0);
+            border-radius: 6px;
+            overflow: hidden;
+            font-size: 0.8rem;
+            margin-top: 0.5rem;
+        }
+        .admin-mat-table th {
+            background: var(--color-bg-subtle, #f8fafc);
+            padding: 0.5rem 0.75rem;
+            font-size: 0.68rem;
+        }
+        .admin-mat-table td {
+            padding: 0.5rem 0.75rem;
+        }
+        .admin-timeline {
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+            margin-top: 0.5rem;
+            padding-left: 0.5rem;
+            border-left: 2px solid var(--color-border-default, #e2e8f0);
+        }
+        .admin-tl-item {
+            position: relative;
+            padding-left: 1rem;
+        }
+        .admin-tl-item::before {
+            content: '';
+            position: absolute;
+            left: -0.85rem;
+            top: 0.35rem;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--color-action-primary, #0355f3);
+        }
+        .admin-tl-date {
+            font-size: 0.68rem;
+            color: var(--color-text-muted, #94a3b8);
+        }
+        .admin-tl-note {
+            font-size: 0.8rem;
+            color: var(--color-text-primary, #0f172a);
+            font-weight: 600;
+        }
+
+        /* ── Action Buttons ── */
+        .btn-table-sm {
+            padding: 0.28rem 0.55rem;
+            font-size: 0.72rem;
+            font-weight: 600;
+            border-radius: 5px;
+            border: 1px solid var(--color-border-default, #e2e8f0);
+            background: var(--color-bg-surface, #ffffff);
+            color: var(--color-text-primary, #0f172a);
+            cursor: pointer;
+            transition: all 0.15s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            white-space: nowrap;
+        }
+        .btn-table-sm:hover {
+            border-color: var(--color-action-primary, #0355f3);
+            color: var(--color-action-primary, #0355f3);
+        }
+
+        /* ── Modals ── */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: rgba(15, 23, 42, 0.48);
+            backdrop-filter: blur(4px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        .modal-overlay.hidden {
+            display: none !important;
+        }
+        .modal-container {
+            background: var(--color-bg-surface, #ffffff);
+            border: 1px solid var(--color-border-default, #e2e8f0);
+            border-radius: 10px;
+            width: 90%;
+            max-width: 540px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+        }
+        .modal-header {
+            padding: 0.85rem 1.25rem;
+            border-bottom: 1px solid var(--color-border-default, #e2e8f0);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .modal-header h3 {
+            margin: 0;
+            font-size: 0.9375rem;
+            font-weight: 700;
+            color: var(--color-text-primary, #0f172a);
+        }
+        .modal-close-btn {
+            background: transparent;
+            border: none;
+            color: var(--color-text-muted, #94a3b8);
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 4px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-close-btn:hover {
+            color: var(--color-text-primary, #0f172a);
+        }
+        .modal-body {
+            padding: 1rem 1.25rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+        .modal-footer {
+            padding: 0.75rem 1.25rem;
+            border-top: 1px solid var(--color-border-default, #e2e8f0);
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            gap: 0.5rem;
+            background: var(--color-bg-subtle, #f8fafc);
+            border-bottom-left-radius: 10px;
+            border-bottom-right-radius: 10px;
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+        .form-label {
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+            color: var(--color-text-muted, #64748b);
+        }
+        .form-control {
+            height: 34px;
+            padding: 0.35rem 0.65rem;
+            border-radius: 5px;
+            border: 1px solid var(--color-border-default, #cbd5e1);
+            background: var(--color-bg-surface, #ffffff);
+            color: var(--color-text-primary, #0f172a);
+            font-size: 0.8125rem;
+            box-sizing: border-box;
+            width: 100%;
+            transition: border-color 0.15s ease, box-shadow 0.15s ease;
+        }
+        .form-control:focus {
+            outline: none;
+            border-color: var(--color-action-primary, #0355f3);
+            box-shadow: 0 0 0 2px rgba(3, 85, 243, 0.12);
+        }
+        textarea.form-control {
+            height: 65px;
+            min-height: 55px;
+            padding: 0.4rem 0.65rem;
+            resize: vertical;
+        }
+        .legal-notice-box {
+            background-color: var(--color-bg-subtle, #f8fafc);
+            border: 1px solid var(--color-border-default, #e2e8f0);
+            border-radius: 5px;
+            padding: 0.45rem 0.65rem;
+            font-size: 0.72rem;
+            line-height: 1.4;
+            color: var(--color-text-secondary, #475569);
+        }
+    </style>
+</head>
+<body class="app-loading" data-role="admin" data-page-title="Maintenance">
+    <main class="dashboard-container admin-maintenance-page" aria-labelledby="appPageTitle">
+        <!-- KPI Metric Cards Strip -->
+        <section class="metric-cards-strip" aria-label="Operational Cost KPI Summary">
+            <div class="metric-card">
+                <div class="metric-label">
+                    <span>Total Expenses</span>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+                </div>
+                <div class="metric-value" id="kpiTotalCost">₱0.00</div>
+                <div class="metric-subtext" id="kpiCostSubtext">All repair expenses</div>
+            </div>
+
+            <div class="metric-card">
+                <div class="metric-label">
+                    <span>Landlord Share</span>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                </div>
+                <div class="metric-value" id="kpiLandlordCost" style="color: #1d4ed8;">₱0.00</div>
+                <div class="metric-subtext">Wear &amp; tear repairs</div>
+            </div>
+
+            <div class="metric-card">
+                <div class="metric-label">
+                    <span>Tenant Share</span>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                </div>
+                <div class="metric-value" id="kpiTenantCost" style="color: #92400e;">₱0.00</div>
+                <div class="metric-subtext">Misuse &amp; negligence</div>
+            </div>
+
+            <div class="metric-card">
+                <div class="metric-label">
+                    <span>Technicians</span>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+                </div>
+                <div class="metric-value" id="kpiWorkers">0 Technicians</div>
+                <div class="metric-subtext" id="kpiActiveRequests">0 active jobs</div>
+            </div>
+        </section>
+
+        <!-- Tabs & Actions Bar (Matching Landlord Billings Header System) -->
+        <div class="tabs-actions-bar">
+            <nav class="subnav-tabs-bar" aria-label="Maintenance Views">
+                <button type="button" id="tabBtnRequests" class="subnav-tab-btn active" data-tab="requests">
+                    <span>Work Orders</span>
+                    <span class="subnav-tab-badge" id="badgeRequests">0</span>
+                </button>
+                <button type="button" id="tabBtnLiability" class="subnav-tab-btn" data-tab="liability">
+                    <span>Liability &amp; Quotes</span>
+                    <span class="subnav-tab-badge" id="badgeQuotes">0</span>
+                </button>
+                <button type="button" id="tabBtnPersonnel" class="subnav-tab-btn" data-tab="personnel">
+                    <span>Technicians</span>
+                    <span class="subnav-tab-badge" id="badgeWorkers">0</span>
+                </button>
+                <button type="button" id="tabBtnPayments" class="subnav-tab-btn" data-tab="payments">
+                    <span>Maintenance Payments</span>
+                    <span class="subnav-tab-badge" id="badgePayments">0</span>
+                </button>
+            </nav>
+
+            <div class="maintenance-actions-wrap">
+                <button type="button" id="toggleFiltersBtn" class="btn-toggle-filters" aria-expanded="false" aria-controls="filterPanel">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+                    </svg>
+                    <span>Filters</span>
+                    <span id="filterActiveDot" class="filter-active-dot hidden" aria-hidden="true"></span>
+                </button>
+                <button type="button" id="btnOpenAddWorkerModal" class="btn-action-primary">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                    <span>Add Technician</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Filter Panel (Collapsible, closed by default) -->
+        <div id="filterPanel" class="filter-panel hidden">
+            <div class="filter-group" style="flex: 2 1 240px; max-width: 380px;">
+                <label for="filterSearch" class="filter-label">Search Query</label>
+                <div class="search-input-wrap">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                    <input type="text" id="filterSearch" class="filter-input filter-search-input" placeholder="Search by issue, property, tenant...">
+                </div>
+            </div>
+
+            <div class="filter-group">
+                <label for="filterStatus" class="filter-label">Status</label>
+                <select id="filterStatus" class="filter-input" aria-label="Filter by Status">
+                    <option value="all">All Statuses</option>
+                    <option value="pending">Pending</option>
+                    <option value="assigned">Assigned</option>
+                    <option value="quoted">Quoted</option>
+                    <option value="approved">Approved</option>
+                    <option value="repairing">In Progress</option>
+                    <option value="completed">Completed</option>
+                    <option value="closed">Closed</option>
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label for="filterLiability" class="filter-label">Legal Liability</label>
+                <select id="filterLiability" class="filter-input" aria-label="Filter by Legal Liability">
+                    <option value="all">All Liabilities</option>
+                    <option value="landlord">Landlord (Art. 1654)</option>
+                    <option value="tenant">Tenant (Art. 1657)</option>
+                    <option value="shared">50/50 Split</option>
+                    <option value="pending">Pending</option>
+                </select>
+            </div>
+
+            <button type="button" id="resetFiltersBtn" class="btn-icon-reset" title="Reset all filters" aria-label="Reset all filters">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+                    <path d="M3 3v5h5"></path>
+                </svg>
+            </button>
+        </div>
+
+        <!-- Table View 1: Work Orders (Operational Execution Focus) -->
+        <div id="viewRequests" class="table-card">
+            <table style="min-width: 900px;">
+                <colgroup>
+                    <col style="width: 28%;">
+                    <col style="width: 25%;">
+                    <col style="width: 18%;">
+                    <col style="width: 15%;">
+                    <col style="width: 14%;">
+                </colgroup>
+                <thead>
+                    <tr>
+                        <th style="text-align: left;">Issue &amp; Priority</th>
+                        <th style="text-align: left;">Property &amp; Unit</th>
+                        <th style="text-align: left;">Schedule / Target</th>
+                        <th style="text-align: left;">Technician</th>
+                        <th style="text-align: center;">Field Status</th>
+                    </tr>
+                </thead>
+                <tbody id="requestsTableBody" aria-live="polite">
+                    <tr>
+                        <td colspan="5" style="text-align: center; color: var(--color-text-muted); padding: 2rem;">Loading work orders...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Table View 2: Liability & Quotes (Legal & Financial Arbitration Focus) -->
+        <div id="viewLiability" class="table-card" style="display: none;">
+            <table style="min-width: 920px;">
+                <colgroup>
+                    <col style="width: 26%;">
+                    <col style="width: 28%;">
+                    <col style="width: 17%;">
+                    <col style="width: 15%;">
+                    <col style="width: 14%;">
+                </colgroup>
+                <thead>
+                    <tr>
+                        <th style="text-align: left;">Work Order &amp; Tenant</th>
+                        <th style="text-align: left;">Diagnostic Findings</th>
+                        <th style="text-align: left;">Quoted Cost</th>
+                        <th style="text-align: left;">Civil Code Ruling</th>
+                        <th style="text-align: center;">Approval State</th>
+                    </tr>
+                </thead>
+                <tbody id="liabilityTableBody" aria-live="polite">
+                    <tr>
+                        <td colspan="5" style="text-align: center; color: var(--color-text-muted); padding: 2rem;">Loading liability determinations &amp; quotations...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Table View 2: Technician Personnel Pool -->
+        <div id="viewPersonnel" class="table-card" style="display: none;">
+            <table style="min-width: 860px;">
+                <colgroup>
+                    <col style="width: 24%;">
+                    <col style="width: 22%;">
+                    <col style="width: 16%;">
+                    <col style="width: 10%;">
+                    <col style="width: 10%;">
+                    <col style="width: 8%;">
+                    <col style="width: 10%;">
+                </colgroup>
+                <thead>
+                    <tr>
+                        <th style="text-align: left;">Technician</th>
+                        <th style="text-align: left;">Email</th>
+                        <th style="text-align: left;">Contact</th>
+                        <th style="text-align: center;">Active Jobs</th>
+                        <th style="text-align: center;">Completed</th>
+                        <th style="text-align: center;">Status</th>
+                        <th style="text-align: right;">Action</th>
+                    </tr>
+                </thead>
+                <tbody id="workersTableBody" aria-live="polite">
+                    <tr>
+                        <td colspan="7" style="text-align: center; color: var(--color-text-muted); padding: 2rem;">Loading technician roster...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Table View 4: Maintenance Payments (Verification & Settlement) -->
+        <div id="viewPayments" class="table-card" style="display: none;">
+            <!-- Sub-filter pills for payments -->
+            <div style="display: flex; align-items: center; justify-content: space-between; padding: 0.75rem 1rem; border-bottom: 1px solid var(--color-border-default, #e2e8f0); gap: 1rem; flex-wrap: wrap;">
+                <div style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
+                    <button type="button" class="btn-table-sm pay-filter-pill active" data-pay-filter="all" style="padding: 0.35rem 0.75rem; font-weight: 700;">All Payments (<span id="payCountAll">0</span>)</button>
+                    <button type="button" class="btn-table-sm pay-filter-pill" data-pay-filter="waiting_verification" style="padding: 0.35rem 0.75rem; background: #fffbeb; color: #b45309; border-color: #fde68a; font-weight: 700;">Awaiting Verification (<span id="payCountWaiting">0</span>)</button>
+                    <button type="button" class="btn-table-sm pay-filter-pill" data-pay-filter="verified" style="padding: 0.35rem 0.75rem; font-weight: 700;">Verified (<span id="payCountVerified">0</span>)</button>
+                    <button type="button" class="btn-table-sm pay-filter-pill" data-pay-filter="rejected" style="padding: 0.35rem 0.75rem; font-weight: 700;">Rejected (<span id="payCountRejected">0</span>)</button>
+                </div>
+                <div style="position: relative; min-width: 240px;">
+                    <input type="text" id="paySearchInput" class="filter-input" placeholder="Search payer, ref, issue..." style="height: 32px; padding: 0 10px; font-size: 0.78rem;">
+                </div>
+            </div>
+            <table style="min-width: 860px;">
+                <colgroup>
+                    <col style="width: 28%;">
+                    <col style="width: 22%;">
+                    <col style="width: 18%;">
+                    <col style="width: 18%;">
+                    <col style="width: 14%;">
+                </colgroup>
+                <thead>
+                    <tr>
+                        <th style="text-align: left;">Work Order &amp; Property</th>
+                        <th style="text-align: left;">Payer</th>
+                        <th style="text-align: left;">Amount &amp; Method</th>
+                        <th style="text-align: left;">Reference / Date</th>
+                        <th style="text-align: center;">Payment Status</th>
+                    </tr>
+                </thead>
+                <tbody id="paymentsTableBody" aria-live="polite">
+                    <tr>
+                        <td colspan="5" style="text-align: center !important; color: var(--color-text-muted); padding: 2.5rem;">Loading maintenance payments...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </main>
+
+    <!-- ── Modal 1: Dispatch Technician ── -->
+    <div id="dispatchModal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="dispatchModalTitle">
+        <div class="modal-container">
+            <div class="modal-header">
+                <h3 id="dispatchModalTitle">Dispatch Technician</h3>
+                <button type="button" id="closeDispatchModalBtn" class="modal-close-btn" aria-label="Close modal">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
+            </div>
+            <form id="dispatchForm">
+                <input type="hidden" id="dispatchRequestId">
+                <div class="modal-body">
+                    <div style="background: var(--color-bg-subtle, #f8fafc); border: 1px solid var(--color-border-default, #e2e8f0); border-radius: 6px; padding: 0.85rem;">
+                        <div id="dispatchIssueTitle" style="font-weight: 700; color: var(--color-text-primary, #0f172a); margin-bottom: 0.25rem;">—</div>
+                        <div id="dispatchPropertyLocation" style="font-size: 0.8rem; color: var(--color-text-secondary, #64748b);">—</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="dispatchWorkerSelect" class="form-label">Assign Technician</label>
+                        <select id="dispatchWorkerSelect" class="form-control" required>
+                            <option value="">Select technician...</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="dispatchDueDate" class="form-label">Target Due Date</label>
+                        <input type="date" id="dispatchDueDate" class="form-control" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="dispatchInstructions" class="form-label">Instructions (Optional)</label>
+                        <textarea id="dispatchInstructions" class="form-control" placeholder="e.g. Conduct ocular diagnosis of leak and verify cause."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="btnCancelDispatch" class="btn-table-sm" style="padding: 0.5rem 1rem;">Cancel</button>
+                    <button type="submit" id="btnConfirmDispatch" class="btn-action-primary">Dispatch</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ── Modal 2: Review Liability & Quote ── -->
+    <div id="liabilityModal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="liabilityModalTitle">
+        <div class="modal-container" style="max-width: 540px;">
+            <div class="modal-header">
+                <div>
+                    <h3 id="liabilityModalTitle">Review Liability &amp; Quote</h3>
+                    <div id="liabilityModalSubtitle" style="font-size: 0.72rem; color: var(--color-text-muted); margin-top: 2px;"></div>
+                </div>
+                <button type="button" id="closeLiabilityModalBtn" class="modal-close-btn" aria-label="Close modal">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
+            </div>
+            <form id="liabilityForm">
+                <input type="hidden" id="liabilityRequestId">
+                <div class="modal-body">
+                    <div class="legal-notice-box">
+                        <strong>Civil Code Basis:</strong> Art. 1654 for wear &amp; tear (Landlord) | Art. 1657 for misuse/negligence (Tenant) | 50/50 Split for compounded causes.
+                    </div>
+
+                    <div style="background: var(--color-bg-subtle, #f8fafc); border: 1px solid var(--color-border-default, #e2e8f0); border-radius: 6px; padding: 0.65rem 0.85rem;">
+                        <div style="font-size: 0.6875rem; font-weight: 700; text-transform: uppercase; color: var(--color-text-muted); margin-bottom: 0.2rem;">Technician Diagnostic Findings:</div>
+                        <div id="liabilityProblemFound" style="font-size: 0.8125rem; color: var(--color-text-primary); font-weight: 600; line-height: 1.4;">—</div>
+                        <div id="liabilityOcularPreview" style="margin-top: 0.4rem; display: none;"></div>
+                        <div id="liabilityMaterialsSummary" style="margin-top: 0.4rem; display: none;"></div>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+                        <div class="form-group">
+                            <label for="liabilityPartySelect" class="form-label">Responsible Party</label>
+                            <select id="liabilityPartySelect" class="form-control" required>
+                                <option value="landlord">Landlord (Wear &amp; Tear)</option>
+                                <option value="tenant">Tenant (Negligence / Misuse)</option>
+                                <option value="shared">50/50 Split (Compounded)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="liabilityBasisSelect" class="form-label">Legal Basis</label>
+                            <select id="liabilityBasisSelect" class="form-control" required>
+                                <option value="art_1654_wear_and_tear">Natural Wear &amp; Tear</option>
+                                <option value="art_1654_major_utility">Main Utility Lines</option>
+                                <option value="art_1654_force_majeure">Force Majeure / Calamity</option>
+                                <option value="art_1657_negligence">Tenant Fault / Negligence</option>
+                                <option value="art_1657_minor_repair">Minor Consumable Repair</option>
+                                <option value="art_1654_1657_split">Equitable 50/50 Split</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+                        <div class="form-group">
+                            <label for="liabilityLaborCost" class="form-label">Labor Fee (₱)</label>
+                            <input type="number" step="0.01" min="0" id="liabilityLaborCost" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="liabilityMaterialCost" class="form-label">Material Cost (₱)</label>
+                            <input type="number" step="0.01" min="0" id="liabilityMaterialCost" class="form-control" required>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; justify-content: space-between; align-items: center; background: var(--color-bg-subtle, #f8fafc); border: 1px solid var(--color-border-default, #e2e8f0); border-radius: 6px; padding: 0.45rem 0.75rem;">
+                        <span style="font-size: 0.7rem; font-weight: 700; text-transform: uppercase; color: var(--color-text-muted);">Total Quotation:</span>
+                        <span id="liabilityTotalDisplay" style="font-size: 0.9375rem; font-weight: 800; color: var(--color-link, #0355f3);">₱0.00</span>
+                    </div>
+
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <label for="liabilityAdminNotes" class="form-label">Admin Finding / Note</label>
+                        <textarea id="liabilityAdminNotes" class="form-control" placeholder="e.g. Confirmed worn seal under floor drain. Landlord liable under Art. 1654."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="btnCancelLiability" class="btn-table-sm" style="padding: 0.4rem 0.85rem;">Cancel</button>
+                    <button type="submit" id="btnConfirmLiability" class="btn-action-primary" style="padding: 0.4rem 0.9rem; font-size: 0.8125rem;">Save Decision</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ── Modal 3: Add Technician ── -->
+    <div id="addWorkerModal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="addWorkerModalTitle">
+        <div class="modal-container">
+            <div class="modal-header">
+                <h3 id="addWorkerModalTitle">Add Technician</h3>
+                <button type="button" id="closeAddWorkerModalBtn" class="modal-close-btn" aria-label="Close modal">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
+            </div>
+            <form id="addWorkerForm">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="workerFullName" class="form-label">Full Name</label>
+                        <input type="text" id="workerFullName" class="form-control" placeholder="e.g. Juan Dela Cruz" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="workerSpecialization" class="form-label">Specialization</label>
+                        <select id="workerSpecialization" class="form-control">
+                            <option value="Plumber">Plumbing</option>
+                            <option value="Electrician">Electrical</option>
+                            <option value="General Repair">General Handyman</option>
+                            <option value="HVAC">Aircon &amp; Appliances</option>
+                            <option value="Roofing">Roofing &amp; Waterproofing</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="workerEmail" class="form-label">Email (Login ID)</label>
+                        <input type="email" id="workerEmail" class="form-control" placeholder="worker@domiknow.com" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="workerContact" class="form-label">Contact Number</label>
+                        <input type="text" id="workerContact" class="form-control" placeholder="0917-XXX-XXXX">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="workerPassword" class="form-label">Password</label>
+                        <input type="password" id="workerPassword" class="form-control" placeholder="Min. 8 characters" minlength="8" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="btnCancelAddWorker" class="btn-table-sm" style="padding: 0.5rem 1rem;">Cancel</button>
+                    <button type="submit" id="btnConfirmAddWorker" class="btn-action-primary">Save Technician</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ── Modal 4: Work Order Details ── -->
+    <div id="detailsModal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="detailsModalTitle">
+        <div class="modal-container modal-container-large">
+            <div class="modal-header">
+                <div>
+                    <h3 id="detailsModalTitle">Work Order Details</h3>
+                    <div id="detailsModalSubtitle" style="font-size: 0.78rem; color: var(--color-text-muted); margin-top: 2px;">Inspection &amp; History</div>
+                </div>
+                <button type="button" id="closeDetailsModalBtn" class="modal-close-btn" aria-label="Close modal">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
+            </div>
+            <div class="modal-body" id="detailsModalBody" style="max-height: 75vh; overflow-y: auto;">
+                <div style="text-align: center; color: var(--color-text-muted); padding: 2rem;">Loading details...</div>
+            </div>
+            <div class="modal-footer" id="detailsModalFooter">
+                <button type="button" id="btnCloseDetailsModal" class="btn-table-sm" style="padding: 0.5rem 1rem;">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── Modal 5: Maintenance Payment Details & Verification ── -->
+    <div id="paymentDetailsModal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="payDetailsModalTitle">
+        <div class="modal-container" style="max-width: 580px; max-height: 90vh; overflow-y: auto;">
+            <div class="modal-header">
+                <div>
+                    <h3 id="payDetailsModalTitle">Payment Details</h3>
+                    <div id="payDetailsModalSubtitle" style="font-size: 0.75rem; color: var(--color-text-muted); margin-top: 2px;"></div>
+                </div>
+                <button type="button" id="closePaymentDetailsModalBtn" class="modal-close-btn" aria-label="Close modal">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
+            </div>
+            <div class="modal-body" style="padding: 1.25rem; display: flex; flex-direction: column; gap: 1rem;">
+                <input type="hidden" id="verifyPaymentRequestId">
+
+                <!-- Top Summary Card -->
+                <div style="background: var(--color-bg-subtle, #f8fafc); border: 1px solid var(--color-border-default, #e2e8f0); border-radius: 8px; padding: 1rem; display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <div style="font-size: 0.72rem; text-transform: uppercase; font-weight: 700; color: var(--color-text-muted); letter-spacing: 0.04em;">Settlement Amount</div>
+                        <div id="payDetailsAmount" style="font-size: 1.5rem; font-weight: 800; color: #15803d; margin-top: 2px;">₱0.00</div>
+                    </div>
+                    <div id="payDetailsStatusWrap"></div>
+                </div>
+
+                <!-- Work Order & Property Details -->
+                <div style="background: var(--color-bg-surface, #ffffff); border: 1px solid var(--color-border-default, #e2e8f0); border-radius: 8px; padding: 0.85rem 1rem;">
+                    <div style="font-size: 0.6875rem; font-weight: 700; text-transform: uppercase; color: var(--color-text-muted); margin-bottom: 0.35rem;">Work Order &amp; Unit</div>
+                    <div id="payDetailsIssueTitle" style="font-size: 0.92rem; font-weight: 700; color: var(--color-text-primary);">—</div>
+                    <div id="payDetailsPropertyLocation" style="font-size: 0.78rem; color: var(--color-text-secondary); margin-top: 2px;">—</div>
+                </div>
+
+                <!-- 2-Column Info Grid -->
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+                    <div style="background: var(--color-bg-subtle, #f8fafc); border: 1px solid var(--color-border-default, #e2e8f0); border-radius: 6px; padding: 0.75rem;">
+                        <div style="font-size: 0.68rem; font-weight: 700; text-transform: uppercase; color: var(--color-text-muted);">Payer Details</div>
+                        <div id="payDetailsPayerName" style="font-weight: 700; font-size: 0.84rem; color: var(--color-text-primary); margin-top: 4px;">—</div>
+                        <div id="payDetailsPayerContact" style="font-size: 0.74rem; color: var(--color-text-secondary); margin-top: 2px;">—</div>
+                        <div id="payDetailsLiabilityBadge" style="margin-top: 6px;"></div>
+                    </div>
+                    <div style="background: var(--color-bg-subtle, #f8fafc); border: 1px solid var(--color-border-default, #e2e8f0); border-radius: 6px; padding: 0.75rem;">
+                        <div style="font-size: 0.68rem; font-weight: 700; text-transform: uppercase; color: var(--color-text-muted);">Channel &amp; Reference</div>
+                        <div id="payDetailsMethod" style="font-weight: 700; font-size: 0.84rem; color: var(--color-text-primary); margin-top: 4px;">—</div>
+                        <div id="payDetailsRefNum" style="font-family: monospace; font-size: 0.8rem; font-weight: 700; color: #1d4ed8; margin-top: 2px;">—</div>
+                        <div id="payDetailsDate" style="font-size: 0.72rem; color: var(--color-text-muted); margin-top: 4px;">—</div>
+                    </div>
+                </div>
+
+                <!-- Rejection Reason if applicable -->
+                <div id="payDetailsRejectionWrap" style="display: none; background: #fef2f2; border: 1px solid #fecaca; border-radius: 6px; padding: 0.75rem;">
+                    <div style="font-size: 0.7rem; font-weight: 700; color: #991b1b; text-transform: uppercase;">Rejection Reason</div>
+                    <div id="payDetailsRejectionText" style="font-size: 0.8rem; color: #b91c1c; margin-top: 2px; line-height: 1.4;"></div>
+                </div>
+
+                <!-- Payment Receipt Proof Section -->
+                <div>
+                    <div style="font-size: 0.72rem; font-weight: 700; text-transform: uppercase; color: var(--color-text-muted); margin-bottom: 0.4rem;">Proof of Payment</div>
+                    <div id="payDetailsProofContent" style="border: 1px solid var(--color-border-default, #e2e8f0); border-radius: 6px; padding: 0.75rem; text-align: center; background: var(--color-bg-surface, #ffffff);"></div>
+                </div>
+            </div>
+            <div class="modal-footer" id="payDetailsModalFooter" style="display: flex; justify-content: space-between; align-items: center;"></div>
+        </div>
+    </div>
+
+    <!-- ── Modal 6: Reject Maintenance Payment ── -->
+    <div id="rejectPaymentModal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="rejectPaymentModalTitle">
+        <div class="modal-container" style="max-width: 480px;">
+            <div class="modal-header">
+                <div>
+                    <h3 id="rejectPaymentModalTitle" style="color: #b91c1c;">Reject Maintenance Payment</h3>
+                    <div style="font-size: 0.75rem; color: var(--color-text-muted); margin-top: 2px;">Notify payer that payment submission is invalid</div>
+                </div>
+                <button type="button" id="closeRejectPaymentModalBtn" class="modal-close-btn" aria-label="Close modal">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
+            </div>
+            <form id="rejectPaymentForm">
+                <input type="hidden" id="rejectPaymentRequestId">
+                <div class="modal-body">
+                    <div style="background: #fef2f2; border: 1px solid #fecaca; border-radius: 6px; padding: 0.75rem; font-size: 0.78rem; color: #991b1b; line-height: 1.4;">
+                        Provide a clear reason why this payment submission is being rejected so the payer can correct and re-submit it.
+                    </div>
+                    <div class="form-group" style="margin-top: 0.5rem;">
+                        <label for="rejectReasonInput" class="form-label" style="font-weight: 700;">Rejection Reason <span style="color:#b91c1c;">*</span></label>
+                        <textarea id="rejectReasonInput" class="form-control" placeholder="e.g. Reference number not found in bank/wallet records, or amount sent is incomplete." required style="min-height: 70px;"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="btnCancelRejectPayment" class="btn-table-sm" style="padding: 0.45rem 0.9rem;">Cancel</button>
+                    <button type="submit" id="btnConfirmRejectPayment" class="btn-action-primary" style="background: #dc2626; border-color: #dc2626; padding: 0.45rem 1rem;">Reject Payment</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ── Modal 7: Proof Preview Lightbox ── -->
+    <div id="proofPreviewModal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="proofPreviewModalTitle">
+        <div class="modal-container" style="max-width: 600px;">
+            <div class="modal-header">
+                <div>
+                    <h3 id="proofPreviewModalTitle">Payment Receipt Proof</h3>
+                    <div id="proofPreviewSubtitle" style="font-size: 0.75rem; color: var(--color-text-muted); margin-top: 2px;">Official uploaded document</div>
+                </div>
+                <button type="button" id="closeProofPreviewModalBtn" class="modal-close-btn" aria-label="Close modal">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
+            </div>
+            <div class="modal-body" style="padding: 1rem; text-align: center;">
+                <div id="proofPreviewContent" style="max-height: 65vh; overflow: auto; display: flex; align-items: center; justify-content: center;">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <a id="proofPreviewDownloadBtn" href="#" target="_blank" rel="noopener noreferrer" class="btn-table-sm" style="padding: 0.45rem 0.9rem; text-decoration: none;">Open Original File</a>
+                <button type="button" id="btnCloseProofPreviewModal" class="btn-table-sm" style="padding: 0.45rem 0.9rem;">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── Modal 8: Simple Alert & Confirmation Modal ── -->
+    <div id="simpleAlertModal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="simpleAlertTitle" style="z-index: 1200;">
+        <div class="modal-container" style="max-width: 400px; text-align: center; padding: 1.5rem; display: flex; flex-direction: column; align-items: center; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2), 0 8px 10px -6px rgba(0, 0, 0, 0.1);">
+            <div id="simpleAlertIcon" style="margin-bottom: 0.75rem;"></div>
+            <h3 id="simpleAlertTitle" style="font-size: 1.1rem; font-weight: 800; color: var(--color-text-primary, #0f172a); margin-bottom: 0.4rem;">Notice</h3>
+            <p id="simpleAlertMessage" style="font-size: 0.85rem; color: var(--color-text-secondary, #475569); line-height: 1.5; margin-bottom: 1.25rem; word-break: break-word;"></p>
+            <div style="display: flex; justify-content: center; gap: 0.6rem; width: 100%;" id="simpleAlertActions">
+                <button type="button" id="simpleAlertConfirmBtn" class="btn-action-primary" style="min-width: 100px; justify-content: center; height: 36px; padding: 0 16px;">OK</button>
+                <button type="button" id="simpleAlertCancelBtn" class="btn-table-sm" style="min-width: 80px; justify-content: center; height: 36px; display: none; padding: 0 14px;">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="../../js/auth.js"></script>
+    <script src="../../js/dashboard.js"></script>
+    <script src="../../js/navigationConfig.js"></script>
+    <script>
+        const token = localStorage.getItem('domiknow_token');
+        let allRequests = [];
+        let allWorkers = [];
+        let allPayments = [];
+        let activeTab = 'requests';
+        let activePayFilter = 'all';
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
+        function formatPhp(amount) {
+            const num = Number(amount) || 0;
+            return `₱${num.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+        }
+
+        function showModalAlert(message, title = 'Notice', type = 'info') {
+            return new Promise(resolve => {
+                const modal = document.getElementById('simpleAlertModal');
+                const titleEl = document.getElementById('simpleAlertTitle');
+                const msgEl = document.getElementById('simpleAlertMessage');
+                const iconEl = document.getElementById('simpleAlertIcon');
+                const confirmBtn = document.getElementById('simpleAlertConfirmBtn');
+                const cancelBtn = document.getElementById('simpleAlertCancelBtn');
+
+                if (!modal || !titleEl || !msgEl || !confirmBtn) {
+                    window._nativeAlert ? window._nativeAlert(message) : console.log(message);
+                    return resolve(true);
+                }
+
+                titleEl.textContent = title;
+                msgEl.textContent = message;
+                if (cancelBtn) cancelBtn.style.display = 'none';
+                confirmBtn.textContent = 'OK';
+
+                let iconSvg = '';
+                if (type === 'success') {
+                    confirmBtn.style.background = '#15803d';
+                    confirmBtn.style.borderColor = '#15803d';
+                    iconSvg = `<div style="width: 48px; height: 48px; border-radius: 50%; background: #dcfce7; color: #15803d; display: inline-flex; align-items: center; justify-content: center; margin: 0 auto;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></div>`;
+                } else if (type === 'error') {
+                    confirmBtn.style.background = '#dc2626';
+                    confirmBtn.style.borderColor = '#dc2626';
+                    iconSvg = `<div style="width: 48px; height: 48px; border-radius: 50%; background: #fee2e2; color: #dc2626; display: inline-flex; align-items: center; justify-content: center; margin: 0 auto;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></div>`;
+                } else {
+                    confirmBtn.style.background = 'var(--color-action-primary, #0355f3)';
+                    confirmBtn.style.borderColor = 'var(--color-action-primary, #0355f3)';
+                    iconSvg = `<div style="width: 48px; height: 48px; border-radius: 50%; background: #dbeafe; color: #1d4ed8; display: inline-flex; align-items: center; justify-content: center; margin: 0 auto;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg></div>`;
+                }
+                if (iconEl) iconEl.innerHTML = iconSvg;
+
+                function onConfirm(e) {
+                    if (e) e.preventDefault();
+                    modal.classList.add('hidden');
+                    confirmBtn.removeEventListener('click', onConfirm);
+                    resolve(true);
+                }
+
+                confirmBtn.addEventListener('click', onConfirm);
+                modal.classList.remove('hidden');
+                confirmBtn.focus();
+            });
+        }
+
+        function showModalConfirm(message, title = 'Confirmation') {
+            return new Promise(resolve => {
+                const modal = document.getElementById('simpleAlertModal');
+                const titleEl = document.getElementById('simpleAlertTitle');
+                const msgEl = document.getElementById('simpleAlertMessage');
+                const iconEl = document.getElementById('simpleAlertIcon');
+                const confirmBtn = document.getElementById('simpleAlertConfirmBtn');
+                const cancelBtn = document.getElementById('simpleAlertCancelBtn');
+
+                if (!modal || !titleEl || !msgEl || !confirmBtn) {
+                    return resolve(window._nativeConfirm ? window._nativeConfirm(message) : true);
+                }
+
+                titleEl.textContent = title;
+                msgEl.textContent = message;
+                if (cancelBtn) cancelBtn.style.display = 'inline-flex';
+                confirmBtn.textContent = 'Confirm';
+                confirmBtn.style.background = 'var(--color-action-primary, #0355f3)';
+                confirmBtn.style.borderColor = 'var(--color-action-primary, #0355f3)';
+
+                if (iconEl) {
+                    iconEl.innerHTML = `<div style="width: 48px; height: 48px; border-radius: 50%; background: #fef3c7; color: #b45309; display: inline-flex; align-items: center; justify-content: center; margin: 0 auto;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div>`;
+                }
+
+                function onConfirm(e) {
+                    if (e) e.preventDefault();
+                    modal.classList.add('hidden');
+                    cleanup();
+                    resolve(true);
+                }
+
+                function onCancel(e) {
+                    if (e) e.preventDefault();
+                    modal.classList.add('hidden');
+                    cleanup();
+                    resolve(false);
+                }
+
+                function cleanup() {
+                    confirmBtn.removeEventListener('click', onConfirm);
+                    if (cancelBtn) cancelBtn.removeEventListener('click', onCancel);
+                }
+
+                confirmBtn.addEventListener('click', onConfirm);
+                if (cancelBtn) cancelBtn.addEventListener('click', onCancel);
+                modal.classList.remove('hidden');
+                confirmBtn.focus();
+            });
+        }
+
+        window._nativeAlert = window.alert;
+        window._nativeConfirm = window.confirm;
+        window.alert = function(msg) {
+            showModalAlert(String(msg));
+        };
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            if (!token) {
+                window.location.href = '../../login.html';
+                return;
+            }
+
+            setupEventListeners();
+            await loadOverviewStats();
+            await loadRequests();
+            await loadWorkers();
+            await loadMaintenancePayments();
+        });
+
+        function setupEventListeners() {
+            // Filter toggle button & indicator
+            const toggleFiltersBtn = document.getElementById('toggleFiltersBtn');
+            const filterPanel = document.getElementById('filterPanel');
+            const filterActiveDot = document.getElementById('filterActiveDot');
+
+            function updateFilterActiveIndicator() {
+                const searchVal = (document.getElementById('filterSearch')?.value || '').trim();
+                const statusVal = document.getElementById('filterStatus')?.value;
+                const liabilityVal = document.getElementById('filterLiability')?.value;
+                const hasActiveFilter = Boolean(searchVal || (statusVal && statusVal !== 'all') || (liabilityVal && liabilityVal !== 'all'));
+
+                if (filterActiveDot) {
+                    filterActiveDot.classList.toggle('hidden', !hasActiveFilter);
+                }
+            }
+
+            if (toggleFiltersBtn && filterPanel) {
+                toggleFiltersBtn.addEventListener('click', () => {
+                    const isCurrentlyHidden = filterPanel.classList.contains('hidden');
+                    if (isCurrentlyHidden) {
+                        filterPanel.classList.remove('hidden');
+                        toggleFiltersBtn.classList.add('active');
+                        toggleFiltersBtn.setAttribute('aria-expanded', 'true');
+                        const searchInput = document.getElementById('filterSearch');
+                        if (searchInput) searchInput.focus();
+                    } else {
+                        filterPanel.classList.add('hidden');
+                        toggleFiltersBtn.classList.remove('active');
+                        toggleFiltersBtn.setAttribute('aria-expanded', 'false');
+                    }
+                });
+            }
+
+            function refreshCurrentTab() {
+                if (activeTab === 'liability') {
+                    renderLiabilityTable();
+                } else if (activeTab === 'requests') {
+                    renderRequestsTable();
+                } else if (activeTab === 'personnel') {
+                    renderWorkersTable();
+                }
+            }
+
+            // Tabs navigation
+            document.querySelectorAll('.subnav-tab-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.subnav-tab-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    activeTab = btn.dataset.tab;
+
+                    const viewReq = document.getElementById('viewRequests');
+                    const viewLiab = document.getElementById('viewLiability');
+                    const viewPer = document.getElementById('viewPersonnel');
+                    const toggleFiltersBtn = document.getElementById('toggleFiltersBtn');
+                    const filterPanel = document.getElementById('filterPanel');
+
+                    const viewPay = document.getElementById('viewPayments');
+                    if (activeTab === 'payments') {
+                        if (viewReq) viewReq.style.display = 'none';
+                        if (viewLiab) viewLiab.style.display = 'none';
+                        if (viewPer) viewPer.style.display = 'none';
+                        if (viewPay) viewPay.style.display = 'block';
+                        if (toggleFiltersBtn) toggleFiltersBtn.style.display = 'none';
+                        if (filterPanel) filterPanel.classList.add('hidden');
+                        renderPaymentsTable();
+                    } else if (activeTab === 'personnel') {
+                        if (viewReq) viewReq.style.display = 'none';
+                        if (viewLiab) viewLiab.style.display = 'none';
+                        if (viewPer) viewPer.style.display = 'block';
+                        if (viewPay) viewPay.style.display = 'none';
+                        if (toggleFiltersBtn) toggleFiltersBtn.style.display = 'none';
+                        if (filterPanel) filterPanel.classList.add('hidden');
+                        renderWorkersTable();
+                    } else if (activeTab === 'liability') {
+                        if (viewReq) viewReq.style.display = 'none';
+                        if (viewLiab) viewLiab.style.display = 'block';
+                        if (viewPer) viewPer.style.display = 'none';
+                        if (viewPay) viewPay.style.display = 'none';
+                        if (toggleFiltersBtn) toggleFiltersBtn.style.display = 'inline-flex';
+                        renderLiabilityTable();
+                    } else {
+                        if (viewReq) viewReq.style.display = 'block';
+                        if (viewLiab) viewLiab.style.display = 'none';
+                        if (viewPer) viewPer.style.display = 'none';
+                        if (viewPay) viewPay.style.display = 'none';
+                        if (toggleFiltersBtn) toggleFiltersBtn.style.display = 'inline-flex';
+                        renderRequestsTable();
+                    }
+                });
+            });
+
+            // Filters
+            const filterSearchEl = document.getElementById('filterSearch');
+            const filterStatusEl = document.getElementById('filterStatus');
+            const filterLiabilityEl = document.getElementById('filterLiability');
+
+            if (filterSearchEl) {
+                filterSearchEl.addEventListener('input', () => {
+                    updateFilterActiveIndicator();
+                    refreshCurrentTab();
+                });
+            }
+            if (filterStatusEl) {
+                filterStatusEl.addEventListener('change', () => {
+                    updateFilterActiveIndicator();
+                    refreshCurrentTab();
+                });
+            }
+            if (filterLiabilityEl) {
+                filterLiabilityEl.addEventListener('change', () => {
+                    updateFilterActiveIndicator();
+                    refreshCurrentTab();
+                });
+            }
+
+            const resetFiltersBtn = document.getElementById('resetFiltersBtn');
+            if (resetFiltersBtn) {
+                resetFiltersBtn.addEventListener('click', () => {
+                    if (filterSearchEl) filterSearchEl.value = '';
+                    if (filterStatusEl) filterStatusEl.value = 'all';
+                    if (filterLiabilityEl) filterLiabilityEl.value = 'all';
+                    updateFilterActiveIndicator();
+                    refreshCurrentTab();
+                });
+            }
+
+            // Modals close buttons
+            document.getElementById('closeDispatchModalBtn').addEventListener('click', () => closeModals());
+            document.getElementById('btnCancelDispatch').addEventListener('click', () => closeModals());
+            document.getElementById('closeLiabilityModalBtn').addEventListener('click', () => closeModals());
+            document.getElementById('btnCancelLiability').addEventListener('click', () => closeModals());
+            document.getElementById('btnOpenAddWorkerModal').addEventListener('click', () => {
+                document.getElementById('addWorkerModal').classList.remove('hidden');
+            });
+            document.getElementById('closeAddWorkerModalBtn').addEventListener('click', () => closeModals());
+            document.getElementById('btnCancelAddWorker').addEventListener('click', () => closeModals());
+            document.getElementById('closeDetailsModalBtn').addEventListener('click', () => closeModals());
+            document.getElementById('btnCloseDetailsModal').addEventListener('click', () => closeModals());
+
+            // Form Submissions
+            document.getElementById('dispatchForm').addEventListener('submit', handleDispatchSubmit);
+            document.getElementById('liabilityForm').addEventListener('submit', handleLiabilitySubmit);
+            document.getElementById('addWorkerForm').addEventListener('submit', handleAddWorkerSubmit);
+
+            // Payment verification listeners
+            document.getElementById('closePaymentDetailsModalBtn')?.addEventListener('click', closeModals);
+            document.getElementById('closeVerifyPaymentModalBtn')?.addEventListener('click', closeModals);
+            document.getElementById('btnCancelVerifyPayment')?.addEventListener('click', closeModals);
+            document.getElementById('verifyPaymentForm')?.addEventListener('submit', handleVerifyPaymentSubmit);
+
+            document.getElementById('closeRejectPaymentModalBtn')?.addEventListener('click', closeModals);
+            document.getElementById('btnCancelRejectPayment')?.addEventListener('click', closeModals);
+            document.getElementById('rejectPaymentForm')?.addEventListener('submit', handleRejectPaymentSubmit);
+
+            document.getElementById('closeProofPreviewModalBtn')?.addEventListener('click', closeModals);
+            document.getElementById('btnCloseProofPreviewModal')?.addEventListener('click', closeModals);
+
+            document.querySelectorAll('.pay-filter-pill').forEach(pill => {
+                pill.addEventListener('click', () => {
+                    document.querySelectorAll('.pay-filter-pill').forEach(p => p.classList.remove('active'));
+                    pill.classList.add('active');
+                    activePayFilter = pill.dataset.payFilter;
+                    renderPaymentsTable();
+                });
+            });
+
+            document.getElementById('paySearchInput')?.addEventListener('input', () => {
+                renderPaymentsTable();
+            });
+        }
+
+        function closeModals() {
+            document.getElementById('dispatchModal').classList.add('hidden');
+            document.getElementById('liabilityModal').classList.add('hidden');
+            document.getElementById('addWorkerModal').classList.add('hidden');
+            const detailsEl = document.getElementById('detailsModal');
+            if (detailsEl) detailsEl.classList.add('hidden');
+            document.getElementById('verifyPaymentModal')?.classList.add('hidden');
+            document.getElementById('paymentDetailsModal')?.classList.add('hidden');
+            document.getElementById('rejectPaymentModal')?.classList.add('hidden');
+            document.getElementById('proofPreviewModal')?.classList.add('hidden');
+            document.getElementById('simpleAlertModal')?.classList.add('hidden');
+        }
+
+        async function loadOverviewStats() {
+            try {
+                const res = await fetch('/api/maintenance/admin/overview', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (!res.ok) throw new Error('Failed to fetch overview stats');
+                const result = await res.json();
+                const d = result.data || {};
+
+                document.getElementById('kpiTotalCost').textContent = formatPhp(d.total_operational_cost);
+                document.getElementById('kpiLandlordCost').textContent = formatPhp(d.landlord_covered_cost);
+                document.getElementById('kpiTenantCost').textContent = formatPhp(d.tenant_billed_cost);
+                document.getElementById('kpiWorkers').textContent = `${d.total_workers_count} Technicians`;
+                document.getElementById('kpiActiveRequests').textContent = `${d.active_repairs_count} active jobs`;
+
+                document.getElementById('badgeWorkers').textContent = d.total_workers_count || 0;
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
+        async function loadRequests() {
+            try {
+                const res = await fetch('/api/maintenance/admin/requests', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (!res.ok) throw new Error('Failed to fetch requests');
+                const result = await res.json();
+                allRequests = result.data || [];
+                const quotesCount = allRequests.filter(r => ['completed', 'verified', 'closed'].includes((r.status || '').toLowerCase())).length;
+                const bQuotes = document.getElementById('badgeQuotes');
+                if (bQuotes) bQuotes.textContent = quotesCount;
+
+                const bRequests = document.getElementById('badgeRequests');
+                if (bRequests) bRequests.textContent = allRequests.length;
+
+                renderRequestsTable();
+                renderLiabilityTable();
+            } catch (err) {
+                console.error(err);
+                document.getElementById('requestsTableBody').innerHTML = `
+                    <tr><td colspan="5" style="text-align: center !important; color: var(--color-error-text); padding: 2rem;">Error loading maintenance work orders.</td></tr>
+                `;
+                const liabBody = document.getElementById('liabilityTableBody');
+                if (liabBody) {
+                    liabBody.innerHTML = `<tr><td colspan="5" style="text-align: center !important; color: var(--color-error-text); padding: 2rem;">Error loading liability determinations.</td></tr>`;
+                }
+            }
+        }
+
+        async function loadWorkers() {
+            try {
+                const res = await fetch('/api/maintenance/admin/workers', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (!res.ok) throw new Error('Failed to fetch workers');
+                const result = await res.json();
+                allWorkers = result.data || [];
+                const bWorkers = document.getElementById('badgeWorkers');
+                if (bWorkers) bWorkers.textContent = allWorkers.length;
+                renderWorkersTable();
+                populateWorkerSelectOptions();
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
+        function populateWorkerSelectOptions() {
+            const selectEl = document.getElementById('dispatchWorkerSelect');
+            if (!selectEl) return;
+            selectEl.innerHTML = '<option value="">Select technician...</option>';
+            allWorkers.forEach(w => {
+                selectEl.innerHTML += `<option value="${w.id}">${escapeHtml(w.full_name)} (${w.active_tasks || 0} active)</option>`;
+            });
+        }
+
+        function renderRequestsTable() {
+            const search = (document.getElementById('filterSearch')?.value || '').toLowerCase().trim();
+            const statusFilter = document.getElementById('filterStatus')?.value || 'all';
+            const liabilityFilter = document.getElementById('filterLiability')?.value || 'all';
+
+            const filtered = allRequests.filter(r => {
+                const title = (r.issue_title || '').toLowerCase();
+                const prop = (r.properties?.property_name || '').toLowerCase();
+                const tenant = (r.tenant?.full_name || r.users?.full_name || '').toLowerCase();
+                const landlord = (r.landlord?.full_name || '').toLowerCase();
+                const worker = (r.assigned_maintenance?.full_name || '').toLowerCase();
+                const category = (r.issue_category || '').toLowerCase();
+                const unit = (r.unit_number || '').toLowerCase();
+
+                if (search && !title.includes(search) && !prop.includes(search) && !tenant.includes(search) && !landlord.includes(search) && !worker.includes(search) && !category.includes(search) && !unit.includes(search)) {
+                    return false;
+                }
+                if (statusFilter !== 'all' && r.status !== statusFilter) return false;
+                
+                if (liabilityFilter !== 'all') {
+                    if (liabilityFilter === 'pending') {
+                        if (!['pending', 'pending_admin_determination'].includes(r.liability_party)) return false;
+                    } else if (r.liability_party !== liabilityFilter) {
+                        return false;
+                    }
+                }
+
+                return true;
+            });
+
+            const tbody = document.getElementById('requestsTableBody');
+            if (!tbody) return;
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" style="text-align: center !important; color: var(--color-text-muted); padding: 2.5rem;">No matching maintenance work orders found.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = filtered.map(r => {
+                const priorityClass = `badge-priority-${(r.priority_level || 'low').toLowerCase()}`;
+                const priorityBadge = `<span class="badge ${priorityClass}">${(r.priority_level || 'Normal').toUpperCase()}</span>`;
+
+                let statusBadge = `<span class="badge badge-active">${escapeHtml(r.status || 'Active').toUpperCase()}</span>`;
+                const st = (r.status || '').toLowerCase();
+                if (st === 'pending') {
+                    statusBadge = `<span class="badge badge-pending">Pending Dispatch</span>`;
+                } else if (st === 'approved') {
+                    statusBadge = `<span class="badge badge-landlord" title="Approved work order waiting for technician dispatch">Ready for Dispatch</span>`;
+                } else if (st === 'assigned') {
+                    statusBadge = `<span class="badge badge-landlord">Assigned</span>`;
+                } else if (st === 'accepted') {
+                    statusBadge = `<span class="badge badge-landlord">Accepted</span>`;
+                } else if (st === 'travelling') {
+                    statusBadge = `<span class="badge badge-transit">Travelling</span>`;
+                } else if (st === 'arrived') {
+                    statusBadge = `<span class="badge badge-arrived">Arrived On-Site</span>`;
+                } else if (st === 'repairing') {
+                    statusBadge = `<span class="badge badge-active">Repairing</span>`;
+                } else if (['inspection_submitted', 'quoted', 'quote_pending'].includes(st)) {
+                    statusBadge = `<span class="badge badge-inspection">Diagnosed</span>`;
+                } else if (st === 'quote_approved') {
+                    statusBadge = `<span class="badge badge-landlord">Quote Approved</span>`;
+                } else if (st === 'completed') {
+                    statusBadge = `<span class="badge badge-completed">Completed</span>`;
+                } else if (st === 'verified') {
+                    statusBadge = `<span class="badge badge-completed">Verified by Owner</span>`;
+                } else if (st === 'closed') {
+                    statusBadge = `<span class="badge badge-pending">Closed</span>`;
+                }
+
+                const workerName = r.assigned_maintenance?.full_name 
+                    ? `<span style="font-weight:600; color:var(--color-text-primary);">${escapeHtml(r.assigned_maintenance.full_name)}</span>` 
+                    : '<span style="color:var(--color-text-muted); font-style:italic;">Unassigned</span>';
+
+                const propertyUnit = `${escapeHtml(r.properties?.property_name || '—')}${r.unit_number ? ` • Unit ${escapeHtml(r.unit_number)}` : ''}`;
+
+                const scheduleText = r.due_date 
+                    ? `<div style="font-weight:700; color:var(--color-text-primary);">Due: ${new Date(r.due_date).toLocaleDateString('en-PH')}</div>`
+                    : (r.preferred_schedule ? `<div style="color:var(--color-text-secondary);">Pref: ${escapeHtml(r.preferred_schedule)}</div>` : '<span style="color:var(--color-text-muted);">Asap</span>');
+
+                const originText = r.initiated_by === 'landlord' || (r.recommendations || '').includes('[INITIATED_BY:LANDLORD]')
+                    ? '<span style="color:var(--color-info-text); font-weight:600;">Landlord Order</span>'
+                    : `Tenant: ${escapeHtml(r.tenant?.full_name || r.users?.full_name || '—')}`;
+
+                return `
+                    <tr class="clickable-row" onclick="openDetailsModal('${r.id}')" tabindex="0" role="button" aria-label="View details for ${escapeHtml(r.issue_title)}" title="Click to view work order details" onkeydown="if(event.key==='Enter'||event.key===' ') { event.preventDefault(); openDetailsModal('${r.id}'); }">
+                        <td style="text-align: left;">
+                            <div style="display:flex; align-items:center; gap:0.4rem; flex-wrap:wrap; margin-bottom:0.2rem;">
+                                <span style="font-weight: 700; color: var(--color-text-primary); font-size:0.9rem;">${escapeHtml(r.issue_title)}</span>
+                                ${priorityBadge}
+                            </div>
+                            <div style="font-size: 0.74rem; color: var(--color-text-secondary);">${escapeHtml(r.issue_category)} • ${originText}</div>
+                        </td>
+                        <td style="text-align: left;">
+                            <div style="font-weight: 600; color: var(--color-text-primary);">${propertyUnit}</div>
+                            <div style="font-size: 0.72rem; color: var(--color-text-muted);">${escapeHtml(r.properties?.address || '')}</div>
+                        </td>
+                        <td style="text-align: left; font-size: 0.78rem;">
+                            ${scheduleText}
+                        </td>
+                        <td style="text-align: left;">${workerName}</td>
+                        <td style="text-align: center;">${statusBadge}</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function renderLiabilityTable() {
+            const search = (document.getElementById('filterSearch')?.value || '').toLowerCase().trim();
+            const statusFilter = document.getElementById('filterStatus')?.value || 'all';
+            const liabilityFilter = document.getElementById('filterLiability')?.value || 'all';
+
+            const filtered = allRequests.filter(r => {
+                const isFieldCompleted = ['completed', 'verified', 'closed'].includes((r.status || '').toLowerCase());
+                if (!isFieldCompleted) return false;
+
+                const title = (r.issue_title || '').toLowerCase();
+                const prop = (r.properties?.property_name || '').toLowerCase();
+                const tenant = (r.tenant?.full_name || r.users?.full_name || '').toLowerCase();
+                const landlord = (r.landlord?.full_name || '').toLowerCase();
+                const problem = (r.problem_found || '').toLowerCase();
+                const unit = (r.unit_number || '').toLowerCase();
+
+                if (search && !title.includes(search) && !prop.includes(search) && !tenant.includes(search) && !landlord.includes(search) && !problem.includes(search) && !unit.includes(search)) {
+                    return false;
+                }
+                if (statusFilter !== 'all' && r.status !== statusFilter) return false;
+                
+                if (liabilityFilter !== 'all') {
+                    if (liabilityFilter === 'pending') {
+                        if (!['pending', 'pending_admin_determination'].includes(r.liability_party)) return false;
+                    } else if (r.liability_party !== liabilityFilter) {
+                        return false;
+                    }
+                }
+                return true;
+            });
+
+            const tbody = document.getElementById('liabilityTableBody');
+            if (!tbody) return;
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" style="text-align: center !important; color: var(--color-text-muted); padding: 2.5rem;">No completed work orders awaiting liability review or settlement.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = filtered.map(r => {
+                const laborCost = Number(r.labor_cost || 0);
+                const materialCost = Number(r.material_cost || 0);
+                const totalCostNum = Number(r.total_cost || 0) || (laborCost + materialCost);
+
+                const liabilityBadge = r.liability_party === 'landlord'
+                    ? `<span class="badge badge-landlord" title="Civil Code Art. 1654: Natural Wear-and-Tear">Landlord (Art. 1654)</span>`
+                    : r.liability_party === 'tenant'
+                    ? `<span class="badge badge-tenant" title="Civil Code Art. 1657: Tenant Misuse/Negligence">Tenant (Art. 1657)</span>`
+                    : r.liability_party === 'shared'
+                    ? `<span class="badge badge-shared" title="Compounded / Mutual Factors">50/50 Split</span>`
+                    : `<span class="badge badge-pending">Needs Arbiter Ruling</span>`;
+
+                const hasPhoto = Boolean(r.before_photo_url || r.image_url || r.file_attachment_url);
+                const photoBadge = hasPhoto 
+                    ? `<span style="font-size:0.7rem; color:var(--color-link); font-weight:700; display:inline-flex; align-items:center; gap:3px;"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg> Photo Attached</span>`
+                    : '';
+
+                const problemSnippet = r.problem_found 
+                    ? `<div style="font-size:0.8rem; color:var(--color-text-primary); line-height:1.35; max-height:2.7em; overflow:hidden; text-overflow:ellipsis; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical;">${escapeHtml(r.problem_found)}</div>`
+                    : `<div style="font-size:0.78rem; color:var(--color-text-muted); font-style:italic;">Ocular diagnosis pending technician submission.</div>`;
+
+                const tenantName = r.tenant?.full_name || r.users?.full_name || 'Tenant';
+                const propertyUnit = `${escapeHtml(r.properties?.property_name || '—')}${r.unit_number ? ` (Unit ${escapeHtml(r.unit_number)})` : ''}`;
+
+                let approvalBadge = '<span class="badge badge-pending">Needs Arbiter Ruling</span>';
+                const st = (r.status || '').toLowerCase();
+                const liab = r.liability_party;
+
+                if (st === 'inspection_submitted') {
+                    approvalBadge = '<span class="badge badge-inspection">Submitted by Tech</span>';
+                } else if (!liab || ['pending', 'pending_admin_determination'].includes(liab)) {
+                    approvalBadge = '<span class="badge badge-pending">Needs Arbiter Ruling</span>';
+                } else if (st === 'quoted' || st === 'quote_pending') {
+                    if (liab === 'tenant') {
+                        approvalBadge = '<span class="badge badge-tenant">Awaiting Tenant</span>';
+                    } else if (liab === 'landlord') {
+                        approvalBadge = '<span class="badge badge-landlord">Awaiting Landlord</span>';
+                    } else {
+                        approvalBadge = '<span class="badge badge-shared">Awaiting Approvals</span>';
+                    }
+                } else if (['approved', 'quote_approved'].includes(st)) {
+                    approvalBadge = '<span class="badge badge-completed">Quote Approved</span>';
+                } else if (st === 'repairing') {
+                    approvalBadge = '<span class="badge badge-active">Authorized / Active</span>';
+                } else if (['completed', 'verified', 'closed'].includes(st)) {
+                    approvalBadge = '<span class="badge badge-completed">Settled & Closed</span>';
+                }
+
+                return `
+                    <tr class="clickable-row" onclick="openDetailsModal('${r.id}')" tabindex="0" role="button" aria-label="View quotation and liability details for ${escapeHtml(r.issue_title)}" title="Click to view work order &amp; quotation details" onkeydown="if(event.key==='Enter'||event.key===' ') { event.preventDefault(); openDetailsModal('${r.id}'); }">
+                        <td style="text-align: left;">
+                            <div style="font-weight: 700; color: var(--color-text-primary); font-size:0.88rem;">${escapeHtml(r.issue_title)}</div>
+                            <div style="font-size: 0.74rem; color: var(--color-text-secondary); margin-top:0.15rem;">
+                                ${propertyUnit} • <span style="font-weight:600;">${escapeHtml(tenantName)}</span>
+                            </div>
+                        </td>
+                        <td style="text-align: left;">
+                            ${problemSnippet}
+                            ${photoBadge ? `<div style="margin-top:0.25rem;">${photoBadge}</div>` : ''}
+                        </td>
+                        <td style="text-align: left;">
+                            <div style="font-size: 0.92rem; font-weight: 800; color: var(--color-text-primary);">${formatPhp(totalCostNum)}</div>
+                            <div style="font-size: 0.72rem; color: var(--color-text-muted); margin-top:0.1rem;">
+                                Labor: ${formatPhp(laborCost)} • Parts: ${formatPhp(materialCost)}
+                            </div>
+                        </td>
+                        <td style="text-align: left;">
+                            ${liabilityBadge}
+                        </td>
+                        <td style="text-align: center;">
+                            ${approvalBadge}
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function renderWorkersTable() {
+            const tbody = document.getElementById('workersTableBody');
+            if (allWorkers.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: var(--color-text-muted); padding: 2rem;">No platform maintenance personnel registered.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = allWorkers.map(w => `
+                <tr>
+                    <td style="text-align: left;">
+                        <div style="font-weight: 700; color: var(--color-text-primary);">${escapeHtml(w.full_name)}</div>
+                        <div style="font-size: 0.72rem; color: var(--color-text-muted); margin-top: 0.15rem;">Joined ${new Date(w.created_at).toLocaleDateString('en-PH')}</div>
+                    </td>
+                    <td style="text-align: left; color: var(--color-text-secondary);">${escapeHtml(w.email)}</td>
+                    <td style="text-align: left; color: var(--color-text-secondary);">${escapeHtml(w.contact_number || '—')}</td>
+                    <td style="text-align: center;"><strong>${w.active_tasks || 0}</strong></td>
+                    <td style="text-align: center;">${w.completed_tasks || 0}</td>
+                    <td style="text-align: center;"><span class="badge badge-active">${(w.status || 'active').toUpperCase()}</span></td>
+                    <td style="text-align: right;">
+                        <button type="button" class="btn-table-sm" style="color:var(--color-error-text); border-color: rgba(239,68,68,0.3);" onclick="removeWorker('${w.id}', '${escapeHtml(w.full_name)}')" title="Remove Technician">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                            <span>Remove</span>
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        window.removeWorker = async function(id, name) {
+            const confirmed = await showModalConfirm(`Are you sure you want to remove technician "${name}" from the platform roster?`, 'Remove Technician');
+            if (!confirmed) return;
+
+            try {
+                const res = await fetch(`/api/maintenance/workers/${id}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const result = await res.json();
+                if (res.ok) {
+                    await showModalAlert(result.message || `Technician ${name} has been removed.`, 'Technician Removed', 'success');
+                    await loadWorkers();
+                    await loadOverviewStats();
+                } else {
+                    await showModalAlert(result.message || 'Failed to remove technician.', 'Failed', 'error');
+                }
+            } catch (err) {
+                console.error(err);
+                await showModalAlert('Network error while removing technician.', 'Network Error', 'error');
+            }
+        };
+
+        window.openDispatchModal = function(id) {
+            const r = allRequests.find(item => item.id === id);
+            if (!r) return;
+
+            document.getElementById('dispatchRequestId').value = r.id;
+            document.getElementById('dispatchIssueTitle').textContent = `${r.issue_title} (${r.issue_category})`;
+            document.getElementById('dispatchPropertyLocation').textContent = `${r.properties?.property_name || 'Property'} • Unit ${r.unit_number || 'All'}`;
+            document.getElementById('dispatchWorkerSelect').value = r.assigned_maintenance_id || '';
+
+            const today = new Date();
+            today.setDate(today.getDate() + 2);
+            document.getElementById('dispatchDueDate').value = today.toISOString().split('T')[0];
+
+            document.getElementById('dispatchModal').classList.remove('hidden');
+        };
+
+        window.openLiabilityModal = async function(id) {
+            const modal = document.getElementById('liabilityModal');
+            document.getElementById('liabilityRequestId').value = id;
+
+            modal.classList.remove('hidden');
+
+            // Find in local array as fast initial render
+            let r = allRequests.find(item => item.id === id) || {};
+
+            // Fetch latest authoritative details to ensure 100% accurate data
+            try {
+                const res = await fetch(`/api/maintenance/requests/${id}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (res.ok) {
+                    const result = await res.json();
+                    const d = result.data || {};
+                    const req = d.request || {};
+                    const meta = d.meta || {};
+                    const report = d.report || {};
+                    const materials = d.materials || [];
+
+                    const recText = (req.recommendations || '') + ' ' + (req.landlord_remarks || '');
+                    const fallbackPartyMatch = recText.match(/\[LIABILITY:\s*(LANDLORD|TENANT|SHARED)\]/i);
+                    const fallbackBasisMatch = recText.match(/\[BASIS:\s*([A-Z0-9_]+)\]/i);
+                    const party = (meta.liability_party || (fallbackPartyMatch ? fallbackPartyMatch[1] : '') || r.liability_party || '').toLowerCase();
+                    const basis = (meta.liability_basis || (fallbackBasisMatch ? fallbackBasisMatch[1] : '') || r.liability_basis || '').toLowerCase();
+
+                    r = {
+                        ...r,
+                        ...req,
+                        ...meta,
+                        liability_party: party,
+                        liability_basis: basis,
+                        report,
+                        materials,
+                        labor_cost: Number(req.labor_cost ?? report.labor_cost ?? r.labor_cost ?? 0),
+                        material_cost: Number(req.material_cost ?? report.material_cost ?? r.material_cost ?? 0),
+                        problem_found: req.problem_found || report.problem_found || r.problem_found || '',
+                        clean_recommendations: req.landlord_remarks || (req.recommendations || '').match(/\(Admin notes:\s*([^)]+)\)/i)?.[1] || (req.recommendations || '').replace(/\[[A-Z0-9_: ]+\]/gi, '').trim() || ''
+                    };
+                }
+            } catch (err) {
+                console.warn('Could not fetch fresh details, using cached request:', err);
+            }
+
+            // Subtitle
+            const subTitle = document.getElementById('liabilityModalSubtitle');
+            if (subTitle) {
+                const prop = r.properties?.property_name || 'Property';
+                const unit = r.unit_number ? `Unit ${r.unit_number}` : 'Common Area';
+                subTitle.textContent = `${escapeHtml(r.issue_title || 'Work Order')} • ${escapeHtml(prop)} (${escapeHtml(unit)}) • #${r.id ? r.id.substring(0, 8) : ''}`;
+            }
+
+            // Technician findings
+            const findingsEl = document.getElementById('liabilityProblemFound');
+            if (findingsEl) {
+                const diag = r.problem_found || r.issue_description || 'Diagnostic pending on-site inspection.';
+                findingsEl.textContent = diag;
+            }
+
+            // Photos
+            const previewEl = document.getElementById('liabilityOcularPreview');
+            if (previewEl) {
+                const pic = r.before_photo_url || r.after_photo_url || r.image_url || r.file_attachment_url;
+                if (pic) {
+                    previewEl.style.display = 'block';
+                    previewEl.innerHTML = `
+                        <div style="font-size:0.6875rem; font-weight:700; color:var(--color-text-muted); text-transform:uppercase; margin-bottom:0.25rem;">Photo Evidence:</div>
+                        <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
+                            ${r.before_photo_url ? `<a href="${r.before_photo_url}" target="_blank" rel="noopener"><img src="${r.before_photo_url}" alt="Before" style="height:70px; border-radius:4px; border:1px solid var(--color-border-default);" title="Before repair"></a>` : ''}
+                            ${r.after_photo_url ? `<a href="${r.after_photo_url}" target="_blank" rel="noopener"><img src="${r.after_photo_url}" alt="After" style="height:70px; border-radius:4px; border:1px solid var(--color-border-default);" title="After repair"></a>` : ''}
+                            ${!r.before_photo_url && !r.after_photo_url && pic ? `<a href="${pic}" target="_blank" rel="noopener"><img src="${pic}" alt="Evidence" style="height:70px; border-radius:4px; border:1px solid var(--color-border-default);" title="Evidence photo"></a>` : ''}
+                        </div>
+                    `;
+                } else {
+                    previewEl.style.display = 'none';
+                    previewEl.innerHTML = '';
+                }
+            }
+
+            // Itemized materials summary
+            const matSummaryEl = document.getElementById('liabilityMaterialsSummary');
+            if (matSummaryEl) {
+                if (r.materials && r.materials.length > 0) {
+                    matSummaryEl.style.display = 'block';
+                    matSummaryEl.innerHTML = `
+                        <div style="font-size:0.6875rem; font-weight:700; color:var(--color-text-muted); text-transform:uppercase; margin-bottom:0.25rem;">Technician Materials Used:</div>
+                        <div style="font-size:0.75rem; color:var(--color-text-secondary); background:var(--color-bg-surface); border:1px solid var(--color-border-default); border-radius:5px; padding:0.4rem 0.6rem; max-height:80px; overflow-y:auto;">
+                            ${r.materials.map(m => `<div style="display:flex; justify-content:space-between; gap:0.5rem;"><span>• ${escapeHtml(m.material_name)} (x${m.quantity})</span><span style="font-weight:600;">${formatPhp(Number(m.cost || 0) * Number(m.quantity || 1))}</span></div>`).join('')}
+                        </div>
+                    `;
+                } else {
+                    matSummaryEl.style.display = 'none';
+                    matSummaryEl.innerHTML = '';
+                }
+            }
+
+            // Responsible party
+            const partySelect = document.getElementById('liabilityPartySelect');
+            const p = String(r.liability_party || '').toLowerCase();
+            if (partySelect) {
+                partySelect.value = (p === 'shared' ? 'shared' : (p === 'tenant' ? 'tenant' : 'landlord'));
+            }
+
+            // Basis
+            const basisSelect = document.getElementById('liabilityBasisSelect');
+            if (basisSelect) {
+                const b = String(r.liability_basis || '').toLowerCase();
+                const validBases = ['art_1654_wear_and_tear', 'art_1654_major_utility', 'art_1654_force_majeure', 'art_1657_negligence', 'art_1657_minor_repair', 'art_1654_1657_split'];
+                if (validBases.includes(b)) {
+                    basisSelect.value = b;
+                } else {
+                    basisSelect.value = (partySelect?.value === 'tenant' ? 'art_1657_negligence' : (partySelect?.value === 'shared' ? 'art_1654_1657_split' : 'art_1654_wear_and_tear'));
+                }
+            }
+
+            // Cost fields
+            const laborInput = document.getElementById('liabilityLaborCost');
+            const matInput = document.getElementById('liabilityMaterialCost');
+            const totalDisplay = document.getElementById('liabilityTotalDisplay');
+
+            const laborVal = Number(r.labor_cost || 0);
+            const matVal = Number(r.material_cost || 0);
+
+            if (laborInput) laborInput.value = laborVal.toFixed(2);
+            if (matInput) matInput.value = matVal.toFixed(2);
+
+            function updateLiveTotal() {
+                const l = parseFloat(laborInput?.value) || 0;
+                const m = parseFloat(matInput?.value) || 0;
+                if (totalDisplay) {
+                    totalDisplay.textContent = formatPhp(l + m);
+                }
+            }
+
+            if (laborInput) laborInput.oninput = updateLiveTotal;
+            if (matInput) matInput.oninput = updateLiveTotal;
+            updateLiveTotal();
+
+            // Admin notes
+            const notesEl = document.getElementById('liabilityAdminNotes');
+            if (notesEl) {
+                notesEl.value = r.landlord_remarks || (r.recommendations || '').match(/\(Admin notes:\s*([^)]+)\)/i)?.[1] || '';
+            }
+        };
+
+        window.openDetailsModal = async function(id) {
+            const modal = document.getElementById('detailsModal');
+            const body = document.getElementById('detailsModalBody');
+            const footer = document.getElementById('detailsModalFooter');
+            
+            modal.classList.remove('hidden');
+            body.innerHTML = '<div style="text-align: center; color: var(--color-text-muted); padding: 3rem;">Loading work order details...</div>';
+
+            try {
+                const res = await fetch(`/api/maintenance/requests/${id}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (!res.ok) throw new Error('Failed to load request details');
+                const result = await res.json();
+                const d = result.data || {};
+                const req = d.request || {};
+                const assignment = d.assignment;
+                const updates = d.updates || [];
+                const materials = d.materials || [];
+                const report = d.report;
+                const meta = d.meta || {};
+
+                document.getElementById('detailsModalTitle').textContent = req.issue_title || 'Work Order Details';
+                document.getElementById('detailsModalSubtitle').textContent = `Ticket ID: #${req.id.substring(0, 8)} • Status: ${(req.status || '').toUpperCase()}`;
+
+                const isLandlordOrder = meta.initiated_by === 'landlord' || (req.recommendations || '').includes('[INITIATED_BY:LANDLORD]');
+                const originBadge = isLandlordOrder
+                    ? '<span class="badge badge-landlord">Landlord Request</span>'
+                    : '<span class="badge badge-tenant">Tenant Request</span>';
+
+                const recText = (req.recommendations || '') + ' ' + (req.landlord_remarks || '');
+                const fallbackPartyMatch = recText.match(/\[LIABILITY:\s*(LANDLORD|TENANT|SHARED)\]/i);
+                const fallbackBasisMatch = recText.match(/\[BASIS:\s*([A-Z0-9_]+)\]/i);
+
+                const party = String(meta.liability_party || req.liability_party || (fallbackPartyMatch ? fallbackPartyMatch[1] : '')).toLowerCase();
+                const basis = String(meta.liability_basis || req.liability_basis || (fallbackBasisMatch ? fallbackBasisMatch[1] : '')).toLowerCase();
+
+                const liabilityBadge = party === 'landlord'
+                    ? '<span class="badge badge-landlord">Landlord (Art. 1654)</span>'
+                    : party === 'tenant'
+                    ? '<span class="badge badge-tenant">Tenant (Art. 1657)</span>'
+                    : party === 'shared'
+                    ? '<span class="badge badge-shared">50/50 Split</span>'
+                    : '<span class="badge badge-pending">Needs Ruling</span>';
+
+                let rulingBasisText = 'Pending Administrative Decision';
+                if (party === 'landlord') {
+                    if (basis === 'art_1654_major_utility') {
+                        rulingBasisText = 'Art. 1654: Landlord (Main Utility Lines)';
+                    } else if (basis === 'art_1654_force_majeure') {
+                        rulingBasisText = 'Art. 1654: Landlord (Force Majeure / Calamity)';
+                    } else {
+                        rulingBasisText = 'Art. 1654: Landlord (Wear & Tear)';
+                    }
+                } else if (party === 'tenant') {
+                    if (basis === 'art_1657_minor_repair') {
+                        rulingBasisText = 'Art. 1657: Tenant (Minor Consumable Repair)';
+                    } else {
+                        rulingBasisText = 'Art. 1657: Tenant (Misuse / Negligence)';
+                    }
+                } else if (party === 'shared') {
+                    rulingBasisText = 'Equitable 50/50 Split';
+                }
+
+                // Photo Evidence HTML
+                let photosHtml = '';
+                if (req.image_url || req.before_photo_url || req.after_photo_url) {
+                    photosHtml = '<div class="admin-proof-gallery">';
+                    if (req.image_url) {
+                        photosHtml += `
+                            <div class="admin-proof-card">
+                                <a href="${req.image_url}" target="_blank" rel="noopener">
+                                    <img src="${req.image_url}" alt="Initial Photo">
+                                </a>
+                                <div class="admin-proof-cap">Initial Photo</div>
+                            </div>
+                        `;
+                    }
+                    if (req.before_photo_url) {
+                        photosHtml += `
+                            <div class="admin-proof-card">
+                                <a href="${req.before_photo_url}" target="_blank" rel="noopener">
+                                    <img src="${req.before_photo_url}" alt="Before Photo">
+                                </a>
+                                <div class="admin-proof-cap">Before Repair</div>
+                            </div>
+                        `;
+                    }
+                    if (req.after_photo_url) {
+                        photosHtml += `
+                            <div class="admin-proof-card">
+                                <a href="${req.after_photo_url}" target="_blank" rel="noopener">
+                                    <img src="${req.after_photo_url}" alt="After Photo">
+                                </a>
+                                <div class="admin-proof-cap">After Repair</div>
+                            </div>
+                        `;
+                    }
+                    photosHtml += '</div>';
+                } else {
+                    photosHtml = '<div style="font-size:0.78rem; color:var(--color-text-muted); font-style:italic;">No photos attached.</div>';
+                }
+
+                // Materials Table HTML
+                let materialsHtml = '';
+                if (materials.length > 0) {
+                    materialsHtml = `
+                        <table class="admin-mat-table">
+                            <thead>
+                                <tr>
+                                    <th>Material / Item</th>
+                                    <th style="width:15%; text-align:center;">Qty</th>
+                                    <th style="width:20%; text-align:right;">Unit Price</th>
+                                    <th style="width:20%; text-align:right;">Subtotal</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${materials.map(m => `
+                                    <tr>
+                                        <td>${escapeHtml(m.material_name)}</td>
+                                        <td style="text-align:center;">${m.quantity}</td>
+                                        <td style="text-align:right;">${formatPhp(m.cost)}</td>
+                                        <td style="text-align:right; font-weight:700;">${formatPhp((m.quantity || 1) * (m.cost || 0))}</td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    `;
+                } else {
+                    materialsHtml = '<div style="font-size:0.78rem; color:var(--color-text-muted); font-style:italic;">No itemized materials listed.</div>';
+                }
+
+                // Timeline HTML
+                let timelineHtml = '';
+                if (updates.length > 0) {
+                    timelineHtml = `
+                        <div class="admin-timeline">
+                            ${updates.map(u => `
+                                <div class="admin-tl-item">
+                                    <div class="admin-tl-date">${new Date(u.created_at).toLocaleString('en-PH')} • <span style="text-transform:uppercase; font-weight:700;">${u.status_update || ''}</span></div>
+                                    <div class="admin-tl-note">${escapeHtml(u.notes || '')}</div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    `;
+                } else {
+                    timelineHtml = '<div style="font-size:0.78rem; color:var(--color-text-muted); font-style:italic;">No events recorded yet.</div>';
+                }
+
+                const totalCalculated = Number(meta.total_cost || 0) || ((Number(req.labor_cost) || 0) + (Number(req.material_cost) || 0));
+
+                body.innerHTML = `
+                    <!-- Overview Banner -->
+                    <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap:0.6rem; background:var(--color-bg-subtle, #f8fafc); border:1px solid var(--color-border-default); border-radius:6px; padding:0.65rem 0.85rem;">
+                        <div>
+                            <div style="font-size:0.6875rem; color:var(--color-text-muted); font-weight:700; text-transform:uppercase;">Origin</div>
+                            <div style="margin-top:2px;">${originBadge}</div>
+                        </div>
+                        <div>
+                            <div style="font-size:0.6875rem; color:var(--color-text-muted); font-weight:700; text-transform:uppercase;">Legal Liability</div>
+                            <div style="margin-top:2px;">${liabilityBadge}</div>
+                        </div>
+                        <div style="text-align: right;">
+                            <div style="font-size:0.6875rem; color:var(--color-text-muted); font-weight:700; text-transform:uppercase;">Total Quoted Cost</div>
+                            <div style="font-size:0.9375rem; font-weight:700; color:var(--color-link, #0355f3); margin-top:2px;">${formatPhp(totalCalculated)}</div>
+                        </div>
+                    </div>
+
+                    <!-- Section: Property & Contacts -->
+                    <div class="detail-section-title">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+                        <span>Property &amp; Contacts</span>
+                    </div>
+                    <div class="admin-grid-2">
+                        <div class="admin-info-item">
+                            <span class="admin-info-label">Property &amp; Address</span>
+                            <span class="admin-info-value">${escapeHtml(req.properties?.property_name || '—')} (${escapeHtml(req.properties?.address || '—')})</span>
+                        </div>
+                        <div class="admin-info-item">
+                            <span class="admin-info-label">Unit Scope</span>
+                            <span class="admin-info-value">${req.unit_number ? 'Unit ' + escapeHtml(req.unit_number) : 'Common Area'}</span>
+                        </div>
+                        <div class="admin-info-item">
+                            <span class="admin-info-label">Tenant</span>
+                            <span class="admin-info-value">${isLandlordOrder ? 'None (Landlord Work Order)' : escapeHtml(req.tenant?.full_name || req.users?.full_name || '—') + (req.tenant?.contact_number || req.users?.contact_number ? ' (' + (req.tenant?.contact_number || req.users?.contact_number) + ')' : '')}</span>
+                        </div>
+                        <div class="admin-info-item">
+                            <span class="admin-info-label">Landlord</span>
+                            <span class="admin-info-value">${escapeHtml(req.landlord?.full_name || '—')} ${req.landlord?.email ? '• ' + escapeHtml(req.landlord.email) : ''}</span>
+                        </div>
+                    </div>
+
+                    <!-- Section: Reported Problem -->
+                    <div class="detail-section-title">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/></svg>
+                        <span>Reported Problem</span>
+                    </div>
+                    <div style="background:var(--color-bg-surface); border:1px solid var(--color-border-default); border-radius:5px; padding:0.65rem 0.85rem; font-size:0.8125rem; color:var(--color-text-primary); line-height:1.45;">
+                        ${escapeHtml(req.issue_description || 'No detailed description provided.')}
+                    </div>
+
+                    <!-- Section: Visual Evidence -->
+                    <div class="detail-section-title">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                        <span>Visual Evidence</span>
+                    </div>
+                    ${photosHtml}
+
+                    <!-- Section: Diagnosis & Quotation -->
+                    <div class="detail-section-title">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+                        <span>Diagnosis &amp; Quotation</span>
+                    </div>
+                    <div class="admin-grid-2" style="margin-bottom:0.5rem;">
+                        <div class="admin-info-item">
+                            <span class="admin-info-label">Assigned Technician</span>
+                            <span class="admin-info-value">${req.assigned_maintenance?.full_name ? escapeHtml(req.assigned_maintenance.full_name) + ' (' + (req.assigned_maintenance.contact_number || req.assigned_maintenance.email || '') + ')' : '<em style="color:var(--color-text-muted);">Unassigned</em>'}</span>
+                        </div>
+                        <div class="admin-info-item">
+                            <span class="admin-info-label">Target Due Date</span>
+                            <span class="admin-info-value">${assignment?.due_date ? new Date(assignment.due_date).toLocaleDateString('en-PH') : 'Pending Dispatch'}</span>
+                        </div>
+                    </div>
+                    <div style="background:var(--color-bg-subtle, #f8fafc); border:1px solid var(--color-border-default); border-radius:5px; padding:0.65rem 0.85rem; margin-bottom:0.5rem;">
+                        <span class="admin-info-label">Technician Findings:</span>
+                        <div style="font-weight:600; font-size:0.8125rem; color:var(--color-text-primary); margin-top:2px;">${escapeHtml(req.problem_found || report?.problem_found || 'Diagnostic report pending on-site inspection.')}</div>
+                        ${(req.repair_performed || report?.repair_performed) ? `
+                            <div style="margin-top:0.4rem; padding-top:0.4rem; border-top:1px dashed var(--color-border-default);">
+                                <span class="admin-info-label">Repairs Performed:</span>
+                                <div style="font-size:0.8125rem; color:var(--color-text-secondary); margin-top:1px;">${escapeHtml(req.repair_performed || report?.repair_performed)}</div>
+                            </div>
+                        ` : ''}
+                    </div>
+                    ${materialsHtml}
+                    <div style="display:flex; justify-content:flex-end; align-items:center; gap:1.25rem; margin-top:0.4rem; font-size:0.8125rem; padding: 0.45rem 0.75rem; background: var(--color-bg-subtle, #f8fafc); border-radius: 5px; border: 1px solid var(--color-border-default);">
+                        <div>Labor: <strong style="color:var(--color-text-primary);">${formatPhp(meta.labor_cost || req.labor_cost || 0)}</strong></div>
+                        <div>Materials: <strong style="color:var(--color-text-primary);">${formatPhp(meta.material_cost || req.material_cost || 0)}</strong></div>
+                        <div>Total: <strong style="color:var(--color-link, #0355f3); font-size:0.9375rem;">${formatPhp(totalCalculated)}</strong></div>
+                    </div>
+
+                    <!-- Section: Legal Liability Decision -->
+                    <div class="detail-section-title">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                        <span>Legal Ruling &amp; Remarks</span>
+                    </div>
+                    <div style="background:var(--color-bg-subtle, #f8fafc); border:1px solid var(--color-border-default); border-radius:5px; padding:0.65rem 0.85rem; margin-bottom:0.5rem;">
+                        <span class="admin-info-label">Ruling Basis:</span>
+                        <div style="font-weight:600; font-size:0.8125rem; color:var(--color-text-primary); margin-top:2px;">
+                            ${rulingBasisText}
+                        </div>
+                        ${(req.landlord_remarks || meta.admin_notes) ? `<div style="font-size:0.78rem; color:var(--color-text-secondary); margin-top:4px;">Notes: ${escapeHtml(req.landlord_remarks || meta.admin_notes)}</div>` : ''}
+                    </div>
+
+                    <!-- Section: Timeline -->
+                    <div class="detail-section-title">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                        <span>Activity Timeline</span>
+                    </div>
+                    ${timelineHtml}
+                `;
+
+                // Update footer with context-aware buttons (NO Reassign button when on Liability & Quotes tab)
+                let footerHtml = '';
+                if (activeTab === 'requests' && !['completed', 'verified', 'closed'].includes(req.status)) {
+                    footerHtml += `
+                        <button type="button" class="btn-table-sm" onclick="closeModals(); openDispatchModal('${req.id}');" style="background:var(--color-action-primary); color:#ffffff; border-color:var(--color-action-primary); padding: 0.4rem 0.85rem;">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                            <span>${req.assigned_maintenance_id ? 'Reassign' : 'Dispatch'}</span>
+                        </button>
+                    `;
+                }
+
+                if (activeTab === 'liability') {
+                    footerHtml += `
+                        <button type="button" class="btn-table-sm" onclick="closeModals(); openLiabilityModal('${req.id}');" style="background:#10b981; color:#ffffff; border-color:#10b981; font-weight:600; padding: 0.4rem 0.85rem;">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                            <span>Review Liability</span>
+                        </button>
+                    `;
+                }
+
+                footerHtml += `
+                    <button type="button" class="btn-table-sm" onclick="closeModals();" style="padding: 0.4rem 0.85rem;">Close</button>
+                `;
+                footer.innerHTML = footerHtml;
+
+            } catch (err) {
+                console.error('Error fetching request details:', err);
+                body.innerHTML = '<div style="text-align: center; color: var(--color-error-text); padding: 3rem;">Unable to load request details. Please try again.</div>';
+            }
+        };
+
+        async function handleDispatchSubmit(e) {
+            e.preventDefault();
+            const id = document.getElementById('dispatchRequestId').value;
+            const assigned_maintenance_id = document.getElementById('dispatchWorkerSelect').value;
+            const due_date = document.getElementById('dispatchDueDate').value;
+            const instructions = document.getElementById('dispatchInstructions').value;
+
+            const btn = document.getElementById('btnConfirmDispatch');
+            btn.disabled = true;
+            btn.textContent = 'Dispatching...';
+
+            try {
+                const res = await fetch(`/api/maintenance/admin/requests/${id}/dispatch`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    body: JSON.stringify({ assigned_maintenance_id, due_date, instructions })
+                });
+                const result = await res.json();
+                if (res.ok) {
+                    await showModalAlert('Technician has been successfully dispatched.', 'Dispatch Successful', 'success');
+                    closeModals();
+                    await loadOverviewStats();
+                    await loadRequests();
+                } else {
+                    await showModalAlert(result.message || 'Failed to dispatch technician.', 'Dispatch Failed', 'error');
+                }
+            } catch (err) {
+                console.error(err);
+                await showModalAlert('A network error occurred. Please try again.', 'Network Error', 'error');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Dispatch';
+            }
+        }
+
+        async function handleLiabilitySubmit(e) {
+            e.preventDefault();
+            const id = document.getElementById('liabilityRequestId').value;
+            const liability_party = document.getElementById('liabilityPartySelect').value;
+            const liability_basis = document.getElementById('liabilityBasisSelect').value;
+            const labor_cost = document.getElementById('liabilityLaborCost').value;
+            const material_cost = document.getElementById('liabilityMaterialCost').value;
+            const admin_notes = document.getElementById('liabilityAdminNotes').value;
+
+            const btn = document.getElementById('btnConfirmLiability');
+            btn.disabled = true;
+            btn.textContent = 'Saving...';
+
+            try {
+                const res = await fetch(`/api/maintenance/admin/requests/${id}/set-liability`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    body: JSON.stringify({ liability_party, liability_basis, labor_cost, material_cost, admin_notes })
+                });
+                const result = await res.json();
+                if (res.ok) {
+                    await showModalAlert('Liability decision and quote have been saved.', 'Ruling Saved', 'success');
+                    closeModals();
+                    await loadOverviewStats();
+                    await loadRequests();
+                } else {
+                    await showModalAlert(result.message || 'Failed to save decision.', 'Failed to Save', 'error');
+                }
+            } catch (err) {
+                console.error(err);
+                await showModalAlert('A network error occurred. Please try again.', 'Network Error', 'error');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Save Decision';
+            }
+        }
+
+        async function handleAddWorkerSubmit(e) {
+            e.preventDefault();
+            const full_name = document.getElementById('workerFullName').value;
+            const specialization = document.getElementById('workerSpecialization').value;
+            const email = document.getElementById('workerEmail').value;
+            const contact_number = document.getElementById('workerContact').value;
+            const password = document.getElementById('workerPassword').value;
+
+            const btn = document.getElementById('btnConfirmAddWorker');
+            btn.disabled = true;
+            btn.textContent = 'Registering...';
+
+            try {
+                const res = await fetch('/api/maintenance/admin/workers', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    body: JSON.stringify({ full_name, specialization, email, contact_number, password })
+                });
+                const result = await res.json();
+                if (res.ok) {
+                    await showModalAlert(`Technician ${full_name} has been added to the platform roster.`, 'Technician Registered', 'success');
+                    document.getElementById('addWorkerForm').reset();
+                    closeModals();
+                    await loadOverviewStats();
+                    await loadWorkers();
+                } else {
+                    await showModalAlert(result.message || 'Failed to register technician.', 'Registration Failed', 'error');
+                }
+            } catch (err) {
+                console.error(err);
+                await showModalAlert('A network error occurred. Please try again.', 'Network Error', 'error');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Register Technician';
+            }
+        }
+
+        async function loadMaintenancePayments() {
+            try {
+                const res = await fetch('/api/maintenance/admin/payments', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (!res.ok) throw new Error('Failed to fetch maintenance payments');
+                const result = await res.json();
+                allPayments = result.data || [];
+
+                const waitingCount = allPayments.filter(p => (p.payment_status || p.meta?.payment_status) === 'waiting_verification').length;
+                const verifiedCount = allPayments.filter(p => (p.payment_status || p.meta?.payment_status) === 'verified').length;
+                const rejectedCount = allPayments.filter(p => (p.payment_status || p.meta?.payment_status) === 'rejected').length;
+
+                const badge = document.getElementById('badgePayments');
+                if (badge) badge.textContent = allPayments.length;
+
+                const cAll = document.getElementById('payCountAll');
+                const cWait = document.getElementById('payCountWaiting');
+                const cVer = document.getElementById('payCountVerified');
+                const cRej = document.getElementById('payCountRejected');
+                if (cAll) cAll.textContent = allPayments.length;
+                if (cWait) cWait.textContent = waitingCount;
+                if (cVer) cVer.textContent = verifiedCount;
+                if (cRej) cRej.textContent = rejectedCount;
+
+                renderPaymentsTable();
+            } catch (err) {
+                console.error('Error loading maintenance payments:', err);
+                const tbody = document.getElementById('paymentsTableBody');
+                if (tbody) {
+                    tbody.innerHTML = '<tr><td colspan="5" style="text-align: center !important; color: var(--color-error-text); padding: 2rem;">Error loading maintenance payments.</td></tr>';
+                }
+            }
+        }
+
+        function renderPaymentsTable() {
+            const tbody = document.getElementById('paymentsTableBody');
+            if (!tbody) return;
+
+            const search = (document.getElementById('paySearchInput')?.value || '').toLowerCase().trim();
+
+            const filtered = allPayments.filter(item => {
+                const itemPayStatus = item.payment_status || item.meta?.payment_status || 'unpaid';
+                if (activePayFilter !== 'all' && itemPayStatus !== activePayFilter) return false;
+
+                if (search) {
+                    const title = (item.issue_title || '').toLowerCase();
+                    const prop = (item.properties?.property_name || '').toLowerCase();
+                    const tenant = (item.tenant?.full_name || '').toLowerCase();
+                    const landlord = (item.landlord?.full_name || '').toLowerCase();
+                    const ref = (item.reference_number || '').toLowerCase();
+                    const method = (item.payment_method || '').toLowerCase();
+                    if (!title.includes(search) && !prop.includes(search) && !tenant.includes(search) && !landlord.includes(search) && !ref.includes(search) && !method.includes(search)) {
+                        return false;
+                    }
+                }
+                return true;
+            });
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align: center !important; color: var(--color-text-muted); padding: 2.5rem;">No maintenance payments match the filter.</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = filtered.map(item => {
+                const liabParty = (item.liability_party || item.meta?.liability_party || '').toLowerCase();
+                const payerField = (item.paid_by || item.meta?.paid_by || '').toLowerCase();
+                const isLandlordPayer = liabParty === 'landlord' || payerField === 'landlord';
+                const payerRole = isLandlordPayer ? 'Landlord' : 'Tenant';
+                const payerRoleClass = isLandlordPayer ? 'badge-landlord' : 'badge-tenant';
+                const payerName = isLandlordPayer ? (item.landlord?.full_name || 'Landlord') : (item.tenant?.full_name || item.users?.full_name || 'Tenant');
+
+                const rowPayStatus = item.payment_status || item.meta?.payment_status || 'unpaid';
+                let statusBadge = '<span class="badge badge-closed">Unpaid</span>';
+                if (rowPayStatus === 'waiting_verification') {
+                    statusBadge = '<span class="badge" style="background: #fef3c7; color: #92400e; border: 1px solid #fde68a; font-weight: 700;">Awaiting Verification</span>';
+                } else if (rowPayStatus === 'verified') {
+                    statusBadge = '<span class="badge badge-completed">Verified</span>';
+                } else if (rowPayStatus === 'rejected') {
+                    statusBadge = '<span class="badge badge-rejected">Rejected</span>';
+                }
+
+                const propName = item.properties?.property_name || 'Property';
+                const unit = item.unit_number ? ` · Unit ${escapeHtml(item.unit_number)}` : '';
+                const createdDate = item.created_at ? new Date(item.created_at).toLocaleDateString('en-PH', { month: 'short', day: 'numeric', year: 'numeric' }) : '—';
+                const amountVal = item.payment_amount || item.meta?.payment_amount || item.total_cost || item.meta?.total_cost || 0;
+                const payMethod = item.payment_method || item.meta?.payment_method || 'In-System';
+                const refNum = item.reference_number || item.meta?.reference_number || '—';
+
+                return `
+                    <tr class="clickable-row" onclick="openPaymentDetailsModal('${item.id}')" tabindex="0" role="button" aria-label="View payment details for ${escapeHtml(item.issue_title)}" title="Click to view payment details" onkeydown="if(event.key==='Enter'||event.key===' ') { event.preventDefault(); openPaymentDetailsModal('${item.id}'); }">
+                        <td style="text-align: left;">
+                            <div style="font-weight: 700; color: var(--color-text-primary); font-size: 0.85rem;">${escapeHtml(item.issue_title || 'Maintenance Request')}</div>
+                            <div style="font-size: 0.74rem; color: var(--color-text-secondary); margin-top: 2px;">${escapeHtml(propName)}${unit}</div>
+                        </td>
+                        <td style="text-align: left;">
+                            <div style="display: flex; align-items: center; gap: 6px;">
+                                <span class="badge ${payerRoleClass}">${payerRole}</span>
+                                <span style="font-weight: 600; color: var(--color-text-primary); font-size: 0.8125rem;">${escapeHtml(payerName)}</span>
+                            </div>
+                        </td>
+                        <td style="text-align: left;">
+                            <div style="font-weight: 800; color: #15803d; font-size: 0.9rem;">${formatPhp(amountVal)}</div>
+                            <div style="font-size: 0.72rem; color: var(--color-text-muted); margin-top: 1px;">${escapeHtml(payMethod)}</div>
+                        </td>
+                        <td style="text-align: left;">
+                            <div style="font-family: monospace; font-size: 0.8rem; font-weight: 600; color: var(--color-text-primary);">${escapeHtml(refNum)}</div>
+                            <div style="font-size: 0.72rem; color: var(--color-text-muted); margin-top: 1px;">${createdDate}</div>
+                        </td>
+                        <td style="text-align: center;">
+                            ${statusBadge}
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function openProofModal(url, title) {
+            const modal = document.getElementById('proofPreviewModal');
+            if (!modal) return;
+            const content = document.getElementById('proofPreviewContent');
+            const sub = document.getElementById('proofPreviewSubtitle');
+            const dl = document.getElementById('proofPreviewDownloadBtn');
+            if (sub) sub.textContent = title || 'Official uploaded document';
+            if (dl) dl.href = url;
+
+            const isImg = /\.(jpeg|jpg|gif|png|webp|svg)($|\?)/i.test(url) || url.startsWith('data:image/');
+            if (isImg) {
+                content.innerHTML = `<img src="${url}" alt="Payment Proof" style="max-width: 100%; max-height: 60vh; object-fit: contain; border-radius: 6px; box-shadow: 0 2px 8px rgba(0,0,0,0.15);">`;
+            } else {
+                content.innerHTML = `<div style="padding: 2rem;"><p style="margin-bottom: 1rem; color: var(--color-text-secondary);">Uploaded proof is a document file.</p><a href="${url}" target="_blank" rel="noopener noreferrer" class="btn-action-primary" style="display: inline-block;">View Attachment in New Tab</a></div>`;
+            }
+            modal.classList.remove('hidden');
+        }
+
+        window.openPaymentDetailsModal = function(id) {
+            const item = allPayments.find(p => String(p.id) === String(id));
+            if (!item) return;
+
+            document.getElementById('verifyPaymentRequestId').value = id;
+            document.getElementById('rejectPaymentRequestId').value = id;
+
+            const liabParty = (item.liability_party || item.meta?.liability_party || '').toLowerCase();
+            const payerField = (item.paid_by || item.meta?.paid_by || '').toLowerCase();
+            const isLandlordPayer = liabParty === 'landlord' || payerField === 'landlord';
+            const payerName = isLandlordPayer ? (item.landlord?.full_name || 'Landlord') : (item.tenant?.full_name || item.users?.full_name || 'Tenant');
+            const payerRole = isLandlordPayer ? 'Landlord' : 'Tenant';
+            const payerRoleClass = isLandlordPayer ? 'badge-landlord' : 'badge-tenant';
+            const payerContact = isLandlordPayer ? (item.landlord?.contact_number || item.landlord?.email || '—') : (item.tenant?.contact_number || item.tenant?.email || '—');
+
+            const amountVal = item.payment_amount || item.meta?.payment_amount || item.total_cost || item.meta?.total_cost || 0;
+            const payMethod = item.payment_method || item.meta?.payment_method || 'In-System';
+            const refNum = item.reference_number || item.meta?.reference_number || '—';
+            const proofUrl = item.proof_url || item.meta?.proof_url;
+            const createdDate = item.created_at ? new Date(item.created_at).toLocaleString('en-PH', { dateStyle: 'medium', timeStyle: 'short' }) : '—';
+            const propName = item.properties?.property_name || 'Property';
+            const unit = item.unit_number ? ` · Unit ${escapeHtml(item.unit_number)}` : '';
+
+            const rowPayStatus = item.payment_status || item.meta?.payment_status || 'unpaid';
+
+            document.getElementById('payDetailsModalTitle').textContent = 'Payment Details';
+            document.getElementById('payDetailsModalSubtitle').textContent = `Ticket #${(item.id || '').slice(0, 8).toUpperCase()} • Method: ${escapeHtml(payMethod)}`;
+            document.getElementById('payDetailsAmount').textContent = formatPhp(amountVal);
+
+            let statusBadge = '<span class="badge badge-closed">Unpaid</span>';
+            if (rowPayStatus === 'waiting_verification') {
+                statusBadge = '<span class="badge" style="background: #fef3c7; color: #92400e; border: 1px solid #fde68a; font-weight: 700;">Awaiting Verification</span>';
+            } else if (rowPayStatus === 'verified') {
+                statusBadge = '<span class="badge badge-completed">Verified &amp; Settled</span>';
+            } else if (rowPayStatus === 'rejected') {
+                statusBadge = '<span class="badge badge-rejected">Rejected</span>';
+            }
+            document.getElementById('payDetailsStatusWrap').innerHTML = statusBadge;
+
+            document.getElementById('payDetailsIssueTitle').textContent = item.issue_title || 'Maintenance Request';
+            document.getElementById('payDetailsPropertyLocation').textContent = `${propName}${unit} — ${item.properties?.address || ''}`;
+
+            document.getElementById('payDetailsPayerName').innerHTML = `<span class="badge ${payerRoleClass}" style="margin-right: 6px;">${payerRole}</span>${escapeHtml(payerName)}`;
+            document.getElementById('payDetailsPayerContact').textContent = payerContact;
+
+            const liabBasis = (item.liability_basis || item.meta?.liability_basis || 'Civil Code').replace(/_/g, ' ').toUpperCase();
+            document.getElementById('payDetailsLiabilityBadge').innerHTML = `<span style="font-size: 0.72rem; color: var(--color-text-secondary);">Obligation: <strong>${payerRole}</strong> (${escapeHtml(liabBasis)})</span>`;
+
+            document.getElementById('payDetailsMethod').textContent = payMethod;
+            document.getElementById('payDetailsRefNum').textContent = refNum;
+            document.getElementById('payDetailsDate').textContent = `Submitted: ${createdDate}`;
+
+            const rejWrap = document.getElementById('payDetailsRejectionWrap');
+            const rejText = document.getElementById('payDetailsRejectionText');
+            const rejReason = item.rejection_reason || item.meta?.rejection_reason;
+            if (rowPayStatus === 'rejected' && rejReason) {
+                rejWrap.style.display = 'block';
+                rejText.textContent = rejReason;
+            } else {
+                rejWrap.style.display = 'none';
+            }
+
+            const proofContainer = document.getElementById('payDetailsProofContent');
+            if (proofUrl) {
+                proofContainer.innerHTML = `
+                    <div style="display: flex; flex-direction: column; align-items: center; gap: 8px;">
+                        <a href="${proofUrl}" target="_blank" rel="noopener noreferrer" title="Click to view full image in new tab">
+                            <img src="${proofUrl}" alt="Proof of Payment" style="max-height: 180px; max-width: 100%; object-fit: contain; border-radius: 6px; box-shadow: 0 1px 4px rgba(0,0,0,0.12);">
+                        </a>
+                        <div style="display: flex; gap: 10px; align-items: center;">
+                            <a href="${proofUrl}" target="_blank" rel="noopener noreferrer" class="btn-table-sm" style="font-size: 0.75rem;">Open Full Receipt &rarr;</a>
+                        </div>
+                    </div>
+                `;
+            } else {
+                proofContainer.innerHTML = `<div style="font-size: 0.78rem; color: var(--color-text-muted); padding: 0.5rem; font-style: italic;">In-system settlement proof recorded (no external attachment).</div>`;
+            }
+
+            const footer = document.getElementById('payDetailsModalFooter');
+            if (rowPayStatus === 'waiting_verification') {
+                footer.innerHTML = `
+                    <div style="display: flex; gap: 8px; align-items: center;">
+                        <button type="button" id="btnDetailsVerify" class="btn-action-primary" style="background: #15803d; border-color: #15803d; padding: 0.45rem 1rem;" onclick="handleVerifyDirectlyFromModal('${item.id}')">Confirm &amp; Verify</button>
+                        <button type="button" class="btn-table-sm" style="color: #b91c1c; border-color: #fca5a5; font-weight: 700; padding: 0.45rem 0.9rem;" onclick="openRejectFromDetailsModal('${item.id}')">Reject Payment</button>
+                    </div>
+                    <button type="button" class="btn-table-sm" onclick="closeModals()" style="padding: 0.45rem 0.9rem;">Close</button>
+                `;
+            } else if (rowPayStatus === 'verified') {
+                footer.innerHTML = `
+                    <span style="font-size: 0.78rem; color: #15803d; font-weight: 700; display: inline-flex; align-items: center; gap: 4px;">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                        Payment Officially Verified in Ledger
+                    </span>
+                    <button type="button" class="btn-table-sm" onclick="closeModals()" style="padding: 0.45rem 0.9rem;">Close</button>
+                `;
+            } else {
+                footer.innerHTML = `
+                    <span style="font-size: 0.78rem; color: #b91c1c; font-weight: 700;">
+                        Payment Rejected
+                    </span>
+                    <button type="button" class="btn-table-sm" onclick="closeModals()" style="padding: 0.45rem 0.9rem;">Close</button>
+                `;
+            }
+
+            document.getElementById('paymentDetailsModal').classList.remove('hidden');
+        };
+
+        async function handleVerifyDirectlyFromModal(id) {
+            const confirmed = await showModalConfirm('Are you sure you want to officially verify this maintenance payment and settle the expenses in the system ledger?', 'Verify Payment');
+            if (!confirmed) return;
+            const btn = document.getElementById('btnDetailsVerify');
+            if (btn) {
+                btn.disabled = true;
+                btn.textContent = 'Verifying...';
+            }
+            try {
+                const res = await fetch(`/api/maintenance/admin/payments/${id}/verify`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }
+                });
+                const result = await res.json();
+                if (res.ok) {
+                    await showModalAlert('Maintenance payment has been officially verified.', 'Payment Verified', 'success');
+                    closeModals();
+                    await loadOverviewStats();
+                    await loadMaintenancePayments();
+                } else {
+                    await showModalAlert(result.message || 'Failed to verify payment.', 'Verification Failed', 'error');
+                }
+            } catch (err) {
+                console.error(err);
+                await showModalAlert('Network error while verifying payment.', 'Network Error', 'error');
+            } finally {
+                if (btn) {
+                    btn.disabled = false;
+                    btn.textContent = 'Confirm & Verify';
+                }
+            }
+        }
+
+        function openRejectFromDetailsModal(id) {
+            document.getElementById('paymentDetailsModal').classList.add('hidden');
+            openRejectPaymentModal(id);
+        }
+
+        function openRejectPaymentModal(id) {
+            document.getElementById('rejectPaymentRequestId').value = id;
+            document.getElementById('rejectReasonInput').value = '';
+            document.getElementById('rejectPaymentModal').classList.remove('hidden');
+        }
+
+        async function handleVerifyPaymentSubmit(e) {
+            e.preventDefault();
+            const id = document.getElementById('verifyPaymentRequestId').value;
+            const btn = document.getElementById('btnConfirmVerifyPayment');
+            btn.disabled = true;
+            btn.textContent = 'Verifying...';
+
+            try {
+                const res = await fetch(`/api/maintenance/admin/payments/${id}/verify`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }
+                });
+                const result = await res.json();
+                if (res.ok) {
+                    await showModalAlert('Maintenance payment has been officially verified.', 'Payment Verified', 'success');
+                    closeModals();
+                    await loadOverviewStats();
+                    await loadMaintenancePayments();
+                } else {
+                    await showModalAlert(result.message || 'Failed to verify payment.', 'Verification Failed', 'error');
+                }
+            } catch (err) {
+                console.error(err);
+                await showModalAlert('Network error while verifying payment.', 'Network Error', 'error');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Confirm & Verify Payment';
+            }
+        }
+
+        async function handleRejectPaymentSubmit(e) {
+            e.preventDefault();
+            const id = document.getElementById('rejectPaymentRequestId').value;
+            const rejection_reason = document.getElementById('rejectReasonInput').value.trim();
+            if (!rejection_reason) {
+                await showModalAlert('Please provide a reason for rejecting the payment.', 'Reason Required', 'info');
+                return;
+            }
+
+            const btn = document.getElementById('btnConfirmRejectPayment');
+            btn.disabled = true;
+            btn.textContent = 'Rejecting...';
+
+            try {
+                const res = await fetch(`/api/maintenance/admin/payments/${id}/reject`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    body: JSON.stringify({ reason: rejection_reason, rejection_reason })
+                });
+                const result = await res.json();
+                if (res.ok) {
+                    await showModalAlert('Maintenance payment has been rejected and payer notified.', 'Payment Rejected', 'info');
+                    closeModals();
+                    await loadOverviewStats();
+                    await loadMaintenancePayments();
+                } else {
+                    await showModalAlert(result.message || 'Failed to reject payment.', 'Rejection Failed', 'error');
+                }
+            } catch (err) {
+                console.error(err);
+                await showModalAlert('Network error while rejecting payment.', 'Network Error', 'error');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Reject Payment';
+            }
+        }
+
+    </script>
+</body>
+</html>

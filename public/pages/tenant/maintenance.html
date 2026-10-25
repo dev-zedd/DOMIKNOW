@@ -62,6 +62,141 @@
             border-color: var(--color-border-strong);
         }
 
+        /* ── Tenant Primary Subnav Tabs ── */
+        .tenant-subnav-tabs {
+            display: flex;
+            align-items: center;
+            gap: 28px;
+            border-bottom: 1px solid var(--color-border-default, #e2e8f0);
+            padding-bottom: 14px;
+            margin-bottom: 24px;
+        }
+        .tenant-tab-link {
+            background: none;
+            border: none;
+            padding: 0;
+            font-size: 1.0625rem;
+            font-weight: 700;
+            color: var(--color-text-muted);
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: color 0.15s ease;
+            position: relative;
+        }
+        .tenant-tab-link:hover {
+            color: var(--color-action-primary, #0355f3);
+        }
+        .tenant-tab-link.active {
+            color: var(--color-text-primary, #042458);
+            font-weight: 800;
+        }
+        .tenant-tab-link.active::after {
+            content: '';
+            position: absolute;
+            bottom: -15px;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--color-action-primary, #0355f3);
+            border-radius: 2px;
+        }
+
+        /* ── Charges Financial KPI Grid ── */
+        .charges-kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        .charges-kpi-card {
+            background: var(--color-bg-surface);
+            border: 1px solid var(--color-border-default, #e2e8f0);
+            border-radius: 12px;
+            padding: 18px 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .charges-kpi-label {
+            font-size: 0.75rem;
+            font-weight: 750;
+            text-transform: uppercase;
+            color: var(--color-text-muted);
+            letter-spacing: 0.05em;
+            margin-bottom: 6px;
+        }
+        .charges-kpi-val {
+            font-size: 1.5rem;
+            font-weight: 850;
+            color: var(--color-text-primary);
+            line-height: 1.2;
+            letter-spacing: -0.01em;
+        }
+        .charges-kpi-sub {
+            font-size: 0.75rem;
+            color: var(--color-text-secondary);
+            margin-top: 6px;
+        }
+
+        /* ── Charge Card Item ── */
+        .charge-card-item {
+            background: var(--color-bg-surface);
+            border: 1px solid var(--color-border-default, #e2e8f0);
+            border-radius: 12px;
+            padding: 20px 24px;
+            margin-bottom: 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+            transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+            flex-wrap: wrap;
+        }
+        .charge-card-item:hover {
+            border-color: var(--color-border-strong, #cbd5e1);
+            box-shadow: 0 4px 14px rgba(0,0,0,0.05);
+        }
+        .charge-card-main {
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+            min-width: 280px;
+            flex: 1 1 320px;
+        }
+        .charge-card-breakdown {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+            padding: 0 16px;
+            border-left: 1px solid var(--color-border-default, #e2e8f0);
+            border-right: 1px solid var(--color-border-default, #e2e8f0);
+            flex-wrap: wrap;
+        }
+        .charge-card-actions {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 10px;
+            min-width: 170px;
+        }
+        @media (max-width: 768px) {
+            .charge-card-breakdown {
+                border-left: none;
+                border-right: none;
+                padding: 10px 0;
+                width: 100%;
+                justify-content: space-between;
+            }
+            .charge-card-actions {
+                align-items: stretch;
+                width: 100%;
+            }
+        }
+
         /* ── Maintenance Tabs & Action Header Row ── */
         .maintenance-header-row {
             display: flex;
@@ -1044,76 +1179,123 @@
     <script src="../../js/ui.js?v=20260827-3" defer></script>
 </head>
 <body class="app-loading" data-role="tenant" data-page-title="Maintenance Requests" data-domiknow-loading-ignore>
-    <!-- Navbar -->
-    <nav class="navbar navbar-tenant">
-        <div class="navbar-container">
-            <div class="navbar-brand-group">
-                <a href="dashboard.html" style="text-decoration: none;"><span class="navbar-logo">DomiKnow</span></a>
-                <span class="navbar-badge navbar-badge-tenant">Tenant</span>
-            </div>
-            <div class="navbar-menu">
-                <a href="dashboard.html" class="navbar-menu-link">Dashboard</a>
-                <a href="properties.html" class="navbar-menu-link">Property Discovery</a>
-                <a href="properties.html" class="navbar-menu-link">Discovery</a>
-                <a href="applications.html" class="navbar-menu-link">My Applications</a>
-                <a href="leases.html" class="navbar-menu-link">My Lease</a>
-                <a href="billings.html" class="navbar-menu-link">My Billings</a>
-                <a href="maintenance.html" class="navbar-menu-link active">Maintenance</a>
-            </div>
-            <div class="navbar-right">
-                <span class="navbar-user-welcome">Welcome, <span class="user-name">User</span></span>
-                <button id="logoutBtn" class="navbar-btn">Logout</button>
-            </div>
-        </div>
-    </nav>
+    
 
     <!-- ── Main Content ── -->
     <main class="dashboard-container" data-domiknow-loading-ignore>
 
-        <!-- Filter tabs & Submit Button Combined Row -->
-        <div class="maintenance-header-row">
-            <div class="maintenance-tabs-bar" id="filterTabs">
-                <button class="m-tab-btn active" data-filter="all">All</button>
-                <button class="m-tab-btn" data-filter="pending">Pending <span class="tab-count" id="tabCountPending">0</span></button>
-                <button class="m-tab-btn" data-filter="approved">Approved <span class="tab-count" id="tabCountApproved">0</span></button>
-                <button class="m-tab-btn" data-filter="in_progress">In Progress <span class="tab-count" id="tabCountInProgress">0</span></button>
-                <button class="m-tab-btn" data-filter="completed">Completed <span class="tab-count" id="tabCountCompleted">0</span></button>
-                <button class="m-tab-btn" data-filter="closed">Closed <span class="tab-count" id="tabCountClosed">0</span></button>
-                <button class="m-tab-btn" data-filter="rejected">Rejected</button>
-            </div>
-            <button class="btn-submit-request" id="openFormBtn">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-                </svg>
-                <span>Submit New Request</span>
+        <!-- Primary Navigation: Requests vs Charges -->
+        <div class="tenant-subnav-tabs">
+            <button type="button" class="tenant-tab-link active" id="btnTabRequests" data-view="requests">
+                <span>Maintenance Requests</span>
+                <span class="tab-count" id="badgeRequestsCount">0</span>
+            </button>
+            <button type="button" class="tenant-tab-link" id="btnTabCharges" data-view="charges">
+                <span>Maintenance Charges</span>
+                <span class="tab-count" id="badgeChargesCount">0</span>
             </button>
         </div>
 
-        <!-- Ledger Controls bar (Search on left, Filters on right) -->
-        <div class="ledger-controls-bar">
-            <div class="ledger-search-box">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="11" cy="11" r="8"></circle>
-                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-                </svg>
-                <input type="text" id="maintenanceSearchInput" placeholder="Search requests..." autocomplete="off">
+        <!-- ── VIEW 1: Maintenance Requests ── -->
+        <div id="viewRequests" class="tab-view-pane">
+            <!-- Filter tabs & Submit Button Combined Row -->
+            <div class="maintenance-header-row">
+                <div class="maintenance-tabs-bar" id="filterTabs">
+                    <button class="m-tab-btn active" data-filter="all">All</button>
+                    <button class="m-tab-btn" data-filter="pending">Pending <span class="tab-count" id="tabCountPending">0</span></button>
+                    <button class="m-tab-btn" data-filter="quoted">Quoted <span class="tab-count" id="tabCountQuoted">0</span></button>
+                    <button class="m-tab-btn" data-filter="approved">Approved <span class="tab-count" id="tabCountApproved">0</span></button>
+                    <button class="m-tab-btn" data-filter="in_progress">In Progress <span class="tab-count" id="tabCountInProgress">0</span></button>
+                    <button class="m-tab-btn" data-filter="completed">Completed <span class="tab-count" id="tabCountCompleted">0</span></button>
+                    <button class="m-tab-btn" data-filter="closed">Closed <span class="tab-count" id="tabCountClosed">0</span></button>
+                    <button class="m-tab-btn" data-filter="rejected">Rejected</button>
+                </div>
+                <button class="btn-submit-request" id="openFormBtn">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                    </svg>
+                    <span>Submit New Request</span>
+                </button>
             </div>
-            <div class="ledger-filter-group">
-                <div class="ledger-select-wrap">
-                    <select id="priorityFilterSelect" class="ledger-select">
-                        <option value="all">Filters ⌵</option>
-                        <option value="emergency">Emergency</option>
-                        <option value="high">High Priority</option>
-                        <option value="medium">Medium Priority</option>
-                        <option value="low">Low Priority</option>
-                    </select>
+
+            <!-- Ledger Controls bar (Search on left, Filters on right) -->
+            <div class="ledger-controls-bar">
+                <div class="ledger-search-box">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                    </svg>
+                    <input type="text" id="maintenanceSearchInput" placeholder="Search requests..." autocomplete="off">
+                </div>
+                <div class="ledger-filter-group">
+                    <div class="ledger-select-wrap">
+                        <select id="priorityFilterSelect" class="ledger-select">
+                            <option value="all">Filters ⌵</option>
+                            <option value="emergency">Emergency</option>
+                            <option value="high">High Priority</option>
+                            <option value="medium">Medium Priority</option>
+                            <option value="low">Low Priority</option>
+                        </select>
+                    </div>
                 </div>
             </div>
+
+            <!-- Request Cards List -->
+            <div class="requests-list" id="requestsList"></div>
         </div>
 
-        <!-- Request Cards List -->
-        <div class="requests-list" id="requestsList"></div>
+        <!-- ── VIEW 2: Maintenance Charges ── -->
+        <div id="viewCharges" class="tab-view-pane" style="display: none;">
+            <!-- Charges Financial KPI Summary Grid -->
+            <div class="charges-kpi-grid">
+                <div class="charges-kpi-card">
+                    <div class="charges-kpi-label">Total Billed Charges</div>
+                    <div class="charges-kpi-val" id="kpiTotalCharges">₱0.00</div>
+                    <div class="charges-kpi-sub">Assessed tenant maintenance liability</div>
+                </div>
+                <div class="charges-kpi-card">
+                    <div class="charges-kpi-label">Settled &amp; Verified</div>
+                    <div class="charges-kpi-val" style="color: var(--color-success-text, #16a34a);" id="kpiPaidCharges">₱0.00</div>
+                    <div class="charges-kpi-sub">Confirmed platform settlements</div>
+                </div>
+                <div class="charges-kpi-card">
+                    <div class="charges-kpi-label">Outstanding Balance</div>
+                    <div class="charges-kpi-val" style="color: var(--color-warning-text, #d97706);" id="kpiDueCharges">₱0.00</div>
+                    <div class="charges-kpi-sub">Pending settlement or verification</div>
+                </div>
+                <div class="charges-kpi-card">
+                    <div class="charges-kpi-label">Landlord Covered</div>
+                    <div class="charges-kpi-val" style="color: var(--color-text-secondary, #475569);" id="kpiLandlordCharges">₱0.00</div>
+                    <div class="charges-kpi-sub">Absorbed under Civil Code Art. 1654</div>
+                </div>
+            </div>
+
+            <!-- Charges Filter Bar -->
+            <div class="maintenance-header-row">
+                <div class="maintenance-tabs-bar" id="chargesFilterTabs">
+                    <button type="button" class="m-tab-btn active" data-charge-filter="all">All Charges</button>
+                    <button type="button" class="m-tab-btn" data-charge-filter="unpaid">Unpaid / Due <span class="tab-count" id="chargesCountUnpaid">0</span></button>
+                    <button type="button" class="m-tab-btn" data-charge-filter="waiting">Awaiting Verification <span class="tab-count" id="chargesCountWaiting">0</span></button>
+                    <button type="button" class="m-tab-btn" data-charge-filter="verified">Settled &amp; Verified <span class="tab-count" id="chargesCountVerified">0</span></button>
+                    <button type="button" class="m-tab-btn" data-charge-filter="landlord">Landlord Covered</button>
+                </div>
+            </div>
+
+            <!-- Charges Search Bar -->
+            <div class="ledger-controls-bar">
+                <div class="ledger-search-box">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                    </svg>
+                    <input type="text" id="chargesSearchInput" placeholder="Search charges by title, property, or reference #..." autocomplete="off">
+                </div>
+            </div>
+
+            <!-- Charges Items List -->
+            <div id="chargesList" class="charges-list"></div>
+        </div>
     </main>
 
     <!-- ════════════════════════════════════════════
@@ -1281,6 +1463,76 @@
         </div>
     </div>
 
+    <!-- ════════════════════════════════════════════
+         PAYMENT MODAL
+    ════════════════════════════════════════════ -->
+    <div class="modal-overlay" id="payMaintenanceModal" style="display:none;">
+        <div class="modal-container" style="max-width: 520px;">
+            <div class="modal-header">
+                <div>
+                    <h3 class="modal-header-title">Settle Maintenance Charge</h3>
+                    <div class="modal-header-subtitle" id="payModalTicketTitle">Loading ticket details...</div>
+                </div>
+                <button type="button" class="modal-close-x" id="closePayModalBtn" title="Close" aria-label="Close modal">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div id="payAlertErr" class="form-alert err" style="display:none; margin-bottom:14px;"></div>
+                
+                <!-- Amount Banner -->
+                <div style="background: var(--color-bg-subtle, #f8fafc); border: 1px solid var(--color-border-default, #e2e8f0); border-radius: 12px; padding: 18px 20px; text-align: center; margin-bottom: 18px;">
+                    <div style="font-size: 0.75rem; text-transform: uppercase; font-weight: 750; color: var(--color-text-muted); letter-spacing: 0.05em; margin-bottom: 4px;">Total Assessed Amount</div>
+                    <div style="font-size: 2rem; font-weight: 850; color: var(--color-action-primary, #0355f3);" id="payModalAmount">₱0.00</div>
+                    <div style="font-size: 0.75rem; color: var(--color-text-secondary); margin-top: 4px;" id="payModalBasisDesc">Adjudicated under Civil Code Art. 1657 as tenant repair obligation</div>
+                </div>
+
+                <!-- Payment Channel Info Card -->
+                <div style="background: rgba(3, 85, 243, 0.04); border: 1px solid rgba(3, 85, 243, 0.15); border-radius: 10px; padding: 14px 16px; margin-bottom: 18px; font-size: 0.8125rem;">
+                    <div style="font-weight: 750; color: var(--color-action-primary, #0355f3); margin-bottom: 6px; display: flex; align-items: center; gap: 6px;">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                        <span>Official Platform Payment Channels:</span>
+                    </div>
+                    <div style="color: var(--color-text-secondary); line-height: 1.5;">
+                        • <strong>GCash / Maya:</strong> 0917-123-4567 (DomiKnow Escrow Operations)<br>
+                        • <strong>BDO Online Banking:</strong> Account # 1092-3847-5621 (DomiKnow Inc.)<br>
+                        • Please copy the reference number from your transaction and paste it below.
+                    </div>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 14px;">
+                    <label class="form-label" for="payMethodSelect">Payment Method <span style="color: var(--color-error-text);">*</span></label>
+                    <select id="payMethodSelect" class="form-input" style="width: 100%; border-radius: 8px; padding: 10px 12px; border: 1px solid var(--color-border-strong);">
+                        <option value="gcash">GCash</option>
+                        <option value="maya">Maya</option>
+                        <option value="bank_transfer">Bank Transfer (BDO / BPI / UnionBank)</option>
+                        <option value="cash">Direct Cash / Over-the-counter</option>
+                    </select>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 14px;">
+                    <label class="form-label" for="payReferenceNumber">Transaction Reference Number <span style="color: var(--color-error-text);">*</span></label>
+                    <input type="text" id="payReferenceNumber" class="form-input" placeholder="e.g. 100293847562" style="width: 100%; border-radius: 8px; padding: 10px 12px; border: 1px solid var(--color-border-strong);" required>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 8px;">
+                    <label class="form-label" for="payProofInput">Receipt / Proof Screenshot (Optional)</label>
+                    <input type="file" id="payProofInput" accept="image/*" style="width: 100%; font-size: 0.8125rem;">
+                    <div id="payProofPreview" style="display:none; margin-top: 8px;">
+                        <img id="payProofImg" src="" alt="Proof Preview" style="max-height: 100px; border-radius: 6px; border: 1px solid var(--color-border-default);">
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer" style="display: flex; justify-content: flex-end; gap: 10px;">
+                <button type="button" class="btn-modal-cancel" id="cancelPayBtn">Cancel</button>
+                <button type="button" class="btn-modal-primary" id="confirmPayBtn" style="padding: 10px 22px; font-weight: 700;">Submit Payment</button>
+            </div>
+        </div>
+    </div>
+
     <script src="../../js/auth.js"></script>
     <script src="../../js/dashboard.js?v=20260905-1"></script>
     <script>
@@ -1289,6 +1541,8 @@
         let allRequests     = [];
         let selectedPropertyId = null;
         let activeFilter = 'all';
+        let activeView = 'requests';
+        let activeChargeFilter = 'all';
 
         const CAT_ICONS = {
             plumbing:'water', electrical:'bolt', aircon:'snowflake',
@@ -1304,6 +1558,29 @@
             initUpload();
             initEventDelegation();
         });
+
+        // ── View Switcher ─────────────────────────────────────
+        function switchView(view) {
+            activeView = view;
+            const btnReq = document.getElementById('btnTabRequests');
+            const btnChg = document.getElementById('btnTabCharges');
+            const viewReq = document.getElementById('viewRequests');
+            const viewChg = document.getElementById('viewCharges');
+
+            if (view === 'requests') {
+                btnReq?.classList.add('active');
+                btnChg?.classList.remove('active');
+                if (viewReq) viewReq.style.display = 'block';
+                if (viewChg) viewChg.style.display = 'none';
+                renderRequests();
+            } else {
+                btnChg?.classList.add('active');
+                btnReq?.classList.remove('active');
+                if (viewChg) viewChg.style.display = 'block';
+                if (viewReq) viewReq.style.display = 'none';
+                renderCharges();
+            }
+        }
 
         // ── Open / close form modal ───────────────────────────
         function openFormModal() {
@@ -1327,15 +1604,20 @@
         function closeDetailsModal() {
             const m = document.getElementById('detailsModal');
             if (m) m.style.display = 'none';
-            // Only restore overflow if form modal is also closed
+            // Only restore overflow if form modal or pay modal is also closed
             const fm = document.getElementById('formModal');
-            if (!fm || fm.style.display === 'none') {
+            const pm = document.getElementById('payMaintenanceModal');
+            if ((!fm || fm.style.display === 'none') && (!pm || pm.style.display === 'none')) {
                 document.body.style.overflow = '';
             }
         }
 
         // ── Event Delegation ──────────────────────────────────
         function initEventDelegation() {
+            // View switcher tabs
+            document.getElementById('btnTabRequests')?.addEventListener('click', () => switchView('requests'));
+            document.getElementById('btnTabCharges')?.addEventListener('click', () => switchView('charges'));
+
             // Open form modal
             document.getElementById('openFormBtn')?.addEventListener('click', openFormModal);
             document.getElementById('closeFormBtn')?.addEventListener('click', closeFormModal);
@@ -1349,9 +1631,14 @@
             document.getElementById('detailsModal')?.addEventListener('click', (e) => {
                 if (e.target === document.getElementById('detailsModal')) closeDetailsModal();
             });
+            document.getElementById('payMaintenanceModal')?.addEventListener('click', (e) => {
+                if (e.target === document.getElementById('payMaintenanceModal')) closePayModal();
+            });
 
-            // Close details
+            // Close buttons
             document.getElementById('closeDetailsBtn')?.addEventListener('click', closeDetailsModal);
+            document.getElementById('closePayModalBtn')?.addEventListener('click', closePayModal);
+            document.getElementById('cancelPayBtn')?.addEventListener('click', closePayModal);
 
             // Details footer actions
             document.getElementById('detailsFoot')?.addEventListener('click', async (e) => {
@@ -1364,18 +1651,29 @@
                 if (action === 'rework')  await handleConfirm(id, 'rework');
             });
 
-            // Filter tabs
+            // Filter tabs (Requests)
             document.getElementById('filterTabs')?.addEventListener('click', (e) => {
                 const tab = e.target.closest('.m-tab-btn');
                 if (!tab) return;
-                document.querySelectorAll('.m-tab-btn').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('#filterTabs .m-tab-btn').forEach(t => t.classList.remove('active'));
                 tab.classList.add('active');
                 activeFilter = tab.dataset.filter;
                 renderRequests();
             });
 
-            // Search input
+            // Filter tabs (Charges)
+            document.getElementById('chargesFilterTabs')?.addEventListener('click', (e) => {
+                const tab = e.target.closest('.m-tab-btn');
+                if (!tab) return;
+                document.querySelectorAll('#chargesFilterTabs .m-tab-btn').forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                activeChargeFilter = tab.dataset.chargeFilter;
+                renderCharges();
+            });
+
+            // Search inputs
             document.getElementById('maintenanceSearchInput')?.addEventListener('input', renderRequests);
+            document.getElementById('chargesSearchInput')?.addEventListener('input', renderCharges);
 
             // Priority dropdown filter
             document.getElementById('priorityFilterSelect')?.addEventListener('change', renderRequests);
@@ -1391,6 +1689,7 @@
                 if (e.key === 'Escape') {
                     closeDetailsModal();
                     closeFormModal();
+                    closePayModal();
                 }
             });
         }
@@ -1540,21 +1839,53 @@
                 const { data } = await res.json();
                 allRequests = data || [];
                 updateStats();
-                renderRequests();
+                if (activeView === 'charges') {
+                    renderCharges();
+                } else {
+                    renderRequests();
+                }
             } catch (err) { showListError('Network error.'); }
         }
 
+        function parseClientMeta(req) {
+            if (req && req.meta && typeof req.meta.total_cost === 'number') return req.meta;
+            const rec = (req?.recommendations || '') + ' ' + (req?.landlord_remarks || '');
+            const liabMatch = rec.match(/\[LIABILITY:\s*(LANDLORD|TENANT|SHARED)\]/i);
+            const basisMatch = rec.match(/\[BASIS:\s*([A-Z0-9_]+)\]/i);
+            const quoteMatch = rec.match(/\[QUOTE:\s*([A-Z_]+)\]/i);
+            const payMatch = rec.match(/\[PAYMENT:\s*([A-Z_]+)\]/i);
+            const refMatch = rec.match(/\[REF:\s*([^\]]+)\]/i);
+            const proofMatch = rec.match(/\[PROOF_URL:\s*([^\]]+)\]/i);
+            const labor = Number(req?.labor_cost) || 0;
+            const material = Number(req?.material_cost) || 0;
+            const party = liabMatch ? liabMatch[1].toLowerCase() : (['appliance', 'other', 'others'].includes(req?.issue_category) ? 'tenant' : 'landlord');
+            return {
+                liable_party: party.toUpperCase(),
+                liability_party: party,
+                liability_basis: basisMatch ? basisMatch[1].toLowerCase() : (party === 'tenant' ? 'art_1657_negligence' : 'art_1654_wear_and_tear'),
+                quote_status: quoteMatch ? quoteMatch[1].toLowerCase() : (req?.status === 'quoted' ? 'pending' : (req?.status === 'approved' ? 'approved' : 'not_submitted')),
+                payment_status: payMatch ? payMatch[1].toLowerCase() : (req?.status === 'closed' ? 'verified' : 'unpaid'),
+                reference_number: refMatch ? refMatch[1].trim() : null,
+                proof_url: proofMatch ? proofMatch[1].trim() : null,
+                labor_cost: labor,
+                material_cost: material,
+                total_cost: labor + material
+            };
+        }
+    
         function updateStats() {
             const pending     = allRequests.filter(r => r.status === 'pending').length;
+            const quoted      = allRequests.filter(r => r.status === 'quoted').length;
             const inProgress  = allRequests.filter(r => ['travelling','arrived','repairing','accepted','assigned','in_progress','approved'].includes(r.status)).length;
             const completed   = allRequests.filter(r => ['completed','verified'].includes(r.status)).length;
             const closed      = allRequests.filter(r => r.status === 'closed').length;
             const approved    = allRequests.filter(r => r.status === 'approved').length;
 
-
-            // Update filter tab counts
+            // Update filter tab counts (Requests)
             const elPending = document.getElementById('tabCountPending');
             if (elPending) elPending.textContent = pending;
+            const elQuoted = document.getElementById('tabCountQuoted');
+            if (elQuoted) elQuoted.textContent = quoted;
             const elApproved = document.getElementById('tabCountApproved');
             if (elApproved) elApproved.textContent = approved;
             const elInProgress = document.getElementById('tabCountInProgress');
@@ -1563,6 +1894,226 @@
             if (elCompleted) elCompleted.textContent = completed;
             const elClosed = document.getElementById('tabCountClosed');
             if (elClosed) elClosed.textContent = closed;
+
+            // Requests total badge
+            const badgeReq = document.getElementById('badgeRequestsCount');
+            if (badgeReq) badgeReq.textContent = allRequests.length;
+
+            // Charges calculations
+            let totalCharges = 0;
+            let totalPaid = 0;
+            let totalDue = 0;
+            let totalLandlord = 0;
+
+            let countUnpaid = 0;
+            let countWaiting = 0;
+            let countVerified = 0;
+            let countTotalCharges = 0;
+
+            allRequests.forEach(r => {
+                const meta = r.meta || parseClientMeta(r);
+                const party = (meta.liability_party || '').toLowerCase();
+                const paySt = (meta.payment_status || 'unpaid').toLowerCase();
+                const cost = Number(meta.total_cost || 0);
+
+                if (cost > 0 || ['tenant', 'shared', 'landlord'].includes(party)) {
+                    countTotalCharges++;
+                }
+
+                if (party === 'tenant' || party === 'shared') {
+                    totalCharges += cost;
+                    if (paySt === 'verified' || paySt === 'paid') {
+                        totalPaid += cost;
+                        countVerified++;
+                    } else if (paySt === 'waiting_verification') {
+                        totalDue += cost;
+                        countWaiting++;
+                    } else {
+                        totalDue += cost;
+                        countUnpaid++;
+                    }
+                } else if (party === 'landlord') {
+                    totalLandlord += cost;
+                }
+            });
+
+            // Update Charges KPI Cards
+            const kpiTot = document.getElementById('kpiTotalCharges');
+            if (kpiTot) kpiTot.textContent = '₱' + totalCharges.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            const kpiPaid = document.getElementById('kpiPaidCharges');
+            if (kpiPaid) kpiPaid.textContent = '₱' + totalPaid.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            const kpiDue = document.getElementById('kpiDueCharges');
+            if (kpiDue) kpiDue.textContent = '₱' + totalDue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            const kpiLandlord = document.getElementById('kpiLandlordCharges');
+            if (kpiLandlord) kpiLandlord.textContent = '₱' + totalLandlord.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+            // Charges tab counts
+            const elChgUnpaid = document.getElementById('chargesCountUnpaid');
+            if (elChgUnpaid) elChgUnpaid.textContent = countUnpaid;
+            const elChgWaiting = document.getElementById('chargesCountWaiting');
+            if (elChgWaiting) elChgWaiting.textContent = countWaiting;
+            const elChgVerified = document.getElementById('chargesCountVerified');
+            if (elChgVerified) elChgVerified.textContent = countVerified;
+
+            // Primary view badge for charges
+            const badgeChg = document.getElementById('badgeChargesCount');
+            if (badgeChg) {
+                badgeChg.textContent = countUnpaid > 0 ? `${countUnpaid} due` : countTotalCharges;
+                if (countUnpaid > 0) {
+                    badgeChg.style.background = '#fef3c7';
+                    badgeChg.style.color = '#b45309';
+                } else {
+                    badgeChg.style.background = 'var(--color-bg-subtle)';
+                    badgeChg.style.color = 'var(--color-text-secondary)';
+                }
+            }
+        }
+
+        // ── Render Charges View ───────────────────────────────
+        function renderCharges() {
+            const list = document.getElementById('chargesList');
+            if (!list) return;
+            const searchVal = (document.getElementById('chargesSearchInput')?.value || '').toLowerCase().trim();
+
+            const allChargeRequests = allRequests.filter(req => {
+                const meta = req.meta || parseClientMeta(req);
+                return meta.total_cost > 0 || ['tenant', 'shared', 'landlord'].includes(meta.liability_party) || req.labor_cost > 0 || req.material_cost > 0;
+            });
+
+            const filtered = allChargeRequests.filter(req => {
+                const meta = req.meta || parseClientMeta(req);
+                const party = (meta.liability_party || '').toLowerCase();
+                const paySt = (meta.payment_status || 'unpaid').toLowerCase();
+
+                if (activeChargeFilter === 'unpaid') {
+                    if (party === 'landlord') return false;
+                    if (paySt !== 'unpaid' && paySt !== 'rejected') return false;
+                } else if (activeChargeFilter === 'waiting') {
+                    if (paySt !== 'waiting_verification') return false;
+                } else if (activeChargeFilter === 'verified') {
+                    if (party === 'landlord') return false;
+                    if (paySt !== 'verified' && paySt !== 'paid') return false;
+                } else if (activeChargeFilter === 'landlord') {
+                    if (party !== 'landlord') return false;
+                }
+
+                if (searchVal) {
+                    const title = (req.issue_title || '').toLowerCase();
+                    const prop = (req.properties?.property_name || '').toLowerCase();
+                    const unit = String(req.unit_number || '').toLowerCase();
+                    const ref = String(meta.reference_number || '').toLowerCase();
+                    if (!title.includes(searchVal) && !prop.includes(searchVal) && !unit.includes(searchVal) && !ref.includes(searchVal)) {
+                        return false;
+                    }
+                }
+
+                return true;
+            });
+
+            if (filtered.length === 0) {
+                list.innerHTML = `<div class="empty-state"><div class="ei"><span data-icon="clipboard" aria-hidden="true"></span></div><p>No maintenance charges match this filter.</p></div>`;
+                return;
+            }
+
+            list.innerHTML = '';
+            filtered.forEach(req => {
+                const meta = req.meta || parseClientMeta(req);
+                const iconSvg = getCategorySvg(req.issue_category);
+                const dateStr = new Date(req.created_at).toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' });
+                const propName = req.properties?.property_name || 'Property';
+                const unitNum = req.unit_number ? `Unit ${req.unit_number}` : 'Common Area';
+                const party = (meta.liability_party || '').toLowerCase();
+                const paySt = (meta.payment_status || 'unpaid').toLowerCase();
+
+                let basisBadge = '';
+                let basisDesc = '';
+                if (party === 'landlord') {
+                    basisBadge = '<span class="badge badge-landlord" style="font-size:0.75rem;">Civil Code Art. 1654 · Landlord Responsibility</span>';
+                    basisDesc = 'Ordinary wear &amp; tear absorbed by property owner.';
+                } else if (party === 'shared') {
+                    basisBadge = '<span class="badge" style="background:#fef3c7; color:#92400e; border:1px solid #fde68a; font-size:0.75rem;">Shared Liability (Civil Code Art. 1654 / 1657)</span>';
+                    basisDesc = 'Cost apportioned between tenant and property owner.';
+                } else {
+                    basisBadge = '<span class="badge badge-tenant" style="font-size:0.75rem;">Civil Code Art. 1657 · Tenant Responsibility</span>';
+                    basisDesc = 'Assessed as tenant negligence or dedicated usage upkeep.';
+                }
+
+                let payBadge = '';
+                let actionMarkup = '';
+
+                if (party === 'landlord') {
+                    payBadge = '<span class="rc-status-pill completed" style="background:#ecfdf5; color:#047857; font-weight:750;">Covered by Landlord</span>';
+                    actionMarkup = `<button type="button" class="btn-submit-request" onclick="loadDetails('${req.id}')" style="padding:6px 14px; font-size:0.8125rem;">View Details</button>`;
+                } else if (paySt === 'verified' || paySt === 'paid') {
+                    payBadge = '<span class="rc-status-pill completed" style="background:#ecfdf5; color:#047857; font-weight:750;">Paid &amp; Verified</span>';
+                    actionMarkup = `<button type="button" class="btn-submit-request" onclick="loadDetails('${req.id}')" style="padding:6px 14px; font-size:0.8125rem;">View Receipt</button>`;
+                } else if (paySt === 'waiting_verification') {
+                    payBadge = `<span class="rc-status-pill inprogress" style="background:#e0f2fe; color:#0369a1; font-weight:750;">Verification Pending (Ref: ${domiknowEscapeHtml(meta.reference_number || 'Sent')})</span>`;
+                    actionMarkup = `<button type="button" class="btn-submit-request" onclick="loadDetails('${req.id}')" style="padding:6px 14px; font-size:0.8125rem;">View Details</button>`;
+                } else if (paySt === 'rejected') {
+                    payBadge = '<span class="rc-status-pill rejected" style="background:#fee2e2; color:#b91c1c; font-weight:750;">Payment Rejected</span>';
+                    actionMarkup = `
+                        <div style="display:flex; gap:8px;">
+                            <button type="button" class="btn-submit-request" onclick="loadDetails('${req.id}')" style="padding:6px 12px; font-size:0.8125rem;">Details</button>
+                            <button type="button" class="btn-submit-request" onclick="openPayModal('${req.id}')" style="background:var(--color-action-primary); color:#ffffff; border-color:var(--color-action-primary); padding:6px 14px; font-size:0.8125rem;">Re-submit</button>
+                        </div>
+                    `;
+                } else {
+                    payBadge = '<span class="rc-status-pill pending" style="background:#fef3c7; color:#b45309; font-weight:800;">● Action Required (Unpaid)</span>';
+                    actionMarkup = `
+                        <div style="display:flex; gap:8px; align-items:center;">
+                            <button type="button" class="btn-submit-request" onclick="loadDetails('${req.id}')" style="padding:6px 12px; font-size:0.8125rem;">Details</button>
+                            <button type="button" class="btn-submit-request" onclick="openPayModal('${req.id}')" style="background:var(--color-action-primary); color:#ffffff; border-color:var(--color-action-primary); padding:6px 16px; font-size:0.8125rem; font-weight:750;">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+                                <span>Pay Now</span>
+                            </button>
+                        </div>
+                    `;
+                }
+
+                const card = document.createElement('div');
+                card.className = 'charge-card-item';
+                card.innerHTML = `
+                    <div class="charge-card-main">
+                        <div class="rc-icon-box" style="margin-top:2px;">
+                            ${iconSvg}
+                        </div>
+                        <div>
+                            <div style="font-size: 1rem; font-weight: 750; color: var(--color-text-primary); margin-bottom: 3px;">
+                                ${domiknowEscapeHtml(req.issue_title || 'Maintenance Work Order')}
+                            </div>
+                            <div style="font-size: 0.8125rem; color: var(--color-text-secondary); margin-bottom: 6px;">
+                                ${domiknowEscapeHtml(propName)} · ${domiknowEscapeHtml(unitNum)} · ${domiknowEscapeHtml(dateStr)} · <span style="font-family: monospace; font-size:0.75rem;">#${req.id.substring(0,8)}</span>
+                            </div>
+                            <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+                                ${basisBadge}
+                                <span style="font-size: 0.75rem; color: var(--color-text-muted);">${basisDesc}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="charge-card-breakdown">
+                        <div>
+                            <div style="font-size:0.6875rem; font-weight:700; text-transform:uppercase; color:var(--color-text-muted); letter-spacing:0.04em;">Labor</div>
+                            <div style="font-size:0.9375rem; font-weight:600; color:var(--color-text-primary);">₱${Number(req.labor_cost || meta.labor_cost || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
+                        </div>
+                        <div>
+                            <div style="font-size:0.6875rem; font-weight:700; text-transform:uppercase; color:var(--color-text-muted); letter-spacing:0.04em;">Materials</div>
+                            <div style="font-size:0.9375rem; font-weight:600; color:var(--color-text-primary);">₱${Number(req.material_cost || meta.material_cost || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
+                        </div>
+                        <div style="background:var(--color-bg-subtle, #f8fafc); padding:6px 12px; border-radius:8px; border:1px solid var(--color-border-default, #e2e8f0);">
+                            <div style="font-size:0.6875rem; font-weight:750; text-transform:uppercase; color:var(--color-action-primary, #0355f3); letter-spacing:0.04em;">Total Assessed</div>
+                            <div style="font-size:1.125rem; font-weight:850; color:var(--color-text-primary);">₱${Number(meta.total_cost || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
+                        </div>
+                    </div>
+
+                    <div class="charge-card-actions">
+                        ${payBadge}
+                        ${actionMarkup}
+                    </div>
+                `;
+                list.appendChild(card);
+            });
         }
 
         function getCategorySvg(category) {
@@ -1592,7 +2143,7 @@
             const filtered = allRequests.filter(req => {
                 // Tab filter
                 if (activeFilter !== 'all') {
-                    if (activeFilter === 'in_progress' && !['travelling','arrived','repairing','accepted','assigned','in_progress'].includes(req.status)) return false;
+                    if (activeFilter === 'in_progress' && !['travelling','arrived','repairing','accepted','assigned','in_progress','approved'].includes(req.status)) return false;
                     if (activeFilter === 'closed' && !['verified','closed'].includes(req.status)) return false;
                     if (activeFilter !== 'in_progress' && activeFilter !== 'closed' && req.status !== activeFilter) return false;
                 }
@@ -1658,6 +2209,7 @@
 
                 // Category or priority tag
                 const tagDisplay = `• ${req.priority_level || req.issue_category || 'standard'}`;
+                const meta = parseClientMeta(req);
 
                 const card = document.createElement('div');
                 card.className = 'request-card';
@@ -1716,7 +2268,8 @@
         // ── Render Details Content ───────────────────────────
         function renderDetailsContent(req, report, updates) {
             if (!req) return;
-            const tech = req.assigned_maintenance?.full_name || 'Unassigned';
+            const meta = req.meta || parseClientMeta(req);
+            const tech = req.assigned_maintenance?.full_name || req.users?.full_name || 'Unassigned';
 
             // Priority
             const prio = (req.priority_level || 'normal').toLowerCase();
@@ -1858,15 +2411,108 @@
                 html += `</div></div>`;
             }
 
+            if (meta.total_cost > 0 || req.problem_found || req.status === 'quoted') {
+                const quoteStatusColor = String(meta.quote_status).toUpperCase() === 'APPROVED' ? 'var(--color-success-text)' : (String(meta.quote_status).toUpperCase() === 'DISPUTED' ? 'var(--color-error-text)' : 'var(--color-warning-text)');
+                const payStatus = String(meta.payment_status || 'unpaid').toUpperCase();
+                let paymentStatusText = 'UNPAID';
+                let paymentStatusColor = 'var(--color-text-muted)';
+                if (payStatus === 'VERIFIED' || payStatus === 'PAID') {
+                    paymentStatusText = 'SETTLED & VERIFIED';
+                    paymentStatusColor = 'var(--color-success-text)';
+                } else if (payStatus === 'WAITING_VERIFICATION') {
+                    paymentStatusText = 'AWAITING ADMIN VERIFICATION';
+                    paymentStatusColor = '#b45309';
+                } else if (payStatus === 'REJECTED') {
+                    paymentStatusText = 'PAYMENT REJECTED';
+                    paymentStatusColor = 'var(--color-error-text)';
+                }
+
+                let tenantPayAction = '';
+                const party = (meta.liability_party || '').toLowerCase();
+                if (party === 'tenant' || party === 'shared') {
+                    if (payStatus === 'WAITING_VERIFICATION') {
+                        tenantPayAction = `
+                            <div class="detail-alert-box warning" style="margin-top:0.75rem;">
+                                <div class="detail-alert-title">Payment Verification Pending</div>
+                                <div>Your transaction reference code has been submitted (Ref: ${domiknowEscapeHtml(meta.reference_number || 'Pending')}). Platform administration is reviewing and verifying the settlement.</div>
+                            </div>
+                        `;
+                    } else if (payStatus === 'REJECTED') {
+                        tenantPayAction = `
+                            <div class="detail-alert-box danger" style="margin-top:0.75rem;">
+                                <div class="detail-alert-title">Payment Rejected by Admin</div>
+                                <div>${domiknowEscapeHtml(meta.rejection_reason || 'Payment proof could not be verified by platform administrator.')}</div>
+                                <button type="button" class="btn-modal-primary" onclick="openPayModal('${req.id}')" style="margin-top:8px;">Re-submit Payment</button>
+                            </div>
+                        `;
+                    } else if ((payStatus === 'UNPAID' || payStatus === '') && meta.total_cost > 0) {
+                        tenantPayAction = `
+                            <div style="margin-top:0.75rem;">
+                                <button type="button" class="btn-modal-primary" onclick="openPayModal('${req.id}')" style="width: 100%;">Settle ₱${Number(meta.total_cost).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} In-System</button>
+                            </div>
+                        `;
+                    }
+                } else if (party === 'landlord') {
+                    tenantPayAction = `
+                        <div class="detail-alert-box info" style="margin-top:0.75rem;">
+                            <div class="detail-alert-title">Covered by Landlord (Civil Code Art. 1654)</div>
+                            <div>This repair has been categorized under ordinary wear and tear. All labor and material costs are covered by the property owner.</div>
+                        </div>
+                    `;
+                }
+
+                const laborFormatted = Number(meta.labor_cost || req.labor_cost || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                const matFormatted = Number(meta.material_cost || req.material_cost || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                const totFormatted = Number(meta.total_cost || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+                let liabilityLabel = 'Pending Inspection / Attribution';
+                if (party === 'landlord') liabilityLabel = 'Civil Code Art. 1654 · Landlord Responsibility (Wear & Tear)';
+                else if (party === 'shared') liabilityLabel = 'Civil Code Art. 1654 / 1657 · Shared Liability';
+                else if (party === 'tenant') liabilityLabel = 'Civil Code Art. 1657 · Tenant Responsibility (Negligence / Misuse)';
+
+                html += `
+                    <div style="margin-bottom:1.25rem;">
+                        <div class="detail-section-title">Diagnostic Assessment & Quotation</div>
+                        <div class="detail-summary-card" style="margin-bottom:0.75rem;">
+                            ${req.problem_found ? `
+                            <div class="detail-card-item" style="grid-column:span 2;">
+                                <span class="dc-label">Technician Diagnosis</span>
+                                <div class="dc-val" style="font-weight:500;">${domiknowEscapeHtml(req.problem_found)}</div>
+                            </div>` : ''}
+                            <div class="detail-card-item" style="grid-column:span 2;">
+                                <span class="dc-label">Assessed Legal Liability</span>
+                                <div class="dc-val" style="font-weight:700;">${domiknowEscapeHtml(liabilityLabel)}</div>
+                            </div>
+                            <div class="detail-card-item">
+                                <span class="dc-label">Labor Cost</span>
+                                <div class="dc-val">₱${laborFormatted}</div>
+                            </div>
+                            <div class="detail-card-item">
+                                <span class="dc-label">Material Cost</span>
+                                <div class="dc-val">₱${matFormatted}</div>
+                            </div>
+                            <div class="detail-card-item">
+                                <span class="dc-label">Total Operational Cost</span>
+                                <div class="dc-val" style="font-weight:800; color:var(--color-text-primary);">₱${totFormatted}</div>
+                            </div>
+                            <div class="detail-card-item">
+                                <span class="dc-label">Quote Status</span>
+                                <div class="dc-val" style="font-weight:750; color:${quoteStatusColor};">${domiknowEscapeHtml(String(meta.quote_status || 'approved').replace(/_/g, ' ').toUpperCase())}</div>
+                            </div>
+                            <div class="detail-card-item" style="grid-column:span 2;">
+                                <span class="dc-label">In-System Payment Status</span>
+                                <div class="dc-val" style="font-weight:750; color:${paymentStatusColor};">${paymentStatusText}</div>
+                            </div>
+                        </div>
+                        ${tenantPayAction}
+                    </div>
+                `;
+            }
+
             document.getElementById('detailsBody').innerHTML = html;
 
             // Footer
-            const canEvaluate = ['completed','verified'].includes(req.status);
-            document.getElementById('detailsFoot').innerHTML = canEvaluate
-                ? `<button type="button" class="btn-modal-cancel" data-action="close">Close</button>
-                   <button type="button" class="btn-modal-danger"  data-action="rework"  data-id="${domiknowEscapeHtml(req.id || '')}">Request Rework</button>
-                   <button type="button" class="btn-modal-primary" data-action="confirm" data-id="${domiknowEscapeHtml(req.id || '')}">Confirm Finished</button>`
-                : `<button type="button" class="btn-modal-cancel" data-action="close">Close</button>`;
+            document.getElementById('detailsFoot').innerHTML = `<button type="button" class="btn-modal-cancel" data-action="close">Close</button>`;
         }
 
         // ── Load request details ──────────────────────────────
@@ -1958,6 +2604,195 @@
             }
         }
 
+        
+        let currentPayingRequestId = null;
+
+        async function handleQuoteDecision(reqId, decision) {
+            let remarks = '';
+            if (decision === 'dispute') {
+                remarks = await window.domiknowPrompt({
+                    variant: 'warning',
+                    eyebrow: 'Quotation Dispute',
+                    title: 'Reason for disputing quotation',
+                    message: 'Specify your objections (e.g. questionable material costs, disagreement on negligence liability attribution).',
+                    confirmLabel: 'Submit dispute',
+                    cancelLabel: 'Cancel',
+                    input: {
+                        label: 'Dispute remarks',
+                        placeholder: 'Explain why you are disputing this quote...',
+                        required: true,
+                        multiline: true,
+                        maxLength: 1000
+                    }
+                });
+                if (remarks === null) return;
+                if (!remarks.trim()) {
+                    await window.domiknowAlert({ variant: 'warning', eyebrow: 'Quotation review', title: 'Remarks required', message: 'Please provide a clear reason for disputing the quotation.' });
+                    return;
+                }
+            } else {
+                const confirmed = await window.domiknowConfirm({
+                    variant: 'info',
+                    eyebrow: 'Quotation Approval',
+                    title: 'Approve repair quotation?',
+                    message: 'Approving this quote authorizes the technician to proceed with repairs. The amount will be due for settlement.',
+                    confirmLabel: 'Approve quotation',
+                    cancelLabel: 'Review first'
+                });
+                if (!confirmed) return;
+            }
+
+            try {
+                const res = await fetch(`/api/maintenance/requests/${reqId}/quote-decision`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+                    body: JSON.stringify({ decision, remarks })
+                });
+                const result = await res.json();
+                if (res.ok) {
+                    await window.domiknowAlert({ variant: 'success', eyebrow: 'Quotation updated', title: decision === 'approve' ? 'Quote approved' : 'Quote disputed', message: result.message || 'Quotation decision saved.' });
+                    await fetchMyRequests();
+                    loadDetails(reqId);
+                } else {
+                    await window.domiknowAlert({ variant: 'danger', eyebrow: 'Action failed', title: 'Decision not recorded', message: result.message || 'Failed to submit quote decision.' });
+                }
+            } catch (err) {
+                console.error(err);
+                await window.domiknowAlert({ variant: 'danger', eyebrow: 'Network error', title: 'Error', message: 'Unable to communicate with the server.' });
+            }
+        }
+
+        function openPayModal(reqId) {
+            currentPayingRequestId = reqId;
+            const req = allRequests.find(r => String(r.id) === String(reqId));
+            const meta = req?.meta || parseClientMeta(req);
+            const amtEl = document.getElementById('payModalAmount');
+            if (amtEl) amtEl.textContent = '₱' + Number(meta.total_cost || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            const titleEl = document.getElementById('payModalTicketTitle');
+            if (titleEl) titleEl.textContent = `${req?.issue_title || 'Maintenance Request'}${req?.properties?.property_name ? ' · ' + req.properties.property_name : ''}${req?.unit_number ? ' (Unit ' + req.unit_number + ')' : ''}`;
+            const basisDescEl = document.getElementById('payModalBasisDesc');
+            if (basisDescEl) {
+                if (meta.liability_party === 'shared') {
+                    basisDescEl.textContent = 'Apportioned under Shared Liability (Civil Code Art. 1654 / 1657)';
+                } else {
+                    basisDescEl.textContent = 'Adjudicated under Civil Code Art. 1657 as tenant repair obligation';
+                }
+            }
+            const refInput = document.getElementById('payReferenceNumber');
+            if (refInput) refInput.value = '';
+            const proofInput = document.getElementById('payProofInput');
+            if (proofInput) proofInput.value = '';
+            const proofPrev = document.getElementById('payProofPreview');
+            if (proofPrev) proofPrev.style.display = 'none';
+            const proofImg = document.getElementById('payProofImg');
+            if (proofImg) proofImg.src = '';
+            const errEl = document.getElementById('payAlertErr');
+            if (errEl) errEl.style.display = 'none';
+            const modal = document.getElementById('payMaintenanceModal');
+            if (modal) modal.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closePayModal() {
+            const modal = document.getElementById('payMaintenanceModal');
+            if (modal) modal.style.display = 'none';
+            currentPayingRequestId = null;
+            const detailsModal = document.getElementById('detailsModal');
+            const formModal = document.getElementById('formModal');
+            if ((!detailsModal || detailsModal.style.display === 'none') && (!formModal || formModal.style.display === 'none')) {
+                document.body.style.overflow = '';
+            }
+        }
+
+        // Proof image upload preview listener
+        document.getElementById('payProofInput')?.addEventListener('change', () => {
+            const file = document.getElementById('payProofInput')?.files?.[0];
+            const preview = document.getElementById('payProofPreview');
+            const img = document.getElementById('payProofImg');
+            if (file && file.type.startsWith('image/')) {
+                const r = new FileReader();
+                r.onload = (e) => {
+                    if (img) img.src = e.target.result;
+                    if (preview) preview.style.display = 'block';
+                };
+                r.readAsDataURL(file);
+            } else {
+                if (preview) preview.style.display = 'none';
+                if (img) img.src = '';
+            }
+        });
+
+        document.getElementById('closePayModalBtn')?.addEventListener('click', closePayModal);
+        document.getElementById('cancelPayBtn')?.addEventListener('click', closePayModal);
+
+        document.getElementById('confirmPayBtn')?.addEventListener('click', async () => {
+            if (!currentPayingRequestId) return;
+            const req = allRequests.find(r => String(r.id) === String(currentPayingRequestId));
+            const meta = req?.meta || parseClientMeta(req);
+            const method = document.getElementById('payMethodSelect').value;
+            const ref = document.getElementById('payReferenceNumber').value.trim();
+            const errEl = document.getElementById('payAlertErr');
+
+            if (!ref) {
+                errEl.textContent = 'Please enter a transaction reference number or confirmation code.';
+                errEl.style.display = 'block';
+                return;
+            }
+
+            const confirmBtn = document.getElementById('confirmPayBtn');
+            confirmBtn.disabled = true;
+            confirmBtn.textContent = 'Recording Payment...';
+
+            try {
+                const payload = {
+                    payment_method: method,
+                    reference_number: ref,
+                    amount: meta.total_cost,
+                    paid_by: 'tenant'
+                };
+
+                const proofFile = document.getElementById('payProofInput')?.files?.[0];
+                if (proofFile) {
+                    try {
+                        const b64 = await fileToBase64(proofFile);
+                        payload.base64_content = b64;
+                        payload.file_name = proofFile.name;
+                        payload.mime_type = proofFile.type;
+                    } catch (readErr) {
+                        console.warn('Could not read proof file', readErr);
+                    }
+                }
+
+                const res = await fetch(`/api/maintenance/requests/${currentPayingRequestId}/pay`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+                    body: JSON.stringify(payload)
+                });
+                const result = await res.json();
+                if (res.ok) {
+                    closePayModal();
+                    await window.domiknowAlert({
+                        variant: 'success',
+                        eyebrow: 'Payment Submitted',
+                        title: 'Awaiting Admin Verification',
+                        message: 'Your payment submission has been received. Platform administration will verify your receipt.'
+                    });
+                    await fetchMyRequests();
+                    loadDetails(currentPayingRequestId);
+                } else {
+                    errEl.textContent = result.message || 'Payment recording failed.';
+                    errEl.style.display = 'block';
+                }
+            } catch (err) {
+                console.error(err);
+                errEl.textContent = 'Network error. Please try again.';
+                errEl.style.display = 'block';
+            } finally {
+                confirmBtn.disabled = false;
+                confirmBtn.textContent = 'Confirm Payment';
+            }
+        });
+    
         // ── Form submit ───────────────────────────────────────
         async function handleSubmit() {
             clearAlerts();

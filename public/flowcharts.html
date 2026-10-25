@@ -1,0 +1,1279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DOMIKNOW - Per-User Process Flow</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background-color: #f1f3f5;
+            color: #111827;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Top Bar */
+        header {
+            background-color: #ffffff;
+            border-bottom: 2px solid #111827;
+            padding: 12px 24px;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+
+        .header-wrap {
+            max-width: 1440px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .title-group h1 {
+            font-size: 1.25rem;
+            font-weight: bold;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .title-group p {
+            font-size: 0.8rem;
+            color: #4b5563;
+            margin-top: 2px;
+        }
+
+        .btn-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            background-color: #ffffff;
+            color: #111827;
+            border: 1.5px solid #111827;
+            padding: 7px 14px;
+            font-size: 0.82rem;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: all 0.15s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-family: inherit;
+        }
+
+        .btn:hover {
+            background-color: #111827;
+            color: #ffffff;
+        }
+
+        .btn-active {
+            background-color: #111827;
+            color: #ffffff;
+        }
+
+        /* Role Navigation Tabs */
+        .tabs-nav {
+            background-color: #ffffff;
+            border-bottom: 1.5px solid #111827;
+            padding: 6px 24px 0;
+        }
+
+        .tabs-wrap {
+            max-width: 1440px;
+            margin: 0 auto;
+            display: flex;
+            gap: 6px;
+            overflow-x: auto;
+        }
+
+        .tab-btn {
+            background-color: #ffffff;
+            border: 1.5px solid #111827;
+            border-bottom: none;
+            padding: 10px 18px;
+            font-size: 0.88rem;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 4px 4px 0 0;
+            color: #111827;
+            white-space: nowrap;
+            transition: all 0.15s;
+        }
+
+        .tab-btn:hover {
+            background-color: #f3f4f6;
+        }
+
+        .tab-btn.active {
+            background-color: #111827;
+            color: #ffffff;
+        }
+
+        /* Controls / Sub-Bar */
+        .controls-bar {
+            max-width: 1440px;
+            margin: 14px auto 0;
+            padding: 0 24px;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .info-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: #ffffff;
+            border: 1px solid #d1d5db;
+            border-radius: 4px;
+            padding: 5px 12px;
+            font-size: 0.8rem;
+            color: #374151;
+        }
+
+        .color-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 2px;
+            display: inline-block;
+            border: 1px solid #111827;
+        }
+
+        .zoom-wrap {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            background: #ffffff;
+            border: 1.5px solid #111827;
+            border-radius: 4px;
+            padding: 2px 6px;
+        }
+
+        .zoom-btn {
+            background: transparent;
+            border: none;
+            font-weight: bold;
+            font-size: 1rem;
+            cursor: pointer;
+            width: 26px;
+            height: 26px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .zoom-btn:hover {
+            background: #f3f4f6;
+        }
+
+        .zoom-label {
+            font-size: 0.8rem;
+            font-weight: bold;
+            padding: 0 6px;
+        }
+
+        /* Main Canvas Sheet */
+        .workspace {
+            max-width: 1440px;
+            width: 100%;
+            margin: 14px auto 30px;
+            padding: 0 24px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .paper-sheet {
+            background-color: #ffffff;
+            border: 1px solid #9ca3af;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            overflow: auto;
+            max-width: 100%;
+            border-radius: 3px;
+        }
+
+        .flowchart-svg {
+            display: block;
+            background-color: #ffffff;
+            transition: transform 0.2s ease-out;
+            transform-origin: top center;
+        }
+
+        /* Page Legend Bar */
+        .page-legend {
+            max-width: 1440px;
+            width: 100%;
+            margin: 0 auto 30px;
+            padding: 0 24px;
+        }
+
+        .legend-card {
+            background: #ffffff;
+            border: 1.5px solid #111827;
+            border-radius: 4px;
+            padding: 16px 20px;
+        }
+
+        .legend-card h3 {
+            font-size: 0.88rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .legend-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 10px;
+            font-size: 0.8rem;
+        }
+
+        .legend-item {
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            padding: 6px 10px;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .legend-item .label {
+            font-weight: 600;
+            color: #111827;
+        }
+
+        .legend-item .url {
+            color: #2563eb;
+            text-decoration: none;
+            font-family: monospace;
+            font-size: 0.75rem;
+        }
+
+        .legend-item .url:hover {
+            text-decoration: underline;
+        }
+
+        /* Toast Feedback */
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            background-color: #111827;
+            color: #ffffff;
+            padding: 11px 20px;
+            border-radius: 4px;
+            font-size: 0.86rem;
+            font-weight: bold;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.3);
+            opacity: 0;
+            pointer-events: none;
+            transform: translateY(10px);
+            transition: all 0.25s;
+            z-index: 1000;
+        }
+
+        .toast.show {
+            opacity: 1;
+            pointer-events: auto;
+            transform: translateY(0);
+        }
+
+        /* Print Media Styles */
+        @media print {
+            header, .tabs-nav, .controls-bar, .page-legend, .toast {
+                display: none !important;
+            }
+            body, .workspace, .paper-sheet {
+                background: #ffffff !important;
+                box-shadow: none !important;
+                border: none !important;
+                padding: 0 !important;
+                margin: 0 !important;
+            }
+            .flowchart-svg {
+                transform: scale(1) !important;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <header>
+        <div class="header-wrap">
+            <div class="title-group">
+                <h1>DOMIKNOW &bull; PROCESS FLOW</h1>
+                <p>Academic Thesis Standard &bull; Perfectly Aligned Multi-Column Flow Architecture</p>
+            </div>
+
+            <div class="btn-group">
+                <a href="usecase.html" class="btn" title="View Proposed Use Case Diagram">
+                    Use Case Diagram
+                </a>
+                <a href="architecture.html" class="btn" title="View System Context &amp; Data Flow Diagrams">
+                    Context &amp; DFD
+                </a>
+                <a href="hipo.html" class="btn" title="View HIPO Model">
+                    HIPO Model &rarr;
+                </a>
+                <button class="btn" onclick="copyCurrentToClipboard()" title="Copy high-res PNG image to clipboard for Word/Docs">
+                    Copy PNG
+                </button>
+                <button class="btn btn-active" onclick="downloadCurrentPNG()" title="Download high-resolution 300 DPI PNG">
+                    Download PNG
+                </button>
+                <button class="btn" onclick="downloadAllRolesPNG()" title="Download all 4 role process flowcharts">
+                    Download All (4 Roles)
+                </button>
+                <button class="btn" onclick="window.print()" title="Print page or save as PDF">
+                    Print / PDF
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Role Navigation Tabs -->
+    <nav class="tabs-nav">
+        <div class="tabs-wrap">
+            <button class="tab-btn active" data-role="admin" onclick="selectRole('admin', this)">
+                ADMINISTRATOR
+            </button>
+            <button class="tab-btn" data-role="tenant" onclick="selectRole('tenant', this)">
+                TENANT
+            </button>
+            <button class="tab-btn" data-role="landlord" onclick="selectRole('landlord', this)">
+                LANDLORD
+            </button>
+            <button class="tab-btn" data-role="maintenance" onclick="selectRole('maintenance', this)">
+                MAINTENANCE PERSONNEL
+            </button>
+        </div>
+    </nav>
+
+    <!-- Controls Bar -->
+    <div class="controls-bar">
+        <div class="info-badge">
+            <span style="font-weight: bold;">Colors Matched to Reference:</span>
+            <span class="color-dot" style="background:#5dade2;" title="Start/End (Sky Blue)"></span> Oval (Start/End)
+            <span class="color-dot" style="background:#d4e6f1;" title="Process (Pale Ice Blue)"></span> Process Box
+            <span class="color-dot" style="background:#4da8da;" title="Decision (Cyan/Sky Blue)"></span> Decision Diamond
+            <span class="color-dot" style="background:#1b4f72;" title="Connector (Deep Navy)"></span> Connector (A,B,C,D)
+        </div>
+
+        <div class="zoom-wrap">
+            <button class="zoom-btn" onclick="zoom(-0.1)" title="Zoom Out">−</button>
+            <span class="zoom-label" id="zoomText">100%</span>
+            <button class="zoom-btn" onclick="zoom(0.1)" title="Zoom In">+</button>
+            <button class="zoom-btn" onclick="resetZoom()" title="Reset Zoom">⟲</button>
+        </div>
+    </div>
+
+    <!-- Main Workspace -->
+    <main class="workspace">
+        <div class="paper-sheet" id="paperSheet">
+            <div id="svgContainer"></div>
+        </div>
+    </main>
+
+    <!-- System Pages Mapping Legend -->
+    <section class="page-legend">
+        <div class="legend-card" id="legendContainer">
+            <!-- Dynamic Legend Content -->
+        </div>
+    </section>
+
+    <!-- Toast -->
+    <div class="toast" id="toast">Diagram PNG exported successfully!</div>
+
+    <script>
+        let currentRole = 'admin';
+        let currentScale = 1.0;
+
+        // Metadata and Titles
+        const meta = {
+            admin: { 
+                title: "ADMINISTRATOR", 
+                filename: "DOMIKNOW_Process_Flow_Admin.png",
+                pages: [
+                    { category: "User Access", name: "User Access", url: "http://localhost:3000/pages/admin/users.html" },
+                    { category: "User Access", name: "Property Approvals", url: "http://localhost:3000/pages/admin/property-review.html" },
+                    { category: "Platform Monitoring", name: "Payment Monitoring", url: "http://localhost:3000/pages/admin/payments.html" },
+                    { category: "Trust & Governance", name: "Policies", url: "http://localhost:3000/pages/admin/policy-management.html" },
+                    { category: "Trust & Governance", name: "Audit Trail", url: "http://localhost:3000/pages/admin/audit-logs.html" }
+                ]
+            },
+            tenant: { 
+                title: "TENANT", 
+                filename: "DOMIKNOW_Process_Flow_Tenant.png",
+                pages: [
+                    { category: "Find a home", name: "Explore homes", url: "http://localhost:3000/pages/tenant/properties.html" },
+                    { category: "Find a home", name: "My applications", url: "http://localhost:3000/pages/tenant/applications.html" },
+                    { category: "My tenancy", name: "Lease agreement", url: "http://localhost:3000/pages/tenant/leases.html" },
+                    { category: "My tenancy", name: "Billing & payments", url: "http://localhost:3000/pages/tenant/billings.html" },
+                    { category: "Care & support", name: "Maintenance", url: "http://localhost:3000/pages/tenant/maintenance.html" },
+                    { category: "Care & support", name: "Disputes", url: "http://localhost:3000/pages/tenant/disputes.html" },
+                    { category: "Care & support", name: "Ratings & feedback", url: "http://localhost:3000/pages/tenant/feedback.html" },
+                    { category: "Safety & records", name: "Policy violations", url: "http://localhost:3000/pages/tenant/policy-violations.html" }
+                ]
+            },
+            landlord: { 
+                title: "LANDLORD", 
+                filename: "DOMIKNOW_Process_Flow_Landlord.png",
+                pages: [
+                    { category: "Portfolio", name: "Properties", url: "http://localhost:3000/pages/landlord/properties.html" },
+                    { category: "Tenancy", name: "Tenant Applications", url: "http://localhost:3000/pages/landlord/applications.html" },
+                    { category: "Tenancy", name: "Lease Agreements", url: "http://localhost:3000/pages/landlord/leases.html" },
+                    { category: "Financials", name: "Billing & Payments", url: "http://localhost:3000/pages/landlord/billings.html" },
+                    { category: "Operations & Support", name: "Maintenance", url: "http://localhost:3000/pages/landlord/maintenance.html" },
+                    { category: "Operations & Support", name: "Complaints", url: "http://localhost:3000/pages/landlord/disputes.html" },
+                    { category: "Operations & Support", name: "Reviews & Feedback", url: "http://localhost:3000/pages/landlord/feedback.html" }
+                ]
+            },
+            maintenance: { 
+                title: "MAINTENANCE PERSONNEL", 
+                filename: "DOMIKNOW_Process_Flow_Maintenance.png",
+                pages: [
+                    { category: "Field Tasks", name: "Dashboard", url: "http://localhost:3000/pages/maintenance/dashboard.html" },
+                    { category: "Field Tasks", name: "Assigned Tasks", url: "http://localhost:3000/pages/maintenance/tasks.html" },
+                    { category: "Field Tasks", name: "Task Details & Reports", url: "http://localhost:3000/pages/maintenance/task-details.html" },
+                    { category: "Operations & Support", name: "Maintenance Queue", url: "http://localhost:3000/pages/landlord/maintenance.html" },
+                    { category: "Operations & Support", name: "Reviews & Feedback", url: "http://localhost:3000/pages/landlord/feedback.html" }
+                ]
+            }
+        };
+
+        // Shared SVG Defs
+        const svgDefs = `
+        <defs>
+            <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                <path d="M 0 1.5 L 9 5 L 0 8.5 z" fill="#000000" />
+            </marker>
+        </defs>`;
+
+        // SVG Render Helpers
+        // 1. Process Box (Light Pale Ice Blue)
+        function renderBox(x, y, w, h, lines) {
+            let svg = `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="#d4e6f1" stroke="#000000" stroke-width="1.3" rx="1" />`;
+            const cx = x + w / 2;
+            if (lines.length === 1) {
+                svg += `<text x="${cx}" y="${y + h / 2 + 4}" text-anchor="middle" font-family="Arial, sans-serif" font-size="11.5" fill="#000000">${lines[0]}</text>`;
+            } else if (lines.length === 2) {
+                svg += `<text x="${cx}" y="${y + h / 2 - 3}" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="#000000">${lines[0]}</text>`;
+                svg += `<text x="${cx}" y="${y + h / 2 + 11}" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="#000000">${lines[1]}</text>`;
+            } else if (lines.length === 3) {
+                svg += `<text x="${cx}" y="${y + h / 2 - 9}" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#000000">${lines[0]}</text>`;
+                svg += `<text x="${cx}" y="${y + h / 2 + 3}" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#000000">${lines[1]}</text>`;
+                svg += `<text x="${cx}" y="${y + h / 2 + 15}" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#000000">${lines[2]}</text>`;
+            }
+            return svg;
+        }
+
+        // 2. Terminator Oval (Start / End - Sky Blue)
+        function renderOval(cx, cy, rx, ry, text) {
+            return `
+            <ellipse cx="${cx}" cy="${cy}" rx="${rx}" ry="${ry}" fill="#5dade2" stroke="#000000" stroke-width="1.4" />
+            <text x="${cx}" y="${cy + 4.5}" text-anchor="middle" font-family="Arial, sans-serif" font-size="12.5" font-weight="bold" fill="#000000">${text}</text>`;
+        }
+
+        // 3. Circular Connector (Deep Navy with White Letter)
+        function renderConnector(cx, cy, r, letter) {
+            return `
+            <circle cx="${cx}" cy="${cy}" r="${r}" fill="#1b4f72" stroke="#000000" stroke-width="1.2" />
+            <text x="${cx}" y="${cy + 4.5}" text-anchor="middle" font-family="Arial, sans-serif" font-size="12.5" font-weight="bold" fill="#ffffff">${letter}</text>`;
+        }
+
+        // 4. Decision Diamond (Cyan/Sky Blue)
+        function renderDiamond(cx, cy, w, h, lines) {
+            const hw = w / 2;
+            const hh = h / 2;
+            let svg = `<polygon points="${cx},${cy - hh} ${cx + hw},${cy} ${cx},${cy + hh} ${cx - hw},${cy}" fill="#4da8da" stroke="#000000" stroke-width="1.3" />`;
+            if (lines.length === 1) {
+                svg += `<text x="${cx}" y="${cy + 3.5}" text-anchor="middle" font-family="Arial, sans-serif" font-size="10.5" font-weight="bold" fill="#000000">${lines[0]}</text>`;
+            } else if (lines.length === 2) {
+                svg += `<text x="${cx}" y="${cy - 3}" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="#000000">${lines[0]}</text>`;
+                svg += `<text x="${cx}" y="${cy + 9}" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="#000000">${lines[1]}</text>`;
+            }
+            return svg;
+        }
+
+        // 5. Connecting Line with Arrow
+        function renderArrow(x1, y1, x2, y2) {
+            return `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="#000000" stroke-width="1.3" marker-end="url(#arrow)" />`;
+        }
+
+        // 6. Text Label
+        function renderLabel(x, y, text) {
+            return `<text x="${x}" y="${y}" font-family="Arial, sans-serif" font-size="9" font-weight="bold" fill="#000000">${text}</text>`;
+        }
+
+        // 7. Non-Intersecting LoopBack Path
+        function renderLoopBack(cx, diamondY, diamondHalfW, targetY, targetHalfW, labelText) {
+            const exitX = cx + diamondHalfW;
+            const turnX = cx + diamondHalfW + 24;
+            const entryX = cx + targetHalfW;
+            let svg = `<path d="M ${exitX} ${diamondY} H ${turnX} V ${targetY} H ${entryX}" fill="none" stroke="#000000" stroke-width="1.3" marker-end="url(#arrow)" />`;
+            if (labelText) {
+                svg += `<text x="${exitX + 4}" y="${diamondY - 5}" font-family="Arial, sans-serif" font-size="9" font-weight="bold" fill="#000000">${labelText}</text>`;
+            }
+            return svg;
+        }
+
+        // Standard Width & Column Centers
+        const W = 1200;
+        const H = 760;
+        const c1 = 160, c2 = 380, c3 = 600, c4 = 820, c5 = 1040;
+        const bw = 148, bh = 38;
+
+        function startSVG(title) {
+            let svg = `<svg id="activeFlowchart" class="flowchart-svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">`;
+            svg += svgDefs;
+            svg += `<rect width="${W}" height="${H}" fill="#ffffff" />`;
+            // Outer Document Frame
+            svg += `<rect x="30" y="25" width="${W - 60}" height="${H - 50}" fill="#ffffff" stroke="#000000" stroke-width="1.2" />`;
+            // Clean centered title ONLY
+            svg += `<text x="${W / 2}" y="65" text-anchor="middle" font-family="Arial, sans-serif" font-size="19" font-weight="bold" fill="#000000" letter-spacing="2">${title}</text>`;
+            return svg;
+        }
+
+        // ==========================================
+        // 1. ADMIN PROCESS FLOW
+        // ==========================================
+        function getAdminSVG() {
+            let svg = startSVG("ADMINISTRATOR");
+
+            // --- COLUMN 1: Login & Access ---
+            svg += renderOval(c1, 105, 48, 17, "Start");
+            svg += renderArrow(c1, 122, c1, 160);
+
+            svg += renderBox(c1 - bw/2, 160, bw, bh, ["Admin Portal"]);
+            svg += renderArrow(c1, 198, c1, 230);
+
+            svg += renderBox(c1 - bw/2, 230, bw, bh, ["Sign In"]);
+            svg += renderArrow(c1, 268, c1, 300);
+
+            svg += renderBox(c1 - bw/2, 300, bw, bh, ["User Access"]);
+            svg += renderArrow(c1, 338, c1, 370);
+
+            svg += renderBox(c1 - bw/2, 370, bw, bh, ["Review Registrations"]);
+            svg += renderArrow(c1, 408, c1, 445);
+
+            svg += renderConnector(c1, 460, 14, "A");
+
+            // --- COLUMN 2: Approvals ---
+            svg += renderConnector(c2, 105, 14, "A");
+            svg += renderArrow(c2, 120, c2, 160);
+
+            svg += renderDiamond(c2, 182, 124, 44, ["Approve User?"]);
+            // Loopback No
+            svg += renderLoopBack(c2, 182, 62, 160 + bh/2, bw/2, "No: Decline");
+
+            // Yes -> Activate Account
+            svg += renderArrow(c2, 204, c2, 238);
+            svg += renderLabel(c2 + 6, 222, "Yes");
+            svg += renderBox(c2 - bw/2, 238, bw, bh, ["Activate Account"]);
+            svg += renderArrow(c2, 276, c2, 308);
+
+            svg += renderBox(c2 - bw/2, 308, bw, bh, ["Property Approvals"]);
+            svg += renderArrow(c2, 346, c2, 378);
+
+            svg += renderBox(c2 - bw/2, 378, bw, bh, ["Inspect Documents"]);
+            svg += renderArrow(c2, 416, c2, 448);
+
+            svg += renderDiamond(c2, 470, 124, 44, ["Listing Valid?"]);
+            // Loopback No
+            svg += renderLoopBack(c2, 470, 62, 378 + bh/2, bw/2, "No: Revise");
+
+            // Yes -> Publish Listing
+            svg += renderArrow(c2, 492, c2, 526);
+            svg += renderLabel(c2 + 6, 510, "Yes");
+            svg += renderBox(c2 - bw/2, 526, bw, bh, ["Publish Listing"]);
+            svg += renderArrow(c2, 564, c2, 600);
+
+            svg += renderConnector(c2, 615, 14, "B");
+
+            // --- COLUMN 3: Platform Monitoring ---
+            svg += renderConnector(c3, 105, 14, "B");
+            svg += renderArrow(c3, 120, c3, 160);
+
+            svg += renderBox(c3 - bw/2, 160, bw, bh, ["Platform Monitoring"]);
+            svg += renderArrow(c3, 198, c3, 230);
+
+            svg += renderBox(c3 - bw/2, 230, bw, bh, ["Payment Monitoring"]);
+            svg += renderArrow(c3, 268, c3, 300);
+
+            svg += renderBox(c3 - bw/2, 300, bw, bh, ["Verify Reference #"]);
+            svg += renderArrow(c3, 338, c3, 370);
+
+            svg += renderDiamond(c3, 392, 124, 44, ["Payment Valid?"]);
+            // Loopback No
+            svg += renderLoopBack(c3, 392, 62, 300 + bh/2, bw/2, "No: Flag");
+
+            // Yes -> Confirm Payment
+            svg += renderArrow(c3, 414, c3, 448);
+            svg += renderLabel(c3 + 6, 432, "Yes");
+            svg += renderBox(c3 - bw/2, 448, bw, bh, ["Confirm Payment"]);
+            svg += renderArrow(c3, 486, c3, 518);
+
+            svg += renderBox(c3 - bw/2, 518, bw, bh, ["Platform Analytics"]);
+            svg += renderArrow(c3, 556, c3, 595);
+
+            svg += renderConnector(c3, 610, 14, "C");
+
+            // --- COLUMN 4: Trust & Governance (Full-Width Clean Vertical) ---
+            svg += renderConnector(c4, 105, 14, "C");
+            svg += renderArrow(c4, 120, c4, 160);
+
+            svg += renderBox(c4 - bw/2, 160, bw, bh, ["Trust & Governance"]);
+            svg += renderArrow(c4, 198, c4, 230);
+
+            svg += renderBox(c4 - bw/2, 230, bw, bh, ["Case Triage"]);
+            svg += renderArrow(c4, 268, c4, 300);
+
+            svg += renderBox(c4 - bw/2, 300, bw, bh, ["Resolve Disputes"]);
+            svg += renderArrow(c4, 338, c4, 370);
+
+            svg += renderBox(c4 - bw/2, 370, bw, bh, ["Policy Management"]);
+            svg += renderArrow(c4, 408, c4, 440);
+
+            svg += renderBox(c4 - bw/2, 440, bw, bh, ["Audit Trail Logs"]);
+            svg += renderArrow(c4, 478, c4, 515);
+
+            svg += renderConnector(c4, 530, 14, "D");
+
+            // --- COLUMN 5: Final Records & Exit ---
+            svg += renderConnector(c5, 105, 14, "D");
+            svg += renderArrow(c5, 120, c5, 160);
+
+            svg += renderBox(c5 - bw/2, 160, bw, bh, ["System Compliance"]);
+            svg += renderArrow(c5, 198, c5, 230);
+
+            svg += renderBox(c5 - bw/2, 230, bw, bh, ["Broadcast Notice"]);
+            svg += renderArrow(c5, 268, c5, 300);
+
+            svg += renderBox(c5 - bw/2, 300, bw, bh, ["Sign Out"]);
+            svg += renderArrow(c5, 338, c5, 375);
+
+            svg += renderOval(c5, 392, 48, 17, "End");
+
+            svg += `</svg>`;
+            return svg;
+        }
+
+        // ==========================================
+        // 2. TENANT PROCESS FLOW
+        // ==========================================
+        function getTenantSVG() {
+            let svg = startSVG("TENANT");
+
+            // --- COLUMN 1: Search & Discover ---
+            svg += renderOval(c1, 105, 48, 17, "Start");
+            svg += renderArrow(c1, 122, c1, 160);
+
+            svg += renderBox(c1 - bw/2, 160, bw, bh, ["Sign Up"]);
+            svg += renderArrow(c1, 198, c1, 230);
+
+            svg += renderBox(c1 - bw/2, 230, bw, bh, ["Login"]);
+            svg += renderArrow(c1, 268, c1, 300);
+
+            svg += renderBox(c1 - bw/2, 300, bw, bh, ["Find a Home"]);
+            svg += renderArrow(c1, 338, c1, 370);
+
+            svg += renderBox(c1 - bw/2, 370, bw, bh, ["Explore Homes"]);
+            svg += renderArrow(c1, 408, c1, 440);
+
+            svg += renderBox(c1 - bw/2, 440, bw, bh, ["Filter & Map Search"]);
+            svg += renderArrow(c1, 478, c1, 515);
+
+            svg += renderConnector(c1, 530, 14, "A");
+
+            // --- COLUMN 2: Applications ---
+            svg += renderConnector(c2, 105, 14, "A");
+            svg += renderArrow(c2, 120, c2, 160);
+
+            svg += renderDiamond(c2, 182, 124, 44, ["Apply for Unit?"]);
+            // Loop back No
+            svg += renderLoopBack(c2, 182, 62, 120, 14, "No: Browse");
+
+            // Yes -> My Applications
+            svg += renderArrow(c2, 204, c2, 238);
+            svg += renderLabel(c2 + 6, 222, "Yes");
+            svg += renderBox(c2 - bw/2, 238, bw, bh, ["My Applications"]);
+            svg += renderArrow(c2, 276, c2, 308);
+
+            svg += renderBox(c2 - bw/2, 308, bw, bh, ["Fill Application Form"]);
+            svg += renderArrow(c2, 346, c2, 378);
+
+            svg += renderBox(c2 - bw/2, 378, bw, bh, ["Upload Requirements"]);
+            svg += renderArrow(c2, 416, c2, 448);
+
+            svg += renderDiamond(c2, 470, 124, 44, ["Approved?"]);
+            // Loopback No
+            svg += renderLoopBack(c2, 470, 62, 238 + bh/2, bw/2, "No: Remarks");
+
+            // Yes -> My Tenancy
+            svg += renderArrow(c2, 492, c2, 526);
+            svg += renderLabel(c2 + 6, 510, "Yes");
+            svg += renderBox(c2 - bw/2, 526, bw, bh, ["My Tenancy"]);
+            svg += renderArrow(c2, 564, c2, 600);
+
+            svg += renderConnector(c2, 615, 14, "B");
+
+            // --- COLUMN 3: Leases & Billing ---
+            svg += renderConnector(c3, 105, 14, "B");
+            svg += renderArrow(c3, 120, c3, 160);
+
+            svg += renderBox(c3 - bw/2, 160, bw, bh, ["Lease Agreement"]);
+            svg += renderArrow(c3, 198, c3, 230);
+
+            svg += renderBox(c3 - bw/2, 230, bw, bh, ["Review Terms"]);
+            svg += renderArrow(c3, 268, c3, 300);
+
+            svg += renderBox(c3 - bw/2, 300, bw, bh, ["Sign Digital Lease"]);
+            svg += renderArrow(c3, 338, c3, 370);
+
+            svg += renderBox(c3 - bw/2, 370, bw, bh, ["Billing & Payments"]);
+            svg += renderArrow(c3, 408, c3, 440);
+
+            svg += renderBox(c3 - bw/2, 440, bw, bh, ["View Submeters"]);
+            svg += renderArrow(c3, 478, c3, 510);
+
+            svg += renderBox(c3 - bw/2, 510, bw, bh, ["Upload Payment Proof"]);
+            svg += renderArrow(c3, 548, c3, 585);
+
+            svg += renderConnector(c3, 600, 14, "C");
+
+            // --- COLUMN 4: Care & Support (Full-Width Clean Vertical) ---
+            svg += renderConnector(c4, 105, 14, "C");
+            svg += renderArrow(c4, 120, c4, 160);
+
+            svg += renderBox(c4 - bw/2, 160, bw, bh, ["Care & Support"]);
+            svg += renderArrow(c4, 198, c4, 230);
+
+            svg += renderBox(c4 - bw/2, 230, bw, bh, ["Maintenance Tickets"]);
+            svg += renderArrow(c4, 268, c4, 300);
+
+            svg += renderBox(c4 - bw/2, 300, bw, bh, ["Track Repair Status"]);
+            svg += renderArrow(c4, 338, c4, 370);
+
+            svg += renderBox(c4 - bw/2, 370, bw, bh, ["Disputes & Complaints"]);
+            svg += renderArrow(c4, 408, c4, 440);
+
+            svg += renderBox(c4 - bw/2, 440, bw, bh, ["Ratings & Feedback"]);
+            svg += renderArrow(c4, 478, c4, 515);
+
+            svg += renderConnector(c4, 530, 14, "D");
+
+            // --- COLUMN 5: Safety & Records ---
+            svg += renderConnector(c5, 105, 14, "D");
+            svg += renderArrow(c5, 120, c5, 160);
+
+            svg += renderBox(c5 - bw/2, 160, bw, bh, ["Safety & Records"]);
+            svg += renderArrow(c5, 198, c5, 230);
+
+            svg += renderBox(c5 - bw/2, 230, bw, bh, ["Reports Center"]);
+            svg += renderArrow(c5, 268, c5, 300);
+
+            svg += renderBox(c5 - bw/2, 300, bw, bh, ["Policy Violations"]);
+            svg += renderArrow(c5, 338, c5, 370);
+
+            svg += renderBox(c5 - bw/2, 370, bw, bh, ["Sign Out"]);
+            svg += renderArrow(c5, 408, c5, 445);
+
+            svg += renderOval(c5, 462, 48, 17, "End");
+
+            svg += `</svg>`;
+            return svg;
+        }
+
+        // ==========================================
+        // 3. LANDLORD PROCESS FLOW
+        // ==========================================
+        function getLandlordSVG() {
+            let svg = startSVG("LANDLORD");
+
+            // --- COLUMN 1: Portfolio ---
+            svg += renderOval(c1, 105, 48, 17, "Start");
+            svg += renderArrow(c1, 122, c1, 160);
+
+            svg += renderBox(c1 - bw/2, 160, bw, bh, ["Sign Up"]);
+            svg += renderArrow(c1, 198, c1, 230);
+
+            svg += renderBox(c1 - bw/2, 230, bw, bh, ["Login"]);
+            svg += renderArrow(c1, 268, c1, 300);
+
+            svg += renderBox(c1 - bw/2, 300, bw, bh, ["Portfolio"]);
+            svg += renderArrow(c1, 338, c1, 370);
+
+            svg += renderBox(c1 - bw/2, 370, bw, bh, ["Properties"]);
+            svg += renderArrow(c1, 408, c1, 440);
+
+            svg += renderBox(c1 - bw/2, 440, bw, bh, ["Add Property Listing"]);
+            svg += renderArrow(c1, 478, c1, 515);
+
+            svg += renderConnector(c1, 530, 14, "A");
+
+            // --- COLUMN 2: Tenancy & Screening ---
+            svg += renderConnector(c2, 105, 14, "A");
+            svg += renderArrow(c2, 120, c2, 160);
+
+            svg += renderBox(c2 - bw/2, 160, bw, bh, ["Upload Permits"]);
+            svg += renderArrow(c2, 198, c2, 230);
+
+            svg += renderDiamond(c2, 252, 124, 44, ["Admin Approved?"]);
+            // Loop back No
+            svg += renderLoopBack(c2, 252, 62, 160 + bh/2, bw/2, "No: Revise");
+
+            // Yes -> Tenancy
+            svg += renderArrow(c2, 274, c2, 308);
+            svg += renderLabel(c2 + 6, 292, "Yes");
+            svg += renderBox(c2 - bw/2, 308, bw, bh, ["Tenancy"]);
+            svg += renderArrow(c2, 346, c2, 378);
+
+            svg += renderBox(c2 - bw/2, 378, bw, bh, ["Tenant Applications"]);
+            svg += renderArrow(c2, 416, c2, 448);
+
+            svg += renderBox(c2 - bw/2, 448, bw, bh, ["Screen Applicant Score"]);
+            svg += renderArrow(c2, 486, c2, 518);
+
+            svg += renderDiamond(c2, 540, 124, 44, ["Accept Tenant?"]);
+            // Loopback No
+            svg += renderLoopBack(c2, 540, 62, 378 + bh/2, bw/2, "No: Decline");
+
+            // Yes -> B
+            svg += renderArrow(c2, 562, c2, 600);
+            svg += renderLabel(c2 + 6, 580, "Yes");
+            svg += renderConnector(c2, 615, 14, "B");
+
+            // --- COLUMN 3: Leases & Billing ---
+            svg += renderConnector(c3, 105, 14, "B");
+            svg += renderArrow(c3, 120, c3, 160);
+
+            svg += renderBox(c3 - bw/2, 160, bw, bh, ["Lease Agreements"]);
+            svg += renderArrow(c3, 198, c3, 230);
+
+            svg += renderBox(c3 - bw/2, 230, bw, bh, ["Generate Digital Lease"]);
+            svg += renderArrow(c3, 268, c3, 300);
+
+            svg += renderBox(c3 - bw/2, 300, bw, bh, ["Financials"]);
+            svg += renderArrow(c3, 338, c3, 370);
+
+            svg += renderBox(c3 - bw/2, 370, bw, bh, ["Billing & Payments"]);
+            svg += renderArrow(c3, 408, c3, 440);
+
+            svg += renderBox(c3 - bw/2, 440, bw, bh, ["Log Submeter Usage"]);
+            svg += renderArrow(c3, 478, c3, 510);
+
+            svg += renderBox(c3 - bw/2, 510, bw, bh, ["Issue Monthly Bill"]);
+            svg += renderArrow(c3, 548, c3, 585);
+
+            svg += renderConnector(c3, 600, 14, "C");
+
+            // --- COLUMN 4: Operations & Support (Full-Width Clean Vertical) ---
+            svg += renderConnector(c4, 105, 14, "C");
+            svg += renderArrow(c4, 120, c4, 160);
+
+            svg += renderBox(c4 - bw/2, 160, bw, bh, ["Verify Payment Receipt"]);
+            svg += renderArrow(c4, 198, c4, 230);
+
+            svg += renderDiamond(c4, 252, 124, 44, ["Payment Valid?"]);
+            // Loopback No
+            svg += renderLoopBack(c4, 252, 62, 160 + bh/2, bw/2, "No: Notice");
+
+            // Yes -> Operations & Support
+            svg += renderArrow(c4, 274, c4, 308);
+            svg += renderLabel(c4 + 6, 292, "Yes");
+            svg += renderBox(c4 - bw/2, 308, bw, bh, ["Operations & Support"]);
+            svg += renderArrow(c4, 346, c4, 378);
+
+            svg += renderBox(c4 - bw/2, 378, bw, bh, ["Maintenance Queue"]);
+            svg += renderArrow(c4, 416, c4, 448);
+
+            svg += renderBox(c4 - bw/2, 448, bw, bh, ["Assign Technician"]);
+            svg += renderArrow(c4, 486, c4, 518);
+
+            svg += renderBox(c4 - bw/2, 518, bw, bh, ["Tenant Complaints"]);
+            svg += renderArrow(c4, 556, c4, 588);
+
+            svg += renderBox(c4 - bw/2, 588, bw, bh, ["Reviews & Feedback"]);
+            svg += renderArrow(c4, 626, c4, 655);
+
+            svg += renderConnector(c4, 670, 14, "D");
+
+            // --- COLUMN 5: Reports & Sign Out ---
+            svg += renderConnector(c5, 105, 14, "D");
+            svg += renderArrow(c5, 120, c5, 160);
+
+            svg += renderBox(c5 - bw/2, 160, bw, bh, ["Reports Center"]);
+            svg += renderArrow(c5, 198, c5, 230);
+
+            svg += renderBox(c5 - bw/2, 230, bw, bh, ["Revenue Reports"]);
+            svg += renderArrow(c5, 268, c5, 300);
+
+            svg += renderBox(c5 - bw/2, 300, bw, bh, ["Export Statements"]);
+            svg += renderArrow(c5, 338, c5, 370);
+
+            svg += renderBox(c5 - bw/2, 370, bw, bh, ["Sign Out"]);
+            svg += renderArrow(c5, 408, c5, 445);
+
+            svg += renderOval(c5, 462, 48, 17, "End");
+
+            svg += `</svg>`;
+            return svg;
+        }
+
+        // ==========================================
+        // 4. MAINTENANCE PERSONNEL PROCESS FLOW
+        // ==========================================
+        function getMaintenanceSVG() {
+            let svg = startSVG("MAINTENANCE PERSONNEL");
+
+            // --- COLUMN 1: Account Status ---
+            svg += renderOval(c1, 105, 48, 17, "Start");
+            svg += renderArrow(c1, 122, c1, 160);
+
+            svg += renderBox(c1 - bw/2, 160, bw, bh, ["Sign Up"]);
+            svg += renderArrow(c1, 198, c1, 230);
+
+            svg += renderBox(c1 - bw/2, 230, bw, bh, ["Login"]);
+            svg += renderArrow(c1, 268, c1, 300);
+
+            svg += renderBox(c1 - bw/2, 300, bw, bh, ["Dashboard"]);
+            svg += renderArrow(c1, 338, c1, 370);
+
+            svg += renderBox(c1 - bw/2, 370, bw, bh, ["Check Account Status"]);
+            svg += renderArrow(c1, 408, c1, 440);
+
+            svg += renderDiamond(c1, 462, 124, 44, ["Admin Approved?"]);
+            // Loop back No
+            svg += renderLoopBack(c1, 462, 62, 370 + bh/2, bw/2, "No: Pending");
+
+            // Yes -> A
+            svg += renderArrow(c1, 484, c1, 520);
+            svg += renderLabel(c1 + 6, 502, "Yes");
+            svg += renderConnector(c1, 535, 14, "A");
+
+            // --- COLUMN 2: Task Assignment ---
+            svg += renderConnector(c2, 105, 14, "A");
+            svg += renderArrow(c2, 120, c2, 160);
+
+            svg += renderBox(c2 - bw/2, 160, bw, bh, ["Assigned Tasks"]);
+            svg += renderArrow(c2, 198, c2, 230);
+
+            svg += renderBox(c2 - bw/2, 230, bw, bh, ["View Repair Ticket"]);
+            svg += renderArrow(c2, 268, c2, 300);
+
+            svg += renderDiamond(c2, 322, 124, 44, ["Accept Job?"]);
+            // Loopback No
+            svg += renderLoopBack(c2, 322, 62, 160 + bh/2, bw/2, "No: Decline");
+
+            // Yes -> Task Details
+            svg += renderArrow(c2, 344, c2, 378);
+            svg += renderLabel(c2 + 6, 362, "Yes");
+            svg += renderBox(c2 - bw/2, 378, bw, bh, ["Task Details"]);
+            svg += renderArrow(c2, 416, c2, 448);
+
+            svg += renderBox(c2 - bw/2, 448, bw, bh, ["Update Travel Status"]);
+            svg += renderArrow(c2, 486, c2, 520);
+
+            svg += renderConnector(c2, 535, 14, "B");
+
+            // --- COLUMN 3: Field Execution ---
+            svg += renderConnector(c3, 105, 14, "B");
+            svg += renderArrow(c3, 120, c3, 160);
+
+            svg += renderBox(c3 - bw/2, 160, bw, bh, ["Arrive at Unit"]);
+            svg += renderArrow(c3, 198, c3, 230);
+
+            svg += renderBox(c3 - bw/2, 230, bw, bh, ["Inspect & Diagnose"]);
+            svg += renderArrow(c3, 268, c3, 300);
+
+            svg += renderBox(c3 - bw/2, 300, bw, bh, ["Execute Repair Work"]);
+            svg += renderArrow(c3, 338, c3, 370);
+
+            svg += renderBox(c3 - bw/2, 370, bw, bh, ["Log Materials Used"]);
+            svg += renderArrow(c3, 408, c3, 440);
+
+            svg += renderBox(c3 - bw/2, 440, bw, bh, ["Record Labor Cost"]);
+            svg += renderArrow(c3, 478, c3, 515);
+
+            svg += renderConnector(c3, 530, 14, "C");
+
+            // --- COLUMN 4: Completion & Verification (Full-Width Clean Vertical) ---
+            svg += renderConnector(c4, 105, 14, "C");
+            svg += renderArrow(c4, 120, c4, 160);
+
+            svg += renderBox(c4 - bw/2, 160, bw, bh, ["Upload Photo Proof"]);
+            svg += renderArrow(c4, 198, c4, 230);
+
+            svg += renderBox(c4 - bw/2, 230, bw, bh, ["Completion Report"]);
+            svg += renderArrow(c4, 268, c4, 300);
+
+            svg += renderBox(c4 - bw/2, 300, bw, bh, ["Await Verification"]);
+            svg += renderArrow(c4, 338, c4, 370);
+
+            svg += renderDiamond(c4, 392, 124, 44, ["Rework Needed?"]);
+            // Loop back Yes
+            svg += renderLoopBack(c4, 392, 62, 160 + bh/2, bw/2, "Yes: Fix");
+
+            // No -> Tenant Sign-Off
+            svg += renderArrow(c4, 414, c4, 448);
+            svg += renderLabel(c4 + 6, 432, "No");
+            svg += renderBox(c4 - bw/2, 448, bw, bh, ["Tenant Sign-Off"]);
+            svg += renderArrow(c4, 486, c4, 518);
+
+            svg += renderBox(c4 - bw/2, 518, bw, bh, ["Close Task Ticket"]);
+            svg += renderArrow(c4, 556, c4, 595);
+
+            svg += renderConnector(c4, 610, 14, "D");
+
+            // --- COLUMN 5: Operations Records & Sign Out ---
+            svg += renderConnector(c5, 105, 14, "D");
+            svg += renderArrow(c5, 120, c5, 160);
+
+            svg += renderBox(c5 - bw/2, 160, bw, bh, ["Reviews & Feedback"]);
+            svg += renderArrow(c5, 198, c5, 230);
+
+            svg += renderBox(c5 - bw/2, 230, bw, bh, ["Reports Center"]);
+            svg += renderArrow(c5, 268, c5, 300);
+
+            svg += renderBox(c5 - bw/2, 300, bw, bh, ["Check Work History"]);
+            svg += renderArrow(c5, 338, c5, 370);
+
+            svg += renderBox(c5 - bw/2, 370, bw, bh, ["Sign Out"]);
+            svg += renderArrow(c5, 408, c5, 445);
+
+            svg += renderOval(c5, 462, 48, 17, "End");
+
+            svg += `</svg>`;
+            return svg;
+        }
+
+        // Render Current Flowchart
+        function renderCurrent() {
+            const container = document.getElementById('svgContainer');
+            if (currentRole === 'admin') {
+                container.innerHTML = getAdminSVG();
+            } else if (currentRole === 'tenant') {
+                container.innerHTML = getTenantSVG();
+            } else if (currentRole === 'landlord') {
+                container.innerHTML = getLandlordSVG();
+            } else if (currentRole === 'maintenance') {
+                container.innerHTML = getMaintenanceSVG();
+            }
+            renderLegend();
+            applyZoom();
+        }
+
+        // Render Page Legend
+        function renderLegend() {
+            const container = document.getElementById('legendContainer');
+            const roleData = meta[currentRole];
+            let html = `<h3>Official System Pages Mapped &bull; ${roleData.title}</h3><div class="legend-grid">`;
+            for (const p of roleData.pages) {
+                html += `
+                <div class="legend-item">
+                    <span class="label"><small style="color:#6b7280; display:block; font-size:10px;">${p.category}</small>${p.name}</span>
+                    <a href="${p.url}" target="_blank" class="url">${p.url.replace('http://localhost:3000', '')}</a>
+                </div>`;
+            }
+            html += `</div>`;
+            container.innerHTML = html;
+        }
+
+        // Role Selection
+        function selectRole(roleKey, btn) {
+            currentRole = roleKey;
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            if (btn) btn.classList.add('active');
+            renderCurrent();
+        }
+
+        // Zoom Logic
+        function zoom(delta) {
+            currentScale = Math.min(Math.max(currentScale + delta, 0.5), 2.0);
+            applyZoom();
+        }
+
+        function resetZoom() {
+            currentScale = 1.0;
+            applyZoom();
+        }
+
+        function applyZoom() {
+            document.getElementById('zoomText').innerText = Math.round(currentScale * 100) + '%';
+            const svg = document.querySelector('#svgContainer svg');
+            if (svg) svg.style.transform = `scale(${currentScale})`;
+        }
+
+        // Toast Feedback
+        function showToast(msg) {
+            const t = document.getElementById('toast');
+            t.innerText = msg;
+            t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 3000);
+        }
+
+        // High Resolution PNG Converter (Canvas 300 DPI)
+        function getSVGToCanvas(svgElement, scaleMultiplier = 2.5) {
+            return new Promise((resolve, reject) => {
+                try {
+                    const serializer = new XMLSerializer();
+                    let svgStr = serializer.serializeToString(svgElement);
+                    if (!svgStr.match(/^<svg[^>]+xmlns="http\:\/\/www\.w3\.org\/2000\/svg"/)) {
+                        svgStr = svgStr.replace(/^<svg/, '<svg xmlns="http://www.w3.org/2000/svg"');
+                    }
+
+                    const width = svgElement.viewBox.baseVal.width || 1200;
+                    const height = svgElement.viewBox.baseVal.height || 760;
+
+                    const canvas = document.createElement('canvas');
+                    canvas.width = width * scaleMultiplier;
+                    canvas.height = height * scaleMultiplier;
+                    const ctx = canvas.getContext('2d');
+
+                    ctx.imageSmoothingEnabled = true;
+                    ctx.imageSmoothingQuality = 'high';
+
+                    // Pure white background for academic thesis document
+                    ctx.fillStyle = '#ffffff';
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                    const img = new Image();
+                    const blob = new Blob([svgStr], { type: 'image/svg+xml;charset=utf-8' });
+                    const url = URL.createObjectURL(blob);
+
+                    img.onload = () => {
+                        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                        URL.revokeObjectURL(url);
+                        resolve({ canvas, dataURL: canvas.toDataURL('image/png') });
+                    };
+
+                    img.onerror = (e) => {
+                        URL.revokeObjectURL(url);
+                        reject(e);
+                    };
+
+                    img.src = url;
+                } catch (err) {
+                    reject(err);
+                }
+            });
+        }
+
+        // Download Single PNG
+        async function downloadCurrentPNG() {
+            const svg = document.querySelector('#svgContainer svg');
+            if (!svg) return;
+            showToast("Generating crisp thesis-ready PNG...");
+            try {
+                const { dataURL } = await getSVGToCanvas(svg, 2.5);
+                const filename = meta[currentRole].filename;
+                const a = document.createElement('a');
+                a.href = dataURL;
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                showToast(`Downloaded ${filename} successfully!`);
+            } catch (err) {
+                console.error(err);
+                showToast("Failed to generate image.");
+            }
+        }
+
+        // Copy Single PNG to Clipboard
+        async function copyCurrentToClipboard() {
+            const svg = document.querySelector('#svgContainer svg');
+            if (!svg) return;
+            showToast("Rendering to clipboard...");
+            try {
+                const { canvas } = await getSVGToCanvas(svg, 2.0);
+                canvas.toBlob(async (blob) => {
+                    if (!blob) return;
+                    try {
+                        const item = new ClipboardItem({ "image/png": blob });
+                        await navigator.clipboard.write([item]);
+                        showToast("Copied PNG directly to clipboard! Ready to paste (Ctrl+V) in Word or Docs.");
+                    } catch (e) {
+                        downloadCurrentPNG();
+                    }
+                }, "image/png");
+            } catch (err) {
+                showToast("Clipboard copy failed.");
+            }
+        }
+
+        // Download All Roles PNGs (Batch Download)
+        async function downloadAllRolesPNG() {
+            showToast("Exporting all 4 role process flowcharts...");
+            const roles = ['admin', 'tenant', 'landlord', 'maintenance'];
+            const hiddenDiv = document.createElement('div');
+            hiddenDiv.style.position = 'absolute';
+            hiddenDiv.style.left = '-9999px';
+            document.body.appendChild(hiddenDiv);
+
+            const getSvgForRole = (r) => {
+                if (r === 'admin') return getAdminSVG();
+                if (r === 'tenant') return getTenantSVG();
+                if (r === 'landlord') return getLandlordSVG();
+                if (r === 'maintenance') return getMaintenanceSVG();
+            };
+
+            for (const r of roles) {
+                hiddenDiv.innerHTML = getSvgForRole(r);
+                const svg = hiddenDiv.querySelector('svg');
+                if (svg) {
+                    try {
+                        const { dataURL } = await getSVGToCanvas(svg, 2.5);
+                        const a = document.createElement('a');
+                        a.href = dataURL;
+                        a.download = meta[r].filename;
+                        document.body.appendChild(a);
+                        a.click();
+                        document.body.removeChild(a);
+                        await new Promise(res => setTimeout(res, 350));
+                    } catch (e) {
+                        console.error(e);
+                    }
+                }
+            }
+
+            document.body.removeChild(hiddenDiv);
+            showToast("All 4 role flowcharts downloaded successfully!");
+        }
+
+        // Initialize on load
+        window.addEventListener('DOMContentLoaded', () => {
+            renderCurrent();
+        });
+    </script>
+</body>
+</html>

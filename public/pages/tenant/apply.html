@@ -6,6 +6,7 @@
     <title>Apply for Rental - DomiKnow</title>
     <link href="../../css/input.css" rel="stylesheet">
     <link href="../../css/design-system.css?v=20260905-1" rel="stylesheet">
+    <link href="../../css/tenant.css" rel="stylesheet">
     <style>
         :root {
             --primary: #0355F3;
@@ -223,25 +224,6 @@
     <script src="../../js/ui.js?v=20260827-3" defer></script>
 </head>
 <body class="app-loading" data-role="tenant" data-page-title="Rental Application">
-    <!-- Navbar -->
-    <nav class="navbar navbar-tenant">
-        <div class="navbar-container">
-            <div class="navbar-brand-group">
-                <a href="dashboard.html" style="text-decoration: none;"><span class="navbar-logo">DomiKnow</span></a>
-                <span class="navbar-badge navbar-badge-tenant">Tenant</span>
-            </div>
-            <div class="navbar-menu">
-                <a href="dashboard.html" class="navbar-menu-link">Dashboard</a>
-                <a href="properties.html" class="navbar-menu-link">Discovery</a>
-                <a href="applications.html" class="navbar-menu-link">My Applications</a>
-            </div>
-            <div class="navbar-right">
-                <span class="navbar-user-welcome">Welcome, <span class="user-name">User</span></span>
-                <button id="logoutBtn" class="navbar-btn">Logout</button>
-            </div>
-        </div>
-    </nav>
-
     <!-- Main Content -->
     <main class="dashboard-container">
         <div class="wizard-container">
@@ -402,6 +384,45 @@
                     const docType = input.getAttribute('data-type');
                     uploadSingleDocument(docType);
                 }
+            });
+
+            // Drag and drop support on document upload sections
+            const uploadSections = document.querySelectorAll('.doc-upload-section');
+            uploadSections.forEach(section => {
+                let dragCounter = 0;
+                section.addEventListener('dragenter', (e) => {
+                    e.preventDefault();
+                    dragCounter++;
+                    section.classList.add('dragover');
+                });
+                section.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    e.dataTransfer.dropEffect = 'copy';
+                });
+                section.addEventListener('dragleave', (e) => {
+                    e.preventDefault();
+                    dragCounter--;
+                    if (dragCounter <= 0) {
+                        dragCounter = 0;
+                        section.classList.remove('dragover');
+                    }
+                });
+                section.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    dragCounter = 0;
+                    section.classList.remove('dragover');
+                    const file = e.dataTransfer?.files?.[0];
+                    if (file) {
+                        const input = section.querySelector('.doc-file-input');
+                        const docType = section.getAttribute('data-type');
+                        if (input && docType) {
+                            const dt = new DataTransfer();
+                            dt.items.add(file);
+                            input.files = dt.files;
+                            uploadSingleDocument(docType);
+                        }
+                    }
+                });
             });
 
             fetchPropertyPreview();

@@ -399,13 +399,6 @@ function renderNewDashboardLayout(user) {
                             { label: 'Disputes', href: 'disputes.html' },
                             { label: 'Ratings & Feedback', href: 'feedback.html' }
                         ]
-                    },
-                    {
-                        label: 'Reports',
-                        icon: 'Reports',
-                        subItems: [
-                            { label: 'My Reports', href: 'reports.html' }
-                        ]
                     }
                 ]
             }
@@ -440,7 +433,6 @@ function renderNewDashboardLayout(user) {
                 section: 'Operations & Support',
                 items: [
                     { label: 'Maintenance', href: 'maintenance.html' },
-                    { label: 'Reports Center', href: 'reports.html' },
                     { label: 'Complaints', href: 'disputes.html' },
                     { label: 'Reviews & Feedback', href: 'feedback.html' }
                 ]
@@ -458,13 +450,13 @@ function renderNewDashboardLayout(user) {
             {
                 section: 'Platform Monitoring',
                 items: [
-                    { label: 'Payment Monitoring', href: 'payments.html' }
+                    { label: 'Payment Monitoring', href: 'payments.html' },
+                    { label: 'Maintenance', href: 'maintenance.html' }
                 ]
             },
             {
                 section: 'Trust & Governance',
                 items: [
-                    { label: 'Case Triage', href: 'reports.html' },
                     { label: 'Policies', href: 'policy-management.html' },
                     { label: 'Audit Trail', href: 'audit-logs.html' }
                 ]
@@ -509,8 +501,7 @@ function renderNewDashboardLayout(user) {
     const currentPageFilename = currentPath.split('/').pop() || 'dashboard.html';
     const parentNavigationPages = {
         admin: {
-            'property-review-details.html': 'property-review.html',
-            'report-detail.html': 'reports.html'
+            'property-review-details.html': 'property-review.html'
         },
         maintenance: {
             'task-details.html': 'tasks.html'
@@ -518,18 +509,14 @@ function renderNewDashboardLayout(user) {
         tenant: {
             'property-details.html': 'properties.html',
             'apply.html': 'properties.html',
-            'application-details.html': 'applications.html',
-            'landlord-report-form.html': 'reports.html',
-            'tenant-reports.html': 'reports.html'
+            'application-details.html': 'applications.html'
         },
         landlord: {
             'property-details.html': 'properties.html',
             'units.html': 'properties.html',
             'application-details.html': 'applications.html',
             'lease-create.html': 'leases.html',
-            'maintenance-details.html': 'maintenance.html',
-            'tenant-report-form.html': 'reports.html',
-            'landlord-reports.html': 'reports.html'
+            'maintenance-details.html': 'maintenance.html'
         }
     };
     const activeNavigationFilename = parentNavigationPages[role]?.[currentPageFilename] || currentPageFilename;
@@ -563,7 +550,6 @@ function renderNewDashboardLayout(user) {
             {
                 section: 'Safety & records',
                 items: [
-                    { label: 'Reports center', href: 'reports.html', icon: 'Reports' },
                     { label: 'Policy violations', href: 'policy-violations.html', icon: 'Policy Violations' }
                 ]
             }
@@ -632,7 +618,6 @@ function renderNewDashboardLayout(user) {
                 section: 'Operations & Support',
                 items: [
                     { label: 'Maintenance', href: 'maintenance.html', icon: 'Maintenance Management' },
-                    { label: 'Reports Center', href: 'reports.html', icon: 'Reports' },
                     { label: 'Complaints', href: 'disputes.html', icon: 'Disputes' },
                     { label: 'Reviews & Feedback', href: 'feedback.html', icon: 'Ratings and Feedback' }
                 ]
@@ -684,13 +669,13 @@ function renderNewDashboardLayout(user) {
             {
                 section: 'Platform Monitoring',
                 items: [
-                    { label: 'Payment Monitoring', href: 'payments.html', icon: 'Payment Monitoring' }
+                    { label: 'Payment Monitoring', href: 'payments.html', icon: 'Payment Monitoring' },
+                    { label: 'Maintenance', href: 'maintenance.html', icon: 'Maintenance' }
                 ]
             },
             {
                 section: 'Trust & Governance',
                 items: [
-                    { label: 'Case Triage', href: 'reports.html', icon: 'Case Triage' },
                     { label: 'Policies', href: 'policy-management.html', icon: 'Policies' },
                     { label: 'Audit Trail', href: 'audit-logs.html', icon: 'Audit Trail' }
                 ]
@@ -875,7 +860,6 @@ function renderNewDashboardLayout(user) {
                           activeNavigationFilename === 'applications.html' ? 'applications' :
                           activeNavigationFilename === 'leases.html' ? 'leases' :
                           activeNavigationFilename === 'billings.html' ? 'payments' :
-                          activeNavigationFilename === 'reports.html' ? 'reports' :
                           ['maintenance.html', 'disputes.html', 'feedback.html'].includes(activeNavigationFilename) ? 'support' :
                           ['policy-violations.html', 'profile.html'].includes(activeNavigationFilename) ? 'more' : '';
 
@@ -897,7 +881,7 @@ function renderNewDashboardLayout(user) {
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
                     <span>Payments</span>
                 </a>
-                <button type="button" id="btnOpenNavSheet" class="bottom-nav-item ${['support', 'reports', 'more'].includes(activeTab) ? 'active' : ''}" aria-label="Open more tenant tools" aria-controls="navSheetOverlay" aria-expanded="false">
+                <button type="button" id="btnOpenNavSheet" class="bottom-nav-item ${['support', 'more'].includes(activeTab) ? 'active' : ''}" aria-label="Open more tenant tools" aria-controls="navSheetOverlay" aria-expanded="false">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/></svg>
                     <span>More</span>
                 </button>
@@ -910,10 +894,6 @@ function renderNewDashboardLayout(user) {
                         <button type="button" id="btnCloseNavSheet" class="nav-sheet-close" aria-label="Close tenant tools">&times;</button>
                     </div>
                     <nav class="nav-sheet-menu" aria-label="Tenant support navigation">
-                        <a href="/pages/tenant/reports.html" class="nav-sheet-item" ${activeNavigationFilename === 'reports.html' ? 'aria-current="page"' : ''}>
-                            ${getTenantIcon('Reports')}
-                            <span>Reports center</span>
-                        </a>
                         <a href="/pages/tenant/maintenance.html" class="nav-sheet-item" ${activeNavigationFilename === 'maintenance.html' ? 'aria-current="page"' : ''}>
                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
                             <span>Maintenance requests</span>
@@ -978,10 +958,6 @@ function renderNewDashboardLayout(user) {
                         <a href="/pages/landlord/maintenance.html" class="nav-sheet-item" ${activeNavigationFilename === 'maintenance.html' ? 'aria-current="page"' : ''}>
                             ${getLinkIcon('Maintenance Management')}
                             <span>Maintenance</span>
-                        </a>
-                        <a href="/pages/landlord/reports.html" class="nav-sheet-item" ${activeNavigationFilename === 'reports.html' ? 'aria-current="page"' : ''}>
-                            ${getLinkIcon('Reports')}
-                            <span>Reports Center</span>
                         </a>
                         <a href="/pages/landlord/disputes.html" class="nav-sheet-item" ${activeNavigationFilename === 'disputes.html' ? 'aria-current="page"' : ''}>
                             ${getLinkIcon('Disputes')}
@@ -1335,8 +1311,7 @@ function renderNewDashboardLayout(user) {
 
 const parentNavigationPages = {
     admin: {
-        'property-review-details.html': 'property-review.html',
-        'report-detail.html': 'reports.html'
+        'property-review-details.html': 'property-review.html'
     },
     maintenance: {
         'task-details.html': 'tasks.html'
@@ -1345,9 +1320,7 @@ const parentNavigationPages = {
         'property-details.html': 'properties.html',
         'apply.html': 'properties.html',
         'application-details.html': 'applications.html',
-        'lease-details.html': 'leases.html',
-        'landlord-report-form.html': 'reports.html',
-        'tenant-reports.html': 'reports.html'
+        'lease-details.html': 'leases.html'
     },
     landlord: {
         'property-create.html': 'properties.html',
@@ -1356,9 +1329,7 @@ const parentNavigationPages = {
         'application-details.html': 'applications.html',
         'lease-details.html': 'leases.html',
         'lease-create.html': 'leases.html',
-        'maintenance-details.html': 'maintenance.html',
-        'tenant-report-form.html': 'reports.html',
-        'landlord-reports.html': 'reports.html'
+        'maintenance-details.html': 'maintenance.html'
     }
 };
 
@@ -1372,12 +1343,7 @@ const contextualPageLabels = {
     'lease-create.html': 'Create lease',
     'maintenance-details.html': 'Maintenance details',
     'task-details.html': 'Task details',
-    'property-review-details.html': 'Property review details',
-    'report-detail.html': 'Case details',
-    'landlord-report-form.html': 'Report landlord',
-    'tenant-report-form.html': 'Report tenant',
-    'tenant-reports.html': 'Reports against me',
-    'landlord-reports.html': 'Reports against me'
+    'property-review-details.html': 'Property review details'
 };
 
 function navigationLabelForFile(role, filename) {
@@ -2086,6 +2052,8 @@ function getLinkIcon(label) {
     icons['Property Approvals'] = icons['Property Review'];
     icons['Reservations'] = icons['Reservation Monitoring'];
     icons['Payment Monitoring'] = icons['Payment Monitor'];
+    icons['Maintenance'] = icons['Maintenance Monitor'];
+    icons['Maintenance & Cost Hub'] = icons['Maintenance Monitor'];
     icons['Case Triage'] = icons['Reports Monitor'];
     icons['Policies'] = icons['Policy Violations'];
     icons['Audit Trail'] = icons['Audit Logs'];
@@ -2109,3 +2077,152 @@ function getTenantIcon(label) {
     };
     return (icons[label] || '').replace('<svg ', '<svg aria-hidden="true" focusable="false" ');
 }
+
+// ===========================================================================
+// Universal Drag-and-Drop System for File / Image Uploads
+// ===========================================================================
+
+function initDomiknowDragAndDrop() {
+    if (typeof window === 'undefined' || typeof document === 'undefined') return;
+    if (typeof window.addEventListener !== 'function' || typeof document.querySelectorAll !== 'function') return;
+
+    // 1. Prevent default navigation if a file is dropped outside active dropzones
+    if (!window.__domiknowDragDropInitialized) {
+        window.__domiknowDragDropInitialized = true;
+
+        window.addEventListener('dragover', (e) => {
+            if (e && e.dataTransfer && Array.from(e.dataTransfer.types || []).includes('Files')) {
+                e.preventDefault();
+            }
+        });
+
+        window.addEventListener('drop', (e) => {
+            if (e && e.dataTransfer && Array.from(e.dataTransfer.types || []).includes('Files')) {
+                if (e.target && typeof e.target.closest === 'function' && !e.target.closest('[data-drop-zone], .upload-zone, .app-drag-drop-zone, .stmt-file-wrapper, .doc-upload-section, .upload-card, .photo-slot-card, .doc-slot-card, .upload-zone-compact, #chatHeadWindow, .profile-avatar-block, input[type="file"]')) {
+                    e.preventDefault();
+                }
+            }
+        });
+    }
+
+    // 2. Scan and bind dropzone behavior for any input[type="file"]
+    function enhanceFileInput(input) {
+        if (!input || input.dataset?.dragDropBound === 'true') return;
+        if (input.dataset) input.dataset.dragDropBound = 'true';
+
+        // Find best target container: explicit dropzone, parent wrapper, label, or form group
+        const container = (input.closest && input.closest('[data-drop-zone], .upload-zone, .app-drag-drop-zone, .stmt-file-wrapper, .doc-upload-section, .upload-card, .photo-slot-card, .doc-slot-card, .upload-zone-compact, .form-group')) || input.parentElement;
+        if (!container || typeof container.addEventListener !== 'function') return;
+
+        let dragCounter = 0;
+
+        container.addEventListener('dragenter', (e) => {
+            if (!e.dataTransfer || !Array.from(e.dataTransfer.types || []).includes('Files')) return;
+            e.preventDefault();
+            dragCounter++;
+            if (container.classList && typeof container.classList.add === 'function') {
+                container.classList.add('dragover');
+            }
+            if (typeof container.setAttribute === 'function') {
+                container.setAttribute('data-dragover', 'true');
+            }
+        });
+
+        container.addEventListener('dragover', (e) => {
+            if (!e.dataTransfer || !Array.from(e.dataTransfer.types || []).includes('Files')) return;
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'copy';
+        });
+
+        container.addEventListener('dragleave', (e) => {
+            e.preventDefault();
+            dragCounter--;
+            if (dragCounter <= 0) {
+                dragCounter = 0;
+                if (container.classList && typeof container.classList.remove === 'function') {
+                    container.classList.remove('dragover');
+                }
+                if (typeof container.removeAttribute === 'function') {
+                    container.removeAttribute('data-dragover');
+                }
+            }
+        });
+
+        container.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dragCounter = 0;
+            if (container.classList && typeof container.classList.remove === 'function') {
+                container.classList.remove('dragover');
+            }
+            if (typeof container.removeAttribute === 'function') {
+                container.removeAttribute('data-dragover');
+            }
+
+            const files = e.dataTransfer?.files;
+            if (!files || files.length === 0) return;
+
+            try {
+                if (typeof input.hasAttribute === 'function' && input.hasAttribute('multiple')) {
+                    input.files = files;
+                } else if (typeof DataTransfer !== 'undefined') {
+                    const dt = new DataTransfer();
+                    dt.items.add(files[0]);
+                    input.files = dt.files;
+                } else {
+                    input.files = files;
+                }
+            } catch (err) {
+                try {
+                    input.files = files;
+                } catch (e2) {}
+            }
+
+            // Dispatch events to notify form logic
+            if (typeof input.dispatchEvent === 'function') {
+                if (typeof Event === 'function') {
+                    input.dispatchEvent(new Event('input', { bubbles: true }));
+                    input.dispatchEvent(new Event('change', { bubbles: true }));
+                }
+            }
+
+            // If input has inline onchange attribute, invoke it
+            if (typeof input.onchange === 'function') {
+                input.onchange();
+            }
+        });
+    }
+
+    // Initial enhancement
+    try {
+        document.querySelectorAll('input[type="file"]').forEach(enhanceFileInput);
+    } catch (e) {}
+
+    // Dynamic enhancement for newly injected DOM elements (modals, slots, forms)
+    if (!window.__domiknowDropObserver && typeof window.MutationObserver === 'function' && document.body) {
+        window.__domiknowDropObserver = new window.MutationObserver((mutations) => {
+            for (const mutation of mutations) {
+                for (const node of mutation.addedNodes) {
+                    if (node.nodeType === 1) { // ELEMENT_NODE
+                        if (node.matches && node.matches('input[type="file"]')) {
+                            enhanceFileInput(node);
+                        } else if (node.querySelectorAll) {
+                            node.querySelectorAll('input[type="file"]').forEach(enhanceFileInput);
+                        }
+                    }
+                }
+            }
+        });
+        window.__domiknowDropObserver.observe(document.body, { childList: true, subtree: true });
+    }
+}
+
+// Ensure execution on DOM ready
+if (typeof document !== 'undefined') {
+    if (document.readyState === 'loading' && typeof document.addEventListener === 'function') {
+        document.addEventListener('DOMContentLoaded', initDomiknowDragAndDrop);
+    } else {
+        initDomiknowDragAndDrop();
+    }
+}
+
+

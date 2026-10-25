@@ -694,29 +694,10 @@
         }
     </style>
     <link href="../../css/design-system.css" rel="stylesheet">
+    <link href="../../css/landlord.css" rel="stylesheet">
     <script src="../../js/ui.js" defer></script>
 </head>
-<body>
-    <!-- Navbar -->
-    <nav class="navbar navbar-landlord">
-        <div class="navbar-container">
-            <div class="navbar-brand-group">
-                <a href="dashboard.html" style="text-decoration: none;"><span class="navbar-logo">DomiKnow</span></a>
-                <span class="navbar-badge navbar-badge-landlord">Landlord</span>
-            </div>
-            <div class="navbar-menu">
-                <a href="dashboard.html" class="navbar-menu-link">Dashboard</a>
-                <a href="properties.html" class="navbar-menu-link active">Properties</a>
-                <a href="property-create.html" class="navbar-menu-link">Register Property</a>
-                <a href="applications.html" class="navbar-menu-link">Tenant Applications</a>
-            </div>
-            <div class="navbar-right">
-                <span class="navbar-user-welcome">Welcome, <span class="user-name">User</span></span>
-                <button id="logoutBtn" class="navbar-btn">Logout</button>
-            </div>
-        </div>
-    </nav>
-
+<body class="app-loading" data-role="landlord">
     <!-- Main Content -->
     <main class="dashboard-container pd-layout">
         <!-- Back Navigation -->
@@ -1544,6 +1525,40 @@
                     </div>
                 `;
 
+                let photoDragCounter = 0;
+                slotDiv.addEventListener('dragenter', (e) => {
+                    e.preventDefault();
+                    photoDragCounter++;
+                    slotDiv.classList.add('dragover');
+                });
+                slotDiv.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    e.dataTransfer.dropEffect = 'copy';
+                });
+                slotDiv.addEventListener('dragleave', (e) => {
+                    e.preventDefault();
+                    photoDragCounter--;
+                    if (photoDragCounter <= 0) {
+                        photoDragCounter = 0;
+                        slotDiv.classList.remove('dragover');
+                    }
+                });
+                slotDiv.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    photoDragCounter = 0;
+                    slotDiv.classList.remove('dragover');
+                    const file = e.dataTransfer?.files?.[0];
+                    if (file) {
+                        const fileInput = document.getElementById(`fileInput_photo_${index}`);
+                        if (fileInput) {
+                            const dt = new DataTransfer();
+                            dt.items.add(file);
+                            fileInput.files = dt.files;
+                            uploadSlotPhoto(index, slot.key, slot.isMain, matchedImg ? matchedImg.id : '');
+                        }
+                    }
+                });
+
                 gallery.appendChild(slotDiv);
             });
 
@@ -1624,6 +1639,40 @@
                     </div>
                     ${replaceControlsHtml}
                 `;
+
+                let docDragCounter = 0;
+                slotDiv.addEventListener('dragenter', (e) => {
+                    e.preventDefault();
+                    docDragCounter++;
+                    slotDiv.classList.add('dragover');
+                });
+                slotDiv.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    e.dataTransfer.dropEffect = 'copy';
+                });
+                slotDiv.addEventListener('dragleave', (e) => {
+                    e.preventDefault();
+                    docDragCounter--;
+                    if (docDragCounter <= 0) {
+                        docDragCounter = 0;
+                        slotDiv.classList.remove('dragover');
+                    }
+                });
+                slotDiv.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    docDragCounter = 0;
+                    slotDiv.classList.remove('dragover');
+                    const file = e.dataTransfer?.files?.[0];
+                    if (file) {
+                        const fileInput = document.getElementById(`fileInput_doc_${index}`);
+                        if (fileInput) {
+                            const dt = new DataTransfer();
+                            dt.items.add(file);
+                            fileInput.files = dt.files;
+                            uploadSlotDocument(index, slot.type, matchedDoc ? matchedDoc.id : '');
+                        }
+                    }
+                });
 
                 docList.appendChild(slotDiv);
             });

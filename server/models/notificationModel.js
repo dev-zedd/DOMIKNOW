@@ -40,6 +40,19 @@ const notificationModel = {
         return item;
     },
 
+    async createNotification(userId, title, message, type = 'system_update', referenceId = null) {
+        if (typeof userId === 'object' && userId !== null) {
+            return this.create(userId);
+        }
+        return this.create({
+            user_id: userId,
+            title,
+            message,
+            type,
+            reference_id: referenceId
+        });
+    },
+
     async createForRole(role, notificationData) {
         try {
             const { data: users, error } = await supabase

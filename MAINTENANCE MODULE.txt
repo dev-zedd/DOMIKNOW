@@ -1,0 +1,314 @@
+================================================================================
+                    DOMIKNOW - MAINTENANCE & WORK ORDER MODULE
+     Komprehensibong Dokumentasyon, Arkitektura, at Batayang Alituntunin
+================================================================================
+
+--------------------------------------------------------------------------------
+1. PAMBUNGAD AT PANGKALAHATANG PILOSOPIYA (System Overview & Philosophy)
+--------------------------------------------------------------------------------
+Ang Maintenance & Work Order Module ng DOMIKNOW ay dinisenyo upang maging patas,
+mabilis, at mapagkakatiwalaan para sa lahat ng partido sa isang paupahan.
+
+Upang maiwasan ang alitan, pang-aabuso, at maling paniningil, ang buong module
+ay nakasalig sa prinsipyo ng "Clean Separation of Duties" at "Neutral Arbiter Principle":
+
+1. Walang Panghuhula sa Simula (No Speculative Root Cause):
+   * Kapag nag-file ang Tenant, OBSERBASYON AT SINTOMAS LAMANG ang inilalagay
+     (hal. "Tumutulo ang kisame kapag umuulan", "Hindi lumalamig ang aircon").
+   * BAKIT? Kapag pinayagang maglagay agad ang Tenant o Landlord ng paratang o
+     hula sa dahilan (hal. "Sinira ng bata" o "Lumang tubo na may sira"),
+     nagkakaroon agad ng alitan at bias bago pa man masilip ng eksperto ang problema.
+
+2. Eksperto ang Nagsusuri (Ocular Inspection by Field Technicians):
+   * Ang accredited Maintenance Personnel ang pupunta sa unit upang magsagawa ng
+     pormal na ocular inspection. Sila lamang ang mag-uulat ng tunay na sanhi ng sira,
+     magkakalkula ng presyo ng materyales at labor, at kukuha ng litrato bago simulan.
+
+3. Admin bilang Neutral Legal Arbiter (Civil Code Decision):
+   * Hindi maaaring si Landlord ang magdikta kung sino ang magbabayad. Ang ADMIN ang
+     magpapataw ng opisyal na legal liability alinsunod sa batas ng Pilipinas bago
+     aprubahan ang quotation.
+
+4. Transparent Quotation at Multi-Party Sign-Off:
+   * Bago ang aktwal na repair, aprubado muna ang quote ng partido na mananagot.
+   * Pagkatapos ng repair, may two-way verification (Landlord verification at
+     Tenant confirmation / rework request) bago tuluyang isara ang ticket.
+
+
+--------------------------------------------------------------------------------
+2. BATAYANG LEGAL (Civil Code of the Philippines)
+--------------------------------------------------------------------------------
+Ang pagpapasiya ng pananagutan (Liability Determination) ng Admin ay nakabatay sa
+mga sumusunod na probisyon ng Civil Code of the Philippines:
+
+[A] CIVIL CODE ART. 1654 -> MAY PANANAGUTAN: LANDLORD (LESSOR)
+    Obligasyon ng May-ari:
+    1. Panatilihing maayos at ligtas tirhan ang unit (habitability).
+    2. Sagutin ang lahat ng kinakailangang pagkukumpuni dulot ng NATURAL WEAR-AND-TEAR,
+       kalumaan ng materyales, structural leaks, pundasyon, main electrical lines,
+       at sira bago pa man umupa ang tenant.
+    Halimbawa:
+    - Kinakalawang na main drainage pipe
+    - Bitak sa bubong dahil sa panahon/bagyo
+    - Sunog na main circuit breaker dahil sa kalumaan
+
+[B] CIVIL CODE ART. 1657 -> MAY PANANAGUTAN: TENANT (LESSEE)
+    Obligasyon ng Umuupa:
+    1. Gamitin ang unit bilang isang maingat na ama ng tahanan (diligent father of a family).
+    2. Sagutin ang pinsalang dulot ng KAPABAYAAN (negligence), maling paggamit (misuse),
+       kawalan ng pag-iingat, o sadyang pagkasira.
+    Halimbawa:
+    - Baradong inidoro dahil sa itinapong sanitary pads, wipes, o basura
+    - Nabasag na bintana dahil sa pagwawala o paghampas
+    - Nasunog na outlet dahil sa pag-overload ng sariling appliances
+
+[C] CIVIL CODE 50/50 EQUITABLE SPLIT -> SHARED (50% LANDLORD / 50% TENANT)
+    Pinagsamang Sanhi (Mutual / Compounded Factors):
+    Kapag may ambag ang parehong panig o hindi matukoy nang lubusan ang nag-iisang sanhi.
+    Halimbawa:
+    - Lumang gripo na may kalawang na, ngunit nabali dahil sa biglaang pagpiga ng tenant
+    - Baradong lababo dulot ng lumang disenyo ng tubo na sinabayan ng sebo mula sa pagluluto
+
+
+--------------------------------------------------------------------------------
+3. MGA GAMPANIN AT FUNCTIONS NG BAWAT USER
+--------------------------------------------------------------------------------
+
+[A] TENANT (Umuupa)
+    MGA KAYANG GAWIN (Capabilities):
+    1. Mag-submit ng Request:
+       - Pumili ng Category (Plumbing, Electrical, Aircon, Roofing, Carpentry, Locks, atbp.)
+       - Pumili ng Urgency (Low, Medium, High, Emergency)
+       - Magtala ng mga SINTOMAS lamang (walang legal speculation)
+       - Mag-upload ng picture ng nasirang bahagi
+       - Magtakda ng nais na schedule ng pagbisita
+    2. Real-Time Tracking:
+       - Makita kung sino ang technician na itinalaga
+       - Makita ang live status (Assigned -> Travelling -> Arrived -> Repairing)
+    3. Tingnan ang Diagnostic Ocular Report at Admin Decision:
+       - Mabasa ang teknikal na findings ng tubero/electrician
+       - Makita kung sino ang itinalagang magbabayad at ang legal justification ng Admin
+    4. Aprubahan ang Quotation:
+       - Kung siya ang pinatawan ng pananagutan (o split), may kapangyarihang mag-apruba
+         ng quotation bago simulan ang repair
+    5. Kumpirmahin o Humiling ng Rework:
+       - "Confirm Completion": Isasara ang ticket kapag nasubukan at maayos na
+       - "Request Rework": Ibabalik sa technician kung may tagas pa rin kalakip ang paliwanag
+    6. Magbayad sa System:
+       - Direktang pag-settle ng repair payment sa platform
+
+    MGA HINDI DAPAT / HINDI KAYANG GAWIN (Restrictions):
+    - Bawal mag-speculate o mag-akusa agad sa request form.
+    - Bawal magtalaga o mag-dispatch ng sariling technician mula sa labas.
+    - Bawal baguhin ang presyo ng piyesa o labor ng technician.
+    - Bawal magsara ng ticket nang hindi dumadaan sa completion report.
+
+--------------------------------------------------------------------------------
+
+[B] LANDLORD (May-ari ng Paupahan)
+    MGA KAYANG GAWIN (Capabilities):
+    1. Mag-issue ng Owner Work Order (Art. 1654):
+       - Para sa mga bakanteng kwarto (vacant units), paghahanda bago paupahan,
+         o regular na general maintenance.
+       - Awtomatikong 'approved' at diretso sa dispatch queue.
+    2. I-monitor ang Lahat ng Requests:
+       - Naka-grupo ayon sa property at unit na may search at filtering.
+    3. Suriin ang Technician Diagnosis at Admin Decision:
+       - Makita ang 'Before' photos, listahan ng piyesa, at labor cost.
+       - Mabasa ang neutral legal ruling ng Admin.
+    4. Aprubahan ang Quotation:
+       - Kung Landlord Liable o Split, aprubahan ang badyet bago gawin.
+    5. I-verify ang Natapos na Trabaho:
+       - Pagsusuri sa 'After' photos, resibo ng piyesa, at safety remarks ng technician.
+    6. Magbayad ng Repair Cost:
+       - Pagbabayad sa serbisyo ng technician para sa mga repair na pananagutan ng may-ari.
+    7. Tingnan ang Cost History:
+       - Kabuuang nagastos sa maintenance kada unit para sa property accounting.
+
+    MGA HINDI DAPAT / HINDI KAYANG GAWIN (Restrictions):
+    - Bawal piliting pagbayarin ang tenant nang sarili lamang (walang Admin arbiter ruling).
+    - Bawal ibawas sa security deposit nang walang validong maintenance report at liability decision.
+    - Bawal tanggihan ang mga emergency repairs na lumalabag sa Art. 1654 (habitability).
+
+--------------------------------------------------------------------------------
+
+[C] MAINTENANCE PERSONNEL (Field Technician)
+    MGA KAYANG GAWIN (Capabilities):
+    1. Pamahalaan ang Task Queue:
+       - Tumanggap ng alerto sa trabaho; i-click ang "Accept" o "Decline" (na may dahilan).
+    2. I-broadcast ang Field Progress sa Real-Time:
+       - "Start Travel" (travelling) -> Maabisuhan ang Tenant at Landlord na papunta na.
+       - "Mark Arrived" (arrived) -> Patunay na nasa pinto/lokasyon na.
+       - "Begin Work" (repairing) -> Pagsisimula ng pagsusuri o pagkukumpuni.
+    3. Magsumite ng Ocular Inspection at Quotation (/inspection):
+       - Iulat ang natuklasang tunay na sira (Problem Identified).
+       - Mag-upload ng "Before" photo.
+       - Ilista ang materyales (Pangalan, dami, presyo kada piraso).
+       - Maglagay ng tantsang labor fee.
+    4. Magsumite ng Opisyal na Completion Report (/worker-report):
+       - Detalye ng mga ginawang aksyon at inayos.
+       - Mag-upload ng "After" photo bilang patunay na maayos na.
+       - Resibo ng mga aktwal na nagastos sa materyales.
+       - Safety notes upang maiwasan ang muling pagkasira.
+
+    MGA HINDI DAPAT / HINDI KAYANG GAWIN (Restrictions):
+    - Bawal lumaktaw ng status (hindi pwedeng mag-complete nang hindi nag-arrived o repairing).
+    - Bawal magdesisyon kung sino ang magbabayad sa pagitan ng Landlord at Tenant.
+    - Bawal sumilip sa lease agreements o pribadong pinansyal na tala ng tenant/landlord.
+
+--------------------------------------------------------------------------------
+
+[D] ADMIN (Platform Arbiter & Dispatcher)
+    MGA KAYANG GAWIN (Capabilities):
+    1. Centralized Platform Triage:
+       - Makita ang lahat ng requests sa buong sistema na may live status filters.
+    2. Pamamahala ng Personnel Pool:
+       - Mag-rehistro ng mga bagong accredited technicians (Plumber, Electrician, HVAC, Carpentry).
+       - Subaybayan ang active jobs at performance rating ng bawat technician.
+    3. Mag-Dispatch ng Technician:
+       - Piliin ang pinaka-angkop na technician ayon sa trade at lokasyon.
+       - Magtakda ng target due date at initial dispatch notes.
+    4. Neutral Arbiter Liability Determination (/set-liability):
+       - Matapos isumite ng technician ang ocular findings at litrato, susuriin ito ni Admin.
+       - Magpataw ng pormal na desisyon:
+         * 'landlord' (Art. 1654: Natural wear & tear, structural defects)
+         * 'tenant'   (Art. 1657: Misuse, negligence, direct damage)
+         * 'split'    (50/50 Equitable sharing)
+       - Magtala ng opisyal na legal justification na naka-save sa audit trail.
+    5. Emergency Intervention at Auditing:
+       - Mag-reassign ng technician kung nag-decline o hindi rumesponde ang nauna.
+       - Mag-audit ng anumang kaduda-dudang singil sa piyesa o serbisyo.
+
+    MGA HINDI DAPAT / HINDI KAYANG GAWIN (Restrictions):
+    - Bawal magpataw ng liability nang walang teknikal na basehan mula sa ocular report.
+    - Bawal baguhin ang kasaysayan ng audit trail o burahin ang mga litrato ng ebidensya.
+
+
+--------------------------------------------------------------------------------
+4. KUMLETONG WORKFLOW AT PROSESO (Lifecycle Timeline)
+--------------------------------------------------------------------------------
+
+[YUGTO 1: REQUEST INGESTION]
+   - Tenant nag-file ng sintomas at litrato (Status: pending).
+   - O kaya Landlord nag-file ng direct work order para sa bakanteng kwarto (Status: approved).
+
+[YUGTO 2: ADMIN TRIAGE & DISPATCH]
+   - Tinitingnan ni Admin sa Command Center (admin/maintenance.html).
+   - Pinipili ang accredited technician at target deadline.
+   - Status nagiging: assigned.
+
+[YUGTO 3: FIELD DEPLOYMENT & REAL-TIME TRACKING]
+   - Technician tinatanggap ang trabaho (Status: accepted).
+   - Technician nag-uupdate ng live status:
+     * Travelling (papunta)
+     * Arrived (nasa pinto na)
+     * Repairing (nagsimula na ang trabaho)
+
+[YUGTO 4: OCULAR INSPECTION & QUOTATION]
+   - Technician tinitingnan ang sira, kumukuha ng "Before" photo.
+   - Technician naglilista ng materyales at labor fee (/inspection).
+   - Status nagiging: inspection_submitted.
+
+[YUGTO 5: ADMIN NEUTRAL ARBITRATION]
+   - Admin sinusuri ang teknikal na findings at litrato.
+   - Admin nagpapasya ng pananagutan: Landlord (Art. 1654) vs Tenant (Art. 1657) vs Split.
+   - Status nagiging: quote_pending.
+
+[YUGTO 6: QUOTE APPROVAL NG MANANAGOT NA PARTIDO]
+   - Kung Landlord ang liable, Landlord ang mag-aapruba sa kanyang portal.
+   - Kung Tenant ang liable, Tenant ang mag-aapruba sa kanyang portal.
+   - Status nagiging: quote_approved.
+
+[YUGTO 7: REPAIR EXECUTION & COMPLETION REPORT]
+   - Technician binibili ang gamit at inaayos ang sira.
+   - Technician kumukuha ng "After" photo at nagpapasa ng completion report (/worker-report).
+   - Status nagiging: completed.
+
+[YUGTO 8: TWO-WAY SIGN-OFF & PAYMENT SETTLEMENT]
+   - Landlord sinusuri ang resibo at litrato ("Verify Work").
+   - Tenant sinusubukan ang unit:
+     * "Confirm Completion" -> Ticket Status nagiging: closed.
+     * "Request Rework"     -> Kung may tagas pa, babalik sa: repairing.
+   - Pagbabayad sa serbisyo gamit ang in-system payment settlement (/pay).
+
+
+--------------------------------------------------------------------------------
+5. TALAAN NG MGA ESTADO (Status Lifecycle State Machine)
+--------------------------------------------------------------------------------
+- pending              : Bagong pasok na request mula sa tenant; naghihintay ng triage.
+- approved             : Naaprubahan na o direktang galing sa Landlord work order.
+- assigned             : May technician nang napili pero hindi pa tinatanggap.
+- accepted             : Tinanggap na ng technician ang trabaho.
+- travelling           : Papunta na ang technician sa lokasyon.
+- arrived              : Dumating na sa property ang technician.
+- repairing            : Kasalukuyang ginagawa o iniinspeksyon ang unit.
+- inspection_submitted : Naisumite na ang ocular findings at quote ng technician.
+- quote_pending        : May desisyon na sa pananagutan; naghihintay ng approval ng magbabayad.
+- quote_approved       : Aprubado na ang badyet; pwede nang simulan ang pinal na repair.
+- completed            : Natapos na ang pag-aayos at may "After" photo at report na.
+- verified             : Napatunayan na ng may-ari ang trabaho.
+- closed               : Kumpirmado at tapos na ang ticket; bayad na o naitala sa ledger.
+- rejected             : Hindi tinanggap ang request (may kalakip na opisyal na dahilan).
+
+
+--------------------------------------------------------------------------------
+6. TALAAN NG MGA PAGES AT REST API ENDPOINTS
+--------------------------------------------------------------------------------
+
+[MGA PAHINA SA FRONTEND (UI Pages)]:
+- Tenant     : public/pages/tenant/maintenance.html
+- Landlord   : public/pages/landlord/maintenance.html
+               public/pages/landlord/maintenance-details.html
+- Technician : public/pages/maintenance/tasks.html
+               public/pages/maintenance/task-details.html
+- Admin      : public/pages/admin/maintenance.html
+
+[MGA BACKEND REST API ENDPOINTS (server/routes/maintenanceRoutes.js)]:
+POST /api/maintenance/requests                 (Tenant)     : Submit new request
+GET  /api/maintenance/requests/tenant          (Tenant)     : Fetch own tickets
+PUT  /api/maintenance/requests/:id/tenant-confirm (Tenant)  : Confirm closure or request rework
+GET  /api/maintenance/requests/landlord        (Landlord)   : Fetch property tickets
+POST /api/maintenance/landlord/requests        (Landlord)   : Direct Art. 1654 work order
+PUT  /api/maintenance/requests/:id/landlord-verify (Landlord): Verify completion report
+GET  /api/maintenance/requests/worker          (Technician) : Fetch assigned jobs
+PUT  /api/maintenance/requests/:id/worker-respond (Technician): Accept or decline job
+PUT  /api/maintenance/requests/:id/worker-status (Technician): Update travel status
+POST /api/maintenance/requests/:id/inspection  (Technician) : Submit ocular quote & before-pic
+POST /api/maintenance/requests/:id/worker-report (Technician): Submit completion report & after-pic
+GET  /api/maintenance/requests/:id             (All Roles)  : Fetch details & timeline logs
+PUT  /api/maintenance/requests/:id/quote-decision (All Roles): Approve or decline quote
+POST /api/maintenance/requests/:id/pay         (All Roles)  : Pay repair fees
+GET  /api/maintenance/admin/overview           (Admin)      : Platform maintenance statistics
+GET  /api/maintenance/admin/requests           (Admin)      : All platform tickets
+GET  /api/maintenance/admin/workers            (Admin)      : Technician roster directory
+POST /api/maintenance/admin/workers            (Admin)      : Register accredited technician
+PUT  /api/maintenance/admin/requests/:id/dispatch (Admin)   : Dispatch technician to ticket
+PUT  /api/maintenance/admin/requests/:id/set-liability (Admin): Arbiter ruling (Art. 1654 vs Art. 1657)
+
+
+--------------------------------------------------------------------------------
+7. BAKIT MAIIWASAN ANG PANG-AABUSO SA SISTEMANG ITO?
+--------------------------------------------------------------------------------
+1. Walang Unilateral Blame (Proteksyon sa Tenant):
+   Hindi maaaring ibawas agad ng Landlord ang pampagawa sa deposit ng umuupa.
+   Kailangan munang may litrato at ulat mula sa lisensyadong technician, at
+   kumpirmasyon mula sa Admin arbiter alinsunod sa Art. 1654 / Art. 1657.
+
+2. Walang Frivolous o Fake Accusations (Proteksyon sa Landlord):
+   Hindi maaaring magtago ang Tenant sa likod ng maling paratang dahil may
+   ocular inspection. Kung mapatunayang kapabayaan (hal. banyagang bagay sa inidoro
+   o sirang saksakan dahil sa sariling kagamitan), ang Tenant ang pananagutin ng Admin.
+
+3. Transparent Pricing (Proteksyon sa Lahat):
+   Ang quotation ay itemized (nakalista ang bawat piyesa at labor). Walang
+   nakatagong markups o overcharging.
+
+4. Permanent Audit Trail:
+   Ang bawat pagpalit ng estado, pangalan ng nag-apruba, oras ng pagdating ng
+   technician, at litrato ay permanenteng naka-record sa maintenance_logs at
+   hindi mabubura.
+
+================================================================================
+  Ang dokumentong ito ang magsisilbing opisyal na batayan at pamantayan sa lahat
+  ng pagpapaunlad, pagsubok (testing), at operasyon ng Maintenance Module sa DOMIKNOW.
+================================================================================

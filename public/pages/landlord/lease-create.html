@@ -206,31 +206,10 @@
         }
     </style>
     <link href="../../css/design-system.css" rel="stylesheet">
+    <link href="../../css/landlord.css" rel="stylesheet">
     <script src="../../js/ui.js" defer></script>
 </head>
-<body>
-    <!-- Navbar -->
-    <nav class="navbar navbar-landlord">
-        <div class="navbar-container">
-            <div class="navbar-brand-group">
-                <a href="dashboard.html" style="text-decoration: none;"><span class="navbar-logo">DomiKnow</span></a>
-                <span class="navbar-badge navbar-badge-landlord">Landlord</span>
-            </div>
-            <div class="navbar-menu">
-                <a href="dashboard.html" class="navbar-menu-link">Dashboard</a>
-                <a href="properties.html" class="navbar-menu-link">Properties</a>
-                <a href="applications.html" class="navbar-menu-link">Tenant Applications</a>
-                <a href="leases.html" class="navbar-menu-link active">Leases</a>
-                <a href="billings.html" class="navbar-menu-link">Billings</a>
-                <a href="payments.html" class="navbar-menu-link">Payments</a>
-            </div>
-            <div class="navbar-right">
-                <span class="navbar-user-welcome">Welcome, <span class="user-name">User</span></span>
-                <button id="logoutBtn" class="navbar-btn">Logout</button>
-            </div>
-        </div>
-    </nav>
-
+<body class="app-loading" data-role="landlord">
     <!-- Main Content -->
     <main class="dashboard-container" style="max-width: 1200px;">
         <div class="app-back-nav">

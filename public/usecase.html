@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DOMIKNOW - Use Case Diagram (Thesis & Documentation Standard)</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background-color: #f1f3f5;
+            color: #111827;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Top Bar */
+        header {
+            background-color: #ffffff;
+            border-bottom: 2px solid #111827;
+            padding: 12px 24px;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+
+        .header-wrap {
+            max-width: 1440px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .title-group h1 {
+            font-size: 1.25rem;
+            font-weight: bold;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .title-group p {
+            font-size: 0.8rem;
+            color: #4b5563;
+            margin-top: 2px;
+        }
+
+        .btn-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            background-color: #ffffff;
+            color: #111827;
+            border: 1.5px solid #111827;
+            padding: 7px 14px;
+            font-size: 0.82rem;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: all 0.15s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-family: inherit;
+            text-decoration: none;
+        }
+
+        .btn:hover {
+            background-color: #111827;
+            color: #ffffff;
+        }
+
+        .btn-active {
+            background-color: #111827;
+            color: #ffffff;
+        }
+
+        /* Controls / Sub-Bar */
+        .controls-bar {
+            max-width: 1440px;
+            margin: 14px auto 0;
+            padding: 0 24px;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .mode-toggle {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .zoom-wrap {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            background: #ffffff;
+            border: 1.5px solid #111827;
+            border-radius: 4px;
+            padding: 2px 6px;
+        }
+
+        .zoom-btn {
+            background: transparent;
+            border: none;
+            font-weight: bold;
+            font-size: 1rem;
+            cursor: pointer;
+            width: 26px;
+            height: 26px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .zoom-btn:hover {
+            background: #f3f4f6;
+        }
+
+        .zoom-label {
+            font-size: 0.8rem;
+            font-weight: bold;
+            padding: 0 6px;
+        }
+
+        /* Main Canvas Sheet */
+        .workspace {
+            max-width: 1440px;
+            width: 100%;
+            margin: 14px auto 30px;
+            padding: 0 24px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .paper-sheet {
+            background-color: #ffffff;
+            border: 1px solid #9ca3af;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            overflow: auto;
+            max-width: 100%;
+            border-radius: 3px;
+        }
+
+        .usecase-svg {
+            display: block;
+            background-color: #ffffff;
+            transition: transform 0.2s ease-out;
+            transform-origin: top center;
+        }
+
+        /* Toast Feedback */
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            background-color: #111827;
+            color: #ffffff;
+            padding: 11px 20px;
+            border-radius: 4px;
+            font-size: 0.86rem;
+            font-weight: bold;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.3);
+            opacity: 0;
+            pointer-events: none;
+            transform: translateY(10px);
+            transition: all 0.25s;
+            z-index: 1000;
+        }
+
+        .toast.show {
+            opacity: 1;
+            pointer-events: auto;
+            transform: translateY(0);
+        }
+
+        /* Print Media Styles */
+        @media print {
+            header, .controls-bar, .toast {
+                display: none !important;
+            }
+            body, .workspace, .paper-sheet {
+                background: #ffffff !important;
+                box-shadow: none !important;
+                border: none !important;
+                padding: 0 !important;
+                margin: 0 !important;
+            }
+            .usecase-svg {
+                transform: scale(1) !important;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <header>
+        <div class="header-wrap">
+            <div class="title-group">
+                <h1>DOMIKNOW &bull; USE CASE DIAGRAM</h1>
+                <p>Standard UML System Architecture &bull; Clean Categorized Roles &amp; Use Cases</p>
+            </div>
+
+            <div class="btn-group">
+                <a href="flowcharts.html" class="btn" title="View Per-User Process Flows">
+                    &larr; Process Flows
+                </a>
+                <a href="architecture.html" class="btn" title="View System Context &amp; Data Flow Diagrams">
+                    Context &amp; DFD
+                </a>
+                <a href="hipo.html" class="btn" title="View HIPO Model">
+                    HIPO Model &rarr;
+                </a>
+                <button class="btn" onclick="copyCurrentToClipboard()" title="Copy high-res PNG image to clipboard for Word/Docs">
+                    Copy PNG
+                </button>
+                <button class="btn btn-active" onclick="downloadCurrentPNG()" title="Download high-resolution 300 DPI PNG">
+                    Download PNG
+                </button>
+                <button class="btn" onclick="window.print()" title="Print page or save as PDF">
+                    Print / PDF
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Controls Bar -->
+    <div class="controls-bar">
+        <div class="mode-toggle">
+            <span style="font-weight: bold; font-size: 0.85rem;">System:</span>
+            <span style="font-size: 0.82rem; color: #4b5563;">DOMIKNOW Property Management Platform</span>
+        </div>
+
+        <div class="zoom-wrap">
+            <button class="zoom-btn" onclick="zoom(-0.1)" title="Zoom Out">−</button>
+            <span class="zoom-label" id="zoomText">100%</span>
+            <button class="zoom-btn" onclick="zoom(0.1)" title="Zoom In">+</button>
+            <button class="zoom-btn" onclick="resetZoom()" title="Reset Zoom">⟲</button>
+        </div>
+    </div>
+
+    <!-- Main Workspace -->
+    <main class="workspace">
+        <div class="paper-sheet" id="paperSheet">
+            <div id="svgContainer"></div>
+        </div>
+    </main>
+
+    <!-- Toast -->
+    <div class="toast" id="toast">Diagram PNG exported successfully!</div>
+
+    <script>
+        let currentScale = 1.0;
+
+        // Shared SVG Defs
+        const svgDefs = `
+        <defs>
+            <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                <path d="M 0 1.5 L 9 5 L 0 8.5 z" fill="#111827" />
+            </marker>
+            <marker id="openArrow" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                <path d="M 1 2 L 7 5 L 1 8" fill="none" stroke="#111827" stroke-width="1.4" />
+            </marker>
+        </defs>`;
+
+        // Actor Stick Figure
+        function renderActor(cx, cy, label) {
+            let svg = `
+            <g class="actor">
+                <!-- Head -->
+                <circle cx="${cx}" cy="${cy - 24}" r="13" fill="#ffffff" stroke="#111827" stroke-width="1.5" />
+                <!-- Torso -->
+                <line x1="${cx}" y1="${cy - 11}" x2="${cx}" y2="${cy + 18}" stroke="#111827" stroke-width="1.5" />
+                <!-- Arms -->
+                <line x1="${cx - 20}" y1="${cy - 1}" x2="${cx + 20}" y2="${cy - 1}" stroke="#111827" stroke-width="1.5" />
+                <!-- Left Leg -->
+                <line x1="${cx}" y1="${cy + 18}" x2="${cx - 15}" y2="${cy + 42}" stroke="#111827" stroke-width="1.5" />
+                <!-- Right Leg -->
+                <line x1="${cx}" y1="${cy + 18}" x2="${cx + 15}" y2="${cy + 42}" stroke="#111827" stroke-width="1.5" />
+                <!-- Label -->
+                <text x="${cx}" y="${cy + 60}" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#111827">${label}</text>
+            </g>`;
+            return svg;
+        }
+
+        // Use Case Oval (Ellipse)
+        function renderUseCase(cx, cy, rx, ry, fill, lines) {
+            let svg = `
+            <g class="use-case">
+                <ellipse cx="${cx}" cy="${cy}" rx="${rx}" ry="${ry}" fill="${fill}" stroke="#111827" stroke-width="1.3" />`;
+            if (lines.length === 1) {
+                svg += `<text x="${cx}" y="${cy + 4}" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="500" fill="#111827">${lines[0]}</text>`;
+            } else if (lines.length === 2) {
+                svg += `<text x="${cx}" y="${cy - 3}" text-anchor="middle" font-family="Arial, sans-serif" font-size="10.5" font-weight="500" fill="#111827">${lines[0]}</text>`;
+                svg += `<text x="${cx}" y="${cy + 10}" text-anchor="middle" font-family="Arial, sans-serif" font-size="10.5" font-weight="500" fill="#111827">${lines[1]}</text>`;
+            }
+            svg += `</g>`;
+            return svg;
+        }
+
+        // Association Line (Solid)
+        function renderAssociation(x1, y1, x2, y2) {
+            return `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="#111827" stroke-width="1.2" />`;
+        }
+
+        // Curved Association Line
+        function renderCurveAssociation(d) {
+            return `<path d="${d}" fill="none" stroke="#111827" stroke-width="1.2" />`;
+        }
+
+        // Relationship (Include / Extend)
+        function renderRelation(d, type, textX, textY) {
+            return `
+            <path d="${d}" fill="none" stroke="#111827" stroke-width="1.2" stroke-dasharray="4,3" marker-end="url(#openArrow)" />
+            <text x="${textX}" y="${textY}" text-anchor="middle" font-family="Arial, sans-serif" font-size="9.5" font-style="italic" fill="#111827">&lt;&lt;${type}&gt;&gt;</text>`;
+        }
+
+        function getUseCaseSVG() {
+            const W = 1200;
+            const H = 820;
+
+            let svg = `<svg id="activeFlowchart" class="usecase-svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">`;
+            svg += svgDefs;
+            svg += `<rect width="${W}" height="${H}" fill="#ffffff" />`;
+
+            // Outer Document Frame
+            svg += `<rect x="25" y="25" width="${W - 50}" height="${H - 50}" fill="#ffffff" stroke="#111827" stroke-width="1.2" />`;
+
+            // System Boundary Box (bH = 590, bottom edge at y = 645 to leave 60px clean space before Legend)
+            const bX = 220, bY = 55, bW = 750, bH = 590;
+            svg += `<rect x="${bX}" y="${bY}" width="${bW}" height="${bH}" fill="#ffffff" stroke="#111827" stroke-width="1.2" rx="2" />`;
+            // System Boundary Title
+            svg += `<text x="${bX + bW / 2}" y="${bY + 30}" text-anchor="middle" font-family="Arial, sans-serif" font-size="15" font-weight="bold" fill="#111827" letter-spacing="1.5">DOMIKNOW</text>`;
+
+            // Palettes for categories
+            const cAuth = "#cfe2f3";      // Light Ice Blue (Authentication & Internal Core)
+            const cProp = "#d9ead3";      // Light Sage Green (Property)
+            const cLease = "#d9d2e9";     // Light Lavender (Tenancy & Lease)
+            const cBill = "#fff2cc";      // Light Gold/Yellow (Billing & Payment)
+            const cMaint = "#d0e0e3";     // Light Teal/Cyan (Maintenance)
+            const cGov = "#f4cccc";       // Light Rose (Governance & Admin)
+
+            // Use Case Definitions (Coordinates & Fills)
+            // Left Column Use Cases (Center X = 360)
+            const u1 = { cx: 360, cy: 115, rx: 78, ry: 20, fill: cProp, lines: ["Explore Properties"] };
+            const u2 = { cx: 360, cy: 175, rx: 78, ry: 20, fill: cLease, lines: ["Submit Application"] };
+            const u3 = { cx: 360, cy: 235, rx: 80, ry: 20, fill: cLease, lines: ["Sign Digital Lease"] };
+            const u4 = { cx: 360, cy: 295, rx: 84, ry: 20, fill: cProp, lines: ["Manage Properties"] };
+            const u5 = { cx: 360, cy: 355, rx: 84, ry: 20, fill: cBill, lines: ["Record Submeter Usage"] };
+            const u6 = { cx: 360, cy: 415, rx: 82, ry: 20, fill: cMaint, lines: ["Assign Maintenance"] };
+            const u7 = { cx: 360, cy: 475, rx: 84, ry: 20, fill: cMaint, lines: ["Execute Repair & Report"] };
+            const u8 = { cx: 360, cy: 535, rx: 82, ry: 20, fill: cGov, lines: ["File Dispute Request"] };
+            const u9 = { cx: 360, cy: 595, rx: 82, ry: 20, fill: cGov, lines: ["Submit Rating & Review"] };
+
+            // Middle Column Use Cases (Center X = 595)
+            const u10 = { cx: 595, cy: 120, rx: 80, ry: 20, fill: cAuth, lines: ["Manage User Profile"] };
+            const u11 = { cx: 595, cy: 185, rx: 82, ry: 20, fill: cLease, lines: ["Upload ID Requirements"] };
+            const u12 = { cx: 595, cy: 255, rx: 80, ry: 20, fill: cBill, lines: ["Pay Rent & Utilities"] };
+            const u13 = { cx: 595, cy: 325, rx: 84, ry: 20, fill: cAuth, lines: ["Receive Notifications"] };
+            const u14 = { cx: 595, cy: 395, rx: 82, ry: 20, fill: cMaint, lines: ["Submit Repair Ticket"] };
+            const u15 = { cx: 595, cy: 465, rx: 80, ry: 20, fill: cMaint, lines: ["Track Repair Status"] };
+            const u16 = { cx: 595, cy: 540, rx: 82, ry: 20, fill: cGov, lines: ["Manage Platform Policies"] };
+
+            // Right Column Use Cases (Center X = 830)
+            const u17 = { cx: 830, cy: 120, rx: 78, ry: 20, fill: cAuth, lines: ["Authenticate User"] };
+            const u18 = { cx: 830, cy: 185, rx: 84, ry: 20, fill: cProp, lines: ["Review Property Listings"] };
+            const u19 = { cx: 830, cy: 255, rx: 82, ry: 20, fill: cBill, lines: ["Verify Payment Receipts"] };
+            const u20 = { cx: 830, cy: 325, rx: 82, ry: 20, fill: cGov, lines: ["Triage & Settle Disputes"] };
+            const u21 = { cx: 830, cy: 395, rx: 82, ry: 20, fill: cGov, lines: ["Audit Trail & System Logs"] };
+            const u22 = { cx: 830, cy: 465, rx: 80, ry: 20, fill: cAuth, lines: ["Manage User Accounts"] };
+            const u23 = { cx: 830, cy: 540, rx: 82, ry: 20, fill: cAuth, lines: ["Generate Reports"] };
+
+            // Render Association Lines FIRST (under ovals)
+            // 1. Tenant Associations (from x = 115, y = 165)
+            svg += renderAssociation(115, 165, u1.cx - u1.rx, u1.cy);
+            svg += renderAssociation(115, 165, u2.cx - u2.rx, u2.cy);
+            svg += renderAssociation(115, 165, u3.cx - u3.rx, u3.cy);
+            svg += renderCurveAssociation(`M 115 165 C 190 200, 320 255, ${u12.cx - u12.rx} ${u12.cy}`);
+            svg += renderCurveAssociation(`M 115 165 C 180 230, 280 325, ${u13.cx - u13.rx} ${u13.cy}`);
+            svg += renderCurveAssociation(`M 115 165 C 180 260, 260 395, ${u14.cx - u14.rx} ${u14.cy}`);
+            svg += renderCurveAssociation(`M 115 165 C 170 280, 180 460, ${u8.cx - u8.rx} ${u8.cy}`);
+            svg += renderCurveAssociation(`M 115 165 C 150 320, 160 520, ${u9.cx - u9.rx} ${u9.cy}`);
+
+            // 2. Landlord Associations (from x = 115, y = 355)
+            svg += renderAssociation(115, 355, u3.cx - u3.rx, u3.cy);
+            svg += renderAssociation(115, 355, u4.cx - u4.rx, u4.cy);
+            svg += renderAssociation(115, 355, u5.cx - u5.rx, u5.cy);
+            svg += renderAssociation(115, 355, u6.cx - u6.rx, u6.cy);
+            svg += renderCurveAssociation(`M 115 355 C 240 355, 380 325, ${u13.cx - u13.rx} ${u13.cy}`);
+            svg += renderCurveAssociation(`M 115 355 C 190 420, 200 490, ${u8.cx - u8.rx} ${u8.cy}`);
+            svg += renderCurveAssociation(`M 115 355 C 220 330, 460 270, ${u19.cx - u19.rx} ${u19.cy}`);
+            svg += renderCurveAssociation(`M 115 355 C 220 440, 500 540, ${u23.cx - u23.rx} ${u23.cy}`);
+
+            // 3. Maintenance Personnel Associations (from x = 115, y = 525)
+            svg += renderAssociation(115, 525, u7.cx - u7.rx, u7.cy);
+            svg += renderCurveAssociation(`M 115 525 C 240 525, 380 465, ${u15.cx - u15.rx} ${u15.cy}`);
+            svg += renderCurveAssociation(`M 115 525 C 220 460, 340 335, ${u13.cx - u13.rx} ${u13.cy}`);
+
+            // 4. Administrator Associations (from x = 1085, y = 355)
+            svg += renderAssociation(1085, 355, u18.cx + u18.rx, u18.cy);
+            svg += renderAssociation(1085, 355, u19.cx + u19.rx, u19.cy);
+            svg += renderAssociation(1085, 355, u20.cx + u20.rx, u20.cy);
+            svg += renderAssociation(1085, 355, u21.cx + u21.rx, u21.cy);
+            svg += renderAssociation(1085, 355, u22.cx + u22.rx, u22.cy);
+            svg += renderAssociation(1085, 355, u23.cx + u23.rx, u23.cy);
+            svg += renderCurveAssociation(`M 1085 355 C 980 440, 800 540, ${u16.cx + u16.rx} ${u16.cy}`);
+
+            // Relationships: <<include>> & <<extend>>
+            // Submit Application -> Upload Requirements (include)
+            svg += renderRelation(`M ${u2.cx + u2.rx} ${u2.cy} H ${u11.cx - u11.rx}`, "include", 478, 172);
+            // Upload Requirements -> Authenticate User (include)
+            svg += renderRelation(`M ${u11.cx + u11.rx} ${u11.cy} C 705 180, 720 145, ${u17.cx - u17.rx} ${u17.cy}`, "include", 712, 145);
+            // Manage User Profile -> Authenticate User (include)
+            svg += renderRelation(`M ${u10.cx + u10.rx} ${u10.cy} H ${u17.cx - u17.rx}`, "include", 714, 112);
+            // Submit Repair Ticket -> Track Status (include)
+            svg += renderRelation(`M ${u14.cx} ${u14.cy + u14.ry} V ${u15.cy - u15.ry}`, "include", 625, 432);
+            // Review Property Listings -> Manage Properties (extend)
+            svg += renderRelation(`M ${u18.cx - u18.rx} ${u18.cy} C 640 195, 540 250, ${u4.cx + u4.rx} ${u4.cy}`, "extend", 575, 225);
+            // Sign Digital Lease -> Upload ID Requirements (include)
+            svg += renderRelation(`M ${u3.cx + u3.rx} ${u3.cy} C 470 230, 485 200, ${u11.cx - u11.rx} ${u11.cy}`, "include", 476, 218);
+            // Pay Rent -> Authenticate User (include)
+            svg += renderRelation(`M ${u12.cx + u12.rx} ${u12.cy} C 710 240, 735 180, ${u17.cx - 20} ${u17.cy + u17.ry}`, "include", 720, 205);
+
+            // Render All Use Cases (Ovals)
+            const allCases = [u1, u2, u3, u4, u5, u6, u7, u8, u9, u10, u11, u12, u13, u14, u15, u16, u17, u18, u19, u20, u21, u22, u23];
+            for (const c of allCases) {
+                svg += renderUseCase(c.cx, c.cy, c.rx, c.ry, c.fill, c.lines);
+            }
+
+            // Render Actors
+            // Left Actors (Evenly spaced, human actors only - Notification is internal)
+            svg += renderActor(115, 165, "Tenant");
+            svg += renderActor(115, 355, "Landlord");
+            svg += renderActor(115, 525, "Maintenance");
+
+            // Right Actor
+            svg += renderActor(1085, 355, "Admin");
+
+            // LEGEND (Separated cleanly below System Boundary with 60px visible gap)
+            // System Boundary bottom is 645, Legend starts at 705. Generous spacing, standalone card.
+            const legBoxX = 230, legBoxY = 705, legBoxW = 740, legBoxH = 52;
+            svg += `
+            <g class="legend-card" transform="translate(0, 0)">
+                <rect x="${legBoxX}" y="${legBoxY}" width="${legBoxW}" height="${legBoxH}" fill="#ffffff" stroke="#94a3b8" stroke-width="1.2" rx="4" />
+                <text x="${W / 2}" y="${legBoxY + 16}" text-anchor="middle" font-family="Arial, sans-serif" font-size="10.5" font-weight="bold" fill="#111827" letter-spacing="1.5">LEGEND</text>
+                
+                <!-- Swatches Row with generous breathing room -->
+                <rect x="250" y="${legBoxY + 27}" width="14" height="14" fill="${cAuth}" stroke="#111827" stroke-width="1.1" rx="2"/>
+                <text x="270" y="${legBoxY + 38}" font-family="Arial, sans-serif" font-size="9.5" font-weight="bold" fill="#111827">Authentication</text>
+
+                <rect x="365" y="${legBoxY + 27}" width="14" height="14" fill="${cProp}" stroke="#111827" stroke-width="1.1" rx="2"/>
+                <text x="385" y="${legBoxY + 38}" font-family="Arial, sans-serif" font-size="9.5" font-weight="bold" fill="#111827">Property</text>
+
+                <rect x="450" y="${legBoxY + 27}" width="14" height="14" fill="${cLease}" stroke="#111827" stroke-width="1.1" rx="2"/>
+                <text x="470" y="${legBoxY + 38}" font-family="Arial, sans-serif" font-size="9.5" font-weight="bold" fill="#111827">Tenancy &amp; Lease</text>
+
+                <rect x="580" y="${legBoxY + 27}" width="14" height="14" fill="${cBill}" stroke="#111827" stroke-width="1.1" rx="2"/>
+                <text x="600" y="${legBoxY + 38}" font-family="Arial, sans-serif" font-size="9.5" font-weight="bold" fill="#111827">Billing &amp; Payment</text>
+
+                <rect x="715" y="${legBoxY + 27}" width="14" height="14" fill="${cMaint}" stroke="#111827" stroke-width="1.1" rx="2"/>
+                <text x="735" y="${legBoxY + 38}" font-family="Arial, sans-serif" font-size="9.5" font-weight="bold" fill="#111827">Maintenance</text>
+
+                <rect x="830" y="${legBoxY + 27}" width="14" height="14" fill="${cGov}" stroke="#111827" stroke-width="1.1" rx="2"/>
+                <text x="850" y="${legBoxY + 38}" font-family="Arial, sans-serif" font-size="9.5" font-weight="bold" fill="#111827">Governance</text>
+            </g>`;
+
+            svg += `</svg>`;
+            return svg;
+        }
+
+        // Render Current Diagram
+        function renderCurrent() {
+            document.getElementById('svgContainer').innerHTML = getUseCaseSVG();
+            applyZoom();
+        }
+
+        // Zoom Logic
+        function zoom(delta) {
+            currentScale = Math.min(Math.max(currentScale + delta, 0.5), 2.0);
+            applyZoom();
+        }
+
+        function resetZoom() {
+            currentScale = 1.0;
+            applyZoom();
+        }
+
+        function applyZoom() {
+            document.getElementById('zoomText').innerText = Math.round(currentScale * 100) + '%';
+            const svg = document.querySelector('#svgContainer svg');
+            if (svg) svg.style.transform = `scale(${currentScale})`;
+        }
+
+        // Toast Feedback
+        function showToast(msg) {
+            const t = document.getElementById('toast');
+            t.innerText = msg;
+            t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 3000);
+        }
+
+        // High Resolution PNG Converter (Canvas 300 DPI)
+        function getSVGToCanvas(svgElement, scaleMultiplier = 2.5) {
+            return new Promise((resolve, reject) => {
+                try {
+                    const serializer = new XMLSerializer();
+                    let svgStr = serializer.serializeToString(svgElement);
+                    if (!svgStr.match(/^<svg[^>]+xmlns="http\:\/\/www\.w3\.org\/2000\/svg"/)) {
+                        svgStr = svgStr.replace(/^<svg/, '<svg xmlns="http://www.w3.org/2000/svg"');
+                    }
+
+                    const width = svgElement.viewBox.baseVal.width || 1200;
+                    const height = svgElement.viewBox.baseVal.height || 820;
+
+                    const canvas = document.createElement('canvas');
+                    canvas.width = width * scaleMultiplier;
+                    canvas.height = height * scaleMultiplier;
+                    const ctx = canvas.getContext('2d');
+
+                    ctx.imageSmoothingEnabled = true;
+                    ctx.imageSmoothingQuality = 'high';
+
+                    ctx.fillStyle = '#ffffff';
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                    const img = new Image();
+                    const blob = new Blob([svgStr], { type: 'image/svg+xml;charset=utf-8' });
+                    const url = URL.createObjectURL(blob);
+
+                    img.onload = () => {
+                        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                        URL.revokeObjectURL(url);
+                        resolve({ canvas, dataURL: canvas.toDataURL('image/png') });
+                    };
+
+                    img.onerror = (e) => {
+                        URL.revokeObjectURL(url);
+                        reject(e);
+                    };
+
+                    img.src = url;
+                } catch (err) {
+                    reject(err);
+                }
+            });
+        }
+
+        // Download Single PNG
+        async function downloadCurrentPNG() {
+            const svg = document.querySelector('#svgContainer svg');
+            if (!svg) return;
+            showToast("Generating crisp thesis-ready PNG...");
+            try {
+                const { dataURL } = await getSVGToCanvas(svg, 2.5);
+                const filename = "DOMIKNOW_Use_Case_Diagram.png";
+                const a = document.createElement('a');
+                a.href = dataURL;
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                showToast(`Downloaded ${filename} successfully!`);
+            } catch (err) {
+                console.error(err);
+                showToast("Failed to generate image.");
+            }
+        }
+
+        // Copy Single PNG to Clipboard
+        async function copyCurrentToClipboard() {
+            const svg = document.querySelector('#svgContainer svg');
+            if (!svg) return;
+            showToast("Rendering to clipboard...");
+            try {
+                const { canvas } = await getSVGToCanvas(svg, 2.0);
+                canvas.toBlob(async (blob) => {
+                    if (!blob) return;
+                    try {
+                        const item = new ClipboardItem({ "image/png": blob });
+                        await navigator.clipboard.write([item]);
+                        showToast("Copied PNG directly to clipboard! Ready to paste (Ctrl+V) in Word or Docs.");
+                    } catch (e) {
+                        downloadCurrentPNG();
+                    }
+                }, "image/png");
+            } catch (err) {
+                showToast("Clipboard copy failed.");
+            }
+        }
+
+        // Initialize on load
+        window.addEventListener('DOMContentLoaded', () => {
+            renderCurrent();
+        });
+    </script>
+</body>
+</html>

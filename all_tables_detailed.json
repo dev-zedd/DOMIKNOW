@@ -1,0 +1,780 @@
+{
+  "audit_logs": {
+    "table": "audit_logs",
+    "cols": [
+      "id",
+      "user_id",
+      "action",
+      "description",
+      "created_at"
+    ],
+    "sqlDefinition": "id UUID PRIMARY KEY DEFAULT gen_random_uuid(),\r\n    user_id UUID REFERENCES users(id) ON DELETE SET NULL,\r\n    action VARCHAR(255) NOT NULL,\r\n    description TEXT,\r\n    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP"
+  },
+  "billing_records": {
+    "table": "billing_records",
+    "cols": [
+      "id",
+      "lease_id",
+      "tenant_id",
+      "landlord_id",
+      "property_id",
+      "billing_month",
+      "rent_amount",
+      "utility_amount",
+      "penalty_amount",
+      "total_amount",
+      "due_date",
+      "billing_status",
+      "created_at",
+      "updated_at",
+      "water",
+      "electricity",
+      "internet",
+      "parking",
+      "other_charges",
+      "remarks",
+      "unit_id"
+    ],
+    "sqlDefinition": "id UUID PRIMARY KEY DEFAULT gen_random_uuid(),\r\n    lease_id UUID NOT NULL REFERENCES lease_records(id) ON DELETE RESTRICT,\r\n    tenant_id UUID NOT NULL REFERENCES users(id) ON DELETE RESTRICT,\r\n    landlord_id UUID NOT NULL REFERENCES users(id) ON DELETE RESTRICT,\r\n    property_id UUID NOT NULL REFERENCES properties(id) ON DELETE RESTRICT,\r\n    billing_month VARCHAR(20) NOT NULL, -- e.g. \"2026-05\"\r\n    rent_amount DECIMAL(10, 2) NOT NULL DEFAULT 0.00 CHECK (rent_amount >= 0),\r\n    utility_amount DECIMAL(10, 2) NOT NULL DEFAULT 0.00 CHECK (utility_amount >= 0),\r\n    penalty_amount DECIMAL(10, 2) NOT NULL DEFAULT 0.00 CHECK (penalty_amount >= 0),\r\n    total_amount DECIMAL(10, 2) NOT NULL CHECK (total_amount >= 0),\r\n    due_date DATE NOT NULL,\r\n    billing_status VARCHAR(50) NOT NULL DEFAULT 'unpaid' CHECK (billing_status IN ('unpaid', 'partially_paid', 'paid', 'overdue', 'cancelled')),\r\n    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,\r\n    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP"
+  },
+  "complaint_status_logs": {
+    "table": "complaint_status_logs",
+    "cols": [
+      "id",
+      "complaint_id",
+      "updated_by",
+      "previous_status",
+      "new_status",
+      "remarks",
+      "updated_at"
+    ],
+    "sqlDefinition": "id UUID PRIMARY KEY DEFAULT gen_random_uuid(),\r\n    complaint_id UUID NOT NULL REFERENCES complaints(id) ON DELETE CASCADE,\r\n    updated_by UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,\r\n    previous_status VARCHAR(30) NOT NULL,\r\n    new_status VARCHAR(30) NOT NULL,\r\n    remarks TEXT,\r\n    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP"
+  },
+  "complaints": {
+    "table": "complaints",
+    "cols": [
+      "id",
+      "complaint_number",
+      "lease_id",
+      "tenant_id",
+      "landlord_id",
+      "property_id",
+      "category",
+      "subject",
+      "description",
+      "attachment_url",
+      "attachment_path",
+      "status",
+      "resolution_notes",
+      "rejection_reason",
+      "resolved_at",
+      "closed_at",
+      "submitted_at",
+      "updated_at"
+    ],
+    "sqlDefinition": "id UUID PRIMARY KEY DEFAULT gen_random_uuid(),\r\n    complaint_number VARCHAR(30) UNIQUE NOT NULL,\r\n    lease_id UUID NOT NULL REFERENCES lease_records(id) ON DELETE CASCADE,\r\n    tenant_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,\r\n    landlord_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,\r\n    property_id UUID NOT NULL REFERENCES properties(id) ON DELETE CASCADE,\r\n    category VARCHAR(50) NOT NULL CHECK (category IN (\r\n        'billing_concern', 'landlord_concern', 'safety_concern',\r\n        'policy_violation', 'utility_concern', 'noise_complaint', 'other'\r\n    )),\r\n    subject VARCHAR(255) NOT NULL,\r\n    description TEXT NOT NULL,\r\n    attachment_url TEXT,\r\n    attachment_path TEXT,\r\n    status VARCHAR(30) NOT NULL DEFAULT 'submitted' CHECK (status IN (\r\n        'submitted', 'under_review', 'in_progress', 'resolved', 'closed', 'rejected'\r\n    )),\r\n    resolution_notes TEXT,\r\n    rejection_reason TEXT,\r\n    resolved_at TIMESTAMP WITH TIME ZONE,\r\n    closed_at TIMESTAMP WITH TIME ZONE,\r\n    submitted_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,\r\n    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP"
+  },
+  "disputes": {
+    "table": "disputes",
+    "cols": [],
+    "sqlDefinition": "id UUID PRIMARY KEY DEFAULT gen_random_uuid(),\r\n    complainant_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,\r\n    respondent_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,\r\n    property_id UUID NOT NULL REFERENCES properties(id) ON DELETE CASCADE,\r\n    lease_id UUID NOT NULL REFERENCES lease_records(id) ON DELETE CASCADE,\r\n    dispute_type VARCHAR(50) NOT NULL CHECK (dispute_type IN ('payment_dispute', 'property_condition', 'lease_terms', 'maintenance_delay', 'deposit_issue', 'other')),\r\n    dispute_title VARCHAR(255) NOT NULL,\r\n    dispute_description TEXT NOT NULL,\r\n    attachment_url TEXT,\r\n    attachment_path TEXT,\r\n    status VARCHAR(50) NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'under_review', 'resolved', 'dismissed')),\r\n    resolution_notes TEXT,\r\n    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,\r\n    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,\r\n    resolved_at TIMESTAMP WITH TIME ZONE"
+  },
+  "email_verifications": {
+    "table": "email_verifications",
+    "cols": [
+      "id",
+      "user_id",
+      "email",
+      "verification_code",
+      "expires_at",
+      "is_used",
+      "created_at"
+    ],
+    "sqlDefinition": "id UUID PRIMARY KEY DEFAULT gen_random_uuid(),\r\n    user_id UUID REFERENCES users(id) ON DELETE CASCADE,\r\n    email VARCHAR(255) NOT NULL,\r\n    verification_code VARCHAR(10) NOT NULL,\r\n    expires_at TIMESTAMP WITH TIME ZONE NOT NULL,\r\n    is_used BOOLEAN DEFAULT false,\r\n    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP"
+  },
+  "landlord_ratings": {
+    "table": "landlord_ratings",
+    "cols": [
+      "id",
+      "lease_id",
+      "tenant_id",
+      "landlord_id",
+      "property_id",
+      "rating",
+      "feedback",
+      "submitted_at",
+      "updated_at"
+    ],
+    "sqlDefinition": "id UUID PRIMARY KEY DEFAULT gen_random_uuid(),\r\n    lease_id UUID NOT NULL REFERENCES lease_records(id) ON DELETE CASCADE,\r\n    tenant_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,\r\n    landlord_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,\r\n    property_id UUID NOT NULL REFERENCES properties(id) ON DELETE CASCADE,\r\n    rating INTEGER NOT NULL CHECK (rating >= 1 AND rating <= 5),\r\n    feedback TEXT NOT NULL,\r\n    submitted_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,\r\n    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,\r\n    CONSTRAINT one_rating_per_lease UNIQUE (tenant_id, lease_id)"
+  },
+  "landlord_ratings_v2": {
+    "table": "landlord_ratings_v2",
+    "cols": [
+      "id",
+      "lease_id",
+      "tenant_id",
+      "landlord_id",
+      "property_id",
+      "communication",
+      "responsiveness",
+      "professionalism",
+      "fairness",
+      "maintenance_response",
+      "respectfulness",
+      "reliability",
+      "overall_satisfaction",
+      "overall_computed_avg",
+      "feedback",
+      "submitted_at",
+      "updated_at"
+    ],
+    "sqlDefinition": "id UUID PRIMARY KEY DEFAULT gen_random_uuid(),\r\n    lease_id UUID NOT NULL REFERENCES lease_records(id) ON DELETE CASCADE,\r\n    tenant_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,\r\n    landlord_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,\r\n    property_id UUID NOT NULL REFERENCES properties(id) ON DELETE CASCADE,\r\n    communication INTEGER NOT NULL CHECK (communication >= 1 AND communication <= 5),\r\n    responsiveness INTEGER NOT NULL CHECK (responsiveness >= 1 AND responsiveness <= 5),\r\n    professionalism INTEGER NOT NULL CHECK (professionalism >= 1 AND professionalism <= 5),\r\n    fairness INTEGER NOT NULL CHECK (fairness >= 1 AND fairness <= 5),\r\n    maintenance_response INTEGER NOT NULL CHECK (maintenance_response >= 1 AND maintenance_response <= 5),\r\n    respectfulness INTEGER NOT NULL CHECK (respectfulness >= 1 AND respectfulness <= 5),\r\n    reliability INTEGER NOT NULL CHECK (reliability >= 1 AND reliability <= 5),\r\n    overall_satisfaction INTEGER NOT NULL CHECK (overall_satisfaction >= 1 AND overall_satisfaction <= 5),\r\n    overall_computed_avg DECIMAL(3, 2) NOT NULL,\r\n    feedback TEXT NOT NULL,\r\n    submitted_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,\r\n    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,\r\n    CONSTRAINT one_landlord_rating_per_lease UNIQUE (tenant_id, lease_id)"
+  },
+  "landlord_report_evidence": {
+    "table": "landlord_report_evidence",
+    "cols": [
+      "id",
+      "report_id",
+      "file_name",
+      "file_url",
+      "file_path",
+      "file_type",
+      "file_size",
+      "uploaded_at"
+    ],
+    "sqlDefinition": "id        UUID PRIMARY KEY DEFAULT gen_random_uuid(),\r\n    report_id UUID NOT NULL REFERENCES landlord_reports(id) ON DELETE CASCADE,\r\n\r\n    file_name  VARCHAR(255) NOT NULL,\r\n    file_url   TEXT         NOT NULL,\r\n    file_path  TEXT         NOT NULL,\r\n    file_type  VARCHAR(100) NOT NULL,\r\n    file_size  BIGINT,\r\n\r\n    uploaded_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP"
+  },
+  "landlord_reports": {
+    "table": "landlord_reports",
+    "cols": [
+      "id",
+      "tenant_id",
+      "landlord_id",
+      "lease_id",
+      "property_id",
+      "report_category",
+      "incident_date",
+      "incident_description",
+      "severity",
+      "status",
+      "admin_id",
+      "admin_remarks",
+      "reviewed_at",
+      "landlord_explanation",
+      "landlord_responded_at",
+      "created_at",
+      "updated_at"
+    ],
+    "sqlDefinition": "id UUID PRIMARY KEY DEFAULT gen_random_uuid(),\r\n\r\n    tenant_id    UUID NOT NULL REFERENCES users(id) ON DELETE RESTRICT,\r\n    landlord_id  UUID NOT NULL REFERENCES users(id) ON DELETE RESTRICT,\r\n    lease_id     UUID NOT NULL REFERENCES lease_records(id) ON DELETE RESTRICT,\r\n    property_id  UUID NOT NULL REFERENCES properties(id) ON DELETE RESTRICT,\r\n\r\n    -- Incident Information\r\n    report_category VARCHAR(50) NOT NULL CHECK (\r\n        report_category IN (\r\n            'maintenance_neglect',\r\n            'illegal_eviction',\r\n            'deposit_withholding',\r\n            'harassment',\r\n            'lease_violation',\r\n            'unauthorized_entry',\r\n            'overcharging',\r\n            'discrimination',\r\n            'threats_abuse',\r\n            'other'\r\n        )\r\n    ),\r\n    incident_date        DATE NOT NULL,\r\n    incident_description TEXT NOT NULL,\r\n    severity             VARCHAR(20) NOT NULL CHECK (\r\n        severity IN ('minor', 'moderate', 'major', 'critical')\r\n    ),\r\n\r\n    -- Admin Review & Decision Flow\r\n    status VARCHAR(30) NOT NULL DEFAULT 'pending_admin_review'\r\n        CHECK (status IN (\r\n            'pending_admin_review',\r\n            'approved',\r\n            'rejected',\r\n            'needs_more_evidence'\r\n        )),\r\n    admin_id      UUID REFERENCES users(id) ON DELETE SET NULL,\r\n    admin_remarks TEXT,\r\n    reviewed_at   TIMESTAMP WITH TIME ZONE,\r\n\r\n    -- Landlord Response / Explanation\r\n    landlord_explanation   TEXT,\r\n    landlord_responded_at  TIMESTAMP WITH TIME ZONE,\r\n\r\n    -- Timestamps\r\n    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,\r\n    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP"
+  },
+  "landlord_workers": {
+    "table": "landlord_workers",
+    "cols": [],
+    "sqlDefinition": null
+  },
+  "lease_records": {
+    "table": "lease_records",
+    "cols": [
+      "id",
+      "application_id",
+      "tenant_id",
+      "landlord_id",
+      "property_id",
+      "lease_start_date",
+      "lease_end_date",
+      "monthly_rent",
+      "security_deposit",
+      "lease_status",
+      "terms_and_conditions",
+      "created_at",
+      "updated_at",
+      "lease_number",
+      "advance_payment",
+      "payment_due_day",
+      "utilities_covered",
+      "utilities_other",
+      "max_occupants",
+      "pet_policy",
+      "pet_conditions",
+      "smoking_policy",
+      "parking_policy",
+      "parking_slot_number",
+      "house_rules",
+      "landlord_responsibilities",
+      "tenant_responsibilities",
+      "late_fee_amount",
+      "grace_period",
+      "termination_policy",
+      "additional_terms",
+      "landlord_signature_name",
+      "landlord_signature_date",
+      "tenant_signature_name",
+      "tenant_signature_date",
+      "unit_id",
+      "bed_id"
+    ],
+    "sqlDefinition": "id UUID PRIMARY KEY DEFAULT gen_random_uuid(),\r\n    application_id UUID NOT NULL REFERENCES tenant_applications(id) ON DELETE RESTRICT,\r\n    tenant_id UUID NOT NULL REFERENCES users(id) ON DELETE RESTRICT,\r\n    landlord_id UUID NOT NULL REFERENCES users(id) ON DELETE RESTRICT,\r\n    property_id UUID NOT NULL REFERENCES properties(id) ON DELETE RESTRICT,\r\n    lease_start_date DATE NOT NULL,\r\n    lease_end_date DATE NOT NULL CHECK (lease_end_date > lease_start_date),\r\n    monthly_rent DECIMAL(10, 2) NOT NULL CHECK (monthly_rent > 0),\r\n    security_deposit DECIMAL(10, 2) NOT NULL CHECK (security_deposit >= 0),\r\n    lease_status VARCHAR(50) NOT NULL DEFAULT 'active' CHECK (lease_status IN ('active', 'ended', 'cancelled', 'terminated')),\r\n    terms_and_conditions TEXT,\r\n    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,\r\n    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP"
+  },
+  "maintenance_assignments": {
+    "table": "maintenance_assignments",
+    "cols": [
+      "id",
+      "maintenance_request_id",
+      "maintenance_personnel_id",
+      "due_date",
+      "instructions",
+      "assigned_at"
+    ],
+    "sqlDefinition": "id UUID PRIMARY KEY DEFAULT gen_random_uuid(),\r\n    maintenance_request_id UUID NOT NULL REFERENCES maintenance_requests(id) ON DELETE CASCADE,\r\n    maintenance_personnel_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,\r\n    due_date DATE NOT NULL,\r\n    instructions TEXT,\r\n    assigned_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP"
+  },
+  "maintenance_categories": {
+    "table": "maintenance_categories",
+    "cols": [
+      "id",
+      "category_name"
+    ],
+    "sqlDefinition": "id UUID PRIMARY KEY DEFAULT gen_random_uuid(),\r\n    category_name VARCHAR(50) UNIQUE NOT NULL"
+  },
+  "maintenance_materials": {
+    "table": "maintenance_materials",
+    "cols": [
+      "id",
+      "maintenance_request_id",
+      "material_name",
+      "quantity",
+      "cost"
+    ],
+    "sqlDefinition": "id UUID PRIMARY KEY DEFAULT gen_random_uuid(),\r\n    maintenance_request_id UUID NOT NULL REFERENCES maintenance_requests(id) ON DELETE CASCADE,\r\n    material_name VARCHAR(255) NOT NULL,\r\n    quantity INTEGER NOT NULL DEFAULT 1,\r\n    cost DECIMAL(10, 2) NOT NULL DEFAULT 0.00"
+  },
+  "maintenance_personnel": {
+    "table": "maintenance_personnel",
+    "cols": [],
+    "sqlDefinition": null
+  },
+  "maintenance_photos": {
+    "table": "maintenance_photos",
+    "cols": [],
+    "sqlDefinition": "id UUID PRIMARY KEY DEFAULT gen_random_uuid(),\r\n    maintenance_request_id UUID NOT NULL REFERENCES maintenance_requests(id) ON DELETE CASCADE,\r\n    photo_url TEXT NOT NULL,\r\n    photo_type VARCHAR(50) CHECK (photo_type IN ('before', 'after', 'report')),\r\n    uploaded_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP"
+  },
+  "maintenance_reports": {
+    "table": "maintenance_reports",
+    "cols": [
+      "id",
+      "maintenance_request_id",
+      "maintenance_personnel_id",
+      "problem_found",
+      "repair_performed",
+      "materials_used",
+      "recommendations",
+      "labor_cost",
+      "material_cost",
+      "created_at"
+    ],
+    "sqlDefinition": "id UUID PRIMARY KEY DEFAULT gen_random_uuid(),\r\n    maintenance_request_id UUID NOT NULL REFERENCES maintenance_requests(id) ON DELETE CASCADE,\r\n    maintenance_personnel_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,\r\n    problem_found TEXT NOT NULL,\r\n    repair_performed TEXT NOT NULL,\r\n    materials_used TEXT,\r\n    recommendations TEXT,\r\n    labor_cost DECIMAL(10, 2) DEFAULT 0.00,\r\n    material_cost DECIMAL(10, 2) DEFAULT 0.00,\r\n    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP"
+  },
+  "maintenance_requests": {
+    "table": "maintenance_requests",
+    "cols": [
+      "id",
+      "tenant_id",
+      "landlord_id",
+      "property_id",
+      "lease_id",
+      "assigned_maintenance_id",
+      "issue_title",
+      "issue_description",
+      "issue_category",
+      "priority_level",
+      "image_url",
+      "image_path",
+      "status",
+      "landlord_remarks",
+      "created_at",
+      "updated_at",
+      "completed_at",
+      "preferred_schedule",
+      "unit_number",
+      "rejection_reason",
+      "travel_started_at",
+      "arrived_at",
+      "repair_started_at",
+      "problem_found",
+      "repair_performed",
+      "recommendations",
+      "before_photo_url",
+      "after_photo_url",
+      "labor_cost",
+      "material_cost",
+      "unit_id"
+    ],
+    "sqlDefinition": "id UUID PRIMARY KEY DEFAULT gen_random_uuid(),\r\n    tenant_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,\r\n    landlord_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,\r\n    property_id UUID NOT NULL REFERENCES properties(id) ON DELETE CASCADE,\r\n    lease_id UUID NOT NULL REFERENCES lease_records(id) ON DELETE CASCADE,\r\n    assigned_maintenance_id UUID REFERENCES users(id) ON DELETE SET NULL,\r\n    issue_title VARCHAR(255) NOT NULL,\r\n    issue_description TEXT NOT NULL,\r\n    issue_category VARCHAR(50) NOT NULL CHECK (issue_category IN ('plumbing', 'electrical', 'structural', 'appliance', 'cleanliness', 'security', 'other')),\r\n    priority_level VARCHAR(50) NOT NULL CHECK (priority_level IN ('low', 'medium', 'high', 'urgent')),\r\n    image_url TEXT,\r\n    image_path TEXT,\r\n    status VARCHAR(50) NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'reviewed', 'assigned', 'in_progress', 'completed', 'rejected', 'cancelled')),\r\n    landlord_remarks TEXT,\r\n    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,\r\n    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,\r\n    completed_at TIMESTAMP WITH TIME ZONE"
+  },
+  "maintenance_task_updates": {
+    "table": "maintenance_task_updates",
+    "cols": [],
+    "sqlDefinition": "id UUID PRIMARY KEY DEFAULT gen_random_uuid(),\r\n    maintenance_request_id UUID NOT NULL REFERENCES maintenance_requests(id) ON DELETE CASCADE,\r\n    maintenance_personnel_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,\r\n    status_update VARCHAR(50) NOT NULL CHECK (status_update IN ('assigned', 'in_progress', 'completed', 'needs_follow_up')),\r\n    progress_notes TEXT NOT NULL,\r\n    image_url TEXT,\r\n    image_path TEXT,\r\n    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP"
+  },
+  "maintenance_updates": {
+    "table": "maintenance_updates",
+    "cols": [
+      "id",
+      "maintenance_request_id",
+      "status_update",
+      "notes",
+      "created_at"
+    ],
+    "sqlDefinition": "id UUID PRIMARY KEY DEFAULT gen_random_uuid(),\r\n    maintenance_request_id UUID NOT NULL REFERENCES maintenance_requests(id) ON DELETE CASCADE,\r\n    status_update VARCHAR(50) NOT NULL,\r\n    notes TEXT,\r\n    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP"
+  },
+  "messages": {
+    "table": "messages",
+    "cols": [],
+    "sqlDefinition": null
+  },
+  "notifications": {
+    "table": "notifications",
+    "cols": [
+      "id",
+      "user_id",
+      "type",
+      "title",
+      "message",
+      "reference_id",
+      "read_status",
+      "created_at",
+      "updated_at"
+    ],
+    "sqlDefinition": "id UUID PRIMARY KEY DEFAULT gen_random_uuid(),\r\n    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,\r\n    type VARCHAR(80) NOT NULL DEFAULT 'system_update',\r\n    title VARCHAR(255) NOT NULL,\r\n    message TEXT NOT NULL DEFAULT '',\r\n    reference_id TEXT,\r\n    read_status BOOLEAN NOT NULL DEFAULT FALSE,\r\n    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,\r\n    updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP"
+  },
+  "payment_records": {
+    "table": "payment_records",
+    "cols": [
+      "id",
+      "billing_id",
+      "lease_id",
+      "tenant_id",
+      "landlord_id",
+      "property_id",
+      "payment_amount",
+      "payment_method",
+      "payment_reference_number",
+      "payment_proof_url",
+      "payment_proof_path",
+      "payment_status",
+      "verification_remarks",
+      "submitted_at",
+      "verified_at",
+      "created_at",
+      "updated_at"
+    ],
+    "sqlDefinition": "id UUID PRIMARY KEY DEFAULT gen_random_uuid(),\r\n    billing_id UUID NOT NULL REFERENCES billing_records(id) ON DELETE RESTRICT,\r\n    lease_id UUID NOT NULL REFERENCES lease_records(id) ON DELETE RESTRICT,\r\n    tenant_id UUID NOT NULL REFERENCES users(id) ON DELETE RESTRICT,\r\n    landlord_id UUID NOT NULL REFERENCES users(id) ON DELETE RESTRICT,\r\n    property_id UUID NOT NULL REFERENCES properties(id) ON DELETE RESTRICT,\r\n    payment_amount DECIMAL(10, 2) NOT NULL CHECK (payment_amount > 0),\r\n    payment_method VARCHAR(50) NOT NULL CHECK (payment_method IN ('gcash', 'bank_transfer', 'cash', 'other')),\r\n    payment_reference_number VARCHAR(100) NOT NULL,\r\n    payment_proof_url TEXT NOT NULL,\r\n    payment_proof_path TEXT NOT NULL,\r\n    payment_status VARCHAR(50) NOT NULL DEFAULT 'pending_verification' CHECK (payment_status IN ('pending_verification', 'verified', 'rejected')),\r\n    verification_remarks TEXT,\r\n    submitted_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,\r\n    verified_at TIMESTAMP WITH TIME ZONE,\r\n    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,\r\n    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP"
+  },
+  "platform_policies": {
+    "table": "platform_policies",
+    "cols": [],
+    "sqlDefinition": null
+  },
+  "policies": {
+    "table": "policies",
+    "cols": [],
+    "sqlDefinition": null
+  },
+  "policy_violations": {
+    "table": "policy_violations",
+    "cols": [],
+    "sqlDefinition": "id UUID PRIMARY KEY DEFAULT gen_random_uuid(),\r\n    reported_by UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,\r\n    violator_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,\r\n    property_id UUID NOT NULL REFERENCES properties(id) ON DELETE CASCADE,\r\n    lease_id UUID NOT NULL REFERENCES lease_records(id) ON DELETE CASCADE,\r\n    violation_type VARCHAR(50) NOT NULL CHECK (violation_type IN ('property_rule_violation', 'late_payment', 'unauthorized_occupant', 'property_damage', 'noise_complaint', 'misconduct', 'other')),\r\n    violation_description TEXT NOT NULL,\r\n    evidence_url TEXT,\r\n    evidence_path TEXT,\r\n    status VARCHAR(50) NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'under_review', 'resolved', 'dismissed')),\r\n    action_taken TEXT,\r\n    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,\r\n    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,\r\n    resolved_at TIMESTAMP WITH TIME ZONE"
+  },
+  "properties": {
+    "table": "properties",
+    "cols": [
+      "id",
+      "landlord_id",
+      "property_name",
+      "property_type",
+      "description",
+      "address",
+      "barangay",
+      "municipality",
+      "province",
+      "latitude",
+      "longitude",
+      "monthly_rent",
+      "max_occupants",
+      "tenant_type_suitability",
+      "house_rules",
+      "status",
+      "average_rating",
+      "feedback_count",
+      "main_image_url",
+      "created_at",
+      "updated_at",
+      "admin_reviewed_by",
+      "admin_reviewed_at",
+      "rejection_reason",
+      "unit_number",
+      "rating_count",
+      "total_floors",
+      "total_capacity",
+      "landmark"
+    ],
+    "sqlDefinition": "id UUID PRIMARY KEY DEFAULT gen_random_uuid(),\r\n    landlord_id UUID REFERENCES users(id) ON DELETE SET NULL,\r\n    property_name VARCHAR(255) NOT NULL,\r\n    property_type VARCHAR(50) NOT NULL CHECK (property_type IN ('apartment', 'boarding_house', 'bedspace', 'studio_unit', 'room_for_rent', 'house')),\r\n    description TEXT,\r\n    address TEXT NOT NULL,\r\n    barangay VARCHAR(100) NOT NULL,\r\n    municipality VARCHAR(100) NOT NULL,\r\n    province VARCHAR(100) NOT NULL,\r\n    latitude DECIMAL(10, 8) NOT NULL,\r\n    longitude DECIMAL(11, 8) NOT NULL,\r\n    monthly_rent DECIMAL(10, 2) NOT NULL CHECK (monthly_rent > 0),\r\n    max_occupants INTEGER NOT NULL DEFAULT 1 CHECK (max_occupants > 0),\r\n    tenant_type_suitability VARCHAR(50) NOT NULL CHECK (tenant_type_suitability IN ('student', 'worker', 'family', 'general')),\r\n    house_rules TEXT,\r\n    status VARCHAR(50) NOT NULL DEFAULT 'approved' CHECK (status IN ('approved', 'unavailable', 'reserved')),\r\n    average_rating DECIMAL(3, 2) DEFAULT 0.00,\r\n    feedback_count INTEGER DEFAULT 0,\r\n    main_image_url TEXT,\r\n    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,\r\n    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP"
+  },
+  "property_amenities": {
+    "table": "property_amenities",
+    "cols": [
+      "id",
+      "property_id",
+      "amenity_name",
+      "created_at"
+    ],
+    "sqlDefinition": "id UUID PRIMARY KEY DEFAULT gen_random_uuid(),\r\n    property_id UUID REFERENCES properties(id) ON DELETE CASCADE,\r\n    amenity_name VARCHAR(100) NOT NULL CHECK (amenity_name IN ('WiFi', 'CCTV', 'Parking', 'Kitchen Access', 'Laundry Area', 'Air Conditioning', 'Own CR', 'Study Area', 'Near School', 'Near Market', 'Pet Friendly')),\r\n    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP"
+  },
+  "property_documents": {
+    "table": "property_documents",
+    "cols": [
+      "id",
+      "property_id",
+      "landlord_id",
+      "document_type",
+      "file_name",
+      "file_url",
+      "file_path",
+      "mime_type",
+      "file_size",
+      "uploaded_at",
+      "status"
+    ],
+    "sqlDefinition": "id UUID PRIMARY KEY DEFAULT gen_random_uuid(),\r\n    property_id UUID REFERENCES properties(id) ON DELETE CASCADE,\r\n    landlord_id UUID REFERENCES users(id) ON DELETE CASCADE,\r\n    document_type VARCHAR(50) NOT NULL CHECK (document_type IN ('government_permit', 'legal_document', 'ownership_proof', 'authorization_letter', 'other')),\r\n    file_name VARCHAR(255) NOT NULL,\r\n    file_url TEXT NOT NULL,\r\n    file_path TEXT NOT NULL,\r\n    mime_type VARCHAR(100) NOT NULL,\r\n    file_size INTEGER NOT NULL CHECK (file_size > 0),\r\n    uploaded_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,\r\n    status VARCHAR(50) DEFAULT 'submitted' CHECK (status IN ('submitted', 'accepted', 'rejected'))"
+  },
+  "property_feedback_summary": {
+    "table": "property_feedback_summary",
+    "cols": [],
+    "sqlDefinition": "id UUID PRIMARY KEY DEFAULT gen_random_uuid(),\r\n    property_id UUID REFERENCES properties(id) ON DELETE CASCADE,\r\n    rating_average DECIMAL(3, 2) NOT NULL DEFAULT 0.00,\r\n    total_feedback INTEGER NOT NULL DEFAULT 0,\r\n    positive_summary TEXT,\r\n    negative_summary TEXT,\r\n    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,\r\n    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP"
+  },
+  "property_images": {
+    "table": "property_images",
+    "cols": [
+      "id",
+      "property_id",
+      "image_url",
+      "image_path",
+      "is_main",
+      "uploaded_at"
+    ],
+    "sqlDefinition": "id UUID PRIMARY KEY DEFAULT gen_random_uuid(),\r\n    property_id UUID REFERENCES properties(id) ON DELETE CASCADE,\r\n    image_url TEXT NOT NULL,\r\n    image_path TEXT NOT NULL,\r\n    is_main BOOLEAN DEFAULT false,\r\n    uploaded_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP"
+  },
+  "property_ratings": {
+    "table": "property_ratings",
+    "cols": [
+      "id",
+      "lease_id",
+      "tenant_id",
+      "landlord_id",
+      "property_id",
+      "cleanliness",
+      "safety",
+      "comfort",
+      "amenities",
+      "location",
+      "internet_availability",
+      "water_supply",
+      "electricity_reliability",
+      "noise_level",
+      "overall_satisfaction",
+      "overall_computed_avg",
+      "feedback",
+      "submitted_at",
+      "updated_at"
+    ],
+    "sqlDefinition": "id UUID PRIMARY KEY DEFAULT gen_random_uuid(),\r\n    lease_id UUID NOT NULL REFERENCES lease_records(id) ON DELETE CASCADE,\r\n    tenant_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,\r\n    landlord_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,\r\n    property_id UUID NOT NULL REFERENCES properties(id) ON DELETE CASCADE,\r\n    cleanliness INTEGER NOT NULL CHECK (cleanliness >= 1 AND cleanliness <= 5),\r\n    safety INTEGER NOT NULL CHECK (safety >= 1 AND safety <= 5),\r\n    comfort INTEGER NOT NULL CHECK (comfort >= 1 AND comfort <= 5),\r\n    amenities INTEGER NOT NULL CHECK (amenities >= 1 AND amenities <= 5),\r\n    location INTEGER NOT NULL CHECK (location >= 1 AND location <= 5),\r\n    internet_availability INTEGER NOT NULL CHECK (internet_availability >= 1 AND internet_availability <= 5),\r\n    water_supply INTEGER NOT NULL CHECK (water_supply >= 1 AND water_supply <= 5),\r\n    electricity_reliability INTEGER NOT NULL CHECK (electricity_reliability >= 1 AND electricity_reliability <= 5),\r\n    noise_level INTEGER NOT NULL CHECK (noise_level >= 1 AND noise_level <= 5),\r\n    overall_satisfaction INTEGER NOT NULL CHECK (overall_satisfaction >= 1 AND overall_satisfaction <= 5),\r\n    overall_computed_avg DECIMAL(3, 2) NOT NULL,\r\n    feedback TEXT NOT NULL,\r\n    submitted_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,\r\n    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,\r\n    CONSTRAINT one_property_rating_per_lease UNIQUE (tenant_id, lease_id)"
+  },
+  "property_reservations": {
+    "table": "property_reservations",
+    "cols": [],
+    "sqlDefinition": "id UUID PRIMARY KEY DEFAULT gen_random_uuid(),\r\n    tenant_id UUID REFERENCES users(id) ON DELETE CASCADE,\r\n    property_id UUID REFERENCES properties(id) ON DELETE CASCADE,\r\n    reservation_date DATE NOT NULL DEFAULT CURRENT_DATE,\r\n    move_in_date DATE NOT NULL,\r\n    message TEXT,\r\n    status VARCHAR(50) NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'approved', 'rejected', 'cancelled')),\r\n    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,\r\n    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP"
+  },
+  "property_units": {
+    "table": "property_units",
+    "cols": [
+      "id",
+      "property_id",
+      "unit_number",
+      "unit_type",
+      "monthly_rent",
+      "security_deposit",
+      "capacity",
+      "bedrooms",
+      "bathrooms",
+      "floor_area_sqm",
+      "status",
+      "main_image_url",
+      "description",
+      "created_at",
+      "updated_at",
+      "floor",
+      "gender_restriction",
+      "rental_style",
+      "room_name"
+    ],
+    "sqlDefinition": "id UUID PRIMARY KEY DEFAULT gen_random_uuid(),\r\n    property_id UUID NOT NULL REFERENCES properties(id) ON DELETE CASCADE,\r\n    unit_number VARCHAR(100) NOT NULL,\r\n    unit_type VARCHAR(50) NOT NULL DEFAULT 'room' CHECK (unit_type IN ('room', 'studio', '1_bedroom', '2_bedroom', 'bedspace', 'whole_house')),\r\n    monthly_rent DECIMAL(10, 2) NOT NULL CHECK (monthly_rent > 0),\r\n    security_deposit DECIMAL(10, 2) DEFAULT 0.00 CHECK (security_deposit >= 0),\r\n    capacity INTEGER NOT NULL DEFAULT 1 CHECK (capacity > 0),\r\n    bedrooms INTEGER DEFAULT 1 CHECK (bedrooms >= 0),\r\n    bathrooms INTEGER DEFAULT 1 CHECK (bathrooms >= 0),\r\n    floor_area_sqm DECIMAL(6, 2) CHECK (floor_area_sqm >= 0),\r\n    status VARCHAR(50) NOT NULL DEFAULT 'available' CHECK (status IN ('available', 'occupied', 'reserved', 'under_maintenance', 'unavailable')),\r\n    main_image_url TEXT,\r\n    description TEXT,\r\n    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,\r\n    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP"
+  },
+  "ratings_feedback": {
+    "table": "ratings_feedback",
+    "cols": [],
+    "sqlDefinition": "id UUID PRIMARY KEY DEFAULT gen_random_uuid(),\r\n    tenant_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,\r\n    landlord_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,\r\n    property_id UUID NOT NULL REFERENCES properties(id) ON DELETE CASCADE,\r\n    lease_id UUID NOT NULL REFERENCES lease_records(id) ON DELETE CASCADE,\r\n    rating INTEGER NOT NULL CHECK (rating >= 1 AND rating <= 5),\r\n    feedback_text TEXT,\r\n    feedback_type VARCHAR(50) NOT NULL CHECK (feedback_type IN ('property', 'landlord', 'rental_experience')),\r\n    is_authenticated BOOLEAN NOT NULL DEFAULT true,\r\n    status VARCHAR(50) NOT NULL DEFAULT 'submitted' CHECK (status IN ('submitted', 'visible', 'hidden', 'flagged')),\r\n    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,\r\n    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP"
+  },
+  "recommendation_candidates": {
+    "table": "recommendation_candidates",
+    "cols": [
+      "id",
+      "recommendation_run_id",
+      "property_id",
+      "rank",
+      "eligibility_passed",
+      "raw_score",
+      "display_score",
+      "criterion_scores",
+      "fallback_flags",
+      "property_input_snapshot",
+      "explanation_snapshot",
+      "created_at"
+    ],
+    "sqlDefinition": "id UUID PRIMARY KEY DEFAULT gen_random_uuid(),\r\n    recommendation_run_id UUID NOT NULL REFERENCES recommendation_runs(id) ON DELETE CASCADE,\r\n    -- Deliberately not a foreign key: the historical property identifier remains\r\n    -- reproducible even if the mutable property record is later removed.\r\n    property_id UUID NOT NULL,\r\n    rank INTEGER NOT NULL CHECK (rank > 0),\r\n    eligibility_passed BOOLEAN NOT NULL DEFAULT TRUE,\r\n    raw_score DOUBLE PRECISION NOT NULL CHECK (raw_score >= 0 AND raw_score <= 100),\r\n    display_score NUMERIC(5, 2) NOT NULL CHECK (display_score >= 0 AND display_score <= 100),\r\n    criterion_scores JSONB NOT NULL,\r\n    fallback_flags JSONB NOT NULL,\r\n    property_input_snapshot JSONB NOT NULL,\r\n    explanation_snapshot JSONB NOT NULL,\r\n    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),\r\n    UNIQUE (recommendation_run_id, property_id),\r\n    UNIQUE (recommendation_run_id, rank)"
+  },
+  "recommendation_exclusions": {
+    "table": "recommendation_exclusions",
+    "cols": [
+      "id",
+      "recommendation_run_id",
+      "property_id",
+      "reason_codes",
+      "created_at"
+    ],
+    "sqlDefinition": "id UUID PRIMARY KEY DEFAULT gen_random_uuid(),\r\n    recommendation_run_id UUID NOT NULL REFERENCES recommendation_runs(id) ON DELETE CASCADE,\r\n    property_id UUID NOT NULL,\r\n    reason_codes TEXT[] NOT NULL,\r\n    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),\r\n    UNIQUE (recommendation_run_id, property_id)"
+  },
+  "recommendation_runs": {
+    "table": "recommendation_runs",
+    "cols": [
+      "id",
+      "formula_version",
+      "tenant_id",
+      "generated_at",
+      "tenant_input_snapshot",
+      "active_criteria",
+      "raw_importance",
+      "normalized_weights",
+      "platform_priors",
+      "candidate_count",
+      "eligible_count",
+      "excluded_count",
+      "created_at"
+    ],
+    "sqlDefinition": "id UUID PRIMARY KEY,\r\n    formula_version VARCHAR(40) NOT NULL,\r\n    tenant_id UUID REFERENCES users(id) ON DELETE SET NULL,\r\n    generated_at TIMESTAMPTZ NOT NULL,\r\n    tenant_input_snapshot JSONB NOT NULL,\r\n    active_criteria TEXT[] NOT NULL,\r\n    raw_importance JSONB NOT NULL,\r\n    normalized_weights JSONB NOT NULL,\r\n    platform_priors JSONB NOT NULL,\r\n    candidate_count INTEGER NOT NULL CHECK (candidate_count >= 0),\r\n    eligible_count INTEGER NOT NULL CHECK (eligible_count >= 0),\r\n    excluded_count INTEGER NOT NULL CHECK (excluded_count >= 0),\r\n    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()"
+  },
+  "report_messages": {
+    "table": "report_messages",
+    "cols": [
+      "id",
+      "report_type",
+      "report_id",
+      "sender_id",
+      "sender_role",
+      "recipient_role",
+      "message_text",
+      "attachment_url",
+      "attachment_path",
+      "created_at"
+    ],
+    "sqlDefinition": null
+  },
+  "reports": {
+    "table": "reports",
+    "cols": [],
+    "sqlDefinition": null
+  },
+  "statements": {
+    "table": "statements",
+    "cols": [],
+    "sqlDefinition": null
+  },
+  "tenant_application_documents": {
+    "table": "tenant_application_documents",
+    "cols": [
+      "id",
+      "application_id",
+      "tenant_id",
+      "document_type",
+      "file_name",
+      "file_url",
+      "file_path",
+      "mime_type",
+      "file_size",
+      "uploaded_at"
+    ],
+    "sqlDefinition": "id UUID PRIMARY KEY DEFAULT gen_random_uuid(),\r\n    application_id UUID REFERENCES tenant_applications(id) ON DELETE CASCADE,\r\n    tenant_id UUID REFERENCES users(id) ON DELETE CASCADE,\r\n    document_type VARCHAR(50) NOT NULL CHECK (document_type IN ('valid_id', 'proof_of_income', 'student_id', 'parent_guardian_id', 'certificate_of_registration', 'other')),\r\n    file_name VARCHAR(255) NOT NULL,\r\n    file_url TEXT NOT NULL,\r\n    file_path TEXT NOT NULL,\r\n    mime_type VARCHAR(100) NOT NULL,\r\n    file_size INTEGER NOT NULL CHECK (file_size > 0),\r\n    uploaded_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP"
+  },
+  "tenant_applications": {
+    "table": "tenant_applications",
+    "cols": [
+      "id",
+      "tenant_id",
+      "property_id",
+      "landlord_id",
+      "reservation_id",
+      "application_message",
+      "desired_move_in_date",
+      "status",
+      "landlord_remarks",
+      "submitted_at",
+      "reviewed_at",
+      "created_at",
+      "updated_at",
+      "unit_id",
+      "bed_id"
+    ],
+    "sqlDefinition": "id UUID PRIMARY KEY DEFAULT gen_random_uuid(),\r\n    tenant_id UUID REFERENCES users(id) ON DELETE CASCADE,\r\n    property_id UUID REFERENCES properties(id) ON DELETE CASCADE,\r\n    landlord_id UUID REFERENCES users(id) ON DELETE SET NULL,\r\n    reservation_id UUID REFERENCES property_reservations(id) ON DELETE SET NULL,\r\n    application_message TEXT,\r\n    desired_move_in_date DATE NOT NULL,\r\n    status VARCHAR(50) NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'approved', 'rejected', 'cancelled')),\r\n    landlord_remarks TEXT,\r\n    submitted_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,\r\n    reviewed_at TIMESTAMP WITH TIME ZONE,\r\n    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,\r\n    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP"
+  },
+  "tenant_report_evidence": {
+    "table": "tenant_report_evidence",
+    "cols": [
+      "id",
+      "report_id",
+      "file_name",
+      "file_url",
+      "file_path",
+      "file_type",
+      "file_size",
+      "uploaded_at"
+    ],
+    "sqlDefinition": "id        UUID PRIMARY KEY DEFAULT gen_random_uuid(),\r\n    report_id UUID NOT NULL REFERENCES tenant_reports(id) ON DELETE CASCADE,\r\n\r\n    file_name  VARCHAR(255) NOT NULL,\r\n    file_url   TEXT         NOT NULL,\r\n    file_path  TEXT         NOT NULL,\r\n    file_type  VARCHAR(100) NOT NULL,  -- MIME type (e.g. image/jpeg, video/mp4)\r\n    file_size  BIGINT,                 -- size in bytes\r\n\r\n    uploaded_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP"
+  },
+  "tenant_reports": {
+    "table": "tenant_reports",
+    "cols": [
+      "id",
+      "landlord_id",
+      "tenant_id",
+      "lease_id",
+      "property_id",
+      "report_category",
+      "incident_date",
+      "incident_description",
+      "severity",
+      "status",
+      "admin_id",
+      "admin_remarks",
+      "reviewed_at",
+      "tenant_explanation",
+      "tenant_responded_at",
+      "created_at",
+      "updated_at"
+    ],
+    "sqlDefinition": "id UUID PRIMARY KEY DEFAULT gen_random_uuid(),\r\n\r\n    -- Parties\r\n    landlord_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,\r\n    tenant_id   UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,\r\n    lease_id    UUID NOT NULL REFERENCES lease_records(id) ON DELETE CASCADE,\r\n    property_id UUID NOT NULL REFERENCES properties(id) ON DELETE CASCADE,\r\n\r\n    -- Incident Information\r\n    report_category VARCHAR(50) NOT NULL CHECK (report_category IN (\r\n        'non_payment',\r\n        'property_damage',\r\n        'house_rule_violation',\r\n        'noise_complaint',\r\n        'illegal_activity',\r\n        'unauthorized_occupants',\r\n        'harassment',\r\n        'unsanitary_behavior',\r\n        'utility_abuse',\r\n        'other'\r\n    )),\r\n    incident_date        DATE NOT NULL,\r\n    incident_description TEXT NOT NULL,\r\n    severity VARCHAR(20) NOT NULL CHECK (severity IN ('minor', 'moderate', 'major', 'critical')),\r\n\r\n    -- Admin Decision\r\n    status VARCHAR(30) NOT NULL DEFAULT 'pending_admin_review'\r\n        CHECK (status IN (\r\n            'pending_admin_review',\r\n            'approved',\r\n            'rejected',\r\n            'needs_more_evidence'\r\n        )),\r\n    admin_id      UUID REFERENCES users(id) ON DELETE SET NULL,\r\n    admin_remarks TEXT,\r\n    reviewed_at   TIMESTAMP WITH TIME ZONE,\r\n\r\n    -- Tenant Response\r\n    tenant_explanation   TEXT,\r\n    tenant_responded_at  TIMESTAMP WITH TIME ZONE,\r\n\r\n    -- Timestamps\r\n    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,\r\n    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP"
+  },
+  "tenant_screening": {
+    "table": "tenant_screening",
+    "cols": [
+      "id",
+      "tenant_id",
+      "application_id",
+      "property_id",
+      "landlord_id",
+      "monthly_income",
+      "employment_status",
+      "employment_details",
+      "payment_behavior_score",
+      "previous_rental_history",
+      "rental_conduct_notes",
+      "screening_score",
+      "screening_result_label",
+      "screening_remarks",
+      "status",
+      "created_at",
+      "updated_at"
+    ],
+    "sqlDefinition": "id UUID PRIMARY KEY DEFAULT gen_random_uuid(),\r\n    tenant_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,\r\n    application_id UUID NOT NULL REFERENCES tenant_applications(id) ON DELETE CASCADE,\r\n    property_id UUID NOT NULL REFERENCES properties(id) ON DELETE CASCADE,\r\n    landlord_id UUID REFERENCES users(id) ON DELETE SET NULL,\r\n    monthly_income DECIMAL(12, 2) NOT NULL CHECK (monthly_income >= 0),\r\n    employment_status VARCHAR(50) NOT NULL CHECK (employment_status IN ('regular', 'contractual', 'self_employed', 'student', 'unemployed')),\r\n    employment_details TEXT,\r\n    payment_behavior_score INTEGER DEFAULT NULL CHECK (payment_behavior_score >= 0 AND payment_behavior_score <= 100),\r\n    previous_rental_history VARCHAR(50) CHECK (previous_rental_history IN ('positive', 'neutral', 'negative')),\r\n    rental_conduct_notes VARCHAR(50) CHECK (rental_conduct_notes IN ('positive', 'neutral', 'negative')),\r\n    screening_score INTEGER CHECK (screening_score >= 0 AND screening_score <= 100),\r\n    screening_result_label VARCHAR(50) CHECK (screening_result_label IN ('low_risk', 'moderate_risk', 'high_risk', 'insufficient_information')),\r\n    screening_remarks TEXT,\r\n    status VARCHAR(50) NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'reviewed', 'cancelled')),\r\n    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,\r\n    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP"
+  },
+  "unit_amenities": {
+    "table": "unit_amenities",
+    "cols": [
+      "id",
+      "unit_id",
+      "amenity_name",
+      "created_at"
+    ],
+    "sqlDefinition": "id UUID PRIMARY KEY DEFAULT gen_random_uuid(),\r\n    unit_id UUID NOT NULL REFERENCES property_units(id) ON DELETE CASCADE,\r\n    amenity_name VARCHAR(100) NOT NULL,\r\n    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP"
+  },
+  "unit_beds": {
+    "table": "unit_beds",
+    "cols": [
+      "id",
+      "unit_id",
+      "bed_number",
+      "bed_label",
+      "status",
+      "monthly_rent",
+      "created_at",
+      "updated_at"
+    ],
+    "sqlDefinition": "id           UUID PRIMARY KEY DEFAULT gen_random_uuid(),\r\n    unit_id      UUID NOT NULL REFERENCES property_units(id) ON DELETE CASCADE,\r\n    bed_number   INTEGER NOT NULL,\r\n    bed_label    TEXT,                        -- e.g. \"Bed 1\", \"Bed 2\"\r\n    status       TEXT NOT NULL DEFAULT 'available'\r\n                 CHECK (status IN ('available', 'occupied', 'reserved', 'under_maintenance')),\r\n    monthly_rent NUMERIC(10, 2) NOT NULL DEFAULT 0,\r\n    created_at   TIMESTAMPTZ DEFAULT NOW(),\r\n    updated_at   TIMESTAMPTZ DEFAULT NOW()"
+  },
+  "unit_images": {
+    "table": "unit_images",
+    "cols": [
+      "id",
+      "unit_id",
+      "image_url",
+      "image_path",
+      "is_main",
+      "uploaded_at"
+    ],
+    "sqlDefinition": "id UUID PRIMARY KEY DEFAULT gen_random_uuid(),\r\n    unit_id UUID NOT NULL REFERENCES property_units(id) ON DELETE CASCADE,\r\n    image_url TEXT NOT NULL,\r\n    image_path TEXT NOT NULL,\r\n    is_main BOOLEAN DEFAULT false,\r\n    uploaded_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP"
+  },
+  "user_reports": {
+    "table": "user_reports",
+    "cols": [
+      "id",
+      "reporter_id",
+      "reported_user_id",
+      "property_id",
+      "report_type",
+      "report_title",
+      "report_description",
+      "attachment_url",
+      "attachment_path",
+      "status",
+      "admin_remarks",
+      "created_at",
+      "updated_at",
+      "resolved_at"
+    ],
+    "sqlDefinition": "id UUID PRIMARY KEY DEFAULT gen_random_uuid(),\r\n    reporter_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,\r\n    reported_user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,\r\n    property_id UUID REFERENCES properties(id) ON DELETE SET NULL,\r\n    report_type VARCHAR(50) NOT NULL CHECK (report_type IN ('user_behavior', 'fraudulent_listing', 'payment_issue', 'document_issue', 'property_issue', 'other')),\r\n    report_title VARCHAR(255) NOT NULL,\r\n    report_description TEXT NOT NULL,\r\n    attachment_url TEXT,\r\n    attachment_path TEXT,\r\n    status VARCHAR(50) NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'under_review', 'resolved', 'dismissed')),\r\n    admin_remarks TEXT,\r\n    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,\r\n    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,\r\n    resolved_at TIMESTAMP WITH TIME ZONE"
+  },
+  "users": {
+    "table": "users",
+    "cols": [
+      "id",
+      "full_name",
+      "email",
+      "password_hash",
+      "role",
+      "contact_number",
+      "address",
+      "profile_image_url",
+      "is_verified",
+      "account_status",
+      "created_at",
+      "updated_at",
+      "landlord_average_rating",
+      "landlord_rating_count",
+      "landlord_trust_score",
+      "suspension_lifted_at",
+      "created_by_landlord_id"
+    ],
+    "sqlDefinition": "id UUID PRIMARY KEY DEFAULT gen_random_uuid(),\r\n    full_name VARCHAR(255) NOT NULL,\r\n    email VARCHAR(255) UNIQUE NOT NULL,\r\n    password_hash VARCHAR(255) NOT NULL,\r\n    role VARCHAR(50) NOT NULL CHECK (role IN ('tenant', 'landlord', 'maintenance', 'admin')),\r\n    contact_number VARCHAR(50),\r\n    address TEXT,\r\n    profile_image_url TEXT,\r\n    is_verified BOOLEAN DEFAULT false,\r\n    account_status VARCHAR(50) DEFAULT 'pending' CHECK (account_status IN ('pending', 'active', 'disabled', 'rejected')),\r\n    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,\r\n    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP"
+  },
+  "utility_records": {
+    "table": "utility_records",
+    "cols": [],
+    "sqlDefinition": "id UUID PRIMARY KEY DEFAULT gen_random_uuid(),\r\n    lease_id UUID NOT NULL REFERENCES lease_records(id) ON DELETE CASCADE,\r\n    tenant_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,\r\n    landlord_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,\r\n    property_id UUID NOT NULL REFERENCES properties(id) ON DELETE CASCADE,\r\n    utility_type VARCHAR(50) NOT NULL CHECK (utility_type IN ('electricity', 'water', 'internet', 'other')),\r\n    billing_month VARCHAR(20) NOT NULL, -- e.g. \"2026-05\"\r\n    previous_reading DECIMAL(10, 2) NOT NULL CHECK (previous_reading >= 0),\r\n    current_reading DECIMAL(10, 2) NOT NULL CHECK (current_reading >= previous_reading),\r\n    consumption DECIMAL(10, 2) NOT NULL CHECK (consumption >= 0),\r\n    rate_per_unit DECIMAL(10, 2) NOT NULL CHECK (rate_per_unit >= 0),\r\n    total_amount DECIMAL(10, 2) NOT NULL CHECK (total_amount >= 0),\r\n    remarks TEXT,\r\n    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,\r\n    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP"
+  }
+}

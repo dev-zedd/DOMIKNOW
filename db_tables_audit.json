@@ -1,0 +1,1497 @@
+{
+  "existingTables": [
+    {
+      "table": "audit_logs",
+      "sample": [
+        {
+          "id": "bfc79dc0-334a-425b-8514-bdf6521a0f70",
+          "user_id": "eef340a0-e6ac-4aca-b4a4-0d5adfad9efc",
+          "action": "REGISTER",
+          "description": "User registered as tenant",
+          "created_at": "2026-05-30T09:06:34.724937+00:00"
+        }
+      ],
+      "cols": [
+        "id",
+        "user_id",
+        "action",
+        "description",
+        "created_at"
+      ]
+    },
+    {
+      "table": "billing_records",
+      "sample": [
+        {
+          "id": "ad6deee4-e110-4226-a52a-cde8bdd5fbdc",
+          "lease_id": "2b2dc1a9-bab8-4e19-98ea-76a56144b9d7",
+          "tenant_id": "13eadda5-290b-45a7-8cc1-7dd06ec1864e",
+          "landlord_id": "1e28f68b-a1f1-472f-a926-178a127a7ad8",
+          "property_id": "b287dd3f-9e77-45a2-bf5b-2c4e72950638",
+          "billing_month": "2026-08 (Move-In)",
+          "rent_amount": 1200,
+          "utility_amount": 0,
+          "penalty_amount": 0,
+          "total_amount": 4800,
+          "due_date": "2026-08-01",
+          "billing_status": "pending_payment",
+          "created_at": "2026-08-06T05:13:13.904343+00:00",
+          "updated_at": "2026-08-06T05:13:13.904343+00:00",
+          "water": 0,
+          "electricity": 0,
+          "internet": 0,
+          "parking": 0,
+          "other_charges": 3600,
+          "remarks": "Initial Move-In Billing: Monthly Rent (₱1,200) + Security Deposit (₱2,400) + Advance Payment (₱1,200)",
+          "unit_id": null
+        }
+      ],
+      "cols": [
+        "id",
+        "lease_id",
+        "tenant_id",
+        "landlord_id",
+        "property_id",
+        "billing_month",
+        "rent_amount",
+        "utility_amount",
+        "penalty_amount",
+        "total_amount",
+        "due_date",
+        "billing_status",
+        "created_at",
+        "updated_at",
+        "water",
+        "electricity",
+        "internet",
+        "parking",
+        "other_charges",
+        "remarks",
+        "unit_id"
+      ]
+    },
+    {
+      "table": "complaint_status_logs",
+      "sample": [
+        {
+          "id": "d30315b8-f625-4186-8d73-4702477e3d0c",
+          "complaint_id": "09457f81-49ea-4bcc-8169-b8dd128b50ec",
+          "updated_by": "2942e31e-f630-4ff3-bf3e-b8c2836f7ef6",
+          "previous_status": "new",
+          "new_status": "submitted",
+          "remarks": "Complaint submitted by tenant.",
+          "updated_at": "2026-07-26T15:53:10.698413+00:00"
+        }
+      ],
+      "cols": [
+        "id",
+        "complaint_id",
+        "updated_by",
+        "previous_status",
+        "new_status",
+        "remarks",
+        "updated_at"
+      ]
+    },
+    {
+      "table": "complaints",
+      "sample": [
+        {
+          "id": "27a308ea-6ad3-47b6-b302-c5704a1f4997",
+          "complaint_number": "CMP-20260806-0003",
+          "lease_id": "3fbc68a6-ca29-46e3-922d-b94ef86b5731",
+          "tenant_id": "eef340a0-e6ac-4aca-b4a4-0d5adfad9efc",
+          "landlord_id": "1e28f68b-a1f1-472f-a926-178a127a7ad8",
+          "property_id": "a3120d6d-65e0-4346-8e2a-91ac7049bd12",
+          "category": "safety_concern",
+          "subject": "awdawdawdawd",
+          "description": "awdawdawdawdawdawdawdawdawd",
+          "attachment_url": "https://lxbtoohaopokuenmdmia.supabase.co/storage/v1/object/public/complaint-attachments/complaints/eef340a0-e6ac-4aca-b4a4-0d5adfad9efc/1786024141969-Screenshot%20(42).png",
+          "attachment_path": "complaints/eef340a0-e6ac-4aca-b4a4-0d5adfad9efc/1786024141969-Screenshot (42).png",
+          "status": "closed",
+          "resolution_notes": "ljjjjkkjjjjkjkjkkj",
+          "rejection_reason": null,
+          "resolved_at": "2026-08-06T13:51:51.525+00:00",
+          "closed_at": "2026-08-06T14:02:32.649+00:00",
+          "submitted_at": "2026-08-06T13:49:04.194996+00:00",
+          "updated_at": "2026-08-06T14:02:32.65+00:00"
+        }
+      ],
+      "cols": [
+        "id",
+        "complaint_number",
+        "lease_id",
+        "tenant_id",
+        "landlord_id",
+        "property_id",
+        "category",
+        "subject",
+        "description",
+        "attachment_url",
+        "attachment_path",
+        "status",
+        "resolution_notes",
+        "rejection_reason",
+        "resolved_at",
+        "closed_at",
+        "submitted_at",
+        "updated_at"
+      ]
+    },
+    {
+      "table": "disputes",
+      "sample": [],
+      "cols": []
+    },
+    {
+      "table": "email_verifications",
+      "sample": [
+        {
+          "id": "4806de79-a90f-4cc0-97c2-11bc87e871da",
+          "user_id": "eef340a0-e6ac-4aca-b4a4-0d5adfad9efc",
+          "email": "alphi.fidelino@lspu.edu.ph",
+          "verification_code": "191267",
+          "expires_at": "2026-05-30T09:21:31.401+00:00",
+          "is_used": true,
+          "created_at": "2026-05-30T09:06:31.877399+00:00"
+        }
+      ],
+      "cols": [
+        "id",
+        "user_id",
+        "email",
+        "verification_code",
+        "expires_at",
+        "is_used",
+        "created_at"
+      ]
+    },
+    {
+      "table": "landlord_ratings",
+      "sample": [
+        {
+          "id": "28b7e337-d844-48c9-9e58-1362825dee39",
+          "lease_id": "901baba0-8865-405a-b5d6-da89475216d5",
+          "tenant_id": "2942e31e-f630-4ff3-bf3e-b8c2836f7ef6",
+          "landlord_id": "1e28f68b-a1f1-472f-a926-178a127a7ad8",
+          "property_id": "b287dd3f-9e77-45a2-bf5b-2c4e72950638",
+          "rating": 4,
+          "feedback": "Nakapa bait",
+          "submitted_at": "2026-07-26T14:43:07.959084+00:00",
+          "updated_at": "2026-07-26T14:45:22.094+00:00"
+        }
+      ],
+      "cols": [
+        "id",
+        "lease_id",
+        "tenant_id",
+        "landlord_id",
+        "property_id",
+        "rating",
+        "feedback",
+        "submitted_at",
+        "updated_at"
+      ]
+    },
+    {
+      "table": "landlord_ratings_v2",
+      "sample": [
+        {
+          "id": "15cf7435-8dde-4665-9e28-86879f7ceca1",
+          "lease_id": "901baba0-8865-405a-b5d6-da89475216d5",
+          "tenant_id": "2942e31e-f630-4ff3-bf3e-b8c2836f7ef6",
+          "landlord_id": "1e28f68b-a1f1-472f-a926-178a127a7ad8",
+          "property_id": "b287dd3f-9e77-45a2-bf5b-2c4e72950638",
+          "communication": 5,
+          "responsiveness": 5,
+          "professionalism": 4,
+          "fairness": 5,
+          "maintenance_response": 4,
+          "respectfulness": 5,
+          "reliability": 5,
+          "overall_satisfaction": 5,
+          "overall_computed_avg": 4.75,
+          "feedback": "The landlord is very polite and always answers messages on time.",
+          "submitted_at": "2026-07-28T14:18:17.111502+00:00",
+          "updated_at": "2026-07-28T14:29:05.381+00:00"
+        }
+      ],
+      "cols": [
+        "id",
+        "lease_id",
+        "tenant_id",
+        "landlord_id",
+        "property_id",
+        "communication",
+        "responsiveness",
+        "professionalism",
+        "fairness",
+        "maintenance_response",
+        "respectfulness",
+        "reliability",
+        "overall_satisfaction",
+        "overall_computed_avg",
+        "feedback",
+        "submitted_at",
+        "updated_at"
+      ]
+    },
+    {
+      "table": "landlord_report_evidence",
+      "sample": [
+        {
+          "id": "685966a6-248c-4fae-945f-164d9ba1e04b",
+          "report_id": "81cff7be-102f-40b5-b80b-2541066e132e",
+          "file_name": "Screenshot (34).png",
+          "file_url": "https://lxbtoohaopokuenmdmia.supabase.co/storage/v1/object/sign/landlord-report-evidence/landlord_reports/2942e31e-f630-4ff3-bf3e-b8c2836f7ef6/1785345308325_flh1i.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9lODYyM2IzNS04NWUxLTRlZDUtOTUzNy1iMGMyNWNjODI5YjEiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJsYW5kbG9yZC1yZXBvcnQtZXZpZGVuY2UvbGFuZGxvcmRfcmVwb3J0cy8yOTQyZTMxZS1mNjMwLTRmZjMtYmYzZS1iOGMyODM2ZjdlZjYvMTc4NTM0NTMwODMyNV9mbGgxaS5wbmciLCJzY29wZSI6ImRvd25sb2FkIiwiaWF0IjoxNzg1MzQ1MzA5LCJleHAiOjE3ODU5NTAxMDl9.DwlFcC4M45z_BXyg5RMPI1F5Rw8oYqZPmCZ-AEEYZZY",
+          "file_path": "landlord_reports/2942e31e-f630-4ff3-bf3e-b8c2836f7ef6/1785345308325_flh1i.png",
+          "file_type": "image/png",
+          "file_size": 217429,
+          "uploaded_at": "2026-07-29T17:15:09.729361+00:00"
+        }
+      ],
+      "cols": [
+        "id",
+        "report_id",
+        "file_name",
+        "file_url",
+        "file_path",
+        "file_type",
+        "file_size",
+        "uploaded_at"
+      ]
+    },
+    {
+      "table": "landlord_reports",
+      "sample": [
+        {
+          "id": "81cff7be-102f-40b5-b80b-2541066e132e",
+          "tenant_id": "2942e31e-f630-4ff3-bf3e-b8c2836f7ef6",
+          "landlord_id": "1e28f68b-a1f1-472f-a926-178a127a7ad8",
+          "lease_id": "901baba0-8865-405a-b5d6-da89475216d5",
+          "property_id": "b287dd3f-9e77-45a2-bf5b-2c4e72950638",
+          "report_category": "harassment",
+          "incident_date": "2026-07-15",
+          "incident_description": "Nambato ng Hallowblocks",
+          "severity": "critical",
+          "status": "rejected",
+          "admin_id": null,
+          "admin_remarks": null,
+          "reviewed_at": null,
+          "landlord_explanation": "Hende naman eh",
+          "landlord_responded_at": "2026-07-30T20:12:07.542+00:00",
+          "created_at": "2026-07-29T17:15:09.442937+00:00",
+          "updated_at": "2026-07-30T20:12:07.542+00:00"
+        }
+      ],
+      "cols": [
+        "id",
+        "tenant_id",
+        "landlord_id",
+        "lease_id",
+        "property_id",
+        "report_category",
+        "incident_date",
+        "incident_description",
+        "severity",
+        "status",
+        "admin_id",
+        "admin_remarks",
+        "reviewed_at",
+        "landlord_explanation",
+        "landlord_responded_at",
+        "created_at",
+        "updated_at"
+      ]
+    },
+    {
+      "table": "landlord_workers",
+      "sample": null,
+      "error": "Could not find the table 'public.landlord_workers' in the schema cache"
+    },
+    {
+      "table": "lease_records",
+      "sample": [
+        {
+          "id": "901baba0-8865-405a-b5d6-da89475216d5",
+          "application_id": "78a6f863-257b-479d-b98e-089349ac6f76",
+          "tenant_id": "2942e31e-f630-4ff3-bf3e-b8c2836f7ef6",
+          "landlord_id": "1e28f68b-a1f1-472f-a926-178a127a7ad8",
+          "property_id": "b287dd3f-9e77-45a2-bf5b-2c4e72950638",
+          "lease_start_date": "2026-08-01",
+          "lease_end_date": "2026-08-29",
+          "monthly_rent": 1200,
+          "security_deposit": 2400,
+          "lease_status": "active",
+          "terms_and_conditions": null,
+          "created_at": "2026-07-26T04:00:20.725902+00:00",
+          "updated_at": "2026-07-26T04:20:47.953+00:00",
+          "lease_number": "LSE-20260726-2177",
+          "advance_payment": 1200,
+          "payment_due_day": 5,
+          "utilities_covered": {
+            "water": "included",
+            "internet": "included",
+            "electricity": "separate",
+            "association_fee": "separate"
+          },
+          "utilities_other": "electricity:separate,water:included",
+          "max_occupants": 4,
+          "pet_policy": "Allowed",
+          "pet_conditions": "",
+          "smoking_policy": "Not Allowed",
+          "parking_policy": "Included",
+          "parking_slot_number": "11212",
+          "house_rules": "No loud music after 10 PM\nVisitors until 9 PM only\nKeep common areas clean\nGarbage every Tuesday",
+          "landlord_responsibilities": "Major repairs\nRoof leaks\nStructural damage1",
+          "tenant_responsibilities": "Light bulbs\nCleaning\nMinor damages",
+          "late_fee_amount": "₱300",
+          "grace_period": 5,
+          "termination_policy": "Tenant must provide a 30-day written notice before vacating.",
+          "additional_terms": "wala naman",
+          "landlord_signature_name": "ALPHI SANCON FIDELINO",
+          "landlord_signature_date": "2026-07-26T04:20:00.689+00:00",
+          "tenant_signature_name": "KYLEMALIBOG",
+          "tenant_signature_date": "2026-07-26T04:20:47.953+00:00",
+          "unit_id": null,
+          "bed_id": null
+        }
+      ],
+      "cols": [
+        "id",
+        "application_id",
+        "tenant_id",
+        "landlord_id",
+        "property_id",
+        "lease_start_date",
+        "lease_end_date",
+        "monthly_rent",
+        "security_deposit",
+        "lease_status",
+        "terms_and_conditions",
+        "created_at",
+        "updated_at",
+        "lease_number",
+        "advance_payment",
+        "payment_due_day",
+        "utilities_covered",
+        "utilities_other",
+        "max_occupants",
+        "pet_policy",
+        "pet_conditions",
+        "smoking_policy",
+        "parking_policy",
+        "parking_slot_number",
+        "house_rules",
+        "landlord_responsibilities",
+        "tenant_responsibilities",
+        "late_fee_amount",
+        "grace_period",
+        "termination_policy",
+        "additional_terms",
+        "landlord_signature_name",
+        "landlord_signature_date",
+        "tenant_signature_name",
+        "tenant_signature_date",
+        "unit_id",
+        "bed_id"
+      ]
+    },
+    {
+      "table": "maintenance_assignments",
+      "sample": [
+        {
+          "id": "195720ab-6fc0-46d9-95e3-c6406da07e45",
+          "maintenance_request_id": "c1b5697d-c1ed-47ba-ac75-d135d43002a4",
+          "maintenance_personnel_id": "4c38c7a9-049d-4c2c-bc2e-237f7d8f815c",
+          "due_date": "2026-08-06",
+          "instructions": "awdawdawd",
+          "assigned_at": "2026-08-06T14:47:37.025816+00:00"
+        }
+      ],
+      "cols": [
+        "id",
+        "maintenance_request_id",
+        "maintenance_personnel_id",
+        "due_date",
+        "instructions",
+        "assigned_at"
+      ]
+    },
+    {
+      "table": "maintenance_categories",
+      "sample": [
+        {
+          "id": "a434fce6-8c76-4509-9a6a-27181857738a",
+          "category_name": "plumbing"
+        }
+      ],
+      "cols": [
+        "id",
+        "category_name"
+      ]
+    },
+    {
+      "table": "maintenance_materials",
+      "sample": [
+        {
+          "id": "485c4850-55ef-473c-9e3a-aa260d71773b",
+          "maintenance_request_id": "b7fd5649-ea63-422e-b473-88144d542b14",
+          "material_name": "Buko jucie",
+          "quantity": 1,
+          "cost": 10
+        }
+      ],
+      "cols": [
+        "id",
+        "maintenance_request_id",
+        "material_name",
+        "quantity",
+        "cost"
+      ]
+    },
+    {
+      "table": "maintenance_personnel",
+      "sample": null,
+      "error": "Could not find the table 'public.maintenance_personnel' in the schema cache"
+    },
+    {
+      "table": "maintenance_photos",
+      "sample": [],
+      "cols": []
+    },
+    {
+      "table": "maintenance_reports",
+      "sample": [
+        {
+          "id": "dc413c84-e011-4605-b772-88e1931e1813",
+          "maintenance_request_id": "c1b5697d-c1ed-47ba-ac75-d135d43002a4",
+          "maintenance_personnel_id": "4c38c7a9-049d-4c2c-bc2e-237f7d8f815c",
+          "problem_found": "Legit",
+          "repair_performed": "Yown",
+          "materials_used": "A (x2), B (x1)",
+          "recommendations": "Solid",
+          "labor_cost": 150,
+          "material_cost": 176,
+          "created_at": "2026-08-06T14:52:02.433303+00:00"
+        }
+      ],
+      "cols": [
+        "id",
+        "maintenance_request_id",
+        "maintenance_personnel_id",
+        "problem_found",
+        "repair_performed",
+        "materials_used",
+        "recommendations",
+        "labor_cost",
+        "material_cost",
+        "created_at"
+      ]
+    },
+    {
+      "table": "maintenance_requests",
+      "sample": [
+        {
+          "id": "fc15154b-27f4-4d3e-b6ed-5d5c501c7afb",
+          "tenant_id": "970cc0ad-1c06-44ba-8535-e09ea9201e04",
+          "landlord_id": "54815bb4-b75d-45ed-81f4-9b049323a1a1",
+          "property_id": "8c0f6765-4599-4e33-a37f-fdf688f3e98e",
+          "lease_id": "991ec97b-70db-4dd6-b757-5a367161a51e",
+          "assigned_maintenance_id": "6ff14c2f-3660-4c4c-9330-12287f36dd71",
+          "issue_title": "Bathroom door hinge broken",
+          "issue_description": "The upper hinge of the bathroom door is loose and the door drags on the floor.",
+          "issue_category": "door",
+          "priority_level": "low",
+          "image_url": "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?auto=format&fit=crop&w=800&q=80",
+          "image_path": "maintenance/991ec97b-70db-4dd6-b757-5a367161a51e/issue.jpg",
+          "status": "completed",
+          "landlord_remarks": "Please fix the upper hinge. Check if door needs realignment.",
+          "created_at": "2026-08-24T02:12:35.185531+00:00",
+          "updated_at": "2026-09-01T05:20:55.478+00:00",
+          "completed_at": "2026-09-01T05:20:55.478+00:00",
+          "preferred_schedule": "Morning (8AM - 12PM)",
+          "unit_number": "Unit 101",
+          "rejection_reason": null,
+          "travel_started_at": null,
+          "arrived_at": null,
+          "repair_started_at": null,
+          "problem_found": "Upper hinge pin had worn out. Door was dragging on floor tile.",
+          "repair_performed": "Replaced upper hinge with heavy-duty variant. Realigned door frame. Tested swing — no more dragging.",
+          "recommendations": "Check lower hinge annually. Recommend door stopper installation.",
+          "before_photo_url": null,
+          "after_photo_url": null,
+          "labor_cost": 350,
+          "material_cost": 180,
+          "unit_id": "6b1ce024-ffe0-4eed-86bf-4332bfee6ffe"
+        }
+      ],
+      "cols": [
+        "id",
+        "tenant_id",
+        "landlord_id",
+        "property_id",
+        "lease_id",
+        "assigned_maintenance_id",
+        "issue_title",
+        "issue_description",
+        "issue_category",
+        "priority_level",
+        "image_url",
+        "image_path",
+        "status",
+        "landlord_remarks",
+        "created_at",
+        "updated_at",
+        "completed_at",
+        "preferred_schedule",
+        "unit_number",
+        "rejection_reason",
+        "travel_started_at",
+        "arrived_at",
+        "repair_started_at",
+        "problem_found",
+        "repair_performed",
+        "recommendations",
+        "before_photo_url",
+        "after_photo_url",
+        "labor_cost",
+        "material_cost",
+        "unit_id"
+      ]
+    },
+    {
+      "table": "maintenance_task_updates",
+      "sample": [],
+      "cols": []
+    },
+    {
+      "table": "maintenance_updates",
+      "sample": [
+        {
+          "id": "3e698346-6ead-410b-9234-c8e3c09f0d54",
+          "maintenance_request_id": "b7fd5649-ea63-422e-b473-88144d542b14",
+          "status_update": "pending",
+          "notes": "Maintenance request submitted by tenant.",
+          "created_at": "2026-07-26T13:13:49.765119+00:00"
+        }
+      ],
+      "cols": [
+        "id",
+        "maintenance_request_id",
+        "status_update",
+        "notes",
+        "created_at"
+      ]
+    },
+    {
+      "table": "messages",
+      "sample": null,
+      "error": "Could not find the table 'public.messages' in the schema cache"
+    },
+    {
+      "table": "notifications",
+      "sample": [
+        {
+          "id": "92b46793-fb57-4961-a368-ef9e145f6dea",
+          "user_id": "4c0692fb-0806-4d8e-8191-1b621de7c3da",
+          "type": "welcome",
+          "title": "Welcome to DOMIKNOW!",
+          "message": "Your tenant account is now active. Browse available properties and start your rental journey.",
+          "reference_id": null,
+          "read_status": true,
+          "created_at": "2026-08-25T11:21:23.600247+00:00",
+          "updated_at": "2026-08-25T11:21:23.600247+00:00"
+        }
+      ],
+      "cols": [
+        "id",
+        "user_id",
+        "type",
+        "title",
+        "message",
+        "reference_id",
+        "read_status",
+        "created_at",
+        "updated_at"
+      ]
+    },
+    {
+      "table": "payment_records",
+      "sample": [
+        {
+          "id": "93900adf-99e3-4867-b45b-ddaa8c70e77a",
+          "billing_id": "ebb1af7b-f664-4a8c-9fb1-b42946caec0c",
+          "lease_id": "901baba0-8865-405a-b5d6-da89475216d5",
+          "tenant_id": "2942e31e-f630-4ff3-bf3e-b8c2836f7ef6",
+          "landlord_id": "1e28f68b-a1f1-472f-a926-178a127a7ad8",
+          "property_id": "b287dd3f-9e77-45a2-bf5b-2c4e72950638",
+          "payment_amount": 2200.02,
+          "payment_method": "gcash",
+          "payment_reference_number": "34234324324",
+          "payment_proof_url": "https://lxbtoohaopokuenmdmia.supabase.co/storage/v1/object/sign/payment-proofs/payments/ebb1af7b-f664-4a8c-9fb1-b42946caec0c/1785050732933-PeraSmartPh.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9lODYyM2IzNS04NWUxLTRlZDUtOTUzNy1iMGMyNWNjODI5YjEiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJwYXltZW50LXByb29mcy9wYXltZW50cy9lYmIxYWY3Yi1mNjY0LTRhOGMtOWZiMS1iNDI5NDZjYWVjMGMvMTc4NTA1MDczMjkzMy1QZXJhU21hcnRQaC5wbmciLCJzY29wZSI6ImRvd25sb2FkIiwiaWF0IjoxNzg1MDUwNzM1LCJleHAiOjE3ODU2NTU1MzV9.EgDdxzhtDiPP1EZ3R9HJ06A4O3mAf8WQGjTy2oNv9Hk",
+          "payment_proof_path": "payments/ebb1af7b-f664-4a8c-9fb1-b42946caec0c/1785050732933-PeraSmartPh.png",
+          "payment_status": "verified",
+          "verification_remarks": "Salamat sa pag ibig",
+          "submitted_at": "2026-07-26T07:25:35.229331+00:00",
+          "verified_at": "2026-07-26T07:26:33.65+00:00",
+          "created_at": "2026-07-26T07:25:35.229331+00:00",
+          "updated_at": "2026-07-26T07:26:33.65+00:00"
+        }
+      ],
+      "cols": [
+        "id",
+        "billing_id",
+        "lease_id",
+        "tenant_id",
+        "landlord_id",
+        "property_id",
+        "payment_amount",
+        "payment_method",
+        "payment_reference_number",
+        "payment_proof_url",
+        "payment_proof_path",
+        "payment_status",
+        "verification_remarks",
+        "submitted_at",
+        "verified_at",
+        "created_at",
+        "updated_at"
+      ]
+    },
+    {
+      "table": "platform_policies",
+      "sample": null,
+      "error": "Could not find the table 'public.platform_policies' in the schema cache"
+    },
+    {
+      "table": "policies",
+      "sample": null,
+      "error": "Could not find the table 'public.policies' in the schema cache"
+    },
+    {
+      "table": "policy_violations",
+      "sample": [],
+      "cols": []
+    },
+    {
+      "table": "properties",
+      "sample": [
+        {
+          "id": "764eb5ce-da9a-4106-b6bb-3c3159c2cfd2",
+          "landlord_id": "4da79411-e3b9-424d-9925-6bd54599aa6a",
+          "property_name": "ebeth property 1",
+          "property_type": "apartment",
+          "description": "the tenant should be able to obey property policy",
+          "address": "L. de Leon Street",
+          "barangay": "Bagumayan",
+          "municipality": "Siniloan",
+          "province": "Laguna",
+          "latitude": 14.414115,
+          "longitude": 121.448197,
+          "monthly_rent": 1,
+          "max_occupants": 5,
+          "tenant_type_suitability": "student",
+          "house_rules": "{\"house_rules\":\"keep the property clean\",\"custom_policies\":[{\"name\":\"Smoking Policy\",\"value\":\"Not Allowed\"},{\"name\":\"Pet Policy\",\"value\":\"Not Allowed\"}]}",
+          "status": "approved",
+          "average_rating": 0,
+          "feedback_count": 0,
+          "main_image_url": "https://lxbtoohaopokuenmdmia.supabase.co/storage/v1/object/public/property-images/properties/764eb5ce-da9a-4106-b6bb-3c3159c2cfd2/1786949595608-conceptual.png",
+          "created_at": "2026-08-17T06:49:12.543552+00:00",
+          "updated_at": "2026-08-17T06:59:44.915+00:00",
+          "admin_reviewed_by": "8a152b3c-dc46-4bb2-b6f2-4f5ab82d3204",
+          "admin_reviewed_at": "2026-08-17T06:59:44.915+00:00",
+          "rejection_reason": null,
+          "unit_number": null,
+          "rating_count": 0,
+          "total_floors": 2,
+          "total_capacity": null,
+          "landmark": null
+        }
+      ],
+      "cols": [
+        "id",
+        "landlord_id",
+        "property_name",
+        "property_type",
+        "description",
+        "address",
+        "barangay",
+        "municipality",
+        "province",
+        "latitude",
+        "longitude",
+        "monthly_rent",
+        "max_occupants",
+        "tenant_type_suitability",
+        "house_rules",
+        "status",
+        "average_rating",
+        "feedback_count",
+        "main_image_url",
+        "created_at",
+        "updated_at",
+        "admin_reviewed_by",
+        "admin_reviewed_at",
+        "rejection_reason",
+        "unit_number",
+        "rating_count",
+        "total_floors",
+        "total_capacity",
+        "landmark"
+      ]
+    },
+    {
+      "table": "property_amenities",
+      "sample": [
+        {
+          "id": "e032e2cb-b96b-491b-9d63-de33ecb65017",
+          "property_id": "a3120d6d-65e0-4346-8e2a-91ac7049bd12",
+          "amenity_name": "CCTV",
+          "created_at": "2026-08-03T17:33:29.384127+00:00"
+        }
+      ],
+      "cols": [
+        "id",
+        "property_id",
+        "amenity_name",
+        "created_at"
+      ]
+    },
+    {
+      "table": "property_documents",
+      "sample": [
+        {
+          "id": "3c2525ad-73dd-4eca-9a8e-b3872b8760ab",
+          "property_id": "b287dd3f-9e77-45a2-bf5b-2c4e72950638",
+          "landlord_id": "1e28f68b-a1f1-472f-a926-178a127a7ad8",
+          "document_type": "government_permit",
+          "file_name": "Screenshot 2026-07-13 230618.png",
+          "file_url": "https://lxbtoohaopokuenmdmia.supabase.co/storage/v1/object/sign/property-documents/documents/b287dd3f-9e77-45a2-bf5b-2c4e72950638/1785004901114-Screenshot%202026-07-13%20230618.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9lODYyM2IzNS04NWUxLTRlZDUtOTUzNy1iMGMyNWNjODI5YjEiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJwcm9wZXJ0eS1kb2N1bWVudHMvZG9jdW1lbnRzL2IyODdkZDNmLTllNzctNDVhMi1iZjViLTJjNGU3Mjk1MDYzOC8xNzg1MDA0OTAxMTE0LVNjcmVlbnNob3QgMjAyNi0wNy0xMyAyMzA2MTgucG5nIiwic2NvcGUiOiJkb3dubG9hZCIsImlhdCI6MTc4NTAwNDkwMiwiZXhwIjoxNzg1NjA5NzAyfQ.PEpDXJQykVSPKq5pl8f4GUKbBvfNU43zXNc4jZ4aN-E",
+          "file_path": "documents/b287dd3f-9e77-45a2-bf5b-2c4e72950638/1785004901114-Screenshot 2026-07-13 230618.png",
+          "mime_type": "image/png",
+          "file_size": 1047998,
+          "uploaded_at": "2026-07-25T18:41:42.161946+00:00",
+          "status": "accepted"
+        }
+      ],
+      "cols": [
+        "id",
+        "property_id",
+        "landlord_id",
+        "document_type",
+        "file_name",
+        "file_url",
+        "file_path",
+        "mime_type",
+        "file_size",
+        "uploaded_at",
+        "status"
+      ]
+    },
+    {
+      "table": "property_feedback_summary",
+      "sample": [],
+      "cols": []
+    },
+    {
+      "table": "property_images",
+      "sample": [
+        {
+          "id": "1a55c8f8-1bb6-4f6d-86c1-1f3b1a78b194",
+          "property_id": "b287dd3f-9e77-45a2-bf5b-2c4e72950638",
+          "image_url": "https://lxbtoohaopokuenmdmia.supabase.co/storage/v1/object/public/property-images/properties/b287dd3f-9e77-45a2-bf5b-2c4e72950638/1785004925158-ChatGPT%20Image%20Jul%2018,%202026,%2005_50_39%20PM%20(5).png",
+          "image_path": "properties/b287dd3f-9e77-45a2-bf5b-2c4e72950638/1785004925158-ChatGPT Image Jul 18, 2026, 05_50_39 PM (5).png",
+          "is_main": true,
+          "uploaded_at": "2026-07-25T18:42:06.066725+00:00"
+        }
+      ],
+      "cols": [
+        "id",
+        "property_id",
+        "image_url",
+        "image_path",
+        "is_main",
+        "uploaded_at"
+      ]
+    },
+    {
+      "table": "property_ratings",
+      "sample": [
+        {
+          "id": "ba48c31c-815d-4cff-b3f8-30c35f6813c8",
+          "lease_id": "901baba0-8865-405a-b5d6-da89475216d5",
+          "tenant_id": "2942e31e-f630-4ff3-bf3e-b8c2836f7ef6",
+          "landlord_id": "1e28f68b-a1f1-472f-a926-178a127a7ad8",
+          "property_id": "b287dd3f-9e77-45a2-bf5b-2c4e72950638",
+          "cleanliness": 5,
+          "safety": 4,
+          "comfort": 5,
+          "amenities": 4,
+          "location": 5,
+          "internet_availability": 4,
+          "water_supply": 5,
+          "electricity_reliability": 5,
+          "noise_level": 3,
+          "overall_satisfaction": 5,
+          "overall_computed_avg": 4.5,
+          "feedback": "The property is in an excellent condition, near a lot of stores.",
+          "submitted_at": "2026-07-28T14:18:16.402424+00:00",
+          "updated_at": "2026-07-28T14:28:55.465+00:00"
+        }
+      ],
+      "cols": [
+        "id",
+        "lease_id",
+        "tenant_id",
+        "landlord_id",
+        "property_id",
+        "cleanliness",
+        "safety",
+        "comfort",
+        "amenities",
+        "location",
+        "internet_availability",
+        "water_supply",
+        "electricity_reliability",
+        "noise_level",
+        "overall_satisfaction",
+        "overall_computed_avg",
+        "feedback",
+        "submitted_at",
+        "updated_at"
+      ]
+    },
+    {
+      "table": "property_reservations",
+      "sample": [],
+      "cols": []
+    },
+    {
+      "table": "property_units",
+      "sample": [
+        {
+          "id": "d6e17782-caf0-4424-8a55-534c8f9bfe5e",
+          "property_id": "a3120d6d-65e0-4346-8e2a-91ac7049bd12",
+          "unit_number": "AP 1",
+          "unit_type": "room",
+          "monthly_rent": 2600,
+          "security_deposit": 2600,
+          "capacity": 3,
+          "bedrooms": 1,
+          "bathrooms": 1,
+          "floor_area_sqm": 0,
+          "status": "occupied",
+          "main_image_url": "https://lxbtoohaopokuenmdmia.supabase.co/storage/v1/object/public/property-images/units/d6e17782-caf0-4424-8a55-534c8f9bfe5e/1785778955327-Screenshot%202025-10-14%20155848.png",
+          "description": "",
+          "created_at": "2026-08-03T17:42:34.561917+00:00",
+          "updated_at": "2026-08-03T17:42:55.135+00:00",
+          "floor": "1st Floor",
+          "gender_restriction": "mixed",
+          "rental_style": "whole_room",
+          "room_name": "A"
+        }
+      ],
+      "cols": [
+        "id",
+        "property_id",
+        "unit_number",
+        "unit_type",
+        "monthly_rent",
+        "security_deposit",
+        "capacity",
+        "bedrooms",
+        "bathrooms",
+        "floor_area_sqm",
+        "status",
+        "main_image_url",
+        "description",
+        "created_at",
+        "updated_at",
+        "floor",
+        "gender_restriction",
+        "rental_style",
+        "room_name"
+      ]
+    },
+    {
+      "table": "ratings_feedback",
+      "sample": [],
+      "cols": []
+    },
+    {
+      "table": "recommendation_candidates",
+      "sample": [
+        {
+          "id": "bb16a206-13ba-492e-a22a-37d75611518f",
+          "recommendation_run_id": "cd88a37b-accd-4f64-8a1e-dc405a93c287",
+          "property_id": "edaf549b-1d4e-4d70-bd81-a2940cc15e8a",
+          "rank": 1,
+          "eligibility_passed": true,
+          "raw_score": 69.0258352758353,
+          "display_score": 69.03,
+          "criterion_scores": {
+            "C4": 78.86363636363637,
+            "C5": 59.18803418803419
+          },
+          "fallback_flags": {
+            "irr_prior_used": true,
+            "mcr_prior_used": true,
+            "tmr_prior_used": true,
+            "rating_prior_used": true
+          },
+          "property_input_snapshot": {
+            "status": {
+              "suspended": false,
+              "property_active": true,
+              "landlord_verified": true,
+              "property_approved": true,
+              "long_term_residential_eligible": true
+            },
+            "ratings": {
+              "valid_authenticated_star_sum": 0,
+              "valid_authenticated_review_count": 0
+            },
+            "latitude": 14.413726,
+            "policies": {},
+            "amenities": [
+              "WiFi",
+              "CCTV",
+              "Water Supply",
+              "Electricity"
+            ],
+            "documents": {
+              "required_documents_valid": true,
+              "required_documents_complete": true
+            },
+            "longitude": 121.448418,
+            "operations": {
+              "verified_issue_count": 0,
+              "resolved_verified_issue_count": 0,
+              "valid_maintenance_request_count": 0,
+              "completed_maintenance_request_count": 0,
+              "timely_completed_maintenance_request_count": 0
+            },
+            "landlord_id": "1e28f68b-a1f1-472f-a926-178a127a7ad8",
+            "property_id": "edaf549b-1d4e-4d70-bd81-a2940cc15e8a",
+            "monthly_rent": 1000,
+            "property_type": "boarding_house",
+            "available_units": 6,
+            "last_verified_at": "2026-08-02T14:41:06.58+00:00",
+            "maximum_occupants": 3
+          },
+          "explanation_snapshot": {
+            "explanations": [
+              "No authenticated rating history yet; the platform rating prior was used.",
+              "Limited operational history; platform reliability priors were used where records were unavailable."
+            ],
+            "criterion_breakdown": {
+              "authenticated_rating": {
+                "code": "C4",
+                "label": "Authenticated Rating Score",
+                "score": 78.86363636363637,
+                "weight": 0.5,
+                "display_score": 78.86,
+                "display_contribution": 39.43,
+                "weighted_contribution": 39.43181818181819
+              },
+              "operations_reliability": {
+                "code": "C5",
+                "label": "Rental Operations Reliability",
+                "score": 59.18803418803419,
+                "weight": 0.5,
+                "display_score": 59.19,
+                "display_contribution": 29.59,
+                "weighted_contribution": 29.594017094017094
+              }
+            }
+          },
+          "created_at": "2026-08-25T11:28:29.141267+00:00"
+        }
+      ],
+      "cols": [
+        "id",
+        "recommendation_run_id",
+        "property_id",
+        "rank",
+        "eligibility_passed",
+        "raw_score",
+        "display_score",
+        "criterion_scores",
+        "fallback_flags",
+        "property_input_snapshot",
+        "explanation_snapshot",
+        "created_at"
+      ]
+    },
+    {
+      "table": "recommendation_exclusions",
+      "sample": [
+        {
+          "id": "75bc9b2c-d673-4924-9561-5dc56d4f023a",
+          "recommendation_run_id": "cd88a37b-accd-4f64-8a1e-dc405a93c287",
+          "property_id": "764eb5ce-da9a-4106-b6bb-3c3159c2cfd2",
+          "reason_codes": [
+            "NO_AVAILABLE_UNITS"
+          ],
+          "created_at": "2026-08-25T11:28:29.259727+00:00"
+        }
+      ],
+      "cols": [
+        "id",
+        "recommendation_run_id",
+        "property_id",
+        "reason_codes",
+        "created_at"
+      ]
+    },
+    {
+      "table": "recommendation_runs",
+      "sample": [
+        {
+          "id": "cd88a37b-accd-4f64-8a1e-dc405a93c287",
+          "formula_version": "MC-REC-v1.0",
+          "tenant_id": "5df54c2b-8d9c-496c-a8c6-cfd8233b2f12",
+          "generated_at": "2026-08-25T11:28:29.002+00:00",
+          "tenant_input_snapshot": {
+            "budget": {
+              "comfortable_monthly_budget": null,
+              "hard_maximum_monthly_budget": null
+            },
+            "distance": {
+              "ideal_distance_km": null,
+              "maximum_distance_km": null,
+              "maximum_distance_is_required": false
+            },
+            "tenant_id": "5df54c2b-8d9c-496c-a8c6-cfd8233b2f12",
+            "occupant_count": 1,
+            "desired_amenities": [],
+            "reference_location": {
+              "latitude": null,
+              "longitude": null
+            },
+            "required_amenities": [],
+            "criterion_importance": {
+              "C1": 3,
+              "C2": 3,
+              "C3": 3,
+              "C4": 3,
+              "C5": 3
+            },
+            "soft_policy_preferences": [],
+            "preferred_property_types": {
+              "values": [],
+              "required": false
+            },
+            "required_policy_preferences": []
+          },
+          "active_criteria": [
+            "C4",
+            "C5"
+          ],
+          "raw_importance": {
+            "C4": 3,
+            "C5": 3
+          },
+          "normalized_weights": {
+            "C4": 0.5,
+            "C5": 0.5
+          },
+          "platform_priors": {
+            "global_irr": 0.75,
+            "global_mcr": 0.6923076923076923,
+            "global_tmr": 0.3333333333333333,
+            "rating_global_mean": 4.154545454545455,
+            "rating_count_median": 1
+          },
+          "candidate_count": 17,
+          "eligible_count": 1,
+          "excluded_count": 16,
+          "created_at": "2026-08-25T11:28:28.965208+00:00"
+        }
+      ],
+      "cols": [
+        "id",
+        "formula_version",
+        "tenant_id",
+        "generated_at",
+        "tenant_input_snapshot",
+        "active_criteria",
+        "raw_importance",
+        "normalized_weights",
+        "platform_priors",
+        "candidate_count",
+        "eligible_count",
+        "excluded_count",
+        "created_at"
+      ]
+    },
+    {
+      "table": "report_messages",
+      "sample": [
+        {
+          "id": "f2f3281a-61ce-4736-bc3e-ebf22781d7be",
+          "report_type": "tenant_report",
+          "report_id": "a7fafbc7-0b13-4be1-8b65-01d5b080147c",
+          "sender_id": "1e28f68b-a1f1-472f-a926-178a127a7ad8",
+          "sender_role": "landlord",
+          "recipient_role": "reporter",
+          "message_text": "eto po evidence oh",
+          "attachment_url": "https://lxbtoohaopokuenmdmia.supabase.co/storage/v1/object/sign/report-attachments/report-inquiries/1e28f68b-a1f1-472f-a926-178a127a7ad8/1786046495385-763028033_1366616055596093_8657412575241960243_n.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9lODYyM2IzNS04NWUxLTRlZDUtOTUzNy1iMGMyNWNjODI5YjEiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJyZXBvcnQtYXR0YWNobWVudHMvcmVwb3J0LWlucXVpcmllcy8xZTI4ZjY4Yi1hMWYxLTQ3MmYtYTkyNi0xNzhhMTI3YTdhZDgvMTc4NjA0NjQ5NTM4NS03NjMwMjgwMzNfMTM2NjYxNjA1NTU5NjA5M184NjU3NDEyNTc1MjQxOTYwMjQzX24ucG5nIiwic2NvcGUiOiJkb3dubG9hZCIsImlhdCI6MTc4NjA0NjQ5NywiZXhwIjoxNzg2NjUxMjk3fQ.CnH6zFUanE1i2Kl179sTYMKP5SUm5Z_GZfkyAs8YiDA",
+          "attachment_path": "report-inquiries/1e28f68b-a1f1-472f-a926-178a127a7ad8/1786046495385-763028033_1366616055596093_8657412575241960243_n.png",
+          "created_at": "2026-08-06T20:01:36.075+00:00"
+        }
+      ],
+      "cols": [
+        "id",
+        "report_type",
+        "report_id",
+        "sender_id",
+        "sender_role",
+        "recipient_role",
+        "message_text",
+        "attachment_url",
+        "attachment_path",
+        "created_at"
+      ]
+    },
+    {
+      "table": "reports",
+      "sample": null,
+      "error": "Could not find the table 'public.reports' in the schema cache"
+    },
+    {
+      "table": "statements",
+      "sample": null,
+      "error": "Could not find the table 'public.statements' in the schema cache"
+    },
+    {
+      "table": "tenant_application_documents",
+      "sample": [
+        {
+          "id": "c64261a6-f47e-4d5f-9221-9aed710b9321",
+          "application_id": "fcc6a3fc-1ccd-4cee-81b2-7df395eca0de",
+          "tenant_id": "4a3a84af-0c72-4106-a84d-246d0a8eb44a",
+          "document_type": "valid_id",
+          "file_name": "miami_web_color_scheme_VF-1-768x1024.jpg",
+          "file_url": "https://lxbtoohaopokuenmdmia.supabase.co/storage/v1/object/sign/tenant-application-documents/applications/fcc6a3fc-1ccd-4cee-81b2-7df395eca0de/1785010844486-miami_web_color_scheme_VF-1-768x1024.jpg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9lODYyM2IzNS04NWUxLTRlZDUtOTUzNy1iMGMyNWNjODI5YjEiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJ0ZW5hbnQtYXBwbGljYXRpb24tZG9jdW1lbnRzL2FwcGxpY2F0aW9ucy9mY2M2YTNmYy0xY2NkLTRjZWUtODFiMi03ZGYzOTVlY2EwZGUvMTc4NTAxMDg0NDQ4Ni1taWFtaV93ZWJfY29sb3Jfc2NoZW1lX1ZGLTEtNzY4eDEwMjQuanBnIiwic2NvcGUiOiJkb3dubG9hZCIsImlhdCI6MTc4NTAxMDg0NSwiZXhwIjoxNzg1NjE1NjQ1fQ.yln9xrPA1aGbKhUbs-oaTIDdBwddDbyOJ1g-vV0lcWU",
+          "file_path": "applications/fcc6a3fc-1ccd-4cee-81b2-7df395eca0de/1785010844486-miami_web_color_scheme_VF-1-768x1024.jpg",
+          "mime_type": "image/jpeg",
+          "file_size": 14346,
+          "uploaded_at": "2026-07-25T20:20:45.157194+00:00"
+        }
+      ],
+      "cols": [
+        "id",
+        "application_id",
+        "tenant_id",
+        "document_type",
+        "file_name",
+        "file_url",
+        "file_path",
+        "mime_type",
+        "file_size",
+        "uploaded_at"
+      ]
+    },
+    {
+      "table": "tenant_applications",
+      "sample": [
+        {
+          "id": "1dc5ae7b-e682-478b-8fe4-59676038d91a",
+          "tenant_id": "eef340a0-e6ac-4aca-b4a4-0d5adfad9efc",
+          "property_id": "a3120d6d-65e0-4346-8e2a-91ac7049bd12",
+          "landlord_id": "1e28f68b-a1f1-472f-a926-178a127a7ad8",
+          "reservation_id": null,
+          "application_message": "pa opa po yaw",
+          "desired_move_in_date": "2026-08-07",
+          "status": "approved",
+          "landlord_remarks": "",
+          "submitted_at": "2026-08-03T18:02:49.180614+00:00",
+          "reviewed_at": "2026-08-04T16:31:15.44+00:00",
+          "created_at": "2026-08-03T18:02:49.180614+00:00",
+          "updated_at": "2026-08-04T16:31:15.44+00:00",
+          "unit_id": "d6e17782-caf0-4424-8a55-534c8f9bfe5e",
+          "bed_id": null
+        }
+      ],
+      "cols": [
+        "id",
+        "tenant_id",
+        "property_id",
+        "landlord_id",
+        "reservation_id",
+        "application_message",
+        "desired_move_in_date",
+        "status",
+        "landlord_remarks",
+        "submitted_at",
+        "reviewed_at",
+        "created_at",
+        "updated_at",
+        "unit_id",
+        "bed_id"
+      ]
+    },
+    {
+      "table": "tenant_report_evidence",
+      "sample": [
+        {
+          "id": "ac18ed0e-3075-4639-bae3-e17450961fb2",
+          "report_id": "fedb99a8-db29-441d-8fd4-7b4b05d2b940",
+          "file_name": "Screenshot 2026-07-26 212438.png",
+          "file_url": "https://lxbtoohaopokuenmdmia.supabase.co/storage/v1/object/sign/tenant-report-evidence/tenant-reports/1e28f68b-a1f1-472f-a926-178a127a7ad8/1785337659962-Screenshot%202026-07-26%20212438.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9lODYyM2IzNS04NWUxLTRlZDUtOTUzNy1iMGMyNWNjODI5YjEiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJ0ZW5hbnQtcmVwb3J0LWV2aWRlbmNlL3RlbmFudC1yZXBvcnRzLzFlMjhmNjhiLWExZjEtNDcyZi1hOTI2LTE3OGExMjdhN2FkOC8xNzg1MzM3NjU5OTYyLVNjcmVlbnNob3QgMjAyNi0wNy0yNiAyMTI0MzgucG5nIiwic2NvcGUiOiJkb3dubG9hZCIsImlhdCI6MTc4NTMzNzY2MSwiZXhwIjoxNzg1OTQyNDYxfQ._yHxAeXLcGCR0kxlgP6RQK1fE6FZslzJeBftTo3d0-I",
+          "file_path": "tenant-reports/1e28f68b-a1f1-472f-a926-178a127a7ad8/1785337659962-Screenshot 2026-07-26 212438.png",
+          "file_type": "image/png",
+          "file_size": 310670,
+          "uploaded_at": "2026-07-29T15:07:41.493685+00:00"
+        }
+      ],
+      "cols": [
+        "id",
+        "report_id",
+        "file_name",
+        "file_url",
+        "file_path",
+        "file_type",
+        "file_size",
+        "uploaded_at"
+      ]
+    },
+    {
+      "table": "tenant_reports",
+      "sample": [
+        {
+          "id": "fedb99a8-db29-441d-8fd4-7b4b05d2b940",
+          "landlord_id": "1e28f68b-a1f1-472f-a926-178a127a7ad8",
+          "tenant_id": "2942e31e-f630-4ff3-bf3e-b8c2836f7ef6",
+          "lease_id": "901baba0-8865-405a-b5d6-da89475216d5",
+          "property_id": "b287dd3f-9e77-45a2-bf5b-2c4e72950638",
+          "report_category": "illegal_activity",
+          "incident_date": "2026-07-28",
+          "incident_description": "Nag lolo sa dorm",
+          "severity": "critical",
+          "status": "approved",
+          "admin_id": "8a152b3c-dc46-4bb2-b6f2-4f5ab82d3204",
+          "admin_remarks": "pppppppawdaw",
+          "reviewed_at": "2026-08-07T12:21:48.971+00:00",
+          "tenant_explanation": "Hindi naman eh",
+          "tenant_responded_at": "2026-07-29T16:15:02.35+00:00",
+          "created_at": "2026-07-29T15:07:41.398992+00:00",
+          "updated_at": "2026-08-07T12:21:48.971+00:00"
+        }
+      ],
+      "cols": [
+        "id",
+        "landlord_id",
+        "tenant_id",
+        "lease_id",
+        "property_id",
+        "report_category",
+        "incident_date",
+        "incident_description",
+        "severity",
+        "status",
+        "admin_id",
+        "admin_remarks",
+        "reviewed_at",
+        "tenant_explanation",
+        "tenant_responded_at",
+        "created_at",
+        "updated_at"
+      ]
+    },
+    {
+      "table": "tenant_screening",
+      "sample": [
+        {
+          "id": "3568e964-da52-4fc5-9594-4a61be119964",
+          "tenant_id": "5df54c2b-8d9c-496c-a8c6-cfd8233b2f12",
+          "application_id": "7be44a5e-85fb-4b69-b1c9-586f3dc1aab5",
+          "property_id": "42863f95-78fe-4ebb-a700-41a436aee105",
+          "landlord_id": "54815bb4-b75d-45ed-81f4-9b049323a1a1",
+          "monthly_income": 5000,
+          "employment_status": "student",
+          "employment_details": "student — submitted during application.",
+          "payment_behavior_score": 82,
+          "previous_rental_history": "positive",
+          "rental_conduct_notes": "positive",
+          "screening_score": 82,
+          "screening_result_label": "low_risk",
+          "screening_remarks": "Tenant passed screening. Score: 82/100.",
+          "status": "reviewed",
+          "created_at": "2026-08-24T02:12:30.340123+00:00",
+          "updated_at": "2026-08-24T02:12:30.340123+00:00"
+        }
+      ],
+      "cols": [
+        "id",
+        "tenant_id",
+        "application_id",
+        "property_id",
+        "landlord_id",
+        "monthly_income",
+        "employment_status",
+        "employment_details",
+        "payment_behavior_score",
+        "previous_rental_history",
+        "rental_conduct_notes",
+        "screening_score",
+        "screening_result_label",
+        "screening_remarks",
+        "status",
+        "created_at",
+        "updated_at"
+      ]
+    },
+    {
+      "table": "unit_amenities",
+      "sample": [
+        {
+          "id": "35bdde4b-1378-48a9-aa86-f0c5451854d1",
+          "unit_id": "0d21b11f-d1e1-438b-a2d7-2a69cf957fc8",
+          "amenity_name": "Study Table",
+          "created_at": "2026-08-03T16:53:04.159354+00:00"
+        }
+      ],
+      "cols": [
+        "id",
+        "unit_id",
+        "amenity_name",
+        "created_at"
+      ]
+    },
+    {
+      "table": "unit_beds",
+      "sample": [
+        {
+          "id": "fc25593a-67a6-4b92-ae56-bccba3dbfebb",
+          "unit_id": "b6bf098f-8fa6-42b4-b672-e8942929ab38",
+          "bed_number": 1,
+          "bed_label": "Bed 1",
+          "status": "available",
+          "monthly_rent": 1200,
+          "created_at": "2026-08-03T16:30:08.934794+00:00",
+          "updated_at": "2026-08-03T16:30:08.934794+00:00"
+        }
+      ],
+      "cols": [
+        "id",
+        "unit_id",
+        "bed_number",
+        "bed_label",
+        "status",
+        "monthly_rent",
+        "created_at",
+        "updated_at"
+      ]
+    },
+    {
+      "table": "unit_images",
+      "sample": [
+        {
+          "id": "f4b19dff-9494-4f22-a03a-c4a4ee44ad34",
+          "unit_id": "0d21b11f-d1e1-438b-a2d7-2a69cf957fc8",
+          "image_url": "https://lxbtoohaopokuenmdmia.supabase.co/storage/v1/object/public/property-images/units/0d21b11f-d1e1-438b-a2d7-2a69cf957fc8/1785772819148-f3d79d16-52cc-4027-a8eb-45dfe864dfbb.jpg",
+          "image_path": "units/0d21b11f-d1e1-438b-a2d7-2a69cf957fc8/1785772819148-f3d79d16-52cc-4027-a8eb-45dfe864dfbb.jpg",
+          "is_main": true,
+          "uploaded_at": "2026-08-03T16:00:20.081453+00:00"
+        }
+      ],
+      "cols": [
+        "id",
+        "unit_id",
+        "image_url",
+        "image_path",
+        "is_main",
+        "uploaded_at"
+      ]
+    },
+    {
+      "table": "user_reports",
+      "sample": [
+        {
+          "id": "2bb6e504-31e3-436a-85a3-c12f4884319a",
+          "reporter_id": "eef340a0-e6ac-4aca-b4a4-0d5adfad9efc",
+          "reported_user_id": "00d900a0-ef50-4178-9b17-95d9f0ff0cb6",
+          "property_id": null,
+          "report_type": "property_issue",
+          "report_title": "Unfair utility split",
+          "report_description": "Landlord does not share main utility bill records.",
+          "attachment_url": null,
+          "attachment_path": null,
+          "status": "resolved",
+          "admin_remarks": "Warned landlord to share utility breakdowns.",
+          "created_at": "2026-05-30T19:01:30.930686+00:00",
+          "updated_at": "2026-05-30T19:01:30.265+00:00",
+          "resolved_at": "2026-05-30T19:01:30.265+00:00"
+        }
+      ],
+      "cols": [
+        "id",
+        "reporter_id",
+        "reported_user_id",
+        "property_id",
+        "report_type",
+        "report_title",
+        "report_description",
+        "attachment_url",
+        "attachment_path",
+        "status",
+        "admin_remarks",
+        "created_at",
+        "updated_at",
+        "resolved_at"
+      ]
+    },
+    {
+      "table": "users",
+      "sample": [
+        {
+          "id": "00d900a0-ef50-4178-9b17-95d9f0ff0cb6",
+          "full_name": "Lando Landlord",
+          "email": "landlord@domiknow.com",
+          "password_hash": "$2b$12$6ZBsrLKlwilGOGpd7a9EOecpPAuhxk7Mn.9o4sjbpc.UtBRrRAFaq",
+          "role": "landlord",
+          "contact_number": "+63 911 111 1111",
+          "address": "Siniloan, Laguna",
+          "profile_image_url": null,
+          "is_verified": true,
+          "account_status": "active",
+          "created_at": "2026-05-30T18:59:07.797814+00:00",
+          "updated_at": "2026-05-30T18:59:07.797814+00:00",
+          "landlord_average_rating": 0,
+          "landlord_rating_count": 0,
+          "landlord_trust_score": 100,
+          "suspension_lifted_at": null,
+          "created_by_landlord_id": null
+        }
+      ],
+      "cols": [
+        "id",
+        "full_name",
+        "email",
+        "password_hash",
+        "role",
+        "contact_number",
+        "address",
+        "profile_image_url",
+        "is_verified",
+        "account_status",
+        "created_at",
+        "updated_at",
+        "landlord_average_rating",
+        "landlord_rating_count",
+        "landlord_trust_score",
+        "suspension_lifted_at",
+        "created_by_landlord_id"
+      ]
+    },
+    {
+      "table": "utility_records",
+      "sample": [],
+      "cols": []
+    }
+  ],
+  "missingTables": []
+}
