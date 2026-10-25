@@ -510,10 +510,15 @@ function renderNewDashboardLayout(user) {
     const parentNavigationPages = {
         admin: {
             'property-review-details.html': 'property-review.html',
-            'report-detail.html': 'reports.html'
+            'report-detail.html': 'reports.html',
+            'maintenance-onboarding.html': 'maintenance-onboarding.html',
+            'maintenance-screening.html': 'maintenance-screening.html',
+            'maintenance-access.html': 'maintenance-access.html',
+            'maintenance-pool.html': 'maintenance-pool.html'
         },
         maintenance: {
-            'task-details.html': 'tasks.html'
+            'task-details.html': 'tasks.html',
+            'compliance.html': 'compliance.html'
         },
         tenant: {
             'property-details.html': 'properties.html',
@@ -682,6 +687,15 @@ function renderNewDashboardLayout(user) {
                 ]
             },
             {
+                section: 'Workforce & Maintenance',
+                items: [
+                    { label: 'Staff Onboarding', href: 'maintenance-onboarding.html', icon: 'User Management' },
+                    { label: 'Screening Reviews', href: 'maintenance-screening.html', icon: 'Screening Monitor' },
+                    { label: 'Access Control', href: 'maintenance-access.html', icon: 'User Access' },
+                    { label: 'Maintenance Pool', href: 'maintenance-pool.html', icon: 'Maintenance Management' }
+                ]
+            },
+            {
                 section: 'Platform Monitoring',
                 items: [
                     { label: 'Payment Monitoring', href: 'payments.html', icon: 'Payment Monitoring' }
@@ -733,6 +747,7 @@ function renderNewDashboardLayout(user) {
         const maintenanceItems = [
             { label: 'Dashboard', href: 'dashboard.html', icon: 'Dashboard' },
             { label: 'Assigned Tasks', href: 'tasks.html', icon: 'Assigned Tasks' },
+            { label: 'My Compliance', href: 'compliance.html', icon: 'Screening' },
             { label: 'My Profile', href: 'profile.html', icon: 'Profile' }
         ];
 

@@ -99,6 +99,15 @@ const NAVIGATION_CONFIG = {
       ]
     },
     {
+      section: 'Workforce & Maintenance',
+      items: [
+        { label: 'Maintenance Onboarding', href: 'maintenance-onboarding.html' },
+        { label: 'Screening Dashboard', href: 'maintenance-screening.html' },
+        { label: 'Access Management', href: 'maintenance-access.html' },
+        { label: 'Global Maintenance Pool', href: 'maintenance-pool.html' }
+      ]
+    },
+    {
       section: 'Platform Monitoring',
       items: [
         { label: 'Payment Monitoring', href: 'payments.html' }
@@ -119,6 +128,7 @@ const NAVIGATION_CONFIG = {
       items: [
         { label: 'Dashboard', href: 'dashboard.html' },
         { label: 'Assigned Tasks', href: 'tasks.html' },
+        { label: 'My Compliance', href: 'compliance.html' },
         { label: 'My Profile', href: 'profile.html' }
       ]
     }

@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Global Maintenance Pool - DomiKnow</title>
+    <link href="../../css/input.css" rel="stylesheet">
+    <link href="../../css/design-system.css" rel="stylesheet">
+    <link href="../../css/admin.css" rel="stylesheet">
+    <script src="../../js/ui.js" defer></script>
+    <style>
+        .pool-header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+        .pool-kpis {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        .pool-kpi-card {
+            background: var(--color-surface, #ffffff);
+            border: 1px solid var(--color-border, #e2e8f0);
+            border-radius: 12px;
+            padding: 18px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .pool-kpi-card__label {
+            font-size: 12px;
+            color: var(--color-text-muted, #64748b);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .pool-kpi-card__val {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--color-text-primary, #0f172a);
+        }
+        .pool-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+            gap: 20px;
+        }
+        .tech-card {
+            background: var(--color-surface, #ffffff);
+            border: 1px solid var(--color-border, #e2e8f0);
+            border-radius: 14px;
+            padding: 22px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+            transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+            position: relative;
+        }
+        .tech-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px -4px rgba(0,0,0,0.08);
+            border-color: #cbd5e1;
+        }
+        .tech-card--eligible {
+            border-left: 5px solid #10b981;
+        }
+        .tech-card--ineligible {
+            border-left: 5px solid #ef4444;
+        }
+        .eligibility-banner {
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .eligibility-banner--yes {
+            background: #dcfce7;
+            color: #15803d;
+            border: 1px solid #bbf7d0;
+        }
+        .eligibility-banner--no {
+            background: #fee2e2;
+            color: #b91c1c;
+            border: 1px solid #fecaca;
+        }
+        .reasons-list {
+            margin: 0;
+            padding-left: 18px;
+            font-size: 12px;
+            color: #b91c1c;
+            line-height: 1.5;
+        }
+        .checklist-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            background: #f8fafc;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+            font-size: 12px;
+        }
+        .check-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: #334155;
+        }
+        .check-item--pass svg {
+            color: #16a34a;
+        }
+        .check-item--fail svg {
+            color: #dc2626;
+        }
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(4px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s ease;
+        }
+        .modal-overlay.is-active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .modal-container {
+            background: var(--color-surface, #ffffff);
+            border-radius: 16px;
+            width: 100%;
+            max-width: 560px;
+            max-height: 90vh;
+            overflow-y: auto;
+            border: 1px solid var(--color-border, #e2e8f0);
+            box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);
+        }
+        .modal-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--color-border, #e2e8f0);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .modal-body {
+            padding: 24px;
+        }
+        .modal-footer {
+            padding: 16px 24px;
+            border-top: 1px solid var(--color-border, #e2e8f0);
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            background: var(--color-surface-subtle, #f8fafc);
+            border-bottom-left-radius: 16px;
+            border-bottom-right-radius: 16px;
+        }
+    </style>
+</head>
+
+<body class="app-loading" data-role="admin" data-page-title="Global Maintenance Pool">
+    <main class="dashboard-container" aria-labelledby="appPageTitle">
+        <!-- Status Feedback Notification -->
+        <div id="actionFeedback" class="alert alert-success hidden" role="status" aria-live="polite"></div>
+
+        <!-- Top Row -->
+        <div class="pool-header-row">
+            <div>
+                <h1 id="appPageTitle" style="font-size: 24px; font-weight: 700; margin: 0 0 4px 0; color: var(--color-text-primary);">Global Maintenance Pool</h1>
+                <p style="margin: 0; color: var(--color-text-muted); font-size: 14px;">Administrators can dispatch any verified technician across all properties. Ineligible technicians with expired screening or suspended access are strictly blocked.</p>
+            </div>
+            <div style="display: flex; gap: 10px;">
+                <a href="maintenance-onboarding.html" class="navbar-btn" style="border: 1px solid var(--color-border-default, #e2e8f0); text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                    <span>Onboard Staff</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- KPIs -->
+        <div class="pool-kpis">
+            <div class="pool-kpi-card">
+                <span class="pool-kpi-card__label">Global Pool Size</span>
+                <span class="pool-kpi-card__val" id="kpiTotalPool">—</span>
+            </div>
+            <div class="pool-kpi-card">
+                <span class="pool-kpi-card__label">Eligible For Assignment</span>
+                <span class="pool-kpi-card__val" id="kpiEligible" style="color: #10b981;">—</span>
+            </div>
+            <div class="pool-kpi-card">
+                <span class="pool-kpi-card__label">Blocked / Incomplete Compliance</span>
+                <span class="pool-kpi-card__val" id="kpiBlocked" style="color: #ef4444;">—</span>
+            </div>
+        </div>
+
+        <!-- Filter Controls -->
+        <div style="display: flex; gap: 12px; margin-bottom: 24px; flex-wrap: wrap; align-items: center; background: white; padding: 14px 18px; border-radius: 12px; border: 1px solid var(--color-border-default, #e2e8f0);">
+            <div style="flex: 1; min-width: 240px;">
+                <input type="search" id="poolSearch" class="form-input" placeholder="Search technician by name, trade, skills, area..." style="padding: 8px 14px; font-size: 13px;">
+            </div>
+            <div>
+                <select id="eligibilityFilter" class="form-input" style="padding: 8px 14px; font-size: 13px;">
+                    <option value="all">All Technicians</option>
+                    <option value="eligible">Eligible Only (Ready to Assign)</option>
+                    <option value="ineligible">Blocked Only (Compliance Issues)</option>
+                </select>
+            </div>
+            <div>
+                <select id="departmentFilter" class="form-input" style="padding: 8px 14px; font-size: 13px;">
+                    <option value="">All Departments</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Technicians Cards Grid -->
+        <div id="techniciansGrid" class="pool-grid">
+            <div style="grid-column: 1 / -1; text-align: center; padding: 48px; color: var(--color-text-muted);">
+                <span>Loading global maintenance technicians…</span>
+            </div>
+        </div>
+    </main>
+
+    <!-- Assign Work Order Modal -->
+    <div id="assignmentModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="assignModalTitle">
+        <div class="modal-container">
+            <div class="modal-header">
+                <h2 id="assignModalTitle" style="font-size: 18px; font-weight: 700; margin: 0; color: var(--color-text-primary);">Assign Maintenance Request</h2>
+                <button type="button" id="closeAssignModalBtn" class="navbar-btn" style="padding: 4px 8px; font-size: 18px;">&times;</button>
+            </div>
+            <form id="assignForm">
+                <input type="hidden" id="assignTechId">
+                <div class="modal-body">
+                    <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px; padding: 14px 16px; margin-bottom: 20px;">
+                        <span style="font-size: 12px; color: #15803d; font-weight: 700; text-transform: uppercase;">Selected Technician (Compliance Verified)</span>
+                        <strong id="assignTechName" style="display: block; font-size: 16px; color: #14532d; margin-top: 2px;">—</strong>
+                        <span id="assignTechTrade" style="font-size: 13px; color: #166534;">—</span>
+                    </div>
+
+                    <div class="form-group" style="margin-bottom: 16px;">
+                        <label class="form-label" for="assignRequestSelect">Select Open Maintenance Request *</label>
+                        <select id="assignRequestSelect" class="form-input" required>
+                            <option value="">Loading requests...</option>
+                        </select>
+                        <small style="color: var(--color-text-muted); font-size: 12px; margin-top: 4px; display: block;">Only requests awaiting technician dispatch are displayed.</small>
+                    </div>
+
+                    <div class="form-group" style="margin-bottom: 16px;">
+                        <label class="form-label" for="assignDueDate">Completion Due Date *</label>
+                        <input type="date" id="assignDueDate" class="form-input" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="assignInstructions">Work Order Instructions / Scope</label>
+                        <textarea id="assignInstructions" class="form-input" rows="3" placeholder="Provide special instructions, access notes, or safety reminders..."></textarea>
+                    </div>
+
+                    <div id="assignErrorBanner" class="alert alert-danger hidden" style="margin-top: 16px;"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="cancelAssignBtn" class="navbar-btn" style="border: 1px solid var(--color-border-default, #e2e8f0);">Cancel</button>
+                    <button type="submit" id="submitAssignBtn" class="btn-primary">
+                        <span>Confirm & Dispatch Assignment</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="../../js/auth.js"></script>
+    <script src="../../js/dashboard.js"></script>
+    <script>
+        const token = localStorage.getItem('domiknow_token');
+        let globalPool = [];
+        let openRequests = [];
+
+        document.addEventListener('DOMContentLoaded', () => {
+            initAssignmentModal();
+            loadGlobalPool();
+            loadOpenRequests();
+
+            document.getElementById('poolSearch').addEventListener('input', applyPoolFilters);
+            document.getElementById('eligibilityFilter').addEventListener('change', applyPoolFilters);
+            document.getElementById('departmentFilter').addEventListener('change', applyPoolFilters);
+        });
+
+        function initAssignmentModal() {
+            const modal = document.getElementById('assignmentModal');
+            const closeBtn = document.getElementById('closeAssignModalBtn');
+            const cancelBtn = document.getElementById('cancelAssignBtn');
+            const form = document.getElementById('assignForm');
+            const errorBanner = document.getElementById('assignErrorBanner');
+
+            const closeModal = () => modal.classList.remove('is-active');
+            closeBtn.addEventListener('click', closeModal);
+            cancelBtn.addEventListener('click', closeModal);
+
+            // Set default due date to tomorrow
+            const tomorrow = new Date();
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            document.getElementById('assignDueDate').value = tomorrow.toISOString().slice(0, 10);
+            document.getElementById('assignDueDate').min = new Date().toISOString().slice(0, 10);
+
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                errorBanner.classList.add('hidden');
+
+                const technicianId = document.getElementById('assignTechId').value;
+                const requestId = document.getElementById('assignRequestSelect').value;
+                const dueDate = document.getElementById('assignDueDate').value;
+                const instructions = document.getElementById('assignInstructions').value.trim();
+
+                if (!requestId) {
+                    errorBanner.textContent = 'Please select a maintenance request to assign.';
+                    errorBanner.classList.remove('hidden');
+                    return;
+                }
+
+                const submitBtn = document.getElementById('submitAssignBtn');
+                submitBtn.disabled = true;
+                submitBtn.textContent = 'Verifying Compliance & Assigning...';
+
+                try {
+                    const response = await fetch('/api/maintenance/assign', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                        },
+                        body: JSON.stringify({
+                            requestId,
+                            technicianId,
+                            dueDate,
+                            instructions
+                        })
+                    });
+
+                    const result = await response.json();
+                    if (!response.ok) {
+                        // Explicit error message explaining why assignment was blocked
+                        throw new Error(result.message || 'Assignment rejected by compliance engine.');
+                    }
+
+                    closeModal();
+                    const feedback = document.getElementById('actionFeedback');
+                    feedback.textContent = `Work order successfully assigned to technician. Compliance verified and recorded.`;
+                    feedback.classList.remove('hidden');
+                    setTimeout(() => feedback.classList.add('hidden'), 5000);
+
+                    loadGlobalPool();
+                    loadOpenRequests();
+
+                } catch (err) {
+                    errorBanner.textContent = err.message;
+                    errorBanner.classList.remove('hidden');
+                } finally {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '<span>Confirm & Dispatch Assignment</span>';
+                }
+            });
+        }
+
+        async function loadGlobalPool() {
+            const grid = document.getElementById('techniciansGrid');
+            try {
+                const res = await fetch('/api/admin/maintenance/pool', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (!res.ok) throw new Error('Failed to load global maintenance pool.');
+
+                const result = await res.json();
+                globalPool = result.data || [];
+
+                // Metrics
+                const total = globalPool.length;
+                const eligible = globalPool.filter(t => t.is_eligible).length;
+                const blocked = total - eligible;
+
+                document.getElementById('kpiTotalPool').textContent = total;
+                document.getElementById('kpiEligible').textContent = eligible;
+                document.getElementById('kpiBlocked').textContent = blocked;
+
+                // Populate departments
+                const depts = [...new Set(globalPool.map(t => t.profile?.department).filter(Boolean))];
+                const deptSelect = document.getElementById('departmentFilter');
+                deptSelect.innerHTML = '<option value="">All Departments</option>';
+                depts.forEach(d => {
+                    const opt = document.createElement('option');
+                    opt.value = d;
+                    opt.textContent = d;
+                    deptSelect.appendChild(opt);
+                });
+
+                applyPoolFilters();
+
+            } catch (err) {
+                console.error('Error:', err);
+                grid.innerHTML = `<div style="grid-column: 1 / -1; text-align: center; color: var(--color-error-text); padding: 48px;">${domiknowEscapeHtml(err.message)}</div>`;
+            }
+        }
+
+        async function loadOpenRequests() {
+            try {
+                const select = document.getElementById('assignRequestSelect');
+                select.innerHTML = '<option value="">-- Choose a maintenance issue to assign --</option>';
+
+                const res = await fetch('/api/admin/maintenance/open-requests', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (res.ok) {
+                    const result = await res.json();
+                    const reqs = result.data || [];
+                    openRequests = reqs;
+                    reqs.forEach(r => {
+                        const opt = document.createElement('option');
+                        opt.value = r.id;
+                        opt.textContent = `[${r.priority_level?.toUpperCase() || 'NORMAL'}] ${r.issue_title} (${r.properties?.property_name || 'Property'})`;
+                        select.appendChild(opt);
+                    });
+                }
+            } catch (e) {
+                console.error('Load requests error:', e);
+            }
+        }
+
+        function applyPoolFilters() {
+            const query = document.getElementById('poolSearch').value.toLowerCase().trim();
+            const eligFilter = document.getElementById('eligibilityFilter').value;
+            const deptFilter = document.getElementById('departmentFilter').value;
+
+            const filtered = globalPool.filter(t => {
+                if (eligFilter === 'eligible' && !t.is_eligible) return false;
+                if (eligFilter === 'ineligible' && t.is_eligible) return false;
+                if (deptFilter && t.profile?.department !== deptFilter) return false;
+
+                if (query) {
+                    const matchName = t.full_name?.toLowerCase().includes(query);
+                    const matchEmail = t.email?.toLowerCase().includes(query);
+                    const matchDept = t.profile?.department?.toLowerCase().includes(query);
+                    const matchArea = t.profile?.service_area?.toLowerCase().includes(query);
+                    const matchSkills = (t.skills || []).some(s => s.skill_name?.toLowerCase().includes(query));
+                    if (!matchName && !matchEmail && !matchDept && !matchArea && !matchSkills) return false;
+                }
+                return true;
+            });
+
+            renderGrid(filtered);
+        }
+
+        function renderGrid(technicians) {
+            const grid = document.getElementById('techniciansGrid');
+            if (technicians.length === 0) {
+                grid.innerHTML = `<div style="grid-column: 1 / -1; text-align: center; color: var(--color-text-muted); padding: 48px;">No technicians in the global pool match the selected criteria.</div>`;
+                return;
+            }
+
+            grid.innerHTML = '';
+            technicians.forEach(t => {
+                const card = document.createElement('div');
+                card.className = `tech-card ${t.is_eligible ? 'tech-card--eligible' : 'tech-card--ineligible'}`;
+
+                const initial = (t.full_name ? t.full_name.charAt(0) : 'T').toUpperCase();
+                const department = t.profile?.department || 'General Maintenance';
+                const serviceArea = t.profile?.service_area || t.address || 'Global';
+                const availability = t.profile?.availability_status || 'available';
+
+                // Checklist checks
+                const passAccount = t.account_status === 'active' && t.is_verified;
+                const passProfile = t.profile && t.profile.is_active;
+                const passAvail = availability !== 'on_leave' && availability !== 'offline';
+                const passAccess = t.access && (t.access.access_status === 'approved' || t.access.access_status === 'restricted');
+
+                let bannerHtml = '';
+                if (t.is_eligible) {
+                    bannerHtml = `
+                        <div class="eligibility-banner eligibility-banner--yes">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                            <span>ELIGIBLE FOR ASSIGNMENT (ALL COMPLIANT)</span>
+                        </div>
+                    `;
+                } else {
+                    const reasonsHtml = (t.eligibility_reasons || ['Compliance checks pending']).map(r => `<li>${domiknowEscapeHtml(r)}</li>`).join('');
+                    bannerHtml = `
+                        <div class="eligibility-banner eligibility-banner--no" style="flex-direction: column; align-items: flex-start;">
+                            <div style="display: flex; align-items: center; gap: 6px; font-weight: 700;">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                                <span>ASSIGNMENT BLOCKED</span>
+                            </div>
+                            <ul class="reasons-list" style="margin-top: 4px;">
+                                ${reasonsHtml}
+                            </ul>
+                        </div>
+                    `;
+                }
+
+                // Skills tags
+                const skillsHtml = (t.skills && t.skills.length > 0)
+                    ? t.skills.map(s => `<span style="display: inline-block; font-size: 11px; background: #f1f5f9; color: #334155; padding: 2px 6px; border-radius: 4px; border: 1px solid #cbd5e1;">${domiknowEscapeHtml(s.skill_name)}</span>`).join(' ')
+                    : '<span style="font-size: 11px; color: #94a3b8; font-style: italic;">No specific skills listed</span>';
+
+                const iconPass = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>';
+                const iconFail = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>';
+
+                card.innerHTML = `
+                    <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 12px;">
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <span style="width: 44px; height: 44px; border-radius: 50%; background: #0F4953; color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 18px;">${initial}</span>
+                            <div>
+                                <h3 style="margin: 0; font-size: 16px; font-weight: 700; color: var(--color-text-primary);">${domiknowEscapeHtml(t.full_name || 'Technician')}</h3>
+                                <span style="font-size: 13px; color: #0F4953; font-weight: 600;">${domiknowEscapeHtml(department)}</span>
+                            </div>
+                        </div>
+                        <span style="font-size: 11px; padding: 2px 8px; border-radius: 12px; font-weight: 600; text-transform: uppercase; ${availability === 'available' ? 'background: #dcfce7; color: #166534;' : 'background: #fee2e2; color: #991b1b;'}">
+                            ${domiknowEscapeHtml(availability.replace('_', ' '))}
+                        </span>
+                    </div>
+
+                    ${bannerHtml}
+
+                    <div class="checklist-grid">
+                        <div class="check-item ${passAccount ? 'check-item--pass' : 'check-item--fail'}">
+                            ${passAccount ? iconPass : iconFail} <span>Account Active</span>
+                        </div>
+                        <div class="check-item ${passProfile ? 'check-item--pass' : 'check-item--fail'}">
+                            ${passProfile ? iconPass : iconFail} <span>Profile Active</span>
+                        </div>
+                        <div class="check-item ${passAvail ? 'check-item--pass' : 'check-item--fail'}">
+                            ${passAvail ? iconPass : iconFail} <span>Availability</span>
+                        </div>
+                        <div class="check-item ${passAccess ? 'check-item--pass' : 'check-item--fail'}">
+                            ${passAccess ? iconPass : iconFail} <span>Access: ${domiknowEscapeHtml(t.access?.access_status || 'Pending')}</span>
+                        </div>
+                    </div>
+
+                    <div>
+                        <span style="font-size: 11px; font-weight: 600; color: #64748b; text-transform: uppercase; display: block; margin-bottom: 4px;">Verified Skills</span>
+                        <div>${skillsHtml}</div>
+                    </div>
+
+                    <div style="font-size: 12px; color: #64748b; display: flex; flex-direction: column; gap: 2px; border-top: 1px solid #f1f5f9; padding-top: 10px;">
+                        <span>Email: <strong>${domiknowEscapeHtml(t.email)}</strong></span>
+                        <span>Service Area: <strong>${domiknowEscapeHtml(serviceArea)}</strong></span>
+                    </div>
+
+                    <div style="margin-top: auto; display: flex; gap: 8px;">
+                        <button type="button" class="btn-primary assign-btn" data-tech-id="${t.id}" style="flex: 1; justify-content: center; ${!t.is_eligible ? 'opacity: 0.5; cursor: not-allowed;' : ''}">
+                            <span>Assign Work Order</span>
+                        </button>
+                        <a href="maintenance-screening.html?search=${encodeURIComponent(t.email)}" class="btn-action" style="padding: 6px 12px; text-decoration: none;" title="Inspect Screening Records">
+                            <span>Compliance</span>
+                        </a>
+                    </div>
+                `;
+
+                grid.appendChild(card);
+
+                // Assign button click handler
+                const assignBtn = card.querySelector('.assign-btn');
+                assignBtn.addEventListener('click', () => {
+                    if (!t.is_eligible) {
+                        alert(`Cannot assign this technician.\n\nAssignment Blocked Due To Compliance Rules:\n- ` + (t.eligibility_reasons || []).join('\n- '));
+                        return;
+                    }
+                    openAssignmentModal(t);
+                });
+            });
+        }
+
+        function openAssignmentModal(tech) {
+            document.getElementById('assignTechId').value = tech.id;
+            document.getElementById('assignTechName').textContent = tech.full_name || 'Technician';
+            document.getElementById('assignTechTrade').textContent = `${tech.profile?.department || 'General Maintenance'} • ${tech.profile?.service_area || 'Global'}`;
+            document.getElementById('assignInstructions').value = '';
+            document.getElementById('assignErrorBanner').classList.add('hidden');
+
+            document.getElementById('assignmentModal').classList.add('is-active');
+        }
+    </script>
+</body>
+
+</html>

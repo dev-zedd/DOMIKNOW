@@ -77,8 +77,59 @@ const sendForgotPasswordEmail = async (toEmail, resetCode) => {
     }
 };
 
+const sendMaintenanceInvitationEmail = async (toEmail, { fullName, verificationCode, setupUrl }) => {
+    const mailOptions = {
+        from: process.env.SMTP_FROM || 'DomiKnow <no-reply@domiknow.com>',
+        to: toEmail,
+        subject: 'DomiKnow - Maintenance Staff Account Invitation',
+        html: `
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; border: 1px solid #e2e8f0; border-radius: 12px; background-color: #ffffff;">
+                <div style="text-align: center; margin-bottom: 24px;">
+                    <h2 style="color: #0F4953; margin: 0; font-size: 28px; font-weight: 700;">DomiKnow</h2>
+                    <p style="color: #64748b; font-size: 14px; margin-top: 4px;">Field Operations & Maintenance Workforce</p>
+                </div>
+                <h3 style="color: #1e293b; font-size: 20px; margin-bottom: 12px;">Welcome to the Team, ${fullName || 'Technician'}!</h3>
+                <p style="color: #475569; font-size: 15px; line-height: 1.6;">
+                    An administrative maintenance staff account has been created for you on the DomiKnow Property Management Platform.
+                </p>
+                <p style="color: #475569; font-size: 15px; line-height: 1.6;">
+                    To complete your onboarding, please verify your email and set your account password using the 6-digit invitation code below:
+                </p>
+                <div style="text-align: center; margin: 32px 0;">
+                    <span style="display: inline-block; padding: 16px 36px; font-size: 28px; font-weight: 800; background-color: #f0fdfa; color: #0F4953; border: 2px dashed #0d9488; letter-spacing: 6px; border-radius: 8px;">${verificationCode}</span>
+                </div>
+                ${setupUrl ? `
+                <div style="text-align: center; margin-bottom: 30px;">
+                    <a href="${setupUrl}" style="display: inline-block; background-color: #0F4953; color: #ffffff; text-decoration: none; padding: 12px 28px; font-size: 15px; font-weight: 600; border-radius: 8px;">Activate Account & Set Password</a>
+                </div>
+                ` : ''}
+                <p style="color: #64748b; font-size: 13px;"><strong>Note:</strong> This verification invitation code will expire in 24 hours.</p>
+                <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 24px 0;" />
+                <p style="color: #94a3b8; font-size: 12px; text-align: center;">
+                    If you were not expecting this invitation, please contact your DomiKnow Property Administrator or HR Operations.
+                </p>
+            </div>
+        `,
+    };
+
+    try {
+        await transporter.sendMail(mailOptions);
+        console.log(`Maintenance invitation email sent to ${toEmail}`);
+        return true;
+    } catch (error) {
+        console.error('Error sending maintenance invitation email:', error.message || error);
+        console.log(`\n==================================================`);
+        console.log(`[DEV MAINTENANCE INVITATION CODE FOR ${toEmail}]: ${verificationCode}`);
+        if (setupUrl) console.log(`[DEV SETUP URL]: ${setupUrl}`);
+        console.log(`==================================================\n`);
+        return false;
+    }
+};
+
 module.exports = {
     transporter,
     sendVerificationEmail,
-    sendForgotPasswordEmail
+    sendForgotPasswordEmail,
+    sendMaintenanceInvitationEmail
 };
+

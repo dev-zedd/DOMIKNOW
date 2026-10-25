@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Compliance & Screening - DomiKnow</title>
+    <link href="../../css/input.css" rel="stylesheet">
+    <link href="../../css/design-system.css" rel="stylesheet">
+    <link href="../../css/maintenance.css" rel="stylesheet">
+    <script src="../../js/ui.js" defer></script>
+    <style>
+        .compliance-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+        }
+
+        @media (max-width: 900px) {
+            .compliance-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card-panel {
+            background: var(--color-surface, #ffffff);
+            border: 1px solid var(--color-border, #e2e8f0);
+            border-radius: 14px;
+            padding: 24px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+
+        .card-panel-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--color-text-primary, #0f172a);
+            margin: 0 0 6px 0;
+        }
+
+        .card-panel-desc {
+            font-size: 13px;
+            color: var(--color-text-muted, #64748b);
+            margin: 0 0 20px 0;
+        }
+
+        .checkpoint-card {
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 16px;
+            margin-bottom: 14px;
+            background: #fafafa;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .checkpoint-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 12px;
+        }
+
+        .badge-status {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            padding: 3px 8px;
+            border-radius: 12px;
+        }
+
+        .badge-status-approved {
+            background: #dcfce7;
+            color: #15803d;
+        }
+
+        .badge-status-conditional {
+            background: #fef9c3;
+            color: #854d0e;
+        }
+
+        .badge-status-under_review {
+            background: #e0f2fe;
+            color: #0369a1;
+        }
+
+        .badge-status-pending {
+            background: #f1f5f9;
+            color: #475569;
+        }
+
+        .badge-status-expired,
+        .badge-status-rejected {
+            background: #fee2e2;
+            color: #b91c1c;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(4px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s ease;
+        }
+
+        .modal-overlay.is-active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal-container {
+            background: var(--color-surface, #ffffff);
+            border-radius: 16px;
+            width: 100%;
+            max-width: 520px;
+            max-height: 90vh;
+            overflow-y: auto;
+            border: 1px solid var(--color-border, #e2e8f0);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+
+        .modal-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--color-border, #e2e8f0);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-body {
+            padding: 24px;
+        }
+
+        .modal-footer {
+            padding: 16px 24px;
+            border-top: 1px solid var(--color-border, #e2e8f0);
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            background: var(--color-surface-subtle, #f8fafc);
+            border-bottom-left-radius: 16px;
+            border-bottom-right-radius: 16px;
+        }
+    </style>
+</head>
+
+<body class="app-loading" data-role="maintenance" data-page-title="My Profile & Compliance">
+    <main class="dashboard-container" aria-labelledby="appPageTitle">
+        <!-- Status Feedback -->
+        <div id="feedbackBanner" class="alert alert-success hidden" role="status" aria-live="polite"></div>
+
+        <!-- Header -->
+        <div style="margin-bottom: 24px;">
+            <h1 id="appPageTitle"
+                style="font-size: 24px; font-weight: 700; margin: 0 0 6px 0; color: var(--color-text-primary);">
+                Personnel Profile & Compliance</h1>
+            <p style="margin: 0; color: var(--color-text-muted); font-size: 14px;">Complete your service area,
+                availability, department credentials, and submit verification documents to maintain active work order
+                assignment eligibility.</p>
+        </div>
+
+        <!-- Eligibility Status Card -->
+        <div id="eligibilityCard"
+            style="border-radius: 12px; padding: 20px 24px; margin-bottom: 24px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; background: #f8fafc; border: 1px solid #cbd5e1;">
+            <div>
+                <span id="eligibilityBadge"
+                    style="font-size: 13px; font-weight: 800; padding: 4px 12px; border-radius: 20px; display: inline-block; margin-bottom: 6px;">COMPLIANCE
+                    VERIFYING</span>
+                <h3 id="eligibilityHeading" style="margin: 0; font-size: 18px; font-weight: 700; color: #0f172a;">
+                    Assignment Status</h3>
+                <p id="eligibilitySubtext" style="margin: 4px 0 0 0; font-size: 13px; color: #64748b;">Checking
+                    verification records against platform dispatch rules...</p>
+            </div>
+            <div id="reasonsContainer" style="display: none; max-width: 480px;">
+                <ul id="reasonsList"
+                    style="margin: 0; padding-left: 18px; font-size: 12px; color: #b91c1c; line-height: 1.5;"></ul>
+            </div>
+        </div>
+
+        <div class="compliance-grid">
+            <!-- Left Column: Profile Details -->
+            <div class="card-panel">
+                <h2 class="card-panel-title">Operational Profile</h2>
+                <p class="card-panel-desc">Update your employee identification, primary service coverage area, and work
+                    order availability status.</p>
+
+                <form id="profileForm">
+                    <div class="form-group" style="margin-bottom: 14px;">
+                        <label class="form-label" for="profEmpNum">Employee Number</label>
+                        <input type="text" id="profEmpNum" class="form-input" placeholder="e.g. EMP-004821">
+                    </div>
+
+                    <div class="form-group" style="margin-bottom: 14px;">
+                        <label class="form-label" for="profDepartment">Department / Primary Trade</label>
+                        <input type="text" id="profDepartment" class="form-input"
+                            placeholder="e.g. Electrical & Appliance Repair">
+                    </div>
+
+                    <div class="form-group" style="margin-bottom: 14px;">
+                        <label class="form-label" for="profAvailability">Current Availability Status *</label>
+                        <select id="profAvailability" class="form-input" required>
+                            <option value="available">Available (Ready for Assignments)</option>
+                            <option value="busy">Busy (On Active Job)</option>
+                            <option value="on_leave">On Leave (Block Assignments)</option>
+                            <option value="offline">Offline (Off Duty)</option>
+                        </select>
+                        <small
+                            style="color: var(--color-text-muted); font-size: 12px; margin-top: 4px; display: block;">Setting
+                            your status to <strong>On Leave</strong> or <strong>Offline</strong> will temporarily
+                            suspend work order dispatching.</small>
+                    </div>
+
+                    <div class="form-group" style="margin-bottom: 14px;">
+                        <label class="form-label" for="profServiceArea">Service Area / Coverage</label>
+                        <input type="text" id="profServiceArea" class="form-input"
+                            placeholder="e.g. Quezon City, Pasig, Metro Manila">
+                    </div>
+
+                    <div class="form-group" style="margin-bottom: 14px;">
+                        <label class="form-label" for="profCertifications">Licenses & Certifications</label>
+                        <textarea id="profCertifications" class="form-input" rows="2"
+                            placeholder="List trade licenses, TESDA certificates, safety credentials..."></textarea>
+                    </div>
+
+                    <div class="form-group" style="margin-bottom: 20px;">
+                        <label class="form-label" for="profSkills">Specialized Skills (Comma-separated)</label>
+                        <input type="text" id="profSkills" class="form-input"
+                            placeholder="e.g. Wiring, Inverter AC, Circuit Breakers, Pipe Fitting">
+                    </div>
+
+                    <button type="submit" id="saveProfileBtn" class="btn-primary"
+                        style="width: 100%; justify-content: center;">
+                        <span>Save Profile Details</span>
+                    </button>
+                </form>
+            </div>
+
+            <!-- Right Column: Screening Checkpoints -->
+            <div class="card-panel">
+                <h2 class="card-panel-title">Required Screening Checkpoints</h2>
+                <p class="card-panel-desc">All checkpoints marked mandatory must have an <strong>Approved</strong> or
+                    <strong>Conditional</strong> status to receive dispatch assignments.</p>
+
+                <div id="checkpointsContainer">
+                    <div style="text-align: center; padding: 32px; color: var(--color-text-muted);">
+                        Loading screening checkpoints…
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Upload Evidence Modal -->
+    <div id="uploadDocModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="uploadModalTitle">
+        <div class="modal-container">
+            <div class="modal-header">
+                <h2 id="uploadModalTitle" style="font-size: 18px; font-weight: 700; margin: 0;">Submit Screening
+                    Evidence</h2>
+                <button type="button" id="closeUploadModalBtn" class="navbar-btn"
+                    style="padding: 4px 8px; font-size: 18px;">&times;</button>
+            </div>
+            <form id="uploadDocForm">
+                <input type="hidden" id="uploadReqId">
+                <div class="modal-body">
+                    <div
+                        style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 14px; margin-bottom: 16px;">
+                        <strong id="uploadReqName" style="color: #0F4953; font-size: 15px; display: block;">—</strong>
+                        <p id="uploadReqDesc" style="margin: 4px 0 0 0; font-size: 12px; color: #64748b;"></p>
+                    </div>
+
+                    <div class="form-group" style="margin-bottom: 16px;">
+                        <label class="form-label" for="uploadDocFile">Upload Document / Photo (PDF, JPG, PNG)</label>
+                        <input type="file" id="uploadDocFile" class="form-input"
+                            accept=".pdf,image/png,image/jpeg,image/webp">
+                        <small
+                            style="color: var(--color-text-muted); font-size: 12px; margin-top: 4px; display: block;">Max
+                            file size: 15MB.</small>
+                    </div>
+
+                    <div class="form-group" style="margin-bottom: 16px;">
+                        <label class="form-label" for="uploadDocUrl">Or External Document Link</label>
+                        <input type="url" id="uploadDocUrl" class="form-input"
+                            placeholder="https://drive.google.com/...">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="uploadNotes">Submission Remarks</label>
+                        <textarea id="uploadNotes" class="form-input" rows="2"
+                            placeholder="e.g. Attached TESDA Certificate valid through 2028..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="cancelUploadBtn" class="navbar-btn"
+                        style="border: 1px solid var(--color-border-default, #e2e8f0);">Cancel</button>
+                    <button type="submit" id="submitDocBtn" class="btn-primary">
+                        <span>Upload for Review</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="../../js/auth.js"></script>
+    <script src="../../js/dashboard.js"></script>
+    <script>
+        const token = localStorage.getItem('domiknow_token');
+        let complianceData = null;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            initUploadModal();
+            loadCompliance();
+
+            document.getElementById('profileForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const saveBtn = document.getElementById('saveProfileBtn');
+                saveBtn.disabled = true;
+                saveBtn.textContent = 'Saving Profile...';
+
+                try {
+                    const skillsRaw = document.getElementById('profSkills').value;
+                    const skillsArray = skillsRaw.split(',').map(s => s.trim()).filter(Boolean);
+
+                    const payload = {
+                        employee_number: document.getElementById('profEmpNum').value.trim(),
+                        department: document.getElementById('profDepartment').value.trim(),
+                        availability_status: document.getElementById('profAvailability').value,
+                        service_area: document.getElementById('profServiceArea').value.trim(),
+                        certifications: document.getElementById('profCertifications').value.trim(),
+                        skills: skillsArray
+                    };
+
+                    const response = await fetch('/api/maintenance/profile', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                        },
+                        body: JSON.stringify(payload)
+                    });
+
+                    const result = await response.json();
+                    if (!response.ok) {
+                        throw new Error(result.message || 'Failed to save profile.');
+                    }
+
+                    const banner = document.getElementById('feedbackBanner');
+                    banner.textContent = 'Profile details saved successfully. Recomputing eligibility...';
+                    banner.classList.remove('hidden');
+                    setTimeout(() => banner.classList.add('hidden'), 4000);
+
+                    loadCompliance();
+
+                } catch (err) {
+                    alert('Error: ' + err.message);
+                } finally {
+                    saveBtn.disabled = false;
+                    saveBtn.innerHTML = '<span>Save Profile Details</span>';
+                }
+            });
+        });
+
+        function initUploadModal() {
+            const modal = document.getElementById('uploadDocModal');
+            const closeBtn = document.getElementById('closeUploadModalBtn');
+            const cancelBtn = document.getElementById('cancelUploadBtn');
+            const form = document.getElementById('uploadDocForm');
+
+            const closeModal = () => modal.classList.remove('is-active');
+            closeBtn.addEventListener('click', closeModal);
+            cancelBtn.addEventListener('click', closeModal);
+
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const submitBtn = document.getElementById('submitDocBtn');
+                submitBtn.disabled = true;
+                submitBtn.textContent = 'Uploading Evidence...';
+
+                try {
+                    const requirement_id = document.getElementById('uploadReqId').value;
+                    const notes = document.getElementById('uploadNotes').value.trim();
+                    const document_url = document.getElementById('uploadDocUrl').value.trim();
+                    const fileInput = document.getElementById('uploadDocFile');
+
+                    let base64_content = null;
+                    let file_name = null;
+                    let mime_type = null;
+                    let file_size = null;
+
+                    if (fileInput.files.length > 0) {
+                        const file = fileInput.files[0];
+                        file_name = file.name;
+                        mime_type = file.type;
+                        file_size = file.size;
+
+                        base64_content = await new Promise((resolve, reject) => {
+                            const reader = new FileReader();
+                            reader.onload = () => resolve(reader.result.split(',')[1]);
+                            reader.onerror = reject;
+                            reader.readAsDataURL(file);
+                        });
+                    }
+
+                    if (!base64_content && !document_url) {
+                        throw new Error('Please select a file to upload or provide an external document link.');
+                    }
+
+                    const res = await fetch('/api/maintenance/screening/submit', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                        },
+                        body: JSON.stringify({
+                            requirement_id,
+                            notes,
+                            document_url,
+                            base64_content,
+                            file_name,
+                            mime_type,
+                            file_size
+                        })
+                    });
+
+                    const result = await res.json();
+                    if (!res.ok) throw new Error(result.message || 'Failed to submit document.');
+
+                    closeModal();
+                    alert('Evidence successfully uploaded! A screening officer will review your submission.');
+                    loadCompliance();
+
+                } catch (err) {
+                    alert('Upload Error: ' + err.message);
+                } finally {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '<span>Upload for Review</span>';
+                }
+            });
+        }
+
+        async function loadCompliance() {
+            try {
+                const res = await fetch('/api/maintenance/my-compliance', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (!res.ok) throw new Error('Failed to retrieve compliance records.');
+
+                const result = await res.json();
+                complianceData = result.data || {};
+
+                // Populate Form Fields
+                const p = complianceData.profile || {};
+                document.getElementById('profEmpNum').value = p.employee_number || '';
+                document.getElementById('profDepartment').value = p.department || '';
+                document.getElementById('profAvailability').value = p.availability_status || 'available';
+                document.getElementById('profServiceArea').value = p.service_area || '';
+                document.getElementById('profCertifications').value = p.certifications || '';
+
+                const skillsList = (complianceData.skills || []).map(s => s.skill_name).filter(Boolean);
+                document.getElementById('profSkills').value = skillsList.join(', ');
+
+                // Update Eligibility Status Card
+                renderEligibilityBanner(complianceData);
+
+                // Render Checkpoints
+                renderCheckpoints(complianceData);
+
+            } catch (err) {
+                console.error('Error:', err);
+            }
+        }
+
+        function renderEligibilityBanner(data) {
+            const card = document.getElementById('eligibilityCard');
+            const badge = document.getElementById('eligibilityBadge');
+            const heading = document.getElementById('eligibilityHeading');
+            const subtext = document.getElementById('eligibilitySubtext');
+            const reasonsContainer = document.getElementById('reasonsContainer');
+            const reasonsList = document.getElementById('reasonsList');
+
+            if (data.eligible) {
+                card.style.background = '#f0fdf4';
+                card.style.borderColor = '#bbf7d0';
+                badge.style.background = '#dcfce7';
+                badge.style.color = '#15803d';
+                badge.textContent = 'ELIGIBLE FOR ASSIGNMENT';
+                heading.textContent = 'Active in Global Maintenance Pool';
+                subtext.textContent = 'All compliance checkpoints and screening verifications are in good standing. You are eligible to be assigned work orders across all properties.';
+                reasonsContainer.style.display = 'none';
+            } else {
+                card.style.background = '#fef2f2';
+                card.style.borderColor = '#fecaca';
+                badge.style.background = '#fee2e2';
+                badge.style.color = '#b91c1c';
+                badge.textContent = 'ASSIGNMENT INELIGIBLE';
+                heading.textContent = 'Action Required: Pending Checkpoints';
+                subtext.textContent = 'Your account cannot receive work orders until all mandatory screening records and access permissions are completed:';
+                reasonsContainer.style.display = 'block';
+                reasonsList.innerHTML = (data.reasons || ['Verification pending']).map(r => `<li>${domiknowEscapeHtml(r)}</li>`).join('');
+            }
+        }
+
+        function renderCheckpoints(data) {
+            const container = document.getElementById('checkpointsContainer');
+            const requirements = data.requirements || [];
+            const recordsMap = new Map();
+            (data.screeningRecords || []).forEach(r => recordsMap.set(r.requirement_id, r));
+
+            if (requirements.length === 0) {
+                container.innerHTML = '<div style="padding: 20px; text-align: center; color: #64748b;">No screening checkpoints configured.</div>';
+                return;
+            }
+
+            container.innerHTML = '';
+            requirements.forEach(req => {
+                const rec = recordsMap.get(req.id);
+                const status = rec?.status || 'pending';
+                const statusClass = `badge-status-${status}`;
+                const statusLabel = status.replace('_', ' ').toUpperCase();
+
+                const card = document.createElement('div');
+                card.className = 'checkpoint-card';
+
+                const docLink = rec?.document_url
+                    ? `<a href="${rec.document_url}" target="_blank" rel="noopener noreferrer" style="font-size: 12px; color: #0284c7; font-weight: 600; text-decoration: none;">View Uploaded Document &rarr;</a>`
+                    : '<span style="font-size: 12px; color: #94a3b8; font-style: italic;">No document attached yet</span>';
+
+                const expiryInfo = rec?.expires_at
+                    ? `<span style="font-size: 12px; color: #64748b;">Expires: <strong>${new Date(rec.expires_at).toLocaleDateString()}</strong></span>`
+                    : '';
+
+                card.innerHTML = `
+                    <div class="checkpoint-header">
+                        <div>
+                            <strong style="font-size: 15px; color: #0f172a;">${domiknowEscapeHtml(req.name)}</strong>
+                            <p style="margin: 2px 0 0 0; font-size: 12px; color: #64748b;">${domiknowEscapeHtml(req.description || '')}</p>
+                        </div>
+                        <span class="badge-status ${statusClass}">${statusLabel}</span>
+                    </div>
+
+                    <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #e2e8f0; padding-top: 8px; flex-wrap: wrap; gap: 8px;">
+                        <div>${docLink}</div>
+                        <div>${expiryInfo}</div>
+                        <button type="button" class="btn-action upload-btn" style="padding: 4px 10px; font-size: 12px;">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                            <span>${rec?.document_url ? 'Upload New Evidence' : 'Submit Evidence'}</span>
+                        </button>
+                    </div>
+                `;
+
+                container.appendChild(card);
+
+                card.querySelector('.upload-btn').addEventListener('click', () => {
+                    document.getElementById('uploadReqId').value = req.id;
+                    document.getElementById('uploadReqName').textContent = req.name;
+                    document.getElementById('uploadReqDesc').textContent = req.description || '';
+                    document.getElementById('uploadDocUrl').value = '';
+                    document.getElementById('uploadDocFile').value = '';
+                    document.getElementById('uploadNotes').value = '';
+                    document.getElementById('uploadDocModal').classList.add('is-active');
+                });
+            });
+        }
+    </script>
+</body>
+
+</html>

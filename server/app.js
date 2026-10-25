@@ -21,6 +21,7 @@ const billingRoutes = require('./routes/billingRoutes');
 const paymentRoutes = require('./routes/paymentRoutes');
 const adminMonitorRoutes = require('./routes/adminMonitorRoutes');
 const maintenanceRoutes = require('./routes/maintenanceRoutes');
+const maintenanceComplianceRoutes = require('./routes/maintenanceComplianceRoutes');
 const reportRoutes = require('./routes/reportRoutes');
 const feedbackRoutes = require('./routes/feedbackRoutes');
 const storageRoutes = require('./routes/storageRoutes');
@@ -134,6 +135,7 @@ app.use('/api', unitRoutes);
 // Keep the intentionally public feedback endpoint ahead of broad authenticated
 // /api routers so their router-level guards cannot intercept it.
 app.use('/api', feedbackRoutes);
+app.use('/api', maintenanceComplianceRoutes);
 app.use('/api', maintenanceRoutes);
 app.use('/api', reportRoutes);
 app.use('/api', ratingsRoutes);

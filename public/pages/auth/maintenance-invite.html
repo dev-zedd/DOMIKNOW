@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Activate Maintenance Account — DOMIKNOW</title>
+    <link href="../../css/input.css" rel="stylesheet">
+    <link href="../../css/design-system.css?v=20260827-1" rel="stylesheet">
+    <link href="../../css/auth-module.css?v=20260827-2" rel="stylesheet">
+    <link href="../../css/mobile-first.css?v=20260817-1" rel="stylesheet">
+    <script src="../../js/ui.js" defer></script>
+</head>
+<body class="auth-page">
+    <div class="back-to-home-container">
+        <a href="login.html" class="back-to-home-link">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+            <span>Back to Login</span>
+        </a>
+    </div>
+
+    <div class="auth-header">
+        <div class="auth-logo">
+            <a href="../../index.html" class="brand-lockup" aria-label="DOMIKNOW home">
+                <span class="brand-mark" aria-hidden="true">
+                    <span class="brand-mark-dot brand-mark-dot-primary"></span>
+                    <span class="brand-mark-dot brand-mark-dot-left"></span>
+                    <span class="brand-mark-dot brand-mark-dot-right"></span>
+                </span>
+                <span class="brand-wordmark"><span class="brand-wordmark-domi">DOMI</span><span class="brand-wordmark-know">KNOW</span></span>
+            </a>
+        </div>
+        <h1 class="auth-title">Field Operations Onboarding</h1>
+        <p class="auth-subtitle">
+            Activate your maintenance personnel account, verify your email, and establish your account security password.
+        </p>
+    </div>
+
+    <div class="auth-card">
+        <div class="auth-card-heading">
+            <p class="auth-eyebrow">Staff Account Activation</p>
+            <h2>Set Your Password</h2>
+            <p>Enter the 6-digit invitation code sent to your email and choose a secure password.</p>
+        </div>
+
+        <div id="errorMessage" class="alert alert-danger hidden" role="alert" aria-live="assertive">
+            <span class="alert-text">Error message</span>
+        </div>
+
+        <div id="successMessage" class="alert alert-success hidden" role="status" aria-live="polite">
+            <span class="alert-text">Account activated! Redirecting to login...</span>
+        </div>
+
+        <form id="inviteSetupForm" class="auth-form" novalidate>
+            <div class="form-group">
+                <label for="inviteEmail" class="form-label">Email Address *</label>
+                <input type="email" id="inviteEmail" name="email" class="form-input" required placeholder="your.name@domiknow.ph" autocomplete="email">
+            </div>
+
+            <div class="form-group">
+                <label for="inviteCode" class="form-label">6-Digit Invitation Code *</label>
+                <input type="text" id="inviteCode" name="verification_code" class="form-input" required maxlength="6" pattern="[0-9]{6}" placeholder="123456" style="letter-spacing: 4px; font-weight: 700; font-family: monospace; font-size: 18px; text-align: center;">
+                <small style="color: var(--color-text-muted); font-size: 12px; margin-top: 4px; display: block;">Check your inbox for the code provided by your administrator.</small>
+            </div>
+
+            <div class="form-group">
+                <label for="invitePassword" class="form-label">Create Password *</label>
+                <input type="password" id="invitePassword" name="password" class="form-input" required minlength="8" placeholder="Minimum 8 characters" autocomplete="new-password">
+            </div>
+
+            <div class="form-group">
+                <label for="inviteConfirmPassword" class="form-label">Confirm Password *</label>
+                <input type="password" id="inviteConfirmPassword" name="confirm_password" class="form-input" required minlength="8" placeholder="Re-enter password" autocomplete="new-password">
+            </div>
+
+            <div class="form-group">
+                <label for="inviteContact" class="form-label">Primary Mobile Contact (Optional)</label>
+                <input type="tel" id="inviteContact" name="contact_number" class="form-input" placeholder="+63 9XX XXX XXXX">
+            </div>
+
+            <button type="submit" id="submitBtn" class="btn-primary" style="width: 100%; justify-content: center; margin-top: 8px;">
+                <span>Activate Account & Proceed</span>
+            </button>
+        </form>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const emailParam = urlParams.get('email');
+            const codeParam = urlParams.get('code');
+
+            if (emailParam) {
+                document.getElementById('inviteEmail').value = emailParam;
+            }
+            if (codeParam) {
+                document.getElementById('inviteCode').value = codeParam;
+            }
+
+            const form = document.getElementById('inviteSetupForm');
+            const errorEl = document.getElementById('errorMessage');
+            const successEl = document.getElementById('successMessage');
+            const submitBtn = document.getElementById('submitBtn');
+
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                errorEl.classList.add('hidden');
+                successEl.classList.add('hidden');
+
+                const email = document.getElementById('inviteEmail').value.trim();
+                const verification_code = document.getElementById('inviteCode').value.trim();
+                const password = document.getElementById('invitePassword').value;
+                const confirmPassword = document.getElementById('inviteConfirmPassword').value;
+                const contact_number = document.getElementById('inviteContact').value.trim();
+
+                if (!email || !verification_code || !password) {
+                    showError('Please fill in all required fields.');
+                    return;
+                }
+                if (verification_code.length !== 6) {
+                    showError('Invitation code must be exactly 6 digits.');
+                    return;
+                }
+                if (password.length < 8) {
+                    showError('Password must be at least 8 characters long.');
+                    return;
+                }
+                if (password !== confirmPassword) {
+                    showError('Passwords do not match.');
+                    return;
+                }
+
+                submitBtn.disabled = true;
+                submitBtn.textContent = 'Verifying & Activating...';
+
+                try {
+                    const response = await fetch('/api/maintenance/set-password', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            email,
+                            verification_code,
+                            password,
+                            contact_number
+                        })
+                    });
+
+                    const result = await response.json();
+                    if (!response.ok) {
+                        throw new Error(result.message || 'Activation failed.');
+                    }
+
+                    successEl.classList.remove('hidden');
+                    successEl.querySelector('.alert-text').textContent = 'Your maintenance account is now active! Redirecting to sign in...';
+
+                    setTimeout(() => {
+                        window.location.href = `login.html?email=${encodeURIComponent(email)}`;
+                    }, 2000);
+
+                } catch (err) {
+                    showError(err.message);
+                } finally {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '<span>Activate Account & Proceed</span>';
+                }
+            });
+
+            function showError(msg) {
+                errorEl.querySelector('.alert-text').textContent = msg;
+                errorEl.classList.remove('hidden');
+            }
+        });
+    </script>
+</body>
+</html>

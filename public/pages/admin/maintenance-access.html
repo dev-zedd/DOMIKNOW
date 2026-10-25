@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Maintenance Access Management - DomiKnow</title>
+    <link href="../../css/input.css" rel="stylesheet">
+    <link href="../../css/design-system.css" rel="stylesheet">
+    <link href="../../css/admin.css" rel="stylesheet">
+    <script src="../../js/ui.js" defer></script>
+    <style>
+        .access-header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        .stat-card {
+            background: var(--color-surface, #ffffff);
+            border: 1px solid var(--color-border, #e2e8f0);
+            border-radius: 12px;
+            padding: 18px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .stat-card__label {
+            font-size: 12px;
+            color: var(--color-text-muted, #64748b);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .stat-card__value {
+            font-size: 26px;
+            font-weight: 700;
+            color: var(--color-text-primary, #0f172a);
+        }
+        .badge-access-approved {
+            background: #dcfce7;
+            color: #166534;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .badge-access-restricted {
+            background: #fef9c3;
+            color: #854d0e;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .badge-access-pending {
+            background: #f1f5f9;
+            color: #475569;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .badge-access-revoked, .badge-access-expired, .badge-access-rejected {
+            background: #fee2e2;
+            color: #991b1b;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(4px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s ease;
+        }
+        .modal-overlay.is-active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .modal-container {
+            background: var(--color-surface, #ffffff);
+            border-radius: 16px;
+            width: 100%;
+            max-width: 540px;
+            max-height: 90vh;
+            overflow-y: auto;
+            border: 1px solid var(--color-border, #e2e8f0);
+            box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);
+        }
+        .modal-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--color-border, #e2e8f0);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .modal-body {
+            padding: 24px;
+        }
+        .modal-footer {
+            padding: 16px 24px;
+            border-top: 1px solid var(--color-border, #e2e8f0);
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            background: var(--color-surface-subtle, #f8fafc);
+            border-bottom-left-radius: 16px;
+            border-bottom-right-radius: 16px;
+        }
+    </style>
+</head>
+
+<body class="app-loading" data-role="admin" data-page-title="Maintenance Access">
+    <main class="dashboard-container" aria-labelledby="appPageTitle">
+        <!-- Status Feedback Notification -->
+        <div id="actionFeedback" class="alert alert-success hidden" role="status" aria-live="polite"></div>
+
+        <!-- Header -->
+        <div class="access-header-row">
+            <div>
+                <h1 id="appPageTitle" style="font-size: 24px; font-weight: 700; margin: 0 0 4px 0; color: var(--color-text-primary);">Maintenance Access & Security Controls</h1>
+                <p style="margin: 0; color: var(--color-text-muted); font-size: 14px;">Govern technician site authorization, manage conditional restriction reasons, set access expirations, and revoke rogue or non-compliant permissions.</p>
+            </div>
+        </div>
+
+        <!-- Stats Grid -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <span class="stat-card__label">Access Approved</span>
+                <span class="stat-card__value" id="statApprovedAccess" style="color: #16a34a;">—</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-card__label">Restricted Access</span>
+                <span class="stat-card__value" id="statRestrictedAccess" style="color: #ca8a04;">—</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-card__label">Pending Approval</span>
+                <span class="stat-card__value" id="statPendingAccess" style="color: #64748b;">—</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-card__label">Revoked or Expired</span>
+                <span class="stat-card__value" id="statRevokedAccess" style="color: #dc2626;">—</span>
+            </div>
+        </div>
+
+        <!-- Table Card -->
+        <div class="table-card admin-table-card">
+            <div style="padding: 16px 20px; border-bottom: 1px solid var(--color-border-default, #e2e8f0); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+                <h2 style="font-size: 16px; font-weight: 600; margin: 0;">Technician Access Registry</h2>
+                <div style="display: flex; gap: 12px;">
+                    <select id="accessStatusFilter" class="form-input" style="padding: 6px 12px; font-size: 13px;">
+                        <option value="">All Access Statuses</option>
+                        <option value="approved">Approved</option>
+                        <option value="restricted">Restricted</option>
+                        <option value="pending">Pending</option>
+                        <option value="revoked">Revoked</option>
+                        <option value="expired">Expired</option>
+                    </select>
+                    <input type="search" id="accessSearchInput" class="form-input" placeholder="Search technician..." style="max-width: 260px; padding: 6px 12px; font-size: 13px;">
+                </div>
+            </div>
+            <table class="admin-data-table admin-record-table">
+                <thead>
+                    <tr>
+                        <th style="width: 25%;">Technician</th>
+                        <th style="width: 15%;">Department</th>
+                        <th style="width: 15%; text-align: center;">Access Status</th>
+                        <th style="width: 22%;">Restriction Reason / Notes</th>
+                        <th style="width: 11%; text-align: center;">Expires</th>
+                        <th style="width: 12%; text-align: right;">Action</th>
+                    </tr>
+                </thead>
+                <tbody id="accessTableBody">
+                    <tr>
+                        <td colspan="6">
+                            <div class="admin-table-loading">
+                                <span>Loading technician access controls…</span>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </main>
+
+    <!-- Update Access Modal -->
+    <div id="accessModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="accessModalTitle">
+        <div class="modal-container">
+            <div class="modal-header">
+                <h2 id="accessModalTitle" style="font-size: 18px; font-weight: 700; margin: 0; color: var(--color-text-primary);">Update Technician Access</h2>
+                <button type="button" id="closeAccessModalBtn" class="navbar-btn" style="padding: 4px 8px; font-size: 18px;">&times;</button>
+            </div>
+            <form id="accessForm">
+                <input type="hidden" id="accessUserId">
+                <div class="modal-body">
+                    <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 14px 16px; margin-bottom: 20px;">
+                        <strong id="accessModalTechName" style="color: #0f172a; font-size: 15px; display: block;">—</strong>
+                        <span id="accessModalTechEmail" style="color: #64748b; font-size: 13px;">—</span>
+                    </div>
+
+                    <div class="form-group" style="margin-bottom: 16px;">
+                        <label class="form-label" for="accessStatusSelect">Maintenance Access Status *</label>
+                        <select id="accessStatusSelect" class="form-input" required>
+                            <option value="approved">Approved (Full Site Authorization)</option>
+                            <option value="restricted">Restricted (Conditional Assignment Permitted)</option>
+                            <option value="pending">Pending Screening Review</option>
+                            <option value="revoked">Revoked (Access Suspended / Denied)</option>
+                            <option value="expired">Expired</option>
+                        </select>
+                        <small style="color: var(--color-text-muted); font-size: 12px; margin-top: 4px; display: block;">
+                            Technicians can only receive task assignments if their access status is <strong>Approved</strong> or <strong>Restricted</strong>.
+                        </small>
+                    </div>
+
+                    <div class="form-group" style="margin-bottom: 16px;">
+                        <label class="form-label" for="accessExpiresAt">Access Expiry Date (Optional)</label>
+                        <input type="date" id="accessExpiresAt" class="form-input">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="accessRestrictionReason">Restriction / Revocation Reason</label>
+                        <textarea id="accessRestrictionReason" class="form-input" rows="3" placeholder="Provide notes or reasons (required if access is restricted or revoked)..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="cancelAccessBtn" class="navbar-btn" style="border: 1px solid var(--color-border-default, #e2e8f0);">Cancel</button>
+                    <button type="submit" id="submitAccessBtn" class="btn-primary">
+                        <span>Save Access Control</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="../../js/auth.js"></script>
+    <script src="../../js/dashboard.js"></script>
+    <script>
+        const token = localStorage.getItem('domiknow_token');
+        let allPool = [];
+
+        document.addEventListener('DOMContentLoaded', () => {
+            initModal();
+            loadAccessData();
+
+            document.getElementById('accessSearchInput').addEventListener('input', applyFilters);
+            document.getElementById('accessStatusFilter').addEventListener('change', applyFilters);
+        });
+
+        function initModal() {
+            const modal = document.getElementById('accessModal');
+            const closeBtn = document.getElementById('closeAccessModalBtn');
+            const cancelBtn = document.getElementById('cancelAccessBtn');
+            const form = document.getElementById('accessForm');
+
+            const closeModal = () => modal.classList.remove('is-active');
+            closeBtn.addEventListener('click', closeModal);
+            cancelBtn.addEventListener('click', closeModal);
+
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const userId = document.getElementById('accessUserId').value;
+                const access_status = document.getElementById('accessStatusSelect').value;
+                const restriction_reason = document.getElementById('accessRestrictionReason').value.trim();
+                const expires_at = document.getElementById('accessExpiresAt').value;
+
+                if ((access_status === 'restricted' || access_status === 'revoked') && !restriction_reason) {
+                    alert('Please enter a reason when restricting or revoking access.');
+                    return;
+                }
+
+                const submitBtn = document.getElementById('submitAccessBtn');
+                submitBtn.disabled = true;
+                submitBtn.textContent = 'Updating Access...';
+
+                try {
+                    const response = await fetch('/api/maintenance/access/update', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                        },
+                        body: JSON.stringify({
+                            userId,
+                            access_status,
+                            restriction_reason: restriction_reason || null,
+                            expires_at: expires_at ? new Date(expires_at).toISOString() : null
+                        })
+                    });
+
+                    const result = await response.json();
+                    if (!response.ok) {
+                        throw new Error(result.message || 'Failed to update access status.');
+                    }
+
+                    closeModal();
+                    const feedback = document.getElementById('actionFeedback');
+                    feedback.textContent = `Access status updated to '${access_status}'.`;
+                    feedback.classList.remove('hidden');
+                    setTimeout(() => feedback.classList.add('hidden'), 4000);
+                    loadAccessData();
+
+                } catch (err) {
+                    alert('Error: ' + err.message);
+                } finally {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '<span>Save Access Control</span>';
+                }
+            });
+        }
+
+        async function loadAccessData() {
+            const tbody = document.getElementById('accessTableBody');
+            try {
+                const response = await fetch('/api/admin/maintenance/pool', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (!response.ok) throw new Error('Failed to load maintenance workforce access data.');
+
+                const result = await response.json();
+                allPool = result.data || [];
+
+                // Metrics
+                const approved = allPool.filter(t => t.access?.access_status === 'approved').length;
+                const restricted = allPool.filter(t => t.access?.access_status === 'restricted').length;
+                const pending = allPool.filter(t => !t.access || t.access?.access_status === 'pending').length;
+                const revoked = allPool.filter(t => t.access?.access_status === 'revoked' || t.access?.access_status === 'expired' || t.access?.access_status === 'rejected').length;
+
+                document.getElementById('statApprovedAccess').textContent = approved;
+                document.getElementById('statRestrictedAccess').textContent = restricted;
+                document.getElementById('statPendingAccess').textContent = pending;
+                document.getElementById('statRevokedAccess').textContent = revoked;
+
+                // Check search URL param
+                const urlParams = new URLSearchParams(window.location.search);
+                const searchParam = urlParams.get('search');
+                if (searchParam) {
+                    document.getElementById('accessSearchInput').value = searchParam;
+                }
+
+                applyFilters();
+
+            } catch (err) {
+                console.error('Error:', err);
+                tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: var(--color-error-text); padding: 32px 16px;">${domiknowEscapeHtml(err.message)}</td></tr>`;
+            }
+        }
+
+        function applyFilters() {
+            const query = document.getElementById('accessSearchInput').value.toLowerCase().trim();
+            const statusFilter = document.getElementById('accessStatusFilter').value;
+
+            const filtered = allPool.filter(t => {
+                const currentStatus = t.access?.access_status || 'pending';
+                if (statusFilter && currentStatus !== statusFilter) return false;
+                if (query) {
+                    const matchName = t.full_name?.toLowerCase().includes(query);
+                    const matchEmail = t.email?.toLowerCase().includes(query);
+                    const matchDept = t.profile?.department?.toLowerCase().includes(query);
+                    if (!matchName && !matchEmail && !matchDept) return false;
+                }
+                return true;
+            });
+
+            renderAccessTable(filtered);
+        }
+
+        function renderAccessTable(technicians) {
+            const tbody = document.getElementById('accessTableBody');
+            if (technicians.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: var(--color-text-muted); padding: 36px 16px;">No maintenance personnel match the selected filters.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = '';
+            technicians.forEach(t => {
+                const row = document.createElement('tr');
+                const avatarInitial = (t.full_name ? t.full_name.charAt(0) : 'T').toUpperCase();
+                const department = t.profile?.department || 'General Maintenance';
+                const currentAccess = t.access?.access_status || 'pending';
+                const restrictionReason = t.access?.restriction_reason || '—';
+
+                const expiresFormatted = t.access?.expires_at 
+                    ? new Date(t.access.expires_at).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })
+                    : '<span style="color: #94a3b8;">Permanent</span>';
+
+                let badgeClass = `badge-access-${currentAccess}`;
+                let icon = '';
+                if (currentAccess === 'approved') icon = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>';
+                else if (currentAccess === 'restricted') icon = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>';
+                else if (currentAccess === 'revoked' || currentAccess === 'expired') icon = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>';
+
+                row.innerHTML = `
+                    <td>
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <span style="width: 32px; height: 32px; border-radius: 50%; background: #0F4953; color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px;">${avatarInitial}</span>
+                            <div>
+                                <strong style="display: block; font-size: 13px; color: var(--color-text-primary);">${domiknowEscapeHtml(t.full_name || 'Unnamed')}</strong>
+                                <span style="font-size: 12px; color: var(--color-text-muted);">${domiknowEscapeHtml(t.email)}</span>
+                            </div>
+                        </div>
+                    </td>
+                    <td><span style="font-size: 13px; font-weight: 500;">${domiknowEscapeHtml(department)}</span></td>
+                    <td style="text-align: center;"><span class="${badgeClass}">${icon} ${currentAccess.toUpperCase()}</span></td>
+                    <td><span style="font-size: 13px; color: var(--color-text-muted);">${domiknowEscapeHtml(restrictionReason)}</span></td>
+                    <td style="text-align: center; font-size: 13px;">${expiresFormatted}</td>
+                    <td style="text-align: right;">
+                        <button type="button" class="btn-action edit-access-btn" data-tech-id="${t.id}">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                            <span>Manage</span>
+                        </button>
+                    </td>
+                `;
+
+                tbody.appendChild(row);
+
+                row.querySelector('.edit-access-btn').addEventListener('click', () => openAccessModal(t));
+            });
+        }
+
+        function openAccessModal(tech) {
+            document.getElementById('accessUserId').value = tech.id;
+            document.getElementById('accessModalTechName').textContent = tech.full_name || 'Technician';
+            document.getElementById('accessModalTechEmail').textContent = tech.email || '';
+            document.getElementById('accessStatusSelect').value = tech.access?.access_status || 'pending';
+            document.getElementById('accessRestrictionReason').value = tech.access?.restriction_reason || '';
+            document.getElementById('accessExpiresAt').value = tech.access?.expires_at ? tech.access.expires_at.slice(0, 10) : '';
+
+            document.getElementById('accessModal').classList.add('is-active');
+        }
+    </script>
+</body>
+
+</html>
