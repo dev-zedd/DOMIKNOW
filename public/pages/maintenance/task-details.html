@@ -76,6 +76,15 @@
             background: #e0f2fe;
             color: #0369a1;
         }
+        .task-status-pill.status-inspection_submitted,
+        .task-status-pill.status-quote_pending {
+            background: #fef3c7;
+            color: #b45309;
+        }
+        .task-status-pill.status-quote_approved {
+            background: #dbeafe;
+            color: #1d4ed8;
+        }
         .task-status-pill.status-repairing {
             background: #ede9fe;
             color: #5b21b6;
@@ -554,6 +563,37 @@
             font-size: 0.8125rem;
             font-weight: 600;
         }
+        .inspection-info-card {
+            padding: 0.85rem;
+            border-radius: 6px;
+            background: var(--color-bg-subtle, #f8fafc);
+            border: 1px solid var(--color-border-default, #e2e8f0);
+            margin-bottom: 0.75rem;
+        }
+        .inspection-info-header {
+            display: flex;
+            align-items: center;
+            gap: 0.45rem;
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--color-text-primary, #0f172a);
+            margin-bottom: 0.35rem;
+        }
+        .inspection-info-desc {
+            font-size: 0.8rem;
+            color: var(--color-text-secondary, #475569);
+            line-height: 1.4;
+            margin: 0;
+        }
+        .inspection-field-summary {
+            display: flex;
+            justify-content: space-between;
+            gap: 0.5rem;
+            font-size: 0.78rem;
+            margin-top: 0.5rem;
+            padding-top: 0.45rem;
+            border-top: 1px solid var(--color-border-default, #e2e8f0);
+        }
     </style>
     <script src="../../js/ui.js?v=20260827-2" defer></script>
 </head>
@@ -688,7 +728,8 @@
                 } else if (action === 'update-status') {
                     handleStatusUpdate(btn.dataset.status);
                 } else if (action === 'add-row') {
-                    addMaterialRow();
+                    const targetTable = btn.dataset.targetTable || 'materialsTableBody';
+                    addMaterialRow(targetTable);
                 } else if (action === 'remove-row') {
                     btn.closest('tr')?.remove();
                 }
@@ -707,7 +748,7 @@
                     if (!/^[0-9]$/.test(e.key)) {
                         e.preventDefault();
                     }
-                } else if (target.classList.contains('material-cost') || target.id === 'laborCost') {
+                } else if (target.classList.contains('material-cost') || target.id === 'laborCost' || target.id === 'inspectionLaborCost') {
                     if (isNavOrShortcut(e)) return;
                     if (e.key === '.' || e.key === ',') {
                         const val = target.value || '';
@@ -732,7 +773,7 @@
                     if (target.value !== cleaned) {
                         target.value = cleaned;
                     }
-                } else if (target.classList.contains('material-cost') || target.id === 'laborCost') {
+                } else if (target.classList.contains('material-cost') || target.id === 'laborCost' || target.id === 'inspectionLaborCost') {
                     let cleaned = target.value.replace(/,/g, '.').replace(/[^0-9.]/g, '');
                     const parts = cleaned.split('.');
                     if (parts.length > 2) {
@@ -750,7 +791,8 @@
             actionPanel.addEventListener('focusin', (e) => {
                 if (e.target.classList.contains('material-qty') || 
                     e.target.classList.contains('material-cost') || 
-                    e.target.id === 'laborCost') {
+                    e.target.id === 'laborCost' ||
+                    e.target.id === 'inspectionLaborCost') {
                     setTimeout(() => {
                         try { e.target.select(); } catch(_) {}
                     }, 20);
@@ -765,7 +807,7 @@
                     } else {
                         target.value = parseInt(target.value, 10).toString();
                     }
-                } else if (target.classList.contains('material-cost') || target.id === 'laborCost') {
+                } else if (target.classList.contains('material-cost') || target.id === 'laborCost' || target.id === 'inspectionLaborCost') {
                     if (!target.value || isNaN(parseFloat(target.value))) {
                         target.value = '0.00';
                     } else {
@@ -778,6 +820,9 @@
                 if (e.target.id === 'completionReportForm') {
                     e.preventDefault();
                     handleReportSubmit();
+                } else if (e.target.id === 'ocularInspectionForm') {
+                    e.preventDefault();
+                    handleInspectionSubmit();
                 }
             });
         });
@@ -908,6 +953,10 @@
             }
         }
 
+        function safeEscape(str) {
+            return String(str || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+        }
+
         function renderTechnicianActionPanel(req) {
             const panel = document.getElementById('technicianActionPanel');
             const title = document.getElementById('actionPanelTitle');
@@ -928,36 +977,178 @@
                 `;
                 panel.classList.remove('hidden');
             }
-            // 2. Status Progress updates (accepted / travelling / arrived)
-            else if (['accepted', 'travelling', 'arrived'].includes(req.status)) {
+            // 2. Travel & arrival transitions (accepted / travelling)
+            else if (['accepted', 'travelling'].includes(req.status)) {
                 title.textContent = 'Update status';
                 
                 let btnText = 'Start travel';
                 let targetStatus = 'travelling';
+                let desc = 'Acknowledge that you are travelling to the property.';
                 if (req.status === 'travelling') {
                     btnText = 'Mark arrived';
                     targetStatus = 'arrived';
-                } else if (req.status === 'arrived') {
-                    btnText = 'Start repair';
-                    targetStatus = 'repairing';
+                    desc = 'Confirm your arrival at the property location.';
                 }
 
                 container.innerHTML = `
-                    <p class="action-panel-desc">Update your current work progress.</p>
+                    <p class="action-panel-desc">${desc}</p>
                     <div>
                         <button class="btn-action btn-status" data-action="update-status" data-status="${targetStatus}">${btnText}</button>
                     </div>
                 `;
                 panel.classList.remove('hidden');
             }
-            // 3. Completion report form (repairing)
+            // 3. Arrived -> On-site Ocular Diagnostic Inspection & Quotation Form
+            else if (req.status === 'arrived') {
+                title.textContent = 'On-site ocular inspection';
+                container.innerHTML = `
+                    <p class="action-panel-desc">Inspect physical failure, submit technical liability recommendation under the Civil Code, and provide quotation estimates.</p>
+                    <form id="ocularInspectionForm">
+                        <div class="form-field-compact">
+                            <label class="form-label-compact" for="inspectionProblemFound">Diagnostic findings</label>
+                            <input type="text" id="inspectionProblemFound" class="form-input-compact" placeholder="Observed physical failure or damage" required>
+                        </div>
+
+                        <div class="form-field-compact">
+                            <label class="form-label-compact" for="inspectionRecommendedLiability">Recommended liability</label>
+                            <select id="inspectionRecommendedLiability" class="form-input-compact" required>
+                                <option value="landlord">Landlord (Civil Code Art. 1654: Natural Wear &amp; Tear)</option>
+                                <option value="tenant">Tenant (Civil Code Art. 1657: Negligence / Misuse)</option>
+                                <option value="shared">Shared (Civil Code Art. 1654 / 1657: 50/50 Split)</option>
+                            </select>
+                        </div>
+
+                        <div class="form-field-compact">
+                            <label class="form-label-compact" for="inspectionLegalBasis">Technical basis</label>
+                            <select id="inspectionLegalBasis" class="form-input-compact" required>
+                                <option value="wear_and_tear">Normal wear and tear over time (Art. 1654)</option>
+                                <option value="tenant_negligence">Tenant misuse, unauthorized alteration, or negligence (Art. 1657)</option>
+                                <option value="calamity">Force majeure / storm / natural event (Art. 1654)</option>
+                                <option value="initial_defect">Inherent plumbing, structural, or fixture defect</option>
+                                <option value="other">Other technical assessment</option>
+                            </select>
+                        </div>
+
+                        <div class="form-field-compact">
+                            <label class="form-label-compact">Estimated materials needed</label>
+                            <div class="materials-table-wrapper">
+                                <table class="materials-table">
+                                    <thead>
+                                        <tr>
+                                            <th class="col-mat-name">Item</th>
+                                            <th class="col-mat-qty">Qty</th>
+                                            <th class="col-mat-cost">Est. Cost (₱)</th>
+                                            <th class="col-mat-action"></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="inspectionMaterialsTableBody">
+                                    </tbody>
+                                </table>
+                            </div>
+                            <button type="button" class="add-material-btn" data-action="add-row" data-target-table="inspectionMaterialsTableBody">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                                Add item
+                            </button>
+                        </div>
+
+                        <div class="form-field-compact">
+                            <label class="form-label-compact" for="inspectionLaborCost">Estimated labor fee (₱)</label>
+                            <div style="max-width: 180px;">
+                                <input type="text" inputmode="decimal" id="inspectionLaborCost" class="form-input-compact" placeholder="0.00" value="0.00" autocomplete="off">
+                            </div>
+                        </div>
+
+                        <div class="form-field-compact">
+                            <label class="form-label-compact" for="inspectionBeforePhoto">Inspection photo evidence</label>
+                            <div class="upload-zone-compact" id="inspectionBeforePhotoDropZone">
+                                <input type="file" id="inspectionBeforePhoto" accept="image/*" style="display: none;">
+                                <div class="upload-zone-content">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" class="upload-icon"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                                    <span class="upload-zone-text">Click or drop inspection photo</span>
+                                </div>
+                                <div id="inspectionBeforePhotoName" class="upload-file-name" style="display: none;"></div>
+                            </div>
+                        </div>
+
+                        <div class="form-actions-row">
+                            <button type="submit" class="btn-submit-report">Submit Inspection &amp; Quote</button>
+                        </div>
+                    </form>
+
+                    <div style="margin-top: 1.15rem; padding-top: 0.85rem; border-top: 1px dashed var(--color-border-default, #cbd5e1);">
+                        <p class="action-panel-desc" style="margin-bottom: 0.45rem;">Routine minor repair? If no quotation or legal arbitration is necessary, you may commence repair immediately:</p>
+                        <button type="button" class="btn-action btn-status" style="background: transparent; color: var(--color-text-primary, #0f172a); border: 1px solid var(--color-border-default, #cbd5e1);" data-action="update-status" data-status="repairing">Commence Direct Repair</button>
+                    </div>
+                `;
+                panel.classList.remove('hidden');
+
+                bindDropZone('inspectionBeforePhotoDropZone', 'inspectionBeforePhoto', 'inspectionBeforePhotoName');
+                addMaterialRow('inspectionMaterialsTableBody');
+            }
+            // 4. Inspection submitted -> waiting for Admin liability ruling
+            else if (req.status === 'inspection_submitted') {
+                title.textContent = 'Inspection submitted';
+                const diag = req.problem_found || 'Diagnostic assessment submitted';
+                container.innerHTML = `
+                    <div class="inspection-info-card">
+                        <div class="inspection-info-header" style="color: #b45309;">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                            <span>Awaiting Admin Ruling</span>
+                        </div>
+                        <p class="inspection-info-desc">
+                            Your on-site diagnostic assessment and preliminary estimates were submitted. Platform Administration is currently adjudicating legal responsibility under Civil Code guidelines and issuing the quote.
+                        </p>
+                        <div class="inspection-field-summary">
+                            <span style="color:var(--color-text-muted, #64748b);">Diagnosis:</span>
+                            <span style="font-weight:600; color:var(--color-text-primary, #0f172a);">${safeEscape(diag)}</span>
+                        </div>
+                    </div>
+                `;
+                panel.classList.remove('hidden');
+            }
+            // 5. Quote pending -> waiting for responsible party approval
+            else if (req.status === 'quote_pending') {
+                title.textContent = 'Quotation pending';
+                container.innerHTML = `
+                    <div class="inspection-info-card">
+                        <div class="inspection-info-header" style="color: #b45309;">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                            <span>Awaiting Party Approval</span>
+                        </div>
+                        <p class="inspection-info-desc">
+                            Administrative liability ruling has been issued. Awaiting formal quote acceptance from the responsible party before work can begin.
+                        </p>
+                    </div>
+                `;
+                panel.classList.remove('hidden');
+            }
+            // 6. Quote approved -> authorized to repair!
+            else if (req.status === 'quote_approved') {
+                title.textContent = 'Quote approved';
+                container.innerHTML = `
+                    <div class="inspection-info-card" style="border-color:#bbf7d0; background:#f0fdf4;">
+                        <div class="inspection-info-header" style="color:#166534;">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                            <span>Ready to Repair</span>
+                        </div>
+                        <p class="inspection-info-desc" style="color:#166534;">
+                            The quotation has been officially approved by the responsible party. You are authorized to proceed with repairs.
+                        </p>
+                    </div>
+                    <button type="button" class="btn-action btn-status" data-action="update-status" data-status="${'repairing'}">Commence Repairs</button>
+                `;
+                panel.classList.remove('hidden');
+            }
+            // 7. Completion report form (repairing)
             else if (req.status === 'repairing') {
                 title.textContent = 'Completion report';
+                const initialProblem = safeEscape(req.problem_found || '');
+                const initialLabor = req.labor_cost ? Number(req.labor_cost).toFixed(2) : '0.00';
                 container.innerHTML = `
                     <form id="completionReportForm">
                         <div class="form-field-compact">
                             <label class="form-label-compact" for="problemFound">Problem found</label>
-                            <input type="text" id="problemFound" class="form-input-compact" placeholder="Diagnosed problem" required>
+                            <input type="text" id="problemFound" class="form-input-compact" placeholder="Diagnosed problem" value="${initialProblem}" required>
                         </div>
                         <div class="form-field-compact">
                             <label class="form-label-compact" for="repairPerformed">Action taken</label>
@@ -985,7 +1176,7 @@
                                     </tbody>
                                 </table>
                             </div>
-                            <button type="button" class="add-material-btn" data-action="add-row">
+                            <button type="button" class="add-material-btn" data-action="add-row" data-target-table="materialsTableBody">
                                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
                                 Add item
                             </button>
@@ -994,7 +1185,7 @@
                         <div class="form-field-compact">
                             <label class="form-label-compact" for="laborCost">Labor cost (₱)</label>
                             <div style="max-width: 180px;">
-                                <input type="text" inputmode="decimal" id="laborCost" class="form-input-compact" placeholder="0.00" value="0.00" autocomplete="off">
+                                <input type="text" inputmode="decimal" id="laborCost" class="form-input-compact" placeholder="0.00" value="${initialLabor}" autocomplete="off">
                             </div>
                         </div>
 
@@ -1032,67 +1223,11 @@
                 `;
                 panel.classList.remove('hidden');
 
-                // Bind drag & drop for photos
-                [
-                    { zoneId: 'beforePhotoDropZone', inputId: 'beforePhoto', nameId: 'beforePhotoName' },
-                    { zoneId: 'afterPhotoDropZone', inputId: 'afterPhoto', nameId: 'afterPhotoName' }
-                ].forEach(({ zoneId, inputId, nameId }) => {
-                    const zone = document.getElementById(zoneId);
-                    const input = document.getElementById(inputId);
-                    const nameDisp = document.getElementById(nameId);
-                    if (!zone || !input) return;
-
-                    zone.addEventListener('click', (e) => {
-                        if (e.target !== input) input.click();
-                    });
-
-                    function updateName(file) {
-                        if (file && nameDisp) {
-                            nameDisp.textContent = `${file.name} (${(file.size / 1024).toFixed(1)} KB)`;
-                            nameDisp.style.display = 'block';
-                        }
-                    }
-
-                    input.addEventListener('change', () => {
-                        if (input.files && input.files[0]) updateName(input.files[0]);
-                    });
-
-                    let dragCounter = 0;
-                    zone.addEventListener('dragenter', (e) => {
-                        e.preventDefault();
-                        dragCounter++;
-                        zone.classList.add('dragover');
-                    });
-                    zone.addEventListener('dragover', (e) => {
-                        e.preventDefault();
-                        e.dataTransfer.dropEffect = 'copy';
-                    });
-                    zone.addEventListener('dragleave', (e) => {
-                        e.preventDefault();
-                        dragCounter--;
-                        if (dragCounter <= 0) {
-                            dragCounter = 0;
-                            zone.classList.remove('dragover');
-                        }
-                    });
-                    zone.addEventListener('drop', (e) => {
-                        e.preventDefault();
-                        dragCounter = 0;
-                        zone.classList.remove('dragover');
-                        const file = e.dataTransfer?.files?.[0];
-                        if (file) {
-                            const dt = new DataTransfer();
-                            dt.items.add(file);
-                            input.files = dt.files;
-                            updateName(file);
-                            input.dispatchEvent(new Event('change', { bubbles: true }));
-                        }
-                    });
-                });
-
-                addMaterialRow();
+                bindDropZone('beforePhotoDropZone', 'beforePhoto', 'beforePhotoName');
+                bindDropZone('afterPhotoDropZone', 'afterPhoto', 'afterPhotoName');
+                addMaterialRow('materialsTableBody');
             }
-            // 4. Completed or closed state summary
+            // 8. Completed or closed state summary
             else if (['completed', 'verified', 'closed'].includes(req.status)) {
                 title.textContent = 'Status';
                 const statusName = req.status.charAt(0).toUpperCase() + req.status.slice(1);
@@ -1187,8 +1322,62 @@
             }
         }
 
-        function addMaterialRow() {
-            const tbody = document.getElementById('materialsTableBody');
+        function bindDropZone(zoneId, inputId, nameId) {
+            const zone = document.getElementById(zoneId);
+            const input = document.getElementById(inputId);
+            const nameDisp = document.getElementById(nameId);
+            if (!zone || !input) return;
+
+            zone.addEventListener('click', (e) => {
+                if (e.target !== input) input.click();
+            });
+
+            function updateName(file) {
+                if (file && nameDisp) {
+                    nameDisp.textContent = `${file.name} (${(file.size / 1024).toFixed(1)} KB)`;
+                    nameDisp.style.display = 'block';
+                }
+            }
+
+            input.addEventListener('change', () => {
+                if (input.files && input.files[0]) updateName(input.files[0]);
+            });
+
+            let dragCounter = 0;
+            zone.addEventListener('dragenter', (e) => {
+                e.preventDefault();
+                dragCounter++;
+                zone.classList.add('dragover');
+            });
+            zone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                e.dataTransfer.dropEffect = 'copy';
+            });
+            zone.addEventListener('dragleave', (e) => {
+                e.preventDefault();
+                dragCounter--;
+                if (dragCounter <= 0) {
+                    dragCounter = 0;
+                    zone.classList.remove('dragover');
+                }
+            });
+            zone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                dragCounter = 0;
+                zone.classList.remove('dragover');
+                const file = e.dataTransfer?.files?.[0];
+                if (file) {
+                    const dt = new DataTransfer();
+                    dt.items.add(file);
+                    input.files = dt.files;
+                    updateName(file);
+                    input.dispatchEvent(new Event('change', { bubbles: true }));
+                }
+            });
+        }
+
+        function addMaterialRow(tbodyId = 'materialsTableBody') {
+            const tbody = document.getElementById(tbodyId);
             if (!tbody) return;
             const tr = document.createElement('tr');
             tr.innerHTML = `
@@ -1207,6 +1396,83 @@
                 reader.onload = () => resolve(reader.result);
                 reader.onerror = error => reject(error);
             });
+        }
+
+        async function handleInspectionSubmit() {
+            const btn = document.querySelector('#ocularInspectionForm button[type="submit"]');
+            const confirmInspection = await window.domiknowConfirm({
+                variant: 'info',
+                eyebrow: 'Ocular Inspection',
+                title: 'Submit diagnostic inspection?',
+                message: 'This records your empirical findings and estimated quote for Admin liability determination.',
+                confirmLabel: 'Submit Inspection',
+                cancelLabel: 'Cancel'
+            });
+            if (!confirmInspection) return;
+
+            window.DomiKnowLoading?.setButton(btn, true, 'Submitting…');
+
+            try {
+                const beforeFile = document.getElementById('inspectionBeforePhoto')?.files?.[0];
+                let before_base64 = null, before_filename = null, before_mimetype = null;
+                if (beforeFile) {
+                    before_base64 = await fileToBase64(beforeFile);
+                    before_filename = beforeFile.name;
+                    before_mimetype = beforeFile.type;
+                }
+
+                const materials = [];
+                const rows = document.querySelectorAll('#inspectionMaterialsTableBody tr');
+                rows.forEach(row => {
+                    const name = row.querySelector('.material-name')?.value?.trim();
+                    const qtyVal = row.querySelector('.material-qty')?.value?.trim();
+                    const costVal = row.querySelector('.material-cost')?.value?.trim();
+                    const qty = parseInt(qtyVal, 10);
+                    const cost = parseFloat(costVal);
+                    if (name && !isNaN(qty) && qty > 0) {
+                        materials.push({
+                            material_name: name,
+                            quantity: qty,
+                            cost: isNaN(cost) || cost < 0 ? 0 : Number(cost.toFixed(2))
+                        });
+                    }
+                });
+
+                const rawLabor = parseFloat(document.getElementById('inspectionLaborCost')?.value || '0');
+                const labor_cost = isNaN(rawLabor) || rawLabor < 0 ? 0 : Number(rawLabor.toFixed(2));
+
+                const payload = {
+                    problem_found: document.getElementById('inspectionProblemFound')?.value?.trim(),
+                    recommended_liability: document.getElementById('inspectionRecommendedLiability')?.value,
+                    legal_basis: document.getElementById('inspectionLegalBasis')?.value,
+                    labor_cost,
+                    materials,
+                    before_base64,
+                    before_filename,
+                    before_mimetype
+                };
+
+                const response = await fetch(`/api/maintenance/requests/${taskId}/inspection`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                if (response.ok) {
+                    await showTaskNotice('success', 'Inspection submitted', 'Platform Administration will now review findings and adjudicate legal liability.');
+                    fetchTaskDetails();
+                } else {
+                    await showTaskNotice('danger', 'Submission failed', await getResponseMessage(response, 'Could not submit inspection.'));
+                }
+            } catch (err) {
+                console.error(err);
+                await showTaskNotice('danger', 'Network error', 'Check your connection and try again.');
+            } finally {
+                window.DomiKnowLoading?.setButton(btn, false);
+            }
         }
 
         async function handleReportSubmit() {

@@ -626,6 +626,9 @@ const maintenanceModel = {
         const proofMatch = text.match(/\[PROOF_URL:\s*([^\]]+)\]/i);
         const payAmountMatch = text.match(/\[PAY_AMOUNT:\s*([0-9.]+)\]/i);
         const rejectReasonMatch = text.match(/\[REJECTION_REASON:\s*([^\]]+)\]/i);
+        const techFindingsMatch = text.match(/\[TECH_FINDINGS:\s*([^\]]+)\]/i);
+        const techLiabMatch = text.match(/\[TECH_RECOMMENDED_LIABILITY:\s*(LANDLORD|TENANT|SHARED)\]/i);
+        const techBasisMatch = text.match(/\[TECH_BASIS:\s*([A-Z0-9_]+)\]/i);
 
         const isOwnerInitiated = Boolean(
             initiatedMatch ? initiatedMatch[1].toLowerCase() === 'landlord'
@@ -664,6 +667,9 @@ const maintenanceModel = {
             liability_party: party,
             liable_party: party.toUpperCase(),
             liability_basis: basisMatch ? basisMatch[1].toLowerCase() : 'pending_inspection',
+            tech_findings: techFindingsMatch ? techFindingsMatch[1].trim() : (req.problem_found || null),
+            tech_recommended_liability: techLiabMatch ? techLiabMatch[1].toLowerCase() : null,
+            tech_basis: techBasisMatch ? techBasisMatch[1].toLowerCase() : null,
             quote_status: quoteMatch ? quoteMatch[1].toLowerCase() : (['completed', 'verified', 'closed'].includes(req.status) ? 'approved' : 'pending'),
             payment_status: payStatus,
             paid_by: payerMatch ? payerMatch[1].toLowerCase() : null,

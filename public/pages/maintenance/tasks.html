@@ -367,7 +367,7 @@
                 all: myTasks.length,
                 assigned: myTasks.filter(t => t.status === 'assigned').length,
                 accepted: myTasks.filter(t => t.status === 'accepted').length,
-                in_progress: myTasks.filter(t => ['travelling', 'arrived', 'repairing', 'quoted', 'approved'].includes(t.status)).length,
+                in_progress: myTasks.filter(t => ['travelling', 'arrived', 'inspection_submitted', 'quote_pending', 'quote_approved', 'repairing', 'quoted', 'approved'].includes(t.status)).length,
                 completed: myTasks.filter(t => ['completed', 'verified'].includes(t.status)).length,
                 closed: myTasks.filter(t => t.status === 'closed').length
             };
@@ -393,7 +393,7 @@
                 if (query && ![t.properties?.property_name, t.unit_number, t.issue_title, t.issue_category].join(' ').toLowerCase().includes(query)) return false;
                 if (activeFilter === 'all') return true;
                 if (activeFilter === 'in_progress') {
-                    return ['travelling', 'arrived', 'repairing', 'quoted', 'approved'].includes(t.status);
+                    return ['travelling', 'arrived', 'inspection_submitted', 'quote_pending', 'quote_approved', 'repairing', 'quoted', 'approved'].includes(t.status);
                 }
                 if (activeFilter === 'completed') {
                     return ['completed', 'verified'].includes(t.status);
@@ -428,9 +428,17 @@
                     ? 'View details'
                     : task.status === 'assigned'
                         ? 'Review offer'
-                        : task.status === 'completed'
-                            ? 'View report'
-                            : 'Update progress';
+                        : task.status === 'arrived'
+                            ? 'Ocular inspection'
+                            : task.status === 'inspection_submitted'
+                                ? 'Inspection submitted'
+                                : task.status === 'quote_pending'
+                                    ? 'Awaiting quote approval'
+                                    : task.status === 'quote_approved'
+                                        ? 'Start repair'
+                                        : task.status === 'completed'
+                                            ? 'View report'
+                                            : 'Update progress';
 
                 const detailUrl = `task-details.html?id=${encodeURIComponent(task.id)}`;
 

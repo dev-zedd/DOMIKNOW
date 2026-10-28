@@ -168,3 +168,74 @@ test('landlord directly initiates work order (Art. 1654) which starts as pre-app
     assert.match(progressNotes, /Civil Code Art\. 1654/);
 });
 
+test('inspection submission moves task to inspection_submitted and neutral arbitration guard blocks premature rulings', async () => {
+    const flow = workflow('arrived');
+
+    // 1. Admin liability adjudication is blocked before technician submits inspection
+    const premature = await flow.act('adminValidateLiability', 'admin', {
+        liability_party: 'landlord',
+        liability_basis: 'art_1654_wear_and_tear'
+    });
+    assert.equal(premature.statusCode, 400);
+    assert.match(premature.body.message, /inspection/i);
+
+    // 2. Technician submits diagnostic inspection & quote
+    const inspectionRes = await flow.act('workerSubmitInspection', 'worker', {
+        problem_found: 'Corroded brass valve fitting',
+        labor_cost: 350,
+        liability_recommendation: 'landlord',
+        liability_basis: 'art_1654_wear_and_tear',
+        materials: [{ material_name: 'Brass valve', quantity: 1, cost: 250 }]
+    });
+    assert.equal(inspectionRes.statusCode, 200);
+    assert.equal(flow.record.status, 'inspection_submitted');
+    assert.equal(flow.record.problem_found, 'Corroded brass valve fitting');
+
+    // 3. Admin can now determine legal liability under Civil Code Art. 1654
+    const liabilityRes = await flow.act('adminValidateLiability', 'admin', {
+        liability_party: 'landlord',
+        liability_basis: 'art_1654_wear_and_tear',
+        admin_notes: 'Age-related material wear per technician findings.'
+    });
+    assert.equal(liabilityRes.statusCode, 200);
+    assert.equal(flow.record.status, 'quote_pending');
+
+    // 4. Liable landlord approves the quotation
+    const quoteRes = await flow.act('partyDecideQuote', 'landlord', {
+        decision: 'approve'
+    });
+    assert.equal(quoteRes.statusCode, 200);
+    assert.equal(flow.record.status, 'quote_approved');
+
+    // 5. Worker commences repair
+    const repairRes = await flow.act('workerUpdateStatus', 'worker', {
+        status: 'repairing'
+    });
+    assert.equal(repairRes.statusCode, 200);
+    assert.equal(flow.record.status, 'repairing');
+});
+
+test('payment verification gate blocks closure of billable work order until verified by admin', async () => {
+    const flow = workflow('verified');
+    flow.record.recommendations = '[LIABILITY:LANDLORD][BASIS:ART_1654_WEAR_AND_TEAR][PAYMENT:UNPAID]';
+    flow.record.labor_cost = 500;
+    flow.record.material_cost = 250;
+    flow.record.meta = {
+        liability_party: 'landlord',
+        total_cost: 750,
+        payment_status: 'unpaid'
+    };
+
+    // Tenant confirming without verified payment is blocked
+    const closeAttempt = await flow.act('tenantConfirmRequest', 'tenant', { decision: 'confirm' });
+    assert.equal(closeAttempt.statusCode, 400);
+    assert.match(closeAttempt.body.message, /Payment verification required/);
+    assert.equal(flow.record.status, 'verified');
+
+    // Admin verifies payment which auto-closes verified work order
+    const verifyPay = await flow.act('adminVerifyMaintenancePayment', 'admin', {});
+    assert.equal(verifyPay.statusCode, 200);
+    assert.equal(flow.record.status, 'closed');
+});
+
+

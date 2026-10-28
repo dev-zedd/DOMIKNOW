@@ -44,6 +44,17 @@ const DEFAULT_REQUIREMENTS = [
     }
 ];
 
+const CATEGORY_SKILL_KEYWORDS = {
+    plumbing: ['plumb', 'pipe', 'drain', 'leak', 'faucet', 'toilet', 'sink', 'p-trap', 'water'],
+    electrical: ['electric', 'wiring', 'breaker', 'panel', 'voltage', 'outlet', 'lighting', 'power'],
+    aircon: ['aircon', 'hvac', 'refrigerat', 'cooling', 'compressor', 'fan'],
+    door: ['door', 'carpentry', 'lock', 'hinge', 'wood', 'knob', 'carpenter'],
+    roof: ['roof', 'gutter', 'flashing', 'waterproof', 'ceiling'],
+    internet: ['internet', 'network', 'cable', 'router', 'telecom', 'fiber', 'wifi'],
+    appliance: ['appliance', 'refrigerator', 'washing', 'stove', 'oven', 'microwave'],
+    others: ['general', 'handyman', 'maintenance', 'multi-skilled', 'all-around']
+};
+
 const maintenanceComplianceService = {
     /**
      * Ensure default screening requirements exist in database
@@ -162,10 +173,10 @@ const maintenanceComplianceService = {
     },
 
     /**
-     * Check technician assignment eligibility against all 6 business rules
+     * Check technician assignment eligibility against compliance rules and category qualifications
      * Returns: { eligible: boolean, reasons: string[], ...details }
      */
-    async checkEligibility(userId) {
+    async checkEligibility(userId, requestCategory = null) {
         const reasons = [];
 
         // 1. Fetch user identity
@@ -245,6 +256,27 @@ const maintenanceComplianceService = {
                 } else if (rec.expires_at && new Date(rec.expires_at) < now) {
                     reasons.push(`Screening '${req.name}' expired on ${new Date(rec.expires_at).toLocaleDateString()}.`);
                 }
+            }
+        }
+
+        // Rule 8: Category Qualification & Skill Matching
+        if (requestCategory && requestCategory !== 'others') {
+            const cat = requestCategory.toLowerCase().trim();
+            const keywords = CATEGORY_SKILL_KEYWORDS[cat] || [cat];
+            const generalKeywords = ['general', 'handyman', 'multi-skilled', 'all-around', 'maintenance'];
+
+            const textSources = [
+                user.full_name || '',
+                profile?.department || '',
+                profile?.certifications || '',
+                ...(skills || []).map(s => s.skill_name || '')
+            ].join(' ').toLowerCase();
+
+            const isMatched = keywords.some(k => textSources.includes(k)) ||
+                              generalKeywords.some(g => textSources.includes(g));
+
+            if (!isMatched) {
+                reasons.push(`Technician skills and accreditations do not match the required category: '${requestCategory}'.`);
             }
         }
 
@@ -346,8 +378,8 @@ const maintenanceComplianceService = {
             throw new Error('Maintenance request not found.');
         }
 
-        // 2. Validate compliance eligibility
-        const compliance = await this.checkEligibility(technicianId);
+        // 2. Validate compliance eligibility including issue category matching
+        const compliance = await this.checkEligibility(technicianId, request.issue_category);
         if (!compliance.eligible) {
             const reasonText = compliance.reasons.join('; ');
             throw new Error(`Assignment Blocked: Technician is not eligible. ${reasonText}`);

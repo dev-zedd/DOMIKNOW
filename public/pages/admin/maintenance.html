@@ -1644,7 +1644,7 @@
                 if (!res.ok) throw new Error('Failed to fetch requests');
                 const result = await res.json();
                 allRequests = result.data || [];
-                const quotesCount = allRequests.filter(r => ['completed', 'verified', 'closed'].includes((r.status || '').toLowerCase())).length;
+                const quotesCount = allRequests.filter(r => ['inspection_submitted', 'quote_pending', 'quote_approved', 'completed', 'verified', 'closed'].includes((r.status || '').toLowerCase()) || Boolean(r.liability_party && r.liability_party !== 'pending')).length;
                 const bQuotes = document.getElementById('badgeQuotes');
                 if (bQuotes) bQuotes.textContent = quotesCount;
 
@@ -1804,8 +1804,8 @@
             const liabilityFilter = document.getElementById('filterLiability')?.value || 'all';
 
             const filtered = allRequests.filter(r => {
-                const isFieldCompleted = ['completed', 'verified', 'closed'].includes((r.status || '').toLowerCase());
-                if (!isFieldCompleted) return false;
+                const isRelevant = ['inspection_submitted', 'quote_pending', 'quote_approved', 'repairing', 'completed', 'verified', 'closed'].includes((r.status || '').toLowerCase()) || Boolean(r.liability_party && r.liability_party !== 'pending');
+                if (!isRelevant) return false;
 
                 const title = (r.issue_title || '').toLowerCase();
                 const prop = (r.properties?.property_name || '').toLowerCase();
@@ -1833,7 +1833,7 @@
             if (!tbody) return;
 
             if (filtered.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="5" style="text-align: center !important; color: var(--color-text-muted); padding: 2.5rem;">No completed work orders awaiting liability review or settlement.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="5" style="text-align: center !important; color: var(--color-text-muted); padding: 2.5rem;">No work orders currently awaiting liability adjudication or quotation review.</td></tr>`;
                 return;
             }
 
@@ -1867,23 +1867,19 @@
                 const liab = r.liability_party;
 
                 if (st === 'inspection_submitted') {
-                    approvalBadge = '<span class="badge badge-inspection">Submitted by Tech</span>';
+                    approvalBadge = `<button type="button" class="btn-table-sm" style="background:var(--color-action-primary, #0355f3); color:#ffffff; border:none; padding:4px 10px; font-weight:600; border-radius:4px; cursor:pointer;" onclick="event.stopPropagation(); openLiabilityModal('${r.id}');">Adjudicate</button>`;
                 } else if (!liab || ['pending', 'pending_admin_determination'].includes(liab)) {
-                    approvalBadge = '<span class="badge badge-pending">Needs Arbiter Ruling</span>';
+                    approvalBadge = `<button type="button" class="btn-table-sm" style="background:var(--color-action-primary, #0355f3); color:#ffffff; border:none; padding:4px 10px; font-weight:600; border-radius:4px; cursor:pointer;" onclick="event.stopPropagation(); openLiabilityModal('${r.id}');">Adjudicate</button>`;
                 } else if (st === 'quoted' || st === 'quote_pending') {
-                    if (liab === 'tenant') {
-                        approvalBadge = '<span class="badge badge-tenant">Awaiting Tenant</span>';
-                    } else if (liab === 'landlord') {
-                        approvalBadge = '<span class="badge badge-landlord">Awaiting Landlord</span>';
-                    } else {
-                        approvalBadge = '<span class="badge badge-shared">Awaiting Approvals</span>';
-                    }
+                    const partyLabel = liab === 'tenant' ? 'Awaiting Tenant' : (liab === 'landlord' ? 'Awaiting Landlord' : 'Awaiting Approvals');
+                    const partyBadgeClass = liab === 'tenant' ? 'badge-tenant' : (liab === 'landlord' ? 'badge-landlord' : 'badge-shared');
+                    approvalBadge = `<div style="display:flex; flex-direction:column; align-items:center; gap:4px;"><span class="badge ${partyBadgeClass}">${partyLabel}</span><button type="button" class="btn-table-sm" style="background:transparent; color:var(--color-link, #0355f3); border:1px solid var(--color-border-default, #e2e8f0); padding:2px 8px; font-size:0.72rem; border-radius:4px; cursor:pointer;" onclick="event.stopPropagation(); openLiabilityModal('${r.id}');">Edit Ruling</button></div>`;
                 } else if (['approved', 'quote_approved'].includes(st)) {
-                    approvalBadge = '<span class="badge badge-completed">Quote Approved</span>';
+                    approvalBadge = `<div style="display:flex; flex-direction:column; align-items:center; gap:4px;"><span class="badge badge-completed">Quote Approved</span><button type="button" class="btn-table-sm" style="background:transparent; color:var(--color-link, #0355f3); border:1px solid var(--color-border-default, #e2e8f0); padding:2px 8px; font-size:0.72rem; border-radius:4px; cursor:pointer;" onclick="event.stopPropagation(); openLiabilityModal('${r.id}');">Edit Ruling</button></div>`;
                 } else if (st === 'repairing') {
-                    approvalBadge = '<span class="badge badge-active">Authorized / Active</span>';
+                    approvalBadge = `<span class="badge badge-active">Authorized / Active</span>`;
                 } else if (['completed', 'verified', 'closed'].includes(st)) {
-                    approvalBadge = '<span class="badge badge-completed">Settled & Closed</span>';
+                    approvalBadge = `<div style="display:flex; flex-direction:column; align-items:center; gap:4px;"><span class="badge badge-completed">Settled &amp; Closed</span><button type="button" class="btn-table-sm" style="background:transparent; color:var(--color-link, #0355f3); border:1px solid var(--color-border-default, #e2e8f0); padding:2px 8px; font-size:0.72rem; border-radius:4px; cursor:pointer;" onclick="event.stopPropagation(); openLiabilityModal('${r.id}');">View Ruling</button></div>`;
                 }
 
                 return `
@@ -2007,8 +2003,13 @@
                     const recText = (req.recommendations || '') + ' ' + (req.landlord_remarks || '');
                     const fallbackPartyMatch = recText.match(/\[LIABILITY:\s*(LANDLORD|TENANT|SHARED)\]/i);
                     const fallbackBasisMatch = recText.match(/\[BASIS:\s*([A-Z0-9_]+)\]/i);
-                    const party = (meta.liability_party || (fallbackPartyMatch ? fallbackPartyMatch[1] : '') || r.liability_party || '').toLowerCase();
-                    const basis = (meta.liability_basis || (fallbackBasisMatch ? fallbackBasisMatch[1] : '') || r.liability_basis || '').toLowerCase();
+                    const techRecPartyMatch = recText.match(/\[TECH_RECOMMENDED_LIABILITY:\s*(LANDLORD|TENANT|SHARED)\]/i);
+                    const techRecBasisMatch = recText.match(/\[TECH_BASIS:\s*([A-Z0-9_]+)\]/i);
+                    const techFindingsMatch = recText.match(/\[TECH_FINDINGS:\s*([^\]]+)\]/i);
+
+                    const party = (meta.liability_party || (fallbackPartyMatch ? fallbackPartyMatch[1] : '') || meta.tech_recommended_liability || (techRecPartyMatch ? techRecPartyMatch[1] : '') || r.liability_party || '').toLowerCase();
+                    const basis = (meta.liability_basis || (fallbackBasisMatch ? fallbackBasisMatch[1] : '') || meta.tech_basis || (techRecBasisMatch ? techRecBasisMatch[1] : '') || r.liability_basis || '').toLowerCase();
+                    const findings = req.problem_found || meta.tech_findings || (techFindingsMatch ? techFindingsMatch[1] : '') || report.problem_found || r.problem_found || '';
 
                     r = {
                         ...r,
@@ -2020,7 +2021,7 @@
                         materials,
                         labor_cost: Number(req.labor_cost ?? report.labor_cost ?? r.labor_cost ?? 0),
                         material_cost: Number(req.material_cost ?? report.material_cost ?? r.material_cost ?? 0),
-                        problem_found: req.problem_found || report.problem_found || r.problem_found || '',
+                        problem_found: findings,
                         clean_recommendations: req.landlord_remarks || (req.recommendations || '').match(/\(Admin notes:\s*([^)]+)\)/i)?.[1] || (req.recommendations || '').replace(/\[[A-Z0-9_: ]+\]/gi, '').trim() || ''
                     };
                 }
@@ -2039,7 +2040,12 @@
             // Technician findings
             const findingsEl = document.getElementById('liabilityProblemFound');
             if (findingsEl) {
-                const diag = r.problem_found || r.issue_description || 'Diagnostic pending on-site inspection.';
+                let diag = r.problem_found || r.issue_description || 'Diagnostic pending on-site inspection.';
+                if (r.tech_recommended_liability || (r.recommendations || '').includes('[TECH_RECOMMENDED_LIABILITY:')) {
+                    const techParty = (r.tech_recommended_liability || (r.recommendations || '').match(/\[TECH_RECOMMENDED_LIABILITY:\s*([A-Z]+)\]/i)?.[1] || '').toUpperCase();
+                    const techBasis = (r.tech_basis || (r.recommendations || '').match(/\[TECH_BASIS:\s*([A-Z0-9_]+)\]/i)?.[1] || '').replace(/_/g, ' ');
+                    diag += ` • [Technician Recommended: ${techParty}${techBasis ? ` · ${techBasis}` : ''}]`;
+                }
                 findingsEl.textContent = diag;
             }
 
@@ -2401,11 +2407,11 @@
                     `;
                 }
 
-                if (activeTab === 'liability') {
+                if (activeTab === 'liability' || ['inspection_submitted', 'quote_pending'].includes(req.status)) {
                     footerHtml += `
                         <button type="button" class="btn-table-sm" onclick="closeModals(); openLiabilityModal('${req.id}');" style="background:#10b981; color:#ffffff; border-color:#10b981; font-weight:600; padding: 0.4rem 0.85rem;">
                             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-                            <span>Review Liability</span>
+                            <span>${req.status === 'inspection_submitted' ? 'Adjudicate Liability' : 'Review Liability'}</span>
                         </button>
                     `;
                 }

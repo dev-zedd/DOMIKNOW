@@ -7,10 +7,24 @@ const responseHelper = require('../utils/responseHelper');
 const supabase = require('../config/supabaseClient');
 const { uploadFile, getSignedUrl, isStorageObjectNotFound } = require('../utils/storageHelper');
 
+let maintenanceComplianceService = null;
+let maintenancePersonnelModel = null;
+try {
+    maintenanceComplianceService = require('../services/maintenanceComplianceService');
+    maintenancePersonnelModel = require('../models/maintenancePersonnelModel');
+} catch (_) {}
+
 const MAINTENANCE_CATEGORIES = new Set([
     'plumbing', 'electrical', 'aircon', 'door', 'roof', 'internet', 'appliance', 'others'
 ]);
 const MAINTENANCE_PRIORITIES = new Set(['low', 'medium', 'high', 'emergency']);
+
+function getRequestMeta(request) {
+    if (request && typeof maintenanceModel?.parseMaintenanceMeta === 'function') {
+        return maintenanceModel.parseMaintenanceMeta(request);
+    }
+    return (request && request.meta) || {};
+}
 
 const maintenanceController = {
     // ── Tenant: Create request ──────────────────────────────────────────
@@ -138,6 +152,16 @@ const maintenanceController = {
             if (decision === 'rework') {
                 newStatus = 'repairing';
                 note = `Tenant requested rework. Remarks: ${remarks || 'None'}`;
+            } else {
+                // Payment verification gate for billable & adjudicated work orders
+                const meta = getRequestMeta(request);
+                const isBillableAndAdjudicated = ['landlord', 'tenant', 'shared'].includes(meta.liability_party) && meta.total_cost > 0;
+                if (isBillableAndAdjudicated && meta.payment_status !== 'verified') {
+                    return responseHelper.error(
+                        res,
+                        `Payment verification required: This work order has an assessed balance of ₱${meta.total_cost.toFixed(2)} (${meta.liability_party.toUpperCase()} liability) that must be submitted and verified by Admin before the ticket can be formally closed.`
+                    );
+                }
             }
 
             const updated = await maintenanceModel.updateRequestStatus(id, { status: newStatus });
@@ -490,6 +514,14 @@ const maintenanceController = {
                 return responseHelper.error(res, 'You can only assign maintenance workers from your own team.', null, 403);
             }
 
+            // Qualification and compliance verification
+            if (maintenanceComplianceService && typeof maintenanceComplianceService.checkEligibility === 'function') {
+                const eligibility = await maintenanceComplianceService.checkEligibility(assigned_maintenance_id, request.issue_category);
+                if (!eligibility.eligible) {
+                    return responseHelper.error(res, `Assignment blocked: Technician is not eligible. ${eligibility.reasons.join('; ')}`);
+                }
+            }
+
             // Create assignment details
             await maintenanceModel.createAssignment({
                 maintenance_request_id: id,
@@ -497,6 +529,16 @@ const maintenanceController = {
                 due_date,
                 instructions
             });
+
+            if (maintenancePersonnelModel && typeof maintenancePersonnelModel.createVerifiedAssignment === 'function') {
+                await maintenancePersonnelModel.createVerifiedAssignment({
+                    maintenance_request_id: id,
+                    maintenance_personnel_id: assigned_maintenance_id,
+                    due_date,
+                    instructions: instructions || 'Landlord assigned technician.',
+                    compliance_verified_by: landlordId
+                }).catch(() => {});
+            }
 
             // Update request status to assigned
             const updated = await maintenanceModel.updateRequestStatus(id, {
@@ -717,14 +759,17 @@ const maintenanceController = {
                 accepted: 'travelling',
                 travelling: 'arrived',
                 arrived: 'repairing',
-                approved: 'repairing'
+                approved: 'repairing',
+                quote_approved: 'repairing'
             }[request.status];
             if (status !== allowedNextStatus) {
                 return responseHelper.error(
                     res,
                     allowedNextStatus
                         ? `The next valid task status is ${allowedNextStatus}.`
-                        : 'This task cannot receive another progress update in its current state.'
+                        : (['inspection_submitted', 'quote_pending'].includes(request.status)
+                            ? 'This work order is currently awaiting Admin liability adjudication or quotation approval.'
+                            : 'This task cannot receive another progress update in its current state.')
                 );
             }
 
@@ -1020,6 +1065,17 @@ const maintenanceController = {
                 account_status: 'active'
             });
 
+            if (maintenanceComplianceService && typeof maintenanceComplianceService.initStaffRecords === 'function') {
+                await maintenanceComplianceService.initStaffRecords(newWorker.id, {
+                    department: trade ? `${trade.trim()} Team` : 'Property Maintenance',
+                    service_area: 'Landlord Assigned Properties',
+                    created_by: landlordId
+                }).catch(() => {});
+            }
+            if (trade && maintenancePersonnelModel && typeof maintenancePersonnelModel.syncSkills === 'function') {
+                await maintenancePersonnelModel.syncSkills(newWorker.id, [trade.trim()]).catch(() => {});
+            }
+
             await maintenanceModel.ensureWorkerAccreditation(newWorker.id);
             await auditLogModel.log(landlordId, 'CREATE_MAINTENANCE_WORKER', `Created worker ${newWorker.email}`);
 
@@ -1191,6 +1247,14 @@ const maintenanceController = {
                 return responseHelper.error(res, 'Selected user is not registered as maintenance personnel.');
             }
 
+            // Qualification and compliance verification
+            if (maintenanceComplianceService && typeof maintenanceComplianceService.checkEligibility === 'function') {
+                const eligibility = await maintenanceComplianceService.checkEligibility(assigned_maintenance_id, request.issue_category);
+                if (!eligibility.eligible) {
+                    return responseHelper.error(res, `Dispatch blocked: Technician is not eligible. ${eligibility.reasons.join('; ')}`);
+                }
+            }
+
             // Create assignment details
             await maintenanceModel.createAssignment({
                 maintenance_request_id: id,
@@ -1198,6 +1262,16 @@ const maintenanceController = {
                 due_date,
                 instructions: instructions || 'Dispatched by Platform Administrator for on-site assessment.'
             });
+
+            if (maintenancePersonnelModel && typeof maintenancePersonnelModel.createVerifiedAssignment === 'function') {
+                await maintenancePersonnelModel.createVerifiedAssignment({
+                    maintenance_request_id: id,
+                    maintenance_personnel_id: assigned_maintenance_id,
+                    due_date,
+                    instructions: instructions || 'Dispatched by Platform Administrator for on-site assessment.',
+                    compliance_verified_by: adminId
+                }).catch(() => {});
+            }
 
             // Update request status to assigned
             const updated = await maintenanceModel.updateRequestStatus(id, {
@@ -1276,6 +1350,18 @@ const maintenanceController = {
                 return responseHelper.error(res, 'Maintenance request not found.', null, 404);
             }
 
+            // Guard: No liability decision before technician inspection
+            const hasInspection = request.status === 'inspection_submitted' ||
+                                  Boolean(request.problem_found) ||
+                                  Boolean(request.before_photo_url) ||
+                                  Boolean(request.recommendations && request.recommendations.includes('[TECH_FINDINGS:'));
+            if (!hasInspection) {
+                return responseHelper.error(
+                    res,
+                    'Neutral arbitration requires on-site inspection findings. Technician must submit an inspection report before Admin can determine legal liability.'
+                );
+            }
+
             const parsedLabor = Number(labor_cost) || Number(request.labor_cost) || 0;
             const parsedMaterial = Number(material_cost) || Number(request.material_cost) || 0;
             const total = parsedLabor + parsedMaterial;
@@ -1290,9 +1376,9 @@ const maintenanceController = {
             const quoteTag = ['completed', 'verified', 'closed'].includes(request.status) ? 'APPROVED' : 'PENDING_APPROVAL';
             const newRecommendations = `${initTag}[LIABILITY:${liability_party.toUpperCase()}][BASIS:${basisTag}][QUOTE:${quoteTag}][ADMIN_ADJUDICATED:TRUE] ${cleanRec} ${admin_notes ? `(Admin notes: ${admin_notes})` : ''}`.trim();
 
-            let nextStatus = request.status;
-            if (request.status === 'pending') {
-                nextStatus = 'approved';
+            let nextStatus = 'quote_pending';
+            if (['completed', 'verified', 'closed'].includes(request.status)) {
+                nextStatus = request.status;
             }
 
             const updated = await maintenanceModel.updateRequestStatus(id, {
@@ -1387,28 +1473,42 @@ const maintenanceController = {
                 return responseHelper.error(res, 'A user with this email address is already registered.');
             }
 
-            const hashedPassword = await bcrypt.hash(password, 10);
+            const saltRounds = 12;
+            const password_hash = await bcrypt.hash(password, saltRounds);
             const displayName = specialization ? `${full_name.trim()} (${specialization.trim()})` : full_name.trim();
 
-            const { data: newWorker, error: createErr } = await supabase
-                .from('users')
-                .insert([{
-                    full_name: displayName,
-                    email: email.trim().toLowerCase(),
-                    password: hashedPassword,
-                    contact_number: contact_number ? contact_number.trim() : null,
-                    role: 'maintenance',
-                    is_verified: true,
-                    status: 'active'
-                }])
-                .select('id, full_name, email, contact_number, role, created_at')
-                .single();
+            const newWorker = await userModel.createUser({
+                full_name: displayName,
+                email: email.trim().toLowerCase(),
+                password_hash,
+                contact_number: contact_number ? contact_number.trim() : null,
+                role: 'maintenance',
+                is_verified: true,
+                account_status: 'active'
+            });
 
-            if (createErr) throw createErr;
+            if (maintenanceComplianceService && typeof maintenanceComplianceService.initStaffRecords === 'function') {
+                await maintenanceComplianceService.initStaffRecords(newWorker.id, {
+                    department: specialization ? `${specialization.trim()} Department` : 'General Maintenance',
+                    trade: specialization,
+                    service_area: 'Global / All Properties',
+                    created_by: adminId
+                }).catch(() => {});
+            }
+            if (specialization && maintenancePersonnelModel && typeof maintenancePersonnelModel.syncSkills === 'function') {
+                await maintenancePersonnelModel.syncSkills(newWorker.id, [specialization.trim()]).catch(() => {});
+            }
 
             await maintenanceModel.ensureWorkerAccreditation(newWorker.id);
             await auditLogModel.log(adminId, 'ADMIN_CREATE_WORKER', `Admin registered platform technician ${displayName} (${email})`);
-            return responseHelper.success(res, 'Platform maintenance personnel registered successfully.', newWorker, 201);
+            return responseHelper.success(res, 'Platform maintenance personnel registered successfully.', {
+                id: newWorker.id,
+                full_name: newWorker.full_name,
+                email: newWorker.email,
+                contact_number: newWorker.contact_number,
+                role: newWorker.role,
+                created_at: newWorker.created_at
+            }, 201);
         } catch (error) {
             console.error('Admin create worker error:', error);
             return responseHelper.error(res, 'Failed to register platform technician.', error, 500);
@@ -1471,7 +1571,7 @@ const maintenanceController = {
             const initTag = isLandlordInitiated ? '[INITIATED_BY:LANDLORD]' : '';
             const taggedRecommendations = `${initTag}[TECH_FINDINGS:${problem_found}][TECH_RECOMMENDED_LIABILITY:${chosenParty}][TECH_BASIS:${chosenBasis}][LIABILITY:PENDING_ADMIN_DETERMINATION][QUOTE:PENDING_ADMIN_VALIDATION] ${recommendations || ''}`.trim();
 
-            const nextStatus = ['repairing', 'assigned'].includes(request.status) ? request.status : 'repairing';
+            const nextStatus = 'inspection_submitted';
 
             const updated = await maintenanceModel.updateRequestStatus(id, {
                 status: nextStatus,
@@ -1491,7 +1591,7 @@ const maintenanceController = {
             await auditLogModel.log(workerId, 'WORKER_SUBMIT_INSPECTION', `Technician submitted diagnostic inspection for request ${id}`);
 
             // Notify Landlord & Admin
-            await Promise.all([
+            const notifs = [
                 notificationModel.create({
                     user_id: request.landlord_id,
                     type: 'maintenance_quote_ready',
@@ -1499,7 +1599,21 @@ const maintenanceController = {
                     message: `Technician completed diagnostic for ${request.issue_title}. Assessment is available for review.`,
                     reference_id: id
                 })
-            ]);
+            ];
+
+            const { data: admins } = await supabase.from('users').select('id').eq('role', 'admin');
+            if (admins && admins.length > 0) {
+                for (const adm of admins) {
+                    notifs.push(notificationModel.create({
+                        user_id: adm.id,
+                        type: 'maintenance_inspection_submitted',
+                        title: 'Diagnostic Inspection Awaiting Liability Ruling',
+                        message: `Technician submitted inspection for ${request.issue_title}. Impartial legal liability ruling required.`,
+                        reference_id: id
+                    }));
+                }
+            }
+            await Promise.allSettled(notifs);
 
             return responseHelper.success(res, 'Diagnostic inspection & quotation submitted successfully.', updated);
         } catch (error) {
@@ -1524,7 +1638,7 @@ const maintenanceController = {
                 return responseHelper.error(res, 'Maintenance request not found.', null, 404);
             }
 
-            const meta = maintenanceModel.parseMaintenanceMeta(request);
+            const meta = getRequestMeta(request);
             const isAuthorized = userId === request.landlord_id || userId === request.tenant_id || req.user.role === 'admin';
             if (!isAuthorized) {
                 return responseHelper.error(res, 'You are not authorized to decide on this repair quotation.', null, 403);
@@ -1534,13 +1648,15 @@ const maintenanceController = {
             let note = '';
             let newRec = request.recommendations || '';
 
+            const userRole = (req.user.role || (userId === request.landlord_id ? 'landlord' : (userId === request.tenant_id ? 'tenant' : 'admin'))).toUpperCase();
             if (decision === 'approve') {
-                newStatus = 'approved';
+                newStatus = 'quote_approved';
                 newRec = newRec.replace(/\[QUOTE:[A-Z_]+\]/i, '[QUOTE:APPROVED]');
-                note = `${req.user.role.toUpperCase()} approved the repair quotation of ₱${meta.total_cost.toFixed(2)}. Technician is authorized to begin repairs.`;
+                note = `${userRole} approved the repair quotation of ₱${(meta.total_cost || 0).toFixed(2)}. Technician is authorized to begin repairs.`;
             } else {
+                newStatus = 'quote_pending';
                 newRec = newRec.replace(/\[QUOTE:[A-Z_]+\]/i, '[QUOTE:DISPUTED]');
-                note = `${req.user.role.toUpperCase()} disputed the quotation. Remarks: ${remarks || 'None'}`;
+                note = `${userRole} disputed the quotation. Remarks: ${remarks || 'None'}`;
             }
 
             const updated = await maintenanceModel.updateRequestStatus(id, {
@@ -1606,7 +1722,7 @@ const maintenanceController = {
                 }
             }
 
-            const meta = maintenanceModel.parseMaintenanceMeta(request);
+            const meta = getRequestMeta(request);
             const payerRole = paid_by || (userId === request.tenant_id ? 'tenant' : 'landlord');
             const payAmount = Number(amount) || meta.total_cost;
             const cleanRec = (request.recommendations || '')
@@ -1661,7 +1777,7 @@ const maintenanceController = {
                 return responseHelper.error(res, 'Maintenance request not found.', null, 404);
             }
 
-            const meta = maintenanceModel.parseMaintenanceMeta(request);
+            const meta = getRequestMeta(request);
             const cleanRec = (request.recommendations || '')
                 .replace(/\[PAYMENT:[A-Z_]+\]/gi, '')
                 .replace(/\[VERIFIED_BY:[^\]]+\]/gi, '')
@@ -1671,8 +1787,13 @@ const maintenanceController = {
                 .replace(/\[REJECTED_AT:[^\]]+\]/gi, '')
                 .trim();
             const newRec = `${cleanRec} [PAYMENT:VERIFIED][VERIFIED_BY:ADMIN][VERIFIED_AT:${new Date().toISOString()}]`.trim();
+            let targetStatus = request.status;
+            if (request.status === 'verified') {
+                targetStatus = 'closed';
+            }
 
             const updated = await maintenanceModel.updateRequestStatus(id, {
+                status: targetStatus,
                 recommendations: newRec
             });
 
@@ -1680,8 +1801,8 @@ const maintenanceController = {
 
             await maintenanceModel.createProgressUpdate({
                 maintenance_request_id: id,
-                status_update: request.status,
-                notes: `Maintenance payment of ₱${payAmount.toFixed(2)} was verified and confirmed by Administrator.`
+                status_update: targetStatus,
+                notes: `Maintenance payment of ₱${payAmount.toFixed(2)} was verified and confirmed by Administrator.${targetStatus === 'closed' ? ' Work order has been successfully settled and closed.' : ''}`
             });
 
             await auditLogModel.log(adminId, 'VERIFY_MAINTENANCE_PAYMENT', `Verified maintenance payment ₱${payAmount} for request ${id}`);
@@ -1729,7 +1850,7 @@ const maintenanceController = {
                 return responseHelper.error(res, 'Maintenance request not found.', null, 404);
             }
 
-            const meta = maintenanceModel.parseMaintenanceMeta(request);
+            const meta = getRequestMeta(request);
             const safeReason = reason.trim().replace(/[\[\]]/g, '');
             const cleanRec = (request.recommendations || '')
                 .replace(/\[PAYMENT:[A-Z_]+\]/gi, '')
