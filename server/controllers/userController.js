@@ -148,7 +148,8 @@ const userController = {
     // Admin routes
     async getAllUsers(req, res) {
         try {
-            const users = await userModel.getAllUsers();
+            const { status, role } = req.query;
+            const users = await userModel.getAllUsers({ status, role });
             return responseHelper.success(res, 'Users retrieved', users);
         } catch (error) {
             console.error('Get all users error:', error);
@@ -173,16 +174,27 @@ const userController = {
     async updateUserStatus(req, res) {
         try {
             const { id } = req.params;
-            const { account_status } = req.body;
+            const { account_status, reason } = req.body;
 
             const allowedStatuses = ['active', 'disabled', 'rejected', 'pending'];
             if (!allowedStatuses.includes(account_status)) {
                 return responseHelper.error(res, 'Invalid account status');
             }
 
+            const targetUser = await userModel.findById(id);
+            if (!targetUser) {
+                return responseHelper.error(res, 'User not found', null, 404);
+            }
+            if (targetUser.role === 'admin') {
+                return responseHelper.error(res, 'Administrator account statuses cannot be modified.');
+            }
+
             const updatedUser = await userModel.updateStatus(id, account_status);
 
-            await auditLogModel.log(req.user.id, `ADMIN_USER_STATUS_UPDATE`, `Admin changed user ${id} status to ${account_status}`);
+            const auditDesc = reason 
+                ? `Admin changed user ${id} (${targetUser.email}) status to ${account_status}. Reason: ${reason}`
+                : `Admin changed user ${id} (${targetUser.email}) status to ${account_status}`;
+            await auditLogModel.log(req.user.id, `ADMIN_USER_STATUS_UPDATE`, auditDesc);
 
             const statusCopy = {
                 active: {
@@ -191,11 +203,11 @@ const userController = {
                 },
                 disabled: {
                     title: 'Account disabled',
-                    message: 'Your DOMIKNOW account was disabled by an administrator. Contact platform support if you need assistance.'
+                    message: reason ? `Your DOMIKNOW account was disabled: ${reason}` : 'Your DOMIKNOW account was disabled by an administrator. Contact platform support if you need assistance.'
                 },
                 rejected: {
                     title: 'Account application not approved',
-                    message: 'Your DOMIKNOW account application was not approved. Contact platform support for clarification.'
+                    message: reason ? `Your DOMIKNOW account application was rejected: ${reason}` : 'Your DOMIKNOW account application was not approved. Contact platform support for clarification.'
                 },
                 pending: {
                     title: 'Account review pending',

@@ -153,12 +153,20 @@ const userModel = {
         return data;
     },
 
-    async getAllUsers() {
-        const { data, error } = await supabase
+    async getAllUsers(filter = {}) {
+        let query = supabase
             .from('users')
             .select('id, full_name, email, role, is_verified, account_status, created_at')
             .order('created_at', { ascending: false });
-            
+
+        if (filter && filter.status) {
+            query = query.eq('account_status', filter.status);
+        }
+        if (filter && filter.role) {
+            query = query.eq('role', filter.role);
+        }
+
+        const { data, error } = await query;
         if (error) throw error;
         return data;
     },

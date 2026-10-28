@@ -16,6 +16,29 @@
         <!-- Status Feedback Notification -->
         <div id="actionFeedback" class="alert alert-success hidden" role="status" aria-live="polite"></div>
 
+        <!-- Filter Controls -->
+        <div style="display: flex; gap: 12px; margin-bottom: 20px; flex-wrap: wrap; align-items: center; justify-content: space-between;">
+            <div style="display: flex; gap: 12px; flex-wrap: wrap; align-items: center;">
+                <select id="statusFilter" class="form-input" style="padding: 8px 14px; font-size: 13px; min-width: 170px;">
+                    <option value="">All Account Statuses</option>
+                    <option value="pending">Pending Review</option>
+                    <option value="active">Active</option>
+                    <option value="disabled">Disabled</option>
+                    <option value="rejected">Rejected</option>
+                </select>
+                <select id="roleFilter" class="form-input" style="padding: 8px 14px; font-size: 13px; min-width: 150px;">
+                    <option value="">All Roles</option>
+                    <option value="landlord">Landlord</option>
+                    <option value="maintenance">Maintenance</option>
+                    <option value="tenant">Tenant</option>
+                    <option value="admin">Administrator</option>
+                </select>
+            </div>
+            <div style="min-width: 260px;">
+                <input type="search" id="userSearchInput" class="form-input" placeholder="Search by name or email..." style="padding: 8px 14px; font-size: 13px;">
+            </div>
+        </div>
+
         <!-- Users Table Card -->
         <div class="table-card admin-table-card">
             <table class="admin-data-table admin-record-table">
@@ -47,15 +70,42 @@
     <script src="../../js/dashboard.js"></script>
     <script>
         const token = localStorage.getItem('domiknow_token');
+        let allLoadedUsers = [];
 
-        document.addEventListener('DOMContentLoaded', loadUsers);
+        document.addEventListener('DOMContentLoaded', () => {
+            const statusFilter = document.getElementById('statusFilter');
+            const roleFilter = document.getElementById('roleFilter');
+            const searchInput = document.getElementById('userSearchInput');
+
+            // Read URL query params if linked with ?status=pending
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.has('status')) {
+                statusFilter.value = urlParams.get('status');
+            }
+            if (urlParams.has('role')) {
+                roleFilter.value = urlParams.get('role');
+            }
+
+            statusFilter.addEventListener('change', loadUsers);
+            roleFilter.addEventListener('change', loadUsers);
+            searchInput.addEventListener('input', applySearchFilter);
+
+            loadUsers();
+        });
 
         async function loadUsers() {
             if (!token) return;
             const tableBody = document.getElementById('usersTableBody');
+            const status = document.getElementById('statusFilter')?.value || '';
+            const role = document.getElementById('roleFilter')?.value || '';
+
+            const params = new URLSearchParams();
+            if (status) params.append('status', status);
+            if (role) params.append('role', role);
+            const queryStr = params.toString() ? `?${params.toString()}` : '';
 
             try {
-                const response = await fetch('/api/users', {
+                const response = await fetch('/api/users' + queryStr, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
 
@@ -65,91 +115,109 @@
                 }
 
                 const result = await response.json();
-                const users = result.data || [];
-
-                if (users.length === 0) {
-                    tableBody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: var(--color-text-muted); padding: 36px 16px;">No users found in system database.</td></tr>`;
-                    return;
-                }
-
-                tableBody.innerHTML = '';
-                users.forEach(user => {
-                    const row = document.createElement('tr');
-
-                    // Format role badge class
-                    let roleBadgeClass = 'navbar-badge-tenant';
-                    if (user.role === 'landlord') roleBadgeClass = 'navbar-badge-landlord';
-                    if (user.role === 'maintenance') roleBadgeClass = 'navbar-badge-maintenance';
-                    if (user.role === 'admin') roleBadgeClass = 'navbar-badge-admin';
-
-                    // Format status badge class
-                    let statusClass = 'status-pending';
-                    if (user.account_status === 'active') statusClass = 'status-active';
-                    if (user.account_status === 'disabled') statusClass = 'status-rejected';
-                    if (user.account_status === 'rejected') statusClass = 'status-rejected';
-
-                    // Format date
-                    const regDate = user.created_at ? new Date(user.created_at).toLocaleDateString(undefined, {
-                        year: 'numeric', month: 'short', day: 'numeric'
-                    }) : '—';
-
-                    // Avatar Initial
-                    const displayName = user.full_name || user.email || 'User';
-                    const avatarInitial = (displayName.charAt(0) || 'U').toUpperCase();
-
-                    // Build action buttons HTML
-                    let actionsHtml = '';
-                    if (user.role !== 'admin') {
-                        if (user.account_status === 'pending') {
-                            actionsHtml += `<button type="button" data-user-id="${user.id}" data-action="active" class="btn-action btn-action-approve"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg><span>Approve</span></button>`;
-                            actionsHtml += `<button type="button" data-user-id="${user.id}" data-action="rejected" class="btn-action btn-action-reject"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg><span>Reject</span></button>`;
-                        } else if (user.account_status === 'active') {
-                            actionsHtml += `<button type="button" data-user-id="${user.id}" data-action="disabled" class="btn-action btn-action-disable"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg><span>Disable</span></button>`;
-                        } else if (user.account_status === 'disabled' || user.account_status === 'rejected') {
-                            actionsHtml += `<button type="button" data-user-id="${user.id}" data-action="active" class="btn-action btn-action-reactivate"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg><span>Reactivate</span></button>`;
-                        }
-                    } else {
-                        actionsHtml = `<span class="admin-badge-protected"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg><span>Administrator</span></span>`;
-                    }
-
-                    row.innerHTML = `
-                        <td>
-                            <div class="user-identity-cell">
-                                <span class="user-avatar-badge user-avatar-badge--${domiknowEscapeHtml(user.role || 'default')}" aria-hidden="true">${avatarInitial}</span>
-                                <strong class="user-name-text">${domiknowEscapeHtml(user.full_name || 'Unnamed')}</strong>
-                            </div>
-                        </td>
-                        <td><span class="user-email-text">${domiknowEscapeHtml(user.email)}</span></td>
-                        <td style="text-align: center;"><span class="navbar-badge ${roleBadgeClass}">${domiknowEscapeHtml(user.role)}</span></td>
-                        <td style="text-align: center;">
-                            <span class="verify-chip verify-chip--${user.is_verified ? 'yes' : 'no'}">
-                                ${user.is_verified 
-                                    ? '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg> Verified' 
-                                    : '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg> Unverified'}
-                            </span>
-                        </td>
-                        <td style="text-align: center;"><span class="status-badge ${statusClass}">${domiknowEscapeHtml(user.account_status)}</span></td>
-                        <td style="text-align: center;"><span class="user-date-text">${regDate}</span></td>
-                        <td style="text-align: right;"><div class="action-group" style="justify-content: flex-end;">${actionsHtml}</div></td>
-                    `;
-
-                    tableBody.appendChild(row);
-
-                    // Attach event listeners to action buttons
-                    const actionButtons = row.querySelectorAll('.btn-action[data-user-id]');
-                    actionButtons.forEach(btn => {
-                        btn.addEventListener('click', function () {
-                            const userId = this.getAttribute('data-user-id');
-                            const newStatus = this.getAttribute('data-action');
-                            updateStatus(userId, newStatus);
-                        });
-                    });
-                });
+                allLoadedUsers = result.data || [];
+                renderUsersTable(allLoadedUsers);
 
             } catch (err) {
                 console.error('Error loading directory:', err);
                 tableBody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: var(--color-error-text); padding: 32px 16px;">Error contacting registration service.</td></tr>`;
             }
+        }
+
+        function applySearchFilter() {
+            const query = document.getElementById('userSearchInput')?.value.toLowerCase().trim() || '';
+            if (!query) {
+                renderUsersTable(allLoadedUsers);
+                return;
+            }
+            const filtered = allLoadedUsers.filter(u => {
+                return (u.full_name && u.full_name.toLowerCase().includes(query)) ||
+                       (u.email && u.email.toLowerCase().includes(query)) ||
+                       (u.role && u.role.toLowerCase().includes(query));
+            });
+            renderUsersTable(filtered);
+        }
+
+        function renderUsersTable(users) {
+            const tableBody = document.getElementById('usersTableBody');
+            if (users.length === 0) {
+                tableBody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: var(--color-text-muted); padding: 36px 16px;">No users found matching the selected filter criteria.</td></tr>`;
+                return;
+            }
+
+            tableBody.innerHTML = '';
+            users.forEach(user => {
+                const row = document.createElement('tr');
+
+                // Format role badge class
+                let roleBadgeClass = 'navbar-badge-tenant';
+                if (user.role === 'landlord') roleBadgeClass = 'navbar-badge-landlord';
+                if (user.role === 'maintenance') roleBadgeClass = 'navbar-badge-maintenance';
+                if (user.role === 'admin') roleBadgeClass = 'navbar-badge-admin';
+
+                // Format status badge class
+                let statusClass = 'status-pending';
+                if (user.account_status === 'active') statusClass = 'status-active';
+                if (user.account_status === 'disabled') statusClass = 'status-rejected';
+                if (user.account_status === 'rejected') statusClass = 'status-rejected';
+
+                // Format date
+                const regDate = user.created_at ? new Date(user.created_at).toLocaleDateString(undefined, {
+                    year: 'numeric', month: 'short', day: 'numeric'
+                }) : '—';
+
+                // Avatar Initial
+                const displayName = user.full_name || user.email || 'User';
+                const avatarInitial = (displayName.charAt(0) || 'U').toUpperCase();
+
+                // Build action buttons HTML
+                let actionsHtml = '';
+                if (user.role !== 'admin') {
+                    if (user.account_status === 'pending') {
+                        actionsHtml += `<button type="button" data-user-id="${user.id}" data-action="active" class="btn-action btn-action-approve"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg><span>Approve</span></button>`;
+                        actionsHtml += `<button type="button" data-user-id="${user.id}" data-action="rejected" class="btn-action btn-action-reject"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg><span>Reject</span></button>`;
+                    } else if (user.account_status === 'active') {
+                        actionsHtml += `<button type="button" data-user-id="${user.id}" data-action="disabled" class="btn-action btn-action-disable"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg><span>Disable</span></button>`;
+                    } else if (user.account_status === 'disabled' || user.account_status === 'rejected') {
+                        actionsHtml += `<button type="button" data-user-id="${user.id}" data-action="active" class="btn-action btn-action-reactivate"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg><span>Reactivate</span></button>`;
+                    }
+                } else {
+                    actionsHtml = `<span class="admin-badge-protected"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg><span>Administrator</span></span>`;
+                }
+
+                row.innerHTML = `
+                    <td>
+                        <div class="user-identity-cell">
+                            <span class="user-avatar-badge user-avatar-badge--${domiknowEscapeHtml(user.role || 'default')}" aria-hidden="true">${avatarInitial}</span>
+                            <strong class="user-name-text">${domiknowEscapeHtml(user.full_name || 'Unnamed')}</strong>
+                        </div>
+                    </td>
+                    <td><span class="user-email-text">${domiknowEscapeHtml(user.email)}</span></td>
+                    <td style="text-align: center;"><span class="navbar-badge ${roleBadgeClass}">${domiknowEscapeHtml(user.role)}</span></td>
+                    <td style="text-align: center;">
+                        <span class="verify-chip verify-chip--${user.is_verified ? 'yes' : 'no'}">
+                            ${user.is_verified 
+                                ? '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg> Verified' 
+                                : '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg> Unverified'}
+                        </span>
+                    </td>
+                    <td style="text-align: center;"><span class="status-badge ${statusClass}">${domiknowEscapeHtml(user.account_status)}</span></td>
+                    <td style="text-align: center;"><span class="user-date-text">${regDate}</span></td>
+                    <td style="text-align: right;"><div class="action-group" style="justify-content: flex-end;">${actionsHtml}</div></td>
+                `;
+
+                tableBody.appendChild(row);
+
+                // Attach event listeners to action buttons
+                const actionButtons = row.querySelectorAll('.btn-action[data-user-id]');
+                actionButtons.forEach(btn => {
+                    btn.addEventListener('click', function () {
+                        const userId = this.getAttribute('data-user-id');
+                        const newStatus = this.getAttribute('data-action');
+                        updateStatus(userId, newStatus);
+                    });
+                });
+            });
         }
 
         async function updateStatus(userId, newStatus) {
@@ -169,6 +237,12 @@
             });
             if (!confirmUpdate) return;
 
+            let reason = null;
+            if (newStatus === 'rejected' || newStatus === 'disabled') {
+                const promptReason = prompt(`Optional: Enter notes or reason for setting this account to ${newStatus}:`);
+                if (promptReason !== null) reason = promptReason.trim();
+            }
+
             const feedbackEl = document.getElementById('actionFeedback');
             try {
                 const response = await fetch(`/api/users/${userId}/status`, {
@@ -177,7 +251,7 @@
                         'Content-Type': 'application/json',
                         'Authorization': `Bearer ${token}`
                     },
-                    body: JSON.stringify({ account_status: newStatus })
+                    body: JSON.stringify({ account_status: newStatus, ...(reason && { reason }) })
                 });
 
                 if (response.ok) {

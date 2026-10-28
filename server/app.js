@@ -22,7 +22,6 @@ const paymentRoutes = require('./routes/paymentRoutes');
 const adminMonitorRoutes = require('./routes/adminMonitorRoutes');
 const maintenanceRoutes = require('./routes/maintenanceRoutes');
 const maintenanceComplianceRoutes = require('./routes/maintenanceComplianceRoutes');
-const reportRoutes = require('./routes/reportRoutes');
 const feedbackRoutes = require('./routes/feedbackRoutes');
 const storageRoutes = require('./routes/storageRoutes');
 const ratingsRoutes = require('./routes/ratingsRoutes');

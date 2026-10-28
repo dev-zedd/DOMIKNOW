@@ -502,7 +502,6 @@ function renderNewDashboardLayout(user) {
     const parentNavigationPages = {
         admin: {
             'property-review-details.html': 'property-review.html',
-            'report-detail.html': 'reports.html',
             'maintenance-onboarding.html': 'maintenance-onboarding.html',
             'maintenance-screening.html': 'maintenance-screening.html',
             'maintenance-access.html': 'maintenance-access.html',
