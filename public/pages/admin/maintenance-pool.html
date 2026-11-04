@@ -290,6 +290,7 @@
         let openRequests = [];
 
         document.addEventListener('DOMContentLoaded', () => {
+            if (!token) return;
             initAssignmentModal();
             loadGlobalPool();
             loadOpenRequests();

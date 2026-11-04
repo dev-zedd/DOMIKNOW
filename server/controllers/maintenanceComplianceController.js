@@ -1,4 +1,5 @@
 const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 const userModel = require('../models/userModel');
 const verificationModel = require('../models/verificationModel');
 const maintenancePersonnelModel = require('../models/maintenancePersonnelModel');
@@ -200,10 +201,23 @@ const maintenanceComplianceController = {
             await auditLogModel.log(user.id, 'EMAIL_VERIFIED', 'Maintenance staff verified email via onboarding invite.');
             await auditLogModel.log(user.id, 'PASSWORD_SET', 'Maintenance staff set their account password.');
 
-            return responseHelper.success(res, 'Account verified and password set successfully. You can now log in.', {
-                user_id: user.id,
-                email: user.email,
-                account_status: 'active'
+            // Generate JWT session token for seamless authentication
+            const token = jwt.sign(
+                { id: user.id, role: user.role || 'maintenance' },
+                process.env.JWT_SECRET,
+                { expiresIn: '7d' }
+            );
+
+            return responseHelper.success(res, 'Account verified and password set successfully. Welcome to DomiKnow!', {
+                token,
+                user: {
+                    id: user.id,
+                    email: user.email,
+                    full_name: user.full_name,
+                    role: user.role || 'maintenance',
+                    account_status: 'active'
+                },
+                user_id: user.id
             });
 
         } catch (error) {

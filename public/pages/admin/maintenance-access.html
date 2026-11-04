@@ -271,6 +271,7 @@
         let allPool = [];
 
         document.addEventListener('DOMContentLoaded', () => {
+            if (!token) return;
             initModal();
             loadAccessData();
 

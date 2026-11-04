@@ -85,6 +85,10 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+            // Clear any stale session or previous account token to prevent auth mismatch
+            localStorage.removeItem('domiknow_token');
+            localStorage.removeItem('domiknow_role');
+
             const urlParams = new URLSearchParams(window.location.search);
             const emailParam = urlParams.get('email');
             const codeParam = urlParams.get('code');
@@ -150,11 +154,24 @@
                     }
 
                     successEl.classList.remove('hidden');
-                    successEl.querySelector('.alert-text').textContent = 'Your maintenance account is now active! Redirecting to sign in...';
+                    const token = result.data?.token;
+                    const role = result.data?.user?.role || 'maintenance';
 
-                    setTimeout(() => {
-                        window.location.href = `login.html?email=${encodeURIComponent(email)}`;
-                    }, 2000);
+                    if (token) {
+                        localStorage.setItem('domiknow_token', token);
+                        localStorage.setItem('domiknow_role', role);
+                        successEl.querySelector('.alert-text').textContent = 'Account activated! Entering maintenance workspace...';
+
+                        setTimeout(() => {
+                            window.location.href = '../maintenance/dashboard.html';
+                        }, 1200);
+                    } else {
+                        successEl.querySelector('.alert-text').textContent = 'Your maintenance account is now active! Redirecting to sign in...';
+
+                        setTimeout(() => {
+                            window.location.href = `login.html?email=${encodeURIComponent(email)}`;
+                        }, 2000);
+                    }
 
                 } catch (err) {
                     showError(err.message);

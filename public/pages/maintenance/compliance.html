@@ -313,6 +313,7 @@
         let complianceData = null;
 
         document.addEventListener('DOMContentLoaded', () => {
+            if (!token) return;
             initUploadModal();
             loadCompliance();
 

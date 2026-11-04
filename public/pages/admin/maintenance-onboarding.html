@@ -295,6 +295,7 @@
         let allTechnicians = [];
 
         document.addEventListener('DOMContentLoaded', () => {
+            if (!token) return;
             initModalControls();
             loadTechnicians();
 

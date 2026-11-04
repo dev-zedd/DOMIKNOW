@@ -380,6 +380,7 @@
         let allRequirements = [];
 
         document.addEventListener('DOMContentLoaded', () => {
+            if (!token) return;
             initModals();
             loadRequirements();
             loadRecords();
