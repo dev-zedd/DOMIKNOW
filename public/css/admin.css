@@ -2478,6 +2478,30 @@ body[data-admin-page="policy-management"] #toastBanner[data-state="error"] {
   backdrop-filter: blur(5px);
 }
 
+/* Maintenance workforce workflow modals (Onboarding, Screening, Access, Pool) */
+#createTechnicianModal:not(.is-active),
+#inviteSuccessModal:not(.is-active),
+#reviewModal:not(.is-active),
+#requirementsModal:not(.is-active),
+#accessModal:not(.is-active),
+#assignmentModal:not(.is-active) {
+  display: none !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  animation: none !important;
+}
+
+#createTechnicianModal.is-active,
+#inviteSuccessModal.is-active,
+#reviewModal.is-active,
+#requirementsModal.is-active,
+#accessModal.is-active,
+#assignmentModal.is-active {
+  display: flex !important;
+  opacity: 1 !important;
+  pointer-events: auto !important;
+}
+
 .dashboard-layout-admin .modal-box,
 .dashboard-layout-admin .modal-container,
 .dashboard-layout-admin .chat-head-modal > div,

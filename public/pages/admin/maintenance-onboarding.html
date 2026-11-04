@@ -46,22 +46,25 @@
             font-weight: 700;
             color: var(--color-text-primary, #0f172a);
         }
-        .modal-overlay {
+                .modal-overlay {
             position: fixed;
             inset: 0;
             background: rgba(15, 23, 42, 0.6);
             backdrop-filter: blur(4px);
-            display: flex;
+            display: none;
             align-items: center;
             justify-content: center;
             z-index: 1000;
             opacity: 0;
             pointer-events: none;
             transition: opacity 0.2s ease;
+            animation: none !important;
         }
         .modal-overlay.is-active {
+            display: flex;
             opacity: 1;
             pointer-events: auto;
+            animation: none !important;
         }
         .modal-container {
             background: var(--color-surface, #ffffff);
