@@ -137,8 +137,8 @@ app.use('/api/notifications', notificationRoutes);
 app.use('/api', unitRoutes);
 // Keep the intentionally public feedback endpoint ahead of broad authenticated
 // /api routers so their router-level guards cannot intercept it.
-app.use('/api', feedbackRoutes);
 app.use('/api', maintenanceComplianceRoutes);
+app.use('/api', feedbackRoutes);
 app.use('/api', maintenanceRoutes);
 app.use('/api', ratingsRoutes);
 app.use('/api', propertyRatingRoutes);

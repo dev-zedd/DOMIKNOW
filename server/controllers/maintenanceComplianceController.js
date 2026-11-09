@@ -127,6 +127,10 @@ const maintenanceComplianceController = {
                 return responseHelper.error(res, 'Maintenance user not found.');
             }
 
+            if (user.is_verified) {
+                return responseHelper.error(res, 'This staff account has already been verified and activated.');
+            }
+
             // Generate new code
             const code = generateCode();
             const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
