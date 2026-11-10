@@ -152,6 +152,107 @@
         }
     }
 
+    async function checkWorkerComplianceBanner() {
+        const bannerContainer = document.getElementById('complianceNoticeBanner');
+        if (!bannerContainer) return;
+
+        const token = localStorage.getItem('domiknow_token');
+        if (!token) return;
+
+        try {
+            const response = await fetch('/api/maintenance/my-compliance', {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            if (!response.ok) return;
+
+            const result = await response.json();
+            const data = result.data;
+            if (!data) return;
+
+            // If technician is fully eligible, hide the banner
+            if (data.eligible) {
+                bannerContainer.classList.add('hidden');
+                bannerContainer.innerHTML = '';
+                return;
+            }
+
+            const records = Array.isArray(data.records) ? data.records : [];
+            const requirements = Array.isArray(data.requirements) ? data.requirements : [];
+
+            const recordMap = new Map();
+            records.forEach(r => recordMap.set(r.requirement_id, r));
+
+            const requiredList = requirements.filter(r => r.required_for_assignment && r.is_active);
+            let hasPendingDocs = false;
+            let hasUnderReview = false;
+
+            for (const req of requiredList) {
+                const rec = recordMap.get(req.id);
+                if (!rec || rec.status === 'pending') {
+                    hasPendingDocs = true;
+                } else if (rec.status === 'under_review') {
+                    hasUnderReview = true;
+                }
+            }
+
+            bannerContainer.classList.remove('hidden');
+
+            if (hasPendingDocs) {
+                bannerContainer.innerHTML = `
+                    <div class="alert alert-warning" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; padding: 18px 20px; border-radius: 12px; border: 1px solid #f59e0b; background: #fffbeb;">
+                        <div style="display: flex; gap: 14px; align-items: center;">
+                            <div style="width: 38px; height: 38px; border-radius: 50%; background: #fef3c7; color: #b45309; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                            </div>
+                            <div>
+                                <h3 style="margin: 0 0 4px 0; font-size: 15px; font-weight: 700; color: #92400e;">Action Required: Complete Screening & Compliance</h3>
+                                <p style="margin: 0; font-size: 13px; color: #78350f; line-height: 1.5;">Your account is active, but you cannot receive work order assignments yet. Please submit your required screening documents and complete your operational profile.</p>
+                            </div>
+                        </div>
+                        <a href="compliance.html" class="btn btn-primary" style="white-space: nowrap; font-size: 13px; font-weight: 600; padding: 8px 18px; border-radius: 8px; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
+                            Complete Screening Now &rarr;
+                        </a>
+                    </div>
+                `;
+            } else if (hasUnderReview || data.access?.access_status === 'pending') {
+                bannerContainer.innerHTML = `
+                    <div class="alert alert-info" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; padding: 18px 20px; border-radius: 12px; border: 1px solid #38bdf8; background: #f0f9ff;">
+                        <div style="display: flex; gap: 14px; align-items: center;">
+                            <div style="width: 38px; height: 38px; border-radius: 50%; background: #e0f2fe; color: #0284c7; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                            </div>
+                            <div>
+                                <h3 style="margin: 0 0 4px 0; font-size: 15px; font-weight: 750; color: #0369a1;">Screening Documents Under Review</h3>
+                                <p style="margin: 0; font-size: 13px; color: #075985; line-height: 1.5;">Your compliance documents have been submitted and are under administrator review. You will become eligible for task dispatch once approved.</p>
+                            </div>
+                        </div>
+                        <a href="compliance.html" class="btn btn-secondary" style="white-space: nowrap; font-size: 13px; font-weight: 600; padding: 8px 18px; border-radius: 8px; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
+                            View Compliance Status &rarr;
+                        </a>
+                    </div>
+                `;
+            } else {
+                const reason = (data.reasons && data.reasons[0]) || 'Your profile requires compliance review before tasks can be assigned.';
+                bannerContainer.innerHTML = `
+                    <div class="alert alert-warning" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; padding: 18px 20px; border-radius: 12px; border: 1px solid #f59e0b; background: #fffbeb;">
+                        <div style="display: flex; gap: 14px; align-items: center;">
+                            <div style="width: 38px; height: 38px; border-radius: 50%; background: #fef3c7; color: #b45309; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                            </div>
+                            <div>
+                                <h3 style="margin: 0 0 4px 0; font-size: 15px; font-weight: 700; color: #92400e;">Dispatch Assignment Status: Ineligible</h3>
+                                <p style="margin: 0; font-size: 13px; color: #78350f; line-height: 1.5;">${reason}</p>
+                            </div>
+                        </div>
+                        <a href="compliance.html" class="btn btn-primary" style="white-space: nowrap; font-size: 13px; font-weight: 600; padding: 8px 18px; border-radius: 8px; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
+                            Check Status & Settings &rarr;
+                        </a>
+                    </div>
+                `;
+            }
+        } catch (_) {}
+    }
+
     // ── Worker KPI & Analytics Visual Graph Renderers ──────────────────────────
 
     function renderWorkerCharts(tasks) {
@@ -617,6 +718,7 @@
 
         enhanceTaskContent();
         loadWorkSummary();
+        checkWorkerComplianceBanner();
     }
 
     if (document.readyState === 'loading') {

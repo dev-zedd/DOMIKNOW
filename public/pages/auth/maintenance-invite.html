@@ -160,11 +160,11 @@
                     if (token) {
                         localStorage.setItem('domiknow_token', token);
                         localStorage.setItem('domiknow_role', role);
-                        successEl.querySelector('.alert-text').textContent = 'Account activated! Entering maintenance workspace...';
+                        successEl.querySelector('.alert-text').innerHTML = '<strong>Password set successfully!</strong><br><span style="font-size: 0.9em; opacity: 0.95;">Step 2 of 2: Please complete your operational profile and submit your screening credentials to be eligible for work assignments. Redirecting to Compliance setup...</span>';
 
                         setTimeout(() => {
-                            window.location.href = '../maintenance/dashboard.html';
-                        }, 1200);
+                            window.location.href = '../maintenance/compliance.html?onboarding=true';
+                        }, 1800);
                     } else {
                         successEl.querySelector('.alert-text').textContent = 'Your maintenance account is now active! Redirecting to sign in...';
 
