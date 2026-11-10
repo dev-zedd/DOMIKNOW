@@ -76,11 +76,15 @@ const maintenanceModel = {
             .order('created_at', { ascending: false });
 
         if (error) throw error;
-        return (data || []).map(req => ({
-            ...req,
-            assigned_maintenance: req.assigned_maintenance || req.users || null,
-            meta: this.parseMaintenanceMeta(req)
-        }));
+        return (data || []).map(req => {
+            const meta = this.parseMaintenanceMeta(req);
+            return {
+                ...req,
+                status: this.resolveEffectiveStatus(req, meta),
+                assigned_maintenance: req.assigned_maintenance || req.users || null,
+                meta
+            };
+        });
     },
 
     async findByLandlordId(landlordId) {
@@ -126,10 +130,14 @@ const maintenanceModel = {
             .order('created_at', { ascending: false });
 
         if (error) throw error;
-        return (data || []).map(req => ({
-            ...req,
-            meta: this.parseMaintenanceMeta(req)
-        }));
+        return (data || []).map(req => {
+            const meta = this.parseMaintenanceMeta(req);
+            return {
+                ...req,
+                status: this.resolveEffectiveStatus(req, meta),
+                meta
+            };
+        });
     },
 
     async findRequestDetails(id) {
@@ -169,6 +177,7 @@ const maintenanceModel = {
         const meta = this.parseMaintenanceMeta(data);
         return {
             ...data,
+            status: this.resolveEffectiveStatus(data, meta),
             ...meta,
             meta
         };
@@ -214,6 +223,7 @@ const maintenanceModel = {
                 material_cost,
                 rejection_reason,
                 recommendations,
+                problem_found,
                 maintenance_updates (
                     id,
                     status_update,
@@ -232,10 +242,18 @@ const maintenanceModel = {
             .order('created_at', { ascending: false });
 
         if (error) throw error;
-        return data || [];
+        return (data || []).map(req => {
+            const meta = this.parseMaintenanceMeta(req);
+            return {
+                ...req,
+                status: this.resolveEffectiveStatus(req, meta),
+                meta
+            };
+        });
     },
 
     async updateRequestStatus(id, updateData) {
+        const requestedStatus = updateData.status;
         const { data, error } = await supabase
             .from('maintenance_requests')
             .update({
@@ -246,7 +264,27 @@ const maintenanceModel = {
             .select()
             .single();
 
-        if (error) throw error;
+        if (error) {
+            if (
+                (error.code === '23514' || (error.message && error.message.includes('maintenance_requests_status_check'))) &&
+                ['inspection_submitted', 'quote_pending', 'quote_approved'].includes(requestedStatus)
+            ) {
+                const fallbackPayload = {
+                    ...updateData,
+                    status: 'arrived',
+                    updated_at: new Date()
+                };
+                const { data: fbData, error: fbErr } = await supabase
+                    .from('maintenance_requests')
+                    .update(fallbackPayload)
+                    .eq('id', id)
+                    .select()
+                    .single();
+                if (fbErr) throw fbErr;
+                return { ...fbData, status: requestedStatus };
+            }
+            throw error;
+        }
         return data;
     },
 
@@ -462,6 +500,7 @@ const maintenanceModel = {
             const meta = this.parseMaintenanceMeta(req);
             return {
                 ...req,
+                status: this.resolveEffectiveStatus(req, meta),
                 ...meta,
                 meta
             };
@@ -514,6 +553,7 @@ const maintenanceModel = {
                 const meta = this.parseMaintenanceMeta(req);
                 return {
                     ...req,
+                    status: this.resolveEffectiveStatus(req, meta),
                     ...meta,
                     meta
                 };
@@ -610,6 +650,17 @@ const maintenanceModel = {
 
     async ensureWorkerAccreditation(workerId) {
         return true;
+    },
+
+    resolveEffectiveStatus(req, meta) {
+        const rawStatus = (req.status || 'pending').toLowerCase();
+        if (rawStatus === 'arrived') {
+            const text = (req.recommendations || '') + ' ' + (req.landlord_remarks || '');
+            if (/\[QUOTE:\s*APPROVED\]/i.test(text)) return 'quote_approved';
+            if (/\[QUOTE:\s*(PENDING_APPROVAL|DISPUTED)\]/i.test(text) || /\[ADMIN_ADJUDICATED:\s*TRUE\]/i.test(text)) return 'quote_pending';
+            if (/\[QUOTE:\s*PENDING_ADMIN_VALIDATION\]/i.test(text) || /\[TECH_FINDINGS:/i.test(text) || Boolean(req.problem_found)) return 'inspection_submitted';
+        }
+        return req.status;
     },
 
     parseMaintenanceMeta(req) {

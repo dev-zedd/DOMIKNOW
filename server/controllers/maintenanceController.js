@@ -1450,6 +1450,30 @@ const maintenanceController = {
     async adminGetWorkers(req, res) {
         try {
             const workers = await maintenanceModel.adminGetWorkers();
+            if (maintenanceComplianceService && typeof maintenanceComplianceService.checkEligibility === 'function') {
+                const enriched = await Promise.all(
+                    workers.map(async (w) => {
+                        try {
+                            const compliance = await maintenanceComplianceService.checkEligibility(w.id);
+                            return {
+                                ...w,
+                                is_eligible: compliance.eligible,
+                                eligibility_reasons: compliance.reasons || [],
+                                profile: compliance.profile || null,
+                                access: compliance.access || null,
+                                skills: compliance.skills || []
+                            };
+                        } catch (_) {
+                            return {
+                                ...w,
+                                is_eligible: false,
+                                eligibility_reasons: ['Unable to verify compliance status.']
+                            };
+                        }
+                    })
+                );
+                return responseHelper.success(res, 'Platform maintenance personnel retrieved successfully.', enriched);
+            }
             return responseHelper.success(res, 'Platform maintenance personnel retrieved successfully.', workers);
         } catch (error) {
             console.error('Admin get workers error:', error);

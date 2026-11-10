@@ -399,7 +399,7 @@ const maintenanceComplianceService = {
             assigned_maintenance_id: technicianId,
             status: 'assigned',
             landlord_remarks: instructions || null,
-            screening_status: 'verified'
+            screening_status: 'approved'
         });
 
         // 5. Create progress update log

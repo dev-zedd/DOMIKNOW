@@ -391,18 +391,20 @@ const maintenancePersonnelModel = {
 
         if (!skillsArray || skillsArray.length === 0) return [];
 
+        const allowedLevels = new Set(['basic', 'intermediate', 'advanced']);
         const rows = skillsArray.map(s => {
             if (typeof s === 'string') {
                 return {
                     user_id: userId,
                     skill_name: s.trim(),
-                    proficiency_level: 'proficient'
+                    proficiency_level: 'advanced'
                 };
             }
+            const rawLevel = (s.proficiency_level || '').toLowerCase();
             return {
                 user_id: userId,
                 skill_name: s.skill_name || s.name || '',
-                proficiency_level: s.proficiency_level || 'proficient'
+                proficiency_level: allowedLevels.has(rawLevel) ? rawLevel : 'advanced'
             };
         }).filter(r => r.skill_name);
 

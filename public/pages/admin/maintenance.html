@@ -500,8 +500,6 @@
             color: var(--color-text-primary, #0f172a);
             word-break: break-word;
         }
-            word-break: break-word;
-        }
         .admin-proof-gallery {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
@@ -984,10 +982,13 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="dispatchWorkerSelect" class="form-label">Assign Technician</label>
+                        <label for="dispatchWorkerSelect" class="form-label">Assign Certified Technician</label>
                         <select id="dispatchWorkerSelect" class="form-control" required>
-                            <option value="">Select technician...</option>
+                            <option value="">Select certified technician...</option>
                         </select>
+                        <small id="dispatchComplianceHint" style="display: block; margin-top: 0.35rem; font-size: 0.75rem; color: var(--color-text-secondary, #64748b);">
+                            Only compliance-verified and certified maintenance staff matching the issue category can be assigned.
+                        </small>
                     </div>
 
                     <div class="form-group">
@@ -1682,13 +1683,92 @@
             }
         }
 
-        function populateWorkerSelectOptions() {
+        const CATEGORY_SKILL_KEYWORDS = {
+            plumbing: ['plumb', 'pipe', 'drain', 'leak', 'faucet', 'toilet', 'sink', 'p-trap', 'water'],
+            electrical: ['electric', 'wiring', 'breaker', 'panel', 'voltage', 'outlet', 'lighting', 'power'],
+            aircon: ['aircon', 'hvac', 'refrigerat', 'cooling', 'compressor', 'fan'],
+            door: ['door', 'carpentry', 'lock', 'hinge', 'wood', 'knob', 'carpenter'],
+            roof: ['roof', 'gutter', 'flashing', 'waterproof', 'ceiling'],
+            internet: ['internet', 'network', 'cable', 'router', 'telecom', 'fiber', 'wifi'],
+            appliance: ['appliance', 'refrigerator', 'washing', 'stove', 'oven', 'microwave'],
+            others: ['general', 'handyman', 'maintenance', 'multi-skilled', 'all-around']
+        };
+
+        function isWorkerCategoryQualified(w, issueCategory) {
+            if (!issueCategory || issueCategory.toLowerCase().trim() === 'others') return true;
+            const cat = issueCategory.toLowerCase().trim();
+            const keywords = CATEGORY_SKILL_KEYWORDS[cat] || [cat];
+            const generalKeywords = ['general', 'handyman', 'multi-skilled', 'all-around', 'maintenance'];
+            const textSources = [
+                w.full_name || '',
+                w.profile?.department || '',
+                w.profile?.certifications || '',
+                ...(w.skills || []).map(s => s.skill_name || '')
+            ].join(' ').toLowerCase();
+            return keywords.some(k => textSources.includes(k)) || generalKeywords.some(g => textSources.includes(g));
+        }
+
+        function populateWorkerSelectOptions(issueCategory = null) {
             const selectEl = document.getElementById('dispatchWorkerSelect');
+            const hintEl = document.getElementById('dispatchComplianceHint');
+            const submitBtn = document.getElementById('btnConfirmDispatch');
             if (!selectEl) return;
-            selectEl.innerHTML = '<option value="">Select technician...</option>';
+
+            selectEl.innerHTML = '<option value="">Select certified technician...</option>';
+
+            const eligibleWorkers = [];
+            const blockedWorkers = [];
+
             allWorkers.forEach(w => {
-                selectEl.innerHTML += `<option value="${w.id}">${escapeHtml(w.full_name)} (${w.active_tasks || 0} active)</option>`;
+                const isCompliant = w.is_eligible === true;
+                const isCategoryMatch = isWorkerCategoryQualified(w, issueCategory);
+                if (isCompliant && isCategoryMatch) {
+                    eligibleWorkers.push(w);
+                } else {
+                    const reason = !isCompliant
+                        ? ((w.eligibility_reasons && w.eligibility_reasons[0]) || 'Uncertified / Compliance Pending')
+                        : `Not accredited for '${issueCategory}'`;
+                    blockedWorkers.push({ ...w, blockReason: reason });
+                }
             });
+
+            if (eligibleWorkers.length > 0) {
+                const eligibleGroup = document.createElement('optgroup');
+                eligibleGroup.label = 'Certified & Eligible Technicians';
+                eligibleWorkers.forEach(w => {
+                    const opt = document.createElement('option');
+                    opt.value = w.id;
+                    const dept = w.profile?.department ? ` • ${w.profile.department}` : '';
+                    opt.textContent = `✓ ${w.full_name}${dept} (${w.active_tasks || 0} active)`;
+                    eligibleGroup.appendChild(opt);
+                });
+                selectEl.appendChild(eligibleGroup);
+            }
+
+            if (blockedWorkers.length > 0) {
+                const blockedGroup = document.createElement('optgroup');
+                blockedGroup.label = 'Ineligible / Uncertified (Blocked from Assignment)';
+                blockedWorkers.forEach(w => {
+                    const opt = document.createElement('option');
+                    opt.value = w.id;
+                    opt.disabled = true;
+                    opt.textContent = `✕ ${w.full_name} — ${w.blockReason}`;
+                    blockedGroup.appendChild(opt);
+                });
+                selectEl.appendChild(blockedGroup);
+            }
+
+            if (hintEl) {
+                if (eligibleWorkers.length === 0) {
+                    hintEl.innerHTML = `<span style="color: var(--color-error-text, #dc2626); font-weight: 600;">No certified technicians are currently eligible${issueCategory ? ` for "${escapeHtml(issueCategory)}"` : ''}.</span> Complete staff verification in <a href="maintenance-screening.html" style="color: var(--color-link, #0355f3); text-decoration: underline;">Compliance &amp; Screening</a>.`;
+                } else {
+                    hintEl.innerHTML = `${eligibleWorkers.length} certified technician(s) ready for dispatch${blockedWorkers.length > 0 ? ` (${blockedWorkers.length} uncertified/ineligible blocked)` : ''}.`;
+                }
+            }
+
+            if (submitBtn) {
+                submitBtn.disabled = eligibleWorkers.length === 0;
+            }
         }
 
         function renderRequestsTable() {
@@ -1918,7 +1998,16 @@
                 return;
             }
 
-            tbody.innerHTML = allWorkers.map(w => `
+            tbody.innerHTML = allWorkers.map(w => {
+                const isCertified = w.is_eligible === true;
+                const reasonsTooltip = !isCertified && Array.isArray(w.eligibility_reasons) && w.eligibility_reasons.length > 0
+                    ? escapeHtml(w.eligibility_reasons.join(' • '))
+                    : 'All compliance and certification requirements verified';
+                const statusBadge = isCertified
+                    ? `<span class="badge badge-completed" title="${reasonsTooltip}">CERTIFIED</span>`
+                    : `<span class="badge badge-pending" title="${reasonsTooltip}">UNCERTIFIED</span>`;
+
+                return `
                 <tr>
                     <td style="text-align: left;">
                         <div style="font-weight: 700; color: var(--color-text-primary);">${escapeHtml(w.full_name)}</div>
@@ -1928,7 +2017,7 @@
                     <td style="text-align: left; color: var(--color-text-secondary);">${escapeHtml(w.contact_number || '—')}</td>
                     <td style="text-align: center;"><strong>${w.active_tasks || 0}</strong></td>
                     <td style="text-align: center;">${w.completed_tasks || 0}</td>
-                    <td style="text-align: center;"><span class="badge badge-active">${(w.status || 'active').toUpperCase()}</span></td>
+                    <td style="text-align: center;">${statusBadge}</td>
                     <td style="text-align: right;">
                         <button type="button" class="btn-table-sm" style="color:var(--color-error-text); border-color: rgba(239,68,68,0.3);" onclick="removeWorker('${w.id}', '${escapeHtml(w.full_name)}')" title="Remove Technician">
                             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
@@ -1936,7 +2025,8 @@
                         </button>
                     </td>
                 </tr>
-            `).join('');
+                `;
+            }).join('');
         }
 
         window.removeWorker = async function(id, name) {
@@ -1969,7 +2059,14 @@
             document.getElementById('dispatchRequestId').value = r.id;
             document.getElementById('dispatchIssueTitle').textContent = `${r.issue_title} (${r.issue_category})`;
             document.getElementById('dispatchPropertyLocation').textContent = `${r.properties?.property_name || 'Property'} • Unit ${r.unit_number || 'All'}`;
-            document.getElementById('dispatchWorkerSelect').value = r.assigned_maintenance_id || '';
+
+            populateWorkerSelectOptions(r.issue_category);
+
+            const selectEl = document.getElementById('dispatchWorkerSelect');
+            const assignedOpt = r.assigned_maintenance_id
+                ? selectEl.querySelector(`option[value="${r.assigned_maintenance_id}"]:not([disabled])`)
+                : null;
+            selectEl.value = assignedOpt ? r.assigned_maintenance_id : '';
 
             const today = new Date();
             today.setDate(today.getDate() + 2);
